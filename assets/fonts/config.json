@@ -1,0 +1,304 @@
+{
+  "name": "CustomIcons",
+  "css_prefix_text": "",
+  "css_use_suffix": false,
+  "hinting": true,
+  "units_per_em": 1000,
+  "ascent": 850,
+  "glyphs": [
+    {
+      "uid": "da6c4728f6175a4b99b122274b8f921c",
+      "css": "flow-split",
+      "code": 59392,
+      "src": "typicons"
+    },
+    {
+      "uid": "17ebadd1e3f274ff0205601eef7b9cc4",
+      "css": "help-circled",
+      "code": 59393,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "597ddffd7c1a9ce8c22f27eab6d113a2",
+      "css": "card_giftcard",
+      "code": 59394,
+      "src": "material"
+    },
+    {
+      "uid": "1a1a23f05ffed94d89014715be84238d",
+      "css": "hotel",
+      "code": 59395,
+      "src": "material"
+    },
+    {
+      "uid": "d96e4c793ea532c251c05daccc24c0ee",
+      "css": "landscape",
+      "code": 59396,
+      "src": "material"
+    },
+    {
+      "uid": "51ac007b26b87805b7c9caee069c069c",
+      "css": "local_atm",
+      "code": 59397,
+      "src": "material"
+    },
+    {
+      "uid": "498fb7be4dd0f37dde190eba35b0f12b",
+      "css": "music_note",
+      "code": 59398,
+      "src": "material"
+    },
+    {
+      "uid": "6a6bda472aad052563c8a1b1a4a01ef7",
+      "css": "record_voice_over",
+      "code": 59399,
+      "src": "material"
+    },
+    {
+      "uid": "5925dc2cd793a72e6bbe4313d6449f12",
+      "css": "weekend",
+      "code": 59400,
+      "src": "material"
+    },
+    {
+      "uid": "d73eceadda1f594cec0536087539afbf",
+      "css": "heart",
+      "code": 59401,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "7d1ca956f4181a023de4b9efbed92524",
+      "css": "chart-area",
+      "code": 61950,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "3d8cc269fdad8a4cda55a20542a84e5c",
+      "css": "credit-card",
+      "code": 59402,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "efb5a384af4a5450b7c9acff76a85b8b",
+      "css": "amazon",
+      "code": 62064,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "6cc7af3e5b55720bcb6ef68372ce24be",
+      "css": "facebook-official",
+      "code": 62000,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "50fbbd926b2a64fcaf384788056c0e43",
+      "css": "gwallet",
+      "code": 61934,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "58a16628dcbd6456c61218f3d27591be",
+      "css": "skype",
+      "code": 61822,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "727544621cb891115c99b4a4cfed01df",
+      "css": "steam-squared",
+      "code": 61879,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "fb4794d89b77ab712ad56c0dc4c76c6b",
+      "css": "spotify",
+      "code": 61884,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "dff942d95eb1b3f1be140e622d0a7c74",
+      "css": "soundcloud",
+      "code": 61886,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "47a1f80457068fbeab69fdb83d7d0817",
+      "css": "youtube-play",
+      "code": 61802,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "9698d35be5c118ec7521a98130fddc67",
+      "css": "cc-stripe",
+      "code": 61941,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "b83f99fd47bff831e25255c9bbbbabe7",
+      "css": "cc-paypal",
+      "code": 61940,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "4e7a8235533632f4df7ba7a2c68cd39d",
+      "css": "cc-amex",
+      "code": 61939,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "6413682e05e1c65d13cb76fbca6d67e1",
+      "css": "cc-discover",
+      "code": 61938,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "4b1bfce8593a2c1c7d60b9145ada2adf",
+      "css": "cc-mastercard",
+      "code": 61937,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "e3ed188ab8569b45cf41e74ce81aa86e",
+      "css": "cc-visa",
+      "code": 61936,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "90e0aff5c929e444038355746a952aaf",
+      "css": "shopping-basket",
+      "code": 62097,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "d531ea7e8c094b73df941ed0bac921f3",
+      "css": "shopping-bag",
+      "code": 62096,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "ac10a3a3077eab1b9d66509eb25fb9b4",
+      "css": "cloud-sun",
+      "code": 59403,
+      "src": "typicons"
+    },
+    {
+      "uid": "5840fe162df3bcc8e390c58ef4e2acf9",
+      "css": "sun-filled",
+      "code": 59404,
+      "src": "typicons"
+    },
+    {
+      "uid": "fhpup8jff2yw9kmuwavhyqxogczcbbhj",
+      "css": "dollar",
+      "code": 59405,
+      "src": "modernpics"
+    },
+    {
+      "uid": "053a1eaf96184e74876f45bd0f4970eb",
+      "css": "na",
+      "code": 59406,
+      "src": "meteocons"
+    },
+    {
+      "uid": "7f8b6c0519d85119a6f41fa3c5794806",
+      "css": "religious-christian",
+      "code": 59439,
+      "src": "maki"
+    },
+    {
+      "uid": "878dccd7b810bc231a132d86a3028afe",
+      "css": "tree-1",
+      "code": 59454,
+      "src": "maki"
+    },
+    {
+      "uid": "ee10c11395b5660a1e10a19cd66ea654",
+      "css": "pharmacy",
+      "code": 59433,
+      "src": "maki"
+    },
+    {
+      "uid": "f279f25007794fa6837ff78fe94b216e",
+      "css": "money",
+      "code": 61654,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "8573943a49ed6dd8f7819070445baa46",
+      "css": "photo",
+      "code": 59407,
+      "src": "linecons"
+    },
+    {
+      "uid": "b08f8c33777cd6b512d9576fc6e7f405",
+      "css": "food",
+      "code": 59408,
+      "src": "linecons"
+    },
+    {
+      "uid": "f8e8b267a9b949804f0c9dd7fed8e477",
+      "css": "diamond",
+      "code": 59409,
+      "src": "linecons"
+    },
+    {
+      "uid": "862d4faacb164c0412cb3249d43d5d39",
+      "css": "t-shirt",
+      "code": 59410,
+      "src": "linecons"
+    },
+    {
+      "uid": "5d27926667773d186de09fda4312af27",
+      "css": "shop",
+      "code": 59411,
+      "src": "linecons"
+    },
+    {
+      "uid": "baa375529925294ea0a2bc889c93ba2d",
+      "css": "picture",
+      "code": 59412,
+      "src": "websymbols"
+    },
+    {
+      "uid": "bb1090404a4d33340a9ad7302ef8b6e8",
+      "css": "archive",
+      "code": 59413,
+      "src": "websymbols"
+    },
+    {
+      "uid": "16e56dbb08279980854c7b06be485023",
+      "css": "drop",
+      "code": 59414,
+      "src": "linearicons"
+    },
+    {
+      "uid": "ce1a6833b6497ebef49deeea18fa5afc",
+      "css": "lighter",
+      "code": 59415,
+      "src": "linearicons"
+    },
+    {
+      "uid": "870637388a6b45eb9c51647cec2c5a00",
+      "css": "poop",
+      "code": 59416,
+      "src": "linearicons"
+    },
+    {
+      "uid": "68357988e7fc898214ebf1caac78149f",
+      "css": "picture-1",
+      "code": 59431,
+      "src": "linearicons"
+    },
+    {
+      "uid": "72b1078087c8ed5b474a046d46cab220",
+      "css": "book",
+      "code": 59432,
+      "src": "linearicons"
+    },
+    {
+      "uid": "aa0a9c12cbfa7c52d96dc92404f90eb8",
+      "css": "gift",
+      "code": 59460,
+      "src": "linearicons"
+    }
+  ]
+}
