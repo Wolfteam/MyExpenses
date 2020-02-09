@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/category_item.dart';
+import 'add_edit_category_page.dart';
 
 class CategoriesListPage extends StatelessWidget {
   final _incomes = <CategoryItem>[
@@ -42,10 +43,12 @@ class CategoriesListPage extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.red,
         child: Icon(Icons.add),
-        onPressed: () {},
+        onPressed: () {
+          var route =
+              MaterialPageRoute(builder: (ctx) => AddEditCategoryPage());
+          Navigator.push(context, route);
+        },
       ),
     );
   }
 }
-
-
