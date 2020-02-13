@@ -5,19 +5,13 @@ import 'package:my_expenses/common/utils/date_utils.dart';
 import '../../models/transactions_summary_per_day.dart';
 
 class HomeLast7DaysSummary extends StatelessWidget {
-  final data = [
-    TransactionsSummaryPerDay(DateTime.now().add(Duration(days: -7)), 50),
-    TransactionsSummaryPerDay(DateTime.now().add(Duration(days: -6)), 10),
-    TransactionsSummaryPerDay(DateTime.now().add(Duration(days: -5)), 20),
-    TransactionsSummaryPerDay(DateTime.now().add(Duration(days: -4)), 90),
-    TransactionsSummaryPerDay(DateTime.now().add(Duration(days: -3)), 70),
-    TransactionsSummaryPerDay(DateTime.now().add(Duration(days: -2)), 5),
-    TransactionsSummaryPerDay(DateTime.now().add(Duration(days: -1)), 0),
-  ];
+  final List<TransactionsSummaryPerDay> data;
+
+  const HomeLast7DaysSummary({this.data});
 
   List<charts.Series<TransactionsSummaryPerDay, String>> _createSampleData() {
     return [
-      new charts.Series<TransactionsSummaryPerDay, String>(
+      charts.Series<TransactionsSummaryPerDay, String>(
           id: 'HomeLast7DaysSummary',
           data: data,
           colorFn: (sale, __) => charts.ColorUtil.fromDartColor(sale.color),
@@ -42,7 +36,7 @@ class HomeLast7DaysSummary extends StatelessWidget {
           ),
         ),
         PopupMenuButton(
-          padding: EdgeInsets.all(0),
+          padding: const EdgeInsets.all(0),
           itemBuilder: (context) => <PopupMenuItem<String>>[
             CheckedPopupMenuItem(
               checked: true,
@@ -66,8 +60,8 @@ class HomeLast7DaysSummary extends StatelessWidget {
         _createSampleData(),
         animate: true,
         vertical: true,
-        barRendererDecorator: new charts.BarLabelDecorator<String>(),
-        domainAxis: new charts.OrdinalAxisSpec(
+        barRendererDecorator: charts.BarLabelDecorator<String>(),
+        domainAxis: charts.OrdinalAxisSpec(
           showAxisLine: false,
           renderSpec: charts.SmallTickRendererSpec(
               labelRotation: 45,
@@ -86,8 +80,8 @@ class HomeLast7DaysSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 3,
-      margin: EdgeInsets.all(10),
-      shape: RoundedRectangleBorder(
+      margin: const EdgeInsets.all(10),
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           // bottomLeft: Radius.circular(20),
           bottomRight: Radius.circular(60),
@@ -95,7 +89,7 @@ class HomeLast7DaysSummary extends StatelessWidget {
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.all(15),
+        padding: const EdgeInsets.all(15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.center,

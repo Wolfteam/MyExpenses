@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../widgets/transactions/home_transactions_summary_per_month.dart';
+import '../bloc/bloc.dart';
 import '../widgets/transactions/home_last_7_days_summary.dart';
+import '../widgets/transactions/home_transactions_summary_per_month.dart';
 import '../widgets/transactions/transactions_card_container.dart';
 
 class TransactionsPage extends StatefulWidget {
@@ -14,19 +16,6 @@ class _TransactionsPageState extends State<TransactionsPage>
     with SingleTickerProviderStateMixin {
   ScrollController _scrollController;
   AnimationController _hideFabAnimController;
-
-  void _onScroll() {
-    switch (_scrollController.position.userScrollDirection) {
-      case ScrollDirection.idle:
-        break;
-      case ScrollDirection.forward:
-        _hideFabAnimController.forward();
-        break;
-      case ScrollDirection.reverse:
-        _hideFabAnimController.reverse();
-        break;
-    }
-  }
 
   @override
   void initState() {
@@ -42,6 +31,14 @@ class _TransactionsPageState extends State<TransactionsPage>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final now = DateTime.now();
+    context.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: now));
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white54,
@@ -54,7 +51,7 @@ class _TransactionsPageState extends State<TransactionsPage>
             onPressed: () {
               _scrollController.animateTo(
                 0,
-                duration: Duration(milliseconds: 500),
+                duration: const Duration(milliseconds: 500),
                 curve: Curves.easeInOut,
               );
             },
@@ -65,29 +62,15 @@ class _TransactionsPageState extends State<TransactionsPage>
       body: SingleChildScrollView(
         controller: _scrollController,
         child: Padding(
-          padding: EdgeInsets.all(10),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              HomeTransactionSummaryPerMonth(),
-              HomeLast7DaysSummary(),
-              Padding(
-                padding: EdgeInsets.only(left: 28, top: 15),
-                child: Text(
-                  "Transactions",
-                  textAlign: TextAlign.start,
-                  style: Theme.of(context).textTheme.title,
-                ),
-              ),
-              ListView.builder(
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                scrollDirection: Axis.vertical,
-                itemCount: 10,
-                itemBuilder: (context, _) => TransactionsCardContainer(),
-              ),
-            ],
+          padding: const EdgeInsets.all(10),
+          child: BlocBuilder<TransactionsBloc, TransactionsState>(
+            builder: (ctx, state) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: _buildPage(state),
+              );
+            },
           ),
         ),
       ),
@@ -99,5 +82,62 @@ class _TransactionsPageState extends State<TransactionsPage>
     _scrollController.dispose();
     _hideFabAnimController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    switch (_scrollController.position.userScrollDirection) {
+      case ScrollDirection.idle:
+        break;
+      case ScrollDirection.forward:
+        _hideFabAnimController.forward();
+        break;
+      case ScrollDirection.reverse:
+        _hideFabAnimController.reverse();
+        break;
+    }
+  }
+
+  List<Widget> _buildPage(TransactionsState state) {
+    if (state is TransactionsInitialState) {
+      return [const CircularProgressIndicator()];
+    }
+
+    if (state is TransactionsLoadedState) {
+      return [
+        HomeTransactionSummaryPerMonth(
+          expenses: state.expenseAmount,
+          incomes: state.incomeAmount,
+          total: state.balanceAmount,
+          month: state.month,
+          data: state.monthBalance,
+        ),
+        HomeLast7DaysSummary(
+          data: state.expenseTransactionsPerWeek,
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 28, top: 15),
+          child: Text(
+            "Transactions",
+            textAlign: TextAlign.start,
+            style: Theme.of(context).textTheme.title,
+          ),
+        ),
+        _buildTransactionsCard(state),
+      ];
+    }
+
+    return [];
+  }
+
+  Widget _buildTransactionsCard(TransactionsLoadedState state) {
+    return ListView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      scrollDirection: Axis.vertical,
+      itemCount: state.transactionsPerMonth.length,
+      itemBuilder: (context, index) => TransactionsCardContainer(
+        model: state.transactionsPerMonth[index],
+      ),
+    );
   }
 }

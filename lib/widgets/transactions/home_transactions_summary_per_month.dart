@@ -4,14 +4,23 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import '../../models/transactions_summary_per_month.dart';
 
 class HomeTransactionSummaryPerMonth extends StatelessWidget {
-  final data = [
-    TransactionsSummaryPerMonth(0, 40),
-    TransactionsSummaryPerMonth(1, -60),
-  ];
+  final String month;
+  final double expenses;
+  final double incomes;
+  final double total;
+  final List<TransactionsSummaryPerMonth> data;
+
+  const HomeTransactionSummaryPerMonth({
+    @required this.month,
+    @required this.expenses,
+    @required this.incomes,
+    @required this.total,
+    @required this.data,
+  });
 
   List<charts.Series<TransactionsSummaryPerMonth, int>> _createSampleData() {
     return [
-      new charts.Series<TransactionsSummaryPerMonth, int>(
+      charts.Series<TransactionsSummaryPerMonth, int>(
         id: 'HomeTransactionsSummaryPerMonth',
         data: data,
         domainFn: (item, _) => item.order,
@@ -25,9 +34,9 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
 
   Widget _buildTitle(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(top: 10, bottom: 10, left: 10),
+      padding: const EdgeInsets.only(top: 10, bottom: 10, left: 10),
       child: Text(
-        "January",
+        month,
         style: Theme.of(context).textTheme.title,
       ),
     );
@@ -41,7 +50,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
       child: charts.PieChart(
         _createSampleData(),
         animate: true,
-        defaultRenderer: new charts.ArcRendererConfig(
+        defaultRenderer: charts.ArcRendererConfig(
           // arcWidth: 20,
           // minHoleWidthForCenterContent: 10,
           arcRatio: 1,
@@ -70,7 +79,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
           children: <Widget>[
             Expanded(
               child: Padding(
-                padding: EdgeInsets.only(left: 10),
+                padding: const EdgeInsets.only(left: 10),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -93,28 +102,28 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
             ),
             Expanded(
               child: Padding(
-                padding: EdgeInsets.only(right: 20),
+                padding: const EdgeInsets.only(right: 20),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
                     Text(
-                      "\$ 240000",
+                      "\$ $incomes",
                       textAlign: TextAlign.end,
                       maxLines: 1,
                       style: incomeTextStyle,
                     ),
                     Text(
-                      "\$ -800",
+                      "\$ $expenses",
                       textAlign: TextAlign.end,
                       maxLines: 1,
                       style: expenseTextStyle,
                     ),
                     Text(
-                      "\$ 1600",
+                      "\$ $total",
                       textAlign: TextAlign.end,
                       maxLines: 1,
-                      style: incomeTextStyle,
+                      style: total >= 0 ? incomeTextStyle : expenseTextStyle,
                     ),
                   ],
                 ),
@@ -128,8 +137,8 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 3,
-      margin: EdgeInsets.all(10),
-      shape: RoundedRectangleBorder(
+      margin: const EdgeInsets.all(10),
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           // bottomLeft: Radius.circular(20),
           bottomRight: Radius.circular(60),
@@ -137,7 +146,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.start,

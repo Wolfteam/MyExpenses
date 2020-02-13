@@ -1,6 +1,15 @@
 import 'package:flutter/material.dart';
 
+import '../../models/transaction_item.dart' as Item;
+
 class TransactionItem extends StatelessWidget {
+  final Item.TransactionItem item;
+
+  TransactionItem({
+    Key key,
+    @required this.item,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -10,16 +19,16 @@ class TransactionItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Icon(
-            Icons.attach_money,
-            color: Colors.red,
+            item.category.icon,
+            color: item.category.iconColor,
           ),
           SizedBox(width: 10),
-          Text("Transaction A"),
+          Text(item.description),
           Spacer(),
           Text(
-            "-150 \$",
+            "${item.amount} \$",
             style: TextStyle(
-              color: Colors.red,
+              color: item.category.isAnIncome ? Colors.green : Colors.red,
             ),
           ),
         ],

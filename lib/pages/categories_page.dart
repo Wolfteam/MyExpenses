@@ -25,6 +25,17 @@ class _CategoriesPageState extends State<CategoriesPage>
 
   TabController _tabController;
 
+  List<CategoriesListPage> _buildCategoriesListPages() {
+    var incomes = CategoriesListPage(
+      loadIncomes: true,
+    );
+    var expenses = CategoriesListPage(
+      loadIncomes: false,
+    );
+
+    return [incomes, expenses];
+  }
+
   @override
   void initState() {
     _tabController = TabController(
@@ -47,11 +58,7 @@ class _CategoriesPageState extends State<CategoriesPage>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: _tabs.map(
-          (Tab t) {
-            return CategoriesListPage();
-          },
-        ).toList(),
+        children: _buildCategoriesListPages(),
       ),
     );
   }
