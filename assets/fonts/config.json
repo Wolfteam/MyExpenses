@@ -299,6 +299,36 @@
       "css": "gift",
       "code": 59460,
       "src": "linearicons"
+    },
+    {
+      "uid": "c0a33f22eaeba6c843457bc23a7ab2a8",
+      "css": "internet-explorer",
+      "code": 62059,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "6a7b9d4863bb7e6c79e9457a72d689b6",
+      "css": "tools",
+      "code": 59417,
+      "src": "entypo"
+    },
+    {
+      "uid": "cf62866c0cfe3dd14455b381c724f8e1",
+      "css": "soccer-ball",
+      "code": 61923,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "24c187947d706d5cfa172df53eecec69",
+      "css": "healing",
+      "code": 59418,
+      "src": "material"
+    },
+    {
+      "uid": "a51290161c48d96d7f2e2151a4cbcde1",
+      "css": "battery",
+      "code": 59419,
+      "src": "entypo"
     }
   ]
 }

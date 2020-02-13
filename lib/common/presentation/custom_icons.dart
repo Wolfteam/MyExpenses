@@ -44,6 +44,10 @@
 ///         Author:    Perxis
 ///         License:   CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)
 ///         Homepage:  https://linearicons.com
+/// * Entypo, Copyright (C) 2012 by Daniel Bruce
+///         Author:    Daniel Bruce
+///         License:   SIL (http://scripts.sil.org/OFL)
+///         Homepage:  http://www.entypo.com
 /// * Maki, Copyright (C) Mapbox, LCC
 ///         Author:    Mapbox
 ///         License:   BSD (https://github.com/mapbox/maki/blob/gh-pages/LICENSE.txt)
@@ -81,6 +85,9 @@ class CustomIcons {
   static const IconData drop = const IconData(0xe816, fontFamily: _kFontFam);
   static const IconData lighter = const IconData(0xe817, fontFamily: _kFontFam);
   static const IconData poop = const IconData(0xe818, fontFamily: _kFontFam);
+  static const IconData tools = const IconData(0xe819, fontFamily: _kFontFam);
+  static const IconData healing = const IconData(0xe81a, fontFamily: _kFontFam);
+  static const IconData battery = const IconData(0xe81b, fontFamily: _kFontFam);
   static const IconData picture_1 = const IconData(0xe827, fontFamily: _kFontFam);
   static const IconData book = const IconData(0xe828, fontFamily: _kFontFam);
   static const IconData pharmacy = const IconData(0xe829, fontFamily: _kFontFam);
@@ -93,6 +100,7 @@ class CustomIcons {
   static const IconData steam_squared = const IconData(0xf1b7, fontFamily: _kFontFam);
   static const IconData spotify = const IconData(0xf1bc, fontFamily: _kFontFam);
   static const IconData soundcloud = const IconData(0xf1be, fontFamily: _kFontFam);
+  static const IconData soccer_ball = const IconData(0xf1e3, fontFamily: _kFontFam);
   static const IconData gwallet = const IconData(0xf1ee, fontFamily: _kFontFam);
   static const IconData cc_visa = const IconData(0xf1f0, fontFamily: _kFontFam);
   static const IconData cc_mastercard = const IconData(0xf1f1, fontFamily: _kFontFam);
@@ -102,6 +110,7 @@ class CustomIcons {
   static const IconData cc_stripe = const IconData(0xf1f5, fontFamily: _kFontFam);
   static const IconData chart_area = const IconData(0xf1fe, fontFamily: _kFontFam);
   static const IconData facebook_official = const IconData(0xf230, fontFamily: _kFontFam);
+  static const IconData internet_explorer = const IconData(0xf26b, fontFamily: _kFontFam);
   static const IconData amazon = const IconData(0xf270, fontFamily: _kFontFam);
   static const IconData shopping_bag = const IconData(0xf290, fontFamily: _kFontFam);
   static const IconData shopping_basket = const IconData(0xf291, fontFamily: _kFontFam);
