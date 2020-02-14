@@ -138,12 +138,12 @@ class CategoryUtils {
     CategoryIcon(
       icon: Icon(Icons.school),
       name: school,
-      type: CategoryIconType.Education,
+      type: CategoryIconType.education,
     ),
     CategoryIcon(
       icon: Icon(Icons.palette),
       name: pallete,
-      type: CategoryIconType.Education,
+      type: CategoryIconType.education,
     ),
   ];
 
@@ -151,57 +151,57 @@ class CategoryUtils {
     CategoryIcon(
       icon: Icon(Icons.headset),
       name: headset,
-      type: CategoryIconType.Electronics,
+      type: CategoryIconType.electronics,
     ),
     CategoryIcon(
       icon: Icon(Icons.radio),
       name: radio,
-      type: CategoryIconType.Electronics,
+      type: CategoryIconType.electronics,
     ),
     CategoryIcon(
       icon: Icon(Icons.computer),
       name: laptop,
-      type: CategoryIconType.Electronics,
+      type: CategoryIconType.electronics,
     ),
     CategoryIcon(
       icon: Icon(Icons.desktop_windows),
       name: pc,
-      type: CategoryIconType.Electronics,
+      type: CategoryIconType.electronics,
     ),
     CategoryIcon(
       icon: Icon(Icons.gamepad),
       name: gamepad,
-      type: CategoryIconType.Electronics,
+      type: CategoryIconType.electronics,
     ),
     CategoryIcon(
       icon: Icon(Icons.phone),
       name: phone,
-      type: CategoryIconType.Electronics,
+      type: CategoryIconType.electronics,
     ),
     CategoryIcon(
       icon: Icon(Icons.phone_android),
       name: smartphone,
-      type: CategoryIconType.Electronics,
+      type: CategoryIconType.electronics,
     ),
     CategoryIcon(
       icon: Icon(Icons.watch),
       name: watch,
-      type: CategoryIconType.Electronics,
+      type: CategoryIconType.electronics,
     ),
     CategoryIcon(
       icon: Icon(Icons.live_tv),
       name: tv,
-      type: CategoryIconType.Electronics,
+      type: CategoryIconType.electronics,
     ),
     CategoryIcon(
       icon: Icon(Icons.print),
       name: printer,
-      type: CategoryIconType.Electronics,
+      type: CategoryIconType.electronics,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.battery),
       name: battery,
-      type: CategoryIconType.Electronics,
+      type: CategoryIconType.electronics,
     ),
   ];
 
@@ -209,32 +209,32 @@ class CategoryUtils {
     CategoryIcon(
       icon: Icon(Icons.people),
       name: people,
-      type: CategoryIconType.Family,
+      type: CategoryIconType.family,
     ),
     CategoryIcon(
       icon: Icon(Icons.child_care),
       name: child,
-      type: CategoryIconType.Family,
+      type: CategoryIconType.family,
     ),
     CategoryIcon(
       icon: Icon(Icons.child_friendly),
       name: childFriendly,
-      type: CategoryIconType.Family,
+      type: CategoryIconType.family,
     ),
     CategoryIcon(
       icon: Icon(Icons.local_hospital),
       name: hospital,
-      type: CategoryIconType.Family,
+      type: CategoryIconType.family,
     ),
     CategoryIcon(
       icon: Icon(Icons.local_pharmacy),
       name: pharmacy,
-      type: CategoryIconType.Family,
+      type: CategoryIconType.family,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.gift),
       name: gift,
-      type: CategoryIconType.Family,
+      type: CategoryIconType.family,
     ),
   ];
 
@@ -242,37 +242,37 @@ class CategoryUtils {
     CategoryIcon(
       icon: Icon(Icons.fastfood),
       name: fastFood,
-      type: CategoryIconType.Food,
+      type: CategoryIconType.food,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.food),
       name: food,
-      type: CategoryIconType.Food,
+      type: CategoryIconType.food,
     ),
     CategoryIcon(
       icon: Icon(Icons.local_dining),
       name: dinning,
-      type: CategoryIconType.Food,
+      type: CategoryIconType.food,
     ),
     CategoryIcon(
       icon: Icon(Icons.local_bar),
       name: bar,
-      type: CategoryIconType.Food,
+      type: CategoryIconType.food,
     ),
     CategoryIcon(
       icon: Icon(Icons.local_cafe),
       name: cafe,
-      type: CategoryIconType.Food,
+      type: CategoryIconType.food,
     ),
     CategoryIcon(
       icon: Icon(Icons.local_pizza),
       name: pizza,
-      type: CategoryIconType.Food,
+      type: CategoryIconType.food,
     ),
     CategoryIcon(
       icon: Icon(Icons.restaurant),
       name: restaurant,
-      type: CategoryIconType.Food,
+      type: CategoryIconType.food,
     ),
   ];
 
@@ -280,22 +280,22 @@ class CategoryUtils {
     CategoryIcon(
       icon: Icon(Icons.event_seat),
       name: seat,
-      type: CategoryIconType.Furniture,
+      type: CategoryIconType.furniture,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.weekend),
       name: weekend,
-      type: CategoryIconType.Furniture,
+      type: CategoryIconType.furniture,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.archive),
       name: archive,
-      type: CategoryIconType.Furniture,
+      type: CategoryIconType.furniture,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.hotel),
       name: bed,
-      type: CategoryIconType.Furniture,
+      type: CategoryIconType.furniture,
     ),
   ];
 
@@ -303,72 +303,72 @@ class CategoryUtils {
     CategoryIcon(
       icon: Icon(CustomIcons.money),
       name: money2,
-      type: CategoryIconType.Income,
+      type: CategoryIconType.income,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.dollar),
       name: dollar,
-      type: CategoryIconType.Income,
+      type: CategoryIconType.income,
     ),
     CategoryIcon(
       icon: Icon(Icons.attach_money),
       name: money,
-      type: CategoryIconType.Income,
+      type: CategoryIconType.income,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.gwallet),
       name: gWallet,
-      type: CategoryIconType.Income,
+      type: CategoryIconType.income,
     ),
     CategoryIcon(
       icon: Icon(Icons.account_balance),
       name: bank,
-      type: CategoryIconType.Income,
+      type: CategoryIconType.income,
     ),
     CategoryIcon(
       icon: Icon(Icons.account_balance_wallet),
       name: wallet,
-      type: CategoryIconType.Income,
+      type: CategoryIconType.income,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.local_atm),
       name: atm,
-      type: CategoryIconType.Income,
+      type: CategoryIconType.income,
     ),
     CategoryIcon(
       icon: Icon(Icons.card_giftcard),
       name: giftcard,
-      type: CategoryIconType.Income,
+      type: CategoryIconType.income,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.credit_card),
       name: creditcard,
-      type: CategoryIconType.Income,
+      type: CategoryIconType.income,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.cc_mastercard),
       name: mastercard,
-      type: CategoryIconType.Income,
+      type: CategoryIconType.income,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.cc_stripe),
       name: stipe,
-      type: CategoryIconType.Income,
+      type: CategoryIconType.income,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.cc_discover),
       name: discover,
-      type: CategoryIconType.Income,
+      type: CategoryIconType.income,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.cc_amex),
       name: amex,
-      type: CategoryIconType.Income,
+      type: CategoryIconType.income,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.cc_paypal),
       name: paypal,
-      type: CategoryIconType.Income,
+      type: CategoryIconType.income,
     ),
   ];
 
@@ -376,162 +376,162 @@ class CategoryUtils {
     CategoryIcon(
       icon: Icon(Icons.movie),
       name: movie,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(Icons.camera_enhance),
       name: camera,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(Icons.flight_takeoff),
       name: flight,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(Icons.web),
       name: web,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(Icons.email),
       name: email,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(Icons.forum),
       name: forum,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(Icons.textsms),
       name: sms,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(Icons.videogame_asset),
       name: games,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(Icons.directions_bike),
       name: bike,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(Icons.directions_run),
       name: run,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(Icons.local_movies),
       name: movies,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(Icons.local_hotel),
       name: hotel,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(Icons.map),
       name: map,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(Icons.book),
       name: book,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(Icons.pool),
       name: pool,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(Icons.beach_access),
       name: beach,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.music_note),
       name: music,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(Icons.fitness_center),
       name: fitness,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.cloud_sun),
       name: cloudsun,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.sun_filled),
       name: sun,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(Icons.landscape),
       name: landscape,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.picture),
       name: picture,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.picture_1),
       name: picture1,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.amazon),
       name: amazon,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.facebook_official),
       name: facebook,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.spotify),
       name: spotify,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.steam_squared),
       name: steam,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.soundcloud),
       name: soundcloud,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.skype),
       name: skype,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.youtube_play),
       name: youtube,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.soccer_ball),
       name: soccerBall,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.internet_explorer),
       name: internet,
-      type: CategoryIconType.Life,
+      type: CategoryIconType.life,
     ),
   ];
 
@@ -539,67 +539,67 @@ class CategoryUtils {
     CategoryIcon(
       icon: Icon(Icons.home),
       name: home,
-      type: CategoryIconType.Personal,
+      type: CategoryIconType.personal,
     ),
     CategoryIcon(
       icon: Icon(Icons.work),
       name: work,
-      type: CategoryIconType.Personal,
+      type: CategoryIconType.personal,
     ),
     CategoryIcon(
       icon: Icon(Icons.pets),
       name: pets,
-      type: CategoryIconType.Personal,
+      type: CategoryIconType.personal,
     ),
     CategoryIcon(
       icon: Icon(Icons.language),
       name: language,
-      type: CategoryIconType.Personal,
+      type: CategoryIconType.personal,
     ),
     CategoryIcon(
       icon: Icon(Icons.build),
       name: build,
-      type: CategoryIconType.Personal,
+      type: CategoryIconType.personal,
     ),
     CategoryIcon(
       icon: Icon(Icons.local_gas_station),
       name: gas,
-      type: CategoryIconType.Personal,
+      type: CategoryIconType.personal,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.t_shirt),
       name: tshirt,
-      type: CategoryIconType.Personal,
+      type: CategoryIconType.personal,
     ),
     CategoryIcon(
       icon: Icon(Icons.local_laundry_service),
       name: laundry,
-      type: CategoryIconType.Personal,
+      type: CategoryIconType.personal,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.religious_christian),
       name: religious,
-      type: CategoryIconType.Personal,
+      type: CategoryIconType.personal,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.lighter),
       name: lgihter,
-      type: CategoryIconType.Personal,
+      type: CategoryIconType.personal,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.chart_area),
       name: chartArea,
-      type: CategoryIconType.Personal,
+      type: CategoryIconType.personal,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.tools),
       name: tools,
-      type: CategoryIconType.Personal,
+      type: CategoryIconType.personal,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.healing),
       name: healing,
-      type: CategoryIconType.Personal,
+      type: CategoryIconType.personal,
     ),
   ];
 
@@ -607,37 +607,37 @@ class CategoryUtils {
     CategoryIcon(
       icon: Icon(Icons.add_shopping_cart),
       name: shoppingCart,
-      type: CategoryIconType.Shopping,
+      type: CategoryIconType.shopping,
     ),
     CategoryIcon(
       icon: Icon(Icons.local_offer),
       name: offer,
-      type: CategoryIconType.Shopping,
+      type: CategoryIconType.shopping,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.diamond),
       name: diamond,
-      type: CategoryIconType.Shopping,
+      type: CategoryIconType.shopping,
     ),
     CategoryIcon(
       icon: Icon(Icons.local_mall),
       name: mall,
-      type: CategoryIconType.Shopping,
+      type: CategoryIconType.shopping,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.shop),
       name: shop,
-      type: CategoryIconType.Shopping,
+      type: CategoryIconType.shopping,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.shopping_bag),
       name: shoppingBag,
-      type: CategoryIconType.Shopping,
+      type: CategoryIconType.shopping,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.shopping_basket),
       name: shoopingBasket,
-      type: CategoryIconType.Shopping,
+      type: CategoryIconType.shopping,
     ),
   ];
 
@@ -645,32 +645,32 @@ class CategoryUtils {
     CategoryIcon(
       icon: Icon(Icons.directions_boat),
       name: boat,
-      type: CategoryIconType.Transportation,
+      type: CategoryIconType.transportation,
     ),
     CategoryIcon(
       icon: Icon(Icons.directions_bus),
       name: bus,
-      type: CategoryIconType.Transportation,
+      type: CategoryIconType.transportation,
     ),
     CategoryIcon(
       icon: Icon(Icons.directions_car),
       name: car,
-      type: CategoryIconType.Transportation,
+      type: CategoryIconType.transportation,
     ),
     CategoryIcon(
       icon: Icon(Icons.directions_subway),
       name: subway,
-      type: CategoryIconType.Transportation,
+      type: CategoryIconType.transportation,
     ),
     CategoryIcon(
       icon: Icon(Icons.airplanemode_active),
       name: airplane,
-      type: CategoryIconType.Transportation,
+      type: CategoryIconType.transportation,
     ),
     CategoryIcon(
       icon: Icon(Icons.local_taxi),
       name: taxi,
-      type: CategoryIconType.Transportation,
+      type: CategoryIconType.transportation,
     ),
   ];
 
@@ -678,22 +678,22 @@ class CategoryUtils {
     CategoryIcon(
       icon: Icon(CustomIcons.na),
       name: na,
-      type: CategoryIconType.Others,
+      type: CategoryIconType.others,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.tree_1),
       name: tree,
-      type: CategoryIconType.Others,
+      type: CategoryIconType.others,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.drop),
       name: waterDrop,
-      type: CategoryIconType.Others,
+      type: CategoryIconType.others,
     ),
     CategoryIcon(
       icon: Icon(CustomIcons.help_circled),
       name: question,
-      type: CategoryIconType.Others,
+      type: CategoryIconType.others,
       isSelected: true,
     ),
   ];
@@ -725,27 +725,27 @@ class CategoryUtils {
 
   static String getCategoryIconTypeName(CategoryIconType type) {
     switch (type) {
-      case CategoryIconType.Education:
+      case CategoryIconType.education:
         return "Education";
-      case CategoryIconType.Electronics:
+      case CategoryIconType.electronics:
         return "Electronics";
-      case CategoryIconType.Family:
+      case CategoryIconType.family:
         return "Family";
-      case CategoryIconType.Food:
+      case CategoryIconType.food:
         return "Food";
-      case CategoryIconType.Furniture:
+      case CategoryIconType.furniture:
         return "Furniture";
-      case CategoryIconType.Income:
+      case CategoryIconType.income:
         return "Income";
-      case CategoryIconType.Life:
+      case CategoryIconType.life:
         return "Life";
-      case CategoryIconType.Personal:
+      case CategoryIconType.personal:
         return "Personal";
-      case CategoryIconType.Shopping:
+      case CategoryIconType.shopping:
         return "Shopping";
-      case CategoryIconType.Transportation:
+      case CategoryIconType.transportation:
         return "Transportation";
-      case CategoryIconType.Others:
+      case CategoryIconType.others:
         return "Others";
       default:
         return "N/A";

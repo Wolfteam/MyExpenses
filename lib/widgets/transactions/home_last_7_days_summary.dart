@@ -1,80 +1,20 @@
-import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
-import 'package:my_expenses/common/utils/date_utils.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../bloc/bloc.dart';
+import '../../common/enums/transaction_type.dart';
+import '../../common/utils/date_utils.dart';
 import '../../models/transactions_summary_per_day.dart';
 
 class HomeLast7DaysSummary extends StatelessWidget {
-  final List<TransactionsSummaryPerDay> data;
+  final List<TransactionsSummaryPerDay> incomes;
+  final List<TransactionsSummaryPerDay> expenses;
 
-  const HomeLast7DaysSummary({this.data});
-
-  List<charts.Series<TransactionsSummaryPerDay, String>> _createSampleData() {
-    return [
-      charts.Series<TransactionsSummaryPerDay, String>(
-          id: 'HomeLast7DaysSummary',
-          data: data,
-          colorFn: (sale, __) => charts.ColorUtil.fromDartColor(sale.color),
-          domainFn: (TransactionsSummaryPerDay sales, _) =>
-              DateUtils.formatDate(sales.createdAt),
-          measureFn: (TransactionsSummaryPerDay sales, _) => sales.amount,
-          labelAccessorFn: (TransactionsSummaryPerDay sales, _) =>
-              '${sales.amount}\$'),
-    ];
-  }
-
-  Widget _buildTitle(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(left: 5),
-          child: Text(
-            "Last 7 days",
-            style: Theme.of(context).textTheme.title,
-          ),
-        ),
-        PopupMenuButton(
-          padding: const EdgeInsets.all(0),
-          itemBuilder: (context) => <PopupMenuItem<String>>[
-            CheckedPopupMenuItem(
-              checked: true,
-              value: "Incomes",
-              child: Text("Incomes"),
-            ),
-            CheckedPopupMenuItem(
-              value: "Expenses",
-              child: Text("Expenses"),
-            )
-          ],
-        )
-      ],
-    );
-  }
-
-  Widget _buildBarChart() {
-    return Container(
-      height: 180,
-      child: charts.BarChart(
-        _createSampleData(),
-        animate: true,
-        vertical: true,
-        barRendererDecorator: charts.BarLabelDecorator<String>(),
-        domainAxis: charts.OrdinalAxisSpec(
-          showAxisLine: false,
-          renderSpec: charts.SmallTickRendererSpec(
-              labelRotation: 45,
-              axisLineStyle: charts.LineStyleSpec(
-                  color: charts.ColorUtil.fromDartColor(Colors.brown),
-                  thickness: 5),
-              labelStyle: charts.TextStyleSpec(
-                color: charts.ColorUtil.fromDartColor(Colors.red),
-              )),
-        ),
-      ),
-    );
-  }
+  const HomeLast7DaysSummary({
+    @required this.incomes,
+    @required this.expenses,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -90,13 +30,113 @@ class HomeLast7DaysSummary extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            _buildTitle(context),
-            _buildBarChart(),
+        child:
+            BlocBuilder<TransactionsLast7DaysBloc, TransactionsLast7DaysState>(
+          builder: (ctx, state) => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: _buildPage(state, ctx),
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildPage(
+    TransactionsLast7DaysState state,
+    BuildContext context,
+  ) {
+    bool incomesIsChecked;
+    if (state is TransactionsLast7DaysInitialState) {
+      incomesIsChecked = true;
+    }
+
+    if (state is Last7DaysTransactionTypeChangedState) {
+      incomesIsChecked = state.selectedType == TransactionType.incomes;
+    }
+
+    return [
+      _buildTitle(incomesIsChecked, context),
+      _buildBarChart(incomesIsChecked),
+    ];
+  }
+
+  List<charts.Series<TransactionsSummaryPerDay, String>> _createSampleData(
+    List<TransactionsSummaryPerDay> data,
+  ) {
+    return [
+      charts.Series<TransactionsSummaryPerDay, String>(
+          id: 'HomeLast7DaysSummary',
+          data: data,
+          colorFn: (sale, __) => charts.ColorUtil.fromDartColor(sale.color),
+          domainFn: (sales, _) => DateUtils.formatDate(sales.createdAt),
+          measureFn: (sales, _) => sales.amount,
+          labelAccessorFn: (sales, _) => '${sales.amount}\$'),
+    ];
+  }
+
+  Widget _buildTitle(bool incomesIsChecked, BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(left: 5),
+          child: Text(
+            "Last 7 days",
+            style: Theme.of(context).textTheme.title,
+          ),
+        ),
+        PopupMenuButton(
+          padding: const EdgeInsets.all(0),
+          initialValue: incomesIsChecked
+              ? TransactionType.incomes
+              : TransactionType.expenses,
+          onSelected: (TransactionType newValue) {
+            context
+                .bloc<TransactionsLast7DaysBloc>()
+                .add(Last7DaysTransactionTypeChanged(selectedType: newValue));
+          },
+          itemBuilder: (context) => <PopupMenuItem<TransactionType>>[
+            CheckedPopupMenuItem<TransactionType>(
+              checked: incomesIsChecked,
+              value: TransactionType.incomes,
+              child: Text("Incomes"),
+            ),
+            CheckedPopupMenuItem<TransactionType>(
+              checked: !incomesIsChecked,
+              value: TransactionType.expenses,
+              child: Text("Expenses"),
+            )
           ],
+        )
+      ],
+    );
+  }
+
+  Widget _buildBarChart(bool incomesIsChecked) {
+    return Container(
+      height: 180,
+      child: charts.BarChart(
+        _createSampleData(incomesIsChecked ? incomes : expenses),
+        animate: true,
+        vertical: true,
+        barRendererDecorator: charts.BarLabelDecorator<String>(),
+        domainAxis: charts.OrdinalAxisSpec(
+          showAxisLine: false,
+          renderSpec: charts.SmallTickRendererSpec(
+            labelRotation: 45,
+            axisLineStyle: charts.LineStyleSpec(
+                color: charts.ColorUtil.fromDartColor(
+                  Colors.brown,
+                ),
+                thickness: 5),
+            labelStyle: charts.TextStyleSpec(
+              color: charts.ColorUtil.fromDartColor(
+                incomesIsChecked ? Colors.green : Colors.red,
+              ),
+            ),
+          ),
         ),
       ),
     );

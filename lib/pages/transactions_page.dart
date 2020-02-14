@@ -36,6 +36,9 @@ class _TransactionsPageState extends State<TransactionsPage>
 
     final now = DateTime.now();
     context.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: now));
+    context
+        .bloc<TransactionsLast7DaysBloc>()
+        .add(LoadLast7DaysTransactions());
   }
 
   @override
@@ -112,7 +115,8 @@ class _TransactionsPageState extends State<TransactionsPage>
           data: state.monthBalance,
         ),
         HomeLast7DaysSummary(
-          data: state.expenseTransactionsPerWeek,
+          incomes: state.incomeTransactionsPerWeek,
+          expenses: state.expenseTransactionsPerWeek,
         ),
         Padding(
           padding: const EdgeInsets.only(left: 28, top: 15),

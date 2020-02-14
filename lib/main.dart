@@ -23,17 +23,18 @@ class MyApp extends StatelessWidget {
         providers: [
           BlocProvider(
             create: (ctx) {
-              var db = Provider.of<AppDatabase>(ctx, listen: false);
+              final db = Provider.of<AppDatabase>(ctx, listen: false);
               return CategoriesListBloc(db);
             },
           ),
           BlocProvider(
             create: (ctx) {
-              var db = Provider.of<AppDatabase>(ctx, listen: false);
+              final db = Provider.of<AppDatabase>(ctx, listen: false);
               return TransactionsBloc(db: db);
             },
           ),
           BlocProvider(create: (ctx) => TransactionFormBloc()),
+          BlocProvider(create: (ctx) => TransactionsLast7DaysBloc()),
         ],
         child: MaterialApp(
           title: 'My Expenses',
