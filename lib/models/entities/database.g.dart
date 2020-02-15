@@ -504,6 +504,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   final String description;
   final DateTime transactionDate;
   final int repetitions;
+  final RepetitionCycleType repetitionCycle;
   final int categoryId;
   Transaction(
       {@required this.id,
@@ -515,6 +516,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       @required this.description,
       @required this.transactionDate,
       @required this.repetitions,
+      @required this.repetitionCycle,
       @required this.categoryId});
   factory Transaction.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
@@ -541,6 +543,8 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           .mapFromDatabaseResponse(data['${effectivePrefix}transaction_date']),
       repetitions: intType
           .mapFromDatabaseResponse(data['${effectivePrefix}repetitions']),
+      repetitionCycle: $TransactionsTable.$converter0.mapToDart(intType
+          .mapFromDatabaseResponse(data['${effectivePrefix}repetition_cycle'])),
       categoryId: intType
           .mapFromDatabaseResponse(data['${effectivePrefix}category_id']),
     );
@@ -558,6 +562,8 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       description: serializer.fromJson<String>(json['description']),
       transactionDate: serializer.fromJson<DateTime>(json['transactionDate']),
       repetitions: serializer.fromJson<int>(json['repetitions']),
+      repetitionCycle:
+          serializer.fromJson<RepetitionCycleType>(json['repetitionCycle']),
       categoryId: serializer.fromJson<int>(json['categoryId']),
     );
   }
@@ -574,6 +580,8 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       'description': serializer.toJson<String>(description),
       'transactionDate': serializer.toJson<DateTime>(transactionDate),
       'repetitions': serializer.toJson<int>(repetitions),
+      'repetitionCycle':
+          serializer.toJson<RepetitionCycleType>(repetitionCycle),
       'categoryId': serializer.toJson<int>(categoryId),
     };
   }
@@ -605,6 +613,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       repetitions: repetitions == null && nullToAbsent
           ? const Value.absent()
           : Value(repetitions),
+      repetitionCycle: repetitionCycle == null && nullToAbsent
+          ? const Value.absent()
+          : Value(repetitionCycle),
       categoryId: categoryId == null && nullToAbsent
           ? const Value.absent()
           : Value(categoryId),
@@ -621,6 +632,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           String description,
           DateTime transactionDate,
           int repetitions,
+          RepetitionCycleType repetitionCycle,
           int categoryId}) =>
       Transaction(
         id: id ?? this.id,
@@ -632,6 +644,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
         description: description ?? this.description,
         transactionDate: transactionDate ?? this.transactionDate,
         repetitions: repetitions ?? this.repetitions,
+        repetitionCycle: repetitionCycle ?? this.repetitionCycle,
         categoryId: categoryId ?? this.categoryId,
       );
   @override
@@ -646,6 +659,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           ..write('description: $description, ')
           ..write('transactionDate: $transactionDate, ')
           ..write('repetitions: $repetitions, ')
+          ..write('repetitionCycle: $repetitionCycle, ')
           ..write('categoryId: $categoryId')
           ..write(')'))
         .toString();
@@ -668,8 +682,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
                               description.hashCode,
                               $mrjc(
                                   transactionDate.hashCode,
-                                  $mrjc(repetitions.hashCode,
-                                      categoryId.hashCode))))))))));
+                                  $mrjc(
+                                      repetitions.hashCode,
+                                      $mrjc(repetitionCycle.hashCode,
+                                          categoryId.hashCode)))))))))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
@@ -683,6 +699,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           other.description == this.description &&
           other.transactionDate == this.transactionDate &&
           other.repetitions == this.repetitions &&
+          other.repetitionCycle == this.repetitionCycle &&
           other.categoryId == this.categoryId);
 }
 
@@ -696,6 +713,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   final Value<String> description;
   final Value<DateTime> transactionDate;
   final Value<int> repetitions;
+  final Value<RepetitionCycleType> repetitionCycle;
   final Value<int> categoryId;
   const TransactionsCompanion({
     this.id = const Value.absent(),
@@ -707,6 +725,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.description = const Value.absent(),
     this.transactionDate = const Value.absent(),
     this.repetitions = const Value.absent(),
+    this.repetitionCycle = const Value.absent(),
     this.categoryId = const Value.absent(),
   });
   TransactionsCompanion.insert({
@@ -719,12 +738,14 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     @required String description,
     @required DateTime transactionDate,
     @required int repetitions,
+    @required RepetitionCycleType repetitionCycle,
     @required int categoryId,
   })  : createdBy = Value(createdBy),
         amount = Value(amount),
         description = Value(description),
         transactionDate = Value(transactionDate),
         repetitions = Value(repetitions),
+        repetitionCycle = Value(repetitionCycle),
         categoryId = Value(categoryId);
   TransactionsCompanion copyWith(
       {Value<int> id,
@@ -736,6 +757,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       Value<String> description,
       Value<DateTime> transactionDate,
       Value<int> repetitions,
+      Value<RepetitionCycleType> repetitionCycle,
       Value<int> categoryId}) {
     return TransactionsCompanion(
       id: id ?? this.id,
@@ -747,6 +769,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       description: description ?? this.description,
       transactionDate: transactionDate ?? this.transactionDate,
       repetitions: repetitions ?? this.repetitions,
+      repetitionCycle: repetitionCycle ?? this.repetitionCycle,
       categoryId: categoryId ?? this.categoryId,
     );
   }
@@ -859,6 +882,20 @@ class $TransactionsTable extends Transactions
     );
   }
 
+  final VerificationMeta _repetitionCycleMeta =
+      const VerificationMeta('repetitionCycle');
+  GeneratedIntColumn _repetitionCycle;
+  @override
+  GeneratedIntColumn get repetitionCycle =>
+      _repetitionCycle ??= _constructRepetitionCycle();
+  GeneratedIntColumn _constructRepetitionCycle() {
+    return GeneratedIntColumn(
+      'repetition_cycle',
+      $tableName,
+      false,
+    );
+  }
+
   final VerificationMeta _categoryIdMeta = const VerificationMeta('categoryId');
   GeneratedIntColumn _categoryId;
   @override
@@ -879,6 +916,7 @@ class $TransactionsTable extends Transactions
         description,
         transactionDate,
         repetitions,
+        repetitionCycle,
         categoryId
       ];
   @override
@@ -938,6 +976,7 @@ class $TransactionsTable extends Transactions
     } else if (isInserting) {
       context.missing(_repetitionsMeta);
     }
+    context.handle(_repetitionCycleMeta, const VerificationResult.success());
     if (d.categoryId.present) {
       context.handle(_categoryIdMeta,
           categoryId.isAcceptableValue(d.categoryId.value, _categoryIdMeta));
@@ -986,6 +1025,11 @@ class $TransactionsTable extends Transactions
     if (d.repetitions.present) {
       map['repetitions'] = Variable<int, IntType>(d.repetitions.value);
     }
+    if (d.repetitionCycle.present) {
+      final converter = $TransactionsTable.$converter0;
+      map['repetition_cycle'] =
+          Variable<int, IntType>(converter.mapToSql(d.repetitionCycle.value));
+    }
     if (d.categoryId.present) {
       map['category_id'] = Variable<int, IntType>(d.categoryId.value);
     }
@@ -996,6 +1040,9 @@ class $TransactionsTable extends Transactions
   $TransactionsTable createAlias(String alias) {
     return $TransactionsTable(_db, alias);
   }
+
+  static TypeConverter<RepetitionCycleType, int> $converter0 =
+      const RepetitionCycleConverter();
 }
 
 class Category extends DataClass implements Insertable<Category> {
@@ -1007,7 +1054,7 @@ class Category extends DataClass implements Insertable<Category> {
   final String name;
   final bool isAnIncome;
   final IconData icon;
-  final int iconColor;
+  final Color iconColor;
   Category(
       {@required this.id,
       @required this.createdAt,
@@ -1040,8 +1087,8 @@ class Category extends DataClass implements Insertable<Category> {
           .mapFromDatabaseResponse(data['${effectivePrefix}is_an_income']),
       icon: $CategoriesTable.$converter0.mapToDart(
           stringType.mapFromDatabaseResponse(data['${effectivePrefix}icon'])),
-      iconColor:
-          intType.mapFromDatabaseResponse(data['${effectivePrefix}icon_color']),
+      iconColor: $CategoriesTable.$converter1.mapToDart(intType
+          .mapFromDatabaseResponse(data['${effectivePrefix}icon_color'])),
     );
   }
   factory Category.fromJson(Map<String, dynamic> json,
@@ -1056,7 +1103,7 @@ class Category extends DataClass implements Insertable<Category> {
       name: serializer.fromJson<String>(json['name']),
       isAnIncome: serializer.fromJson<bool>(json['isAnIncome']),
       icon: serializer.fromJson<IconData>(json['icon']),
-      iconColor: serializer.fromJson<int>(json['iconColor']),
+      iconColor: serializer.fromJson<Color>(json['iconColor']),
     );
   }
   @override
@@ -1071,7 +1118,7 @@ class Category extends DataClass implements Insertable<Category> {
       'name': serializer.toJson<String>(name),
       'isAnIncome': serializer.toJson<bool>(isAnIncome),
       'icon': serializer.toJson<IconData>(icon),
-      'iconColor': serializer.toJson<int>(iconColor),
+      'iconColor': serializer.toJson<Color>(iconColor),
     };
   }
 
@@ -1111,7 +1158,7 @@ class Category extends DataClass implements Insertable<Category> {
           String name,
           bool isAnIncome,
           IconData icon,
-          int iconColor}) =>
+          Color iconColor}) =>
       Category(
         id: id ?? this.id,
         createdAt: createdAt ?? this.createdAt,
@@ -1178,7 +1225,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
   final Value<String> name;
   final Value<bool> isAnIncome;
   final Value<IconData> icon;
-  final Value<int> iconColor;
+  final Value<Color> iconColor;
   const CategoriesCompanion({
     this.id = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -1199,7 +1246,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
     @required String name,
     @required bool isAnIncome,
     @required IconData icon,
-    @required int iconColor,
+    @required Color iconColor,
   })  : createdBy = Value(createdBy),
         name = Value(name),
         isAnIncome = Value(isAnIncome),
@@ -1214,7 +1261,7 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
       Value<String> name,
       Value<bool> isAnIncome,
       Value<IconData> icon,
-      Value<int> iconColor}) {
+      Value<Color> iconColor}) {
     return CategoriesCompanion(
       id: id ?? this.id,
       createdAt: createdAt ?? this.createdAt,
@@ -1386,12 +1433,7 @@ class $CategoriesTable extends Categories
       context.missing(_isAnIncomeMeta);
     }
     context.handle(_iconMeta, const VerificationResult.success());
-    if (d.iconColor.present) {
-      context.handle(_iconColorMeta,
-          iconColor.isAcceptableValue(d.iconColor.value, _iconColorMeta));
-    } else if (isInserting) {
-      context.missing(_iconColorMeta);
-    }
+    context.handle(_iconColorMeta, const VerificationResult.success());
     return context;
   }
 
@@ -1433,7 +1475,9 @@ class $CategoriesTable extends Categories
           Variable<String, StringType>(converter.mapToSql(d.icon.value));
     }
     if (d.iconColor.present) {
-      map['icon_color'] = Variable<int, IntType>(d.iconColor.value);
+      final converter = $CategoriesTable.$converter1;
+      map['icon_color'] =
+          Variable<int, IntType>(converter.mapToSql(d.iconColor.value));
     }
     return map;
   }
@@ -1443,7 +1487,9 @@ class $CategoriesTable extends Categories
     return $CategoriesTable(_db, alias);
   }
 
-  static IconDataConverter $converter0 = const IconDataConverter();
+  static TypeConverter<IconData, String> $converter0 =
+      const IconDataConverter();
+  static TypeConverter<Color, int> $converter1 = const ColorConverter();
 }
 
 abstract class _$AppDatabase extends GeneratedDatabase {

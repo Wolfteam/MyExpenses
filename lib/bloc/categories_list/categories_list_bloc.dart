@@ -2,8 +2,9 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:my_expenses/models/category_item.dart';
-import 'package:my_expenses/models/entities/database.dart';
+
+import '../../models/category_item.dart';
+import '../../models/entities/database.dart';
 
 part 'categories_list_event.dart';
 part 'categories_list_state.dart';

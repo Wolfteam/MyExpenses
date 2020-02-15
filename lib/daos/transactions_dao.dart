@@ -15,16 +15,18 @@ class TransactionsDao extends DatabaseAccessor<AppDatabase>
         final cat = rows.readTable(categories);
         final trans = rows.readTable(transactions);
         return TransactionItem(
+          id: trans.id,
           amount: trans.amount,
           description: trans.description,
           repetitions: trans.repetitions,
+          repetitionCycleType: trans.repetitionCycle,
           transactionDate: trans.transactionDate,
           category: CategoryItem(
             cat.id,
             cat.isAnIncome,
             cat.name,
             cat.icon,
-            Color(cat.iconColor),
+            cat.iconColor,
           ),
         );
       },

@@ -3,14 +3,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:moor/moor.dart';
 import 'package:moor_ffi/moor_ffi.dart';
-import 'package:my_expenses/models/category_item.dart';
-import 'package:my_expenses/models/transaction_item.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
-import 'base_entity.dart';
-import 'converters/icon_data_converter.dart';
+import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/utils/db_seed_util.dart';
+import '../../models/category_item.dart';
+import '../../models/transaction_item.dart';
+import 'base_entity.dart';
+import 'converters/color_converter.dart';
+import 'converters/icon_data_converter.dart';
+import 'converters/repetition_cycle_converter.dart';
 
 //Tables
 part 'users.dart';
@@ -25,28 +28,6 @@ part '../../daos/transactions_dao.dart';
 //Generated db
 part 'database.g.dart';
 
-/*
-class BaseEntity extends Table {
-  // autoIncrement automatically sets this to be the primary key
-  IntColumn get id => integer().autoIncrement()();
-  DateTimeColumn get createdAt =>
-      dateTime().clientDefault(() => DateTime.now())();
-  TextColumn get createdBy => text().withLength(min: 0, max: 255)();
-  DateTimeColumn get updatedAt => dateTime().nullable()();
-  TextColumn get updatedBy => text().withLength(min: 0, max: 255)();
-}
-
-class Transactions extends BaseEntity {
-  RealColumn get amount => real()();
-  TextColumn get description => text().withLength(min: 0, max: 255)();
-}
-
-class Categories extends BaseEntity {
-  TextColumn get name => text().withLength(min: 0, max: 255)();
-  BoolColumn get isAnIncome => boolean()();
-  IntColumn get color => integer()();
-}*/
-
 LazyDatabase _openConnection() {
   // the LazyDatabase util lets us find the right location for the file async.
   return LazyDatabase(() async {
@@ -55,6 +36,10 @@ LazyDatabase _openConnection() {
     final dbFolder = await getApplicationDocumentsDirectory();
     print(dbFolder.path);
     final file = File(p.join(dbFolder.path, 'my_expenses.sqlite'));
+    //TODO: CHANGE THIS
+    if (await file.exists()) {
+      await file.delete();
+    }
     return VmDatabase(file, logStatements: true);
   });
 }
@@ -86,8 +71,6 @@ class AppDatabase extends _$AppDatabase {
           if (details.wasCreated) {
             await batch((b) {
               b.insertAll(categories, getDefaultCategories());
-            });
-            await batch((b) {
               b.insertAll(transactions, getDefaultTransactions());
             });
           }

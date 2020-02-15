@@ -11,7 +11,7 @@ class CategoriesDao extends DatabaseAccessor<AppDatabase>
           row.isAnIncome,
           row.name,
           row.icon,
-          Color(row.iconColor),
+          row.iconColor,
         ));
 
     return query.get();
@@ -30,7 +30,7 @@ class CategoriesDao extends DatabaseAccessor<AppDatabase>
               row.isAnIncome,
               row.name,
               row.icon,
-              Color(row.iconColor),
+              row.iconColor,
             ))
         .get();
   }
@@ -43,7 +43,7 @@ class CategoriesDao extends DatabaseAccessor<AppDatabase>
               row.isAnIncome,
               row.name,
               row.icon,
-              Color(row.iconColor),
+              row.iconColor,
             ))
         .get();
   }

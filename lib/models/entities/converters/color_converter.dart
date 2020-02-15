@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:moor/moor_web.dart';
+import 'package:moor/moor.dart';
 
 class ColorConverter extends TypeConverter<Color, int> {
   const ColorConverter();

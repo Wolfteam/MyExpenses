@@ -36,9 +36,6 @@ class _TransactionsPageState extends State<TransactionsPage>
 
     final now = DateTime.now();
     context.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: now));
-    context
-        .bloc<TransactionsLast7DaysBloc>()
-        .add(LoadLast7DaysTransactions());
   }
 
   @override
@@ -69,7 +66,9 @@ class _TransactionsPageState extends State<TransactionsPage>
           child: BlocBuilder<TransactionsBloc, TransactionsState>(
             builder: (ctx, state) {
               return Column(
-                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisAlignment: state is TransactionsInitialState
+                    ? MainAxisAlignment.center
+                    : MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: _buildPage(state),
               );
@@ -102,7 +101,11 @@ class _TransactionsPageState extends State<TransactionsPage>
 
   List<Widget> _buildPage(TransactionsState state) {
     if (state is TransactionsInitialState) {
-      return [const CircularProgressIndicator()];
+      return [
+        const Center(
+          child: CircularProgressIndicator(),
+        )
+      ];
     }
 
     if (state is TransactionsLoadedState) {

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../pages/add_edit_transasctiton_page.dart';
 import '../pages/categories_page.dart';
 import '../pages/charts_page.dart';
 import '../pages/settings_page.dart';
 import '../pages/transactions_page.dart';
-import '../pages/add_edit_transasctiton_page.dart';
 import '../widgets/app_drawer.dart';
+import './../bloc/bloc.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -50,9 +52,12 @@ class _HomePageState extends State<HomePage>
         backgroundColor: colorScheme.secondary,
         mini: false,
         heroTag: "CreateTransactionFab",
-        onPressed: () {
-          var route = MaterialPageRoute(builder: (ctx) => AddEditTransactionPage());
-          Navigator.of(context).push(route);
+        onPressed: () async {
+          final route = MaterialPageRoute(
+            builder: (ctx) => const AddEditTransactionPage(),
+          );
+          await Navigator.of(context).push(route);
+          context.bloc<TransactionFormBloc>().add(FormClosed());
         },
       ),
       bottomNavigationBar: BottomNavigationBar(
