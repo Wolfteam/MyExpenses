@@ -7,11 +7,11 @@ class CategoriesDao extends DatabaseAccessor<AppDatabase>
 
   Future<List<CategoryItem>> getAll() {
     var query = select(categories).map((row) => CategoryItem(
-          row.id,
-          row.isAnIncome,
-          row.name,
-          row.icon,
-          row.iconColor,
+          id: row.id,
+          isAnIncome: row.isAnIncome,
+          name: row.name,
+          icon: row.icon,
+          iconColor: row.iconColor,
         ));
 
     return query.get();
@@ -26,11 +26,11 @@ class CategoriesDao extends DatabaseAccessor<AppDatabase>
     var query = select(categories)..where((c) => c.isAnIncome.equals(true));
     return query
         .map((row) => CategoryItem(
-              row.id,
-              row.isAnIncome,
-              row.name,
-              row.icon,
-              row.iconColor,
+              id: row.id,
+              isAnIncome: row.isAnIncome,
+              name: row.name,
+              icon: row.icon,
+              iconColor: row.iconColor,
             ))
         .get();
   }
@@ -39,11 +39,11 @@ class CategoriesDao extends DatabaseAccessor<AppDatabase>
     var query = select(categories)..where((c) => c.isAnIncome.equals(false));
     return query
         .map((row) => CategoryItem(
-              row.id,
-              row.isAnIncome,
-              row.name,
-              row.icon,
-              row.iconColor,
+              id: row.id,
+              isAnIncome: row.isAnIncome,
+              name: row.name,
+              icon: row.icon,
+              iconColor: row.iconColor,
             ))
         .get();
   }

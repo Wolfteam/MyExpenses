@@ -13,9 +13,13 @@ class TransactionsPage extends StatefulWidget {
 }
 
 class _TransactionsPageState extends State<TransactionsPage>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   ScrollController _scrollController;
   AnimationController _hideFabAnimController;
+  bool _didChangeDependencies = false;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -34,12 +38,17 @@ class _TransactionsPageState extends State<TransactionsPage>
   void didChangeDependencies() {
     super.didChangeDependencies();
 
+    if (_didChangeDependencies) return;
     final now = DateTime.now();
     context.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: now));
+
+    _didChangeDependencies = true;
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return Scaffold(
       backgroundColor: Colors.white54,
       floatingActionButton: FadeTransition(

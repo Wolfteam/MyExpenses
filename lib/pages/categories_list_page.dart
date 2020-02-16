@@ -3,68 +3,86 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/bloc.dart';
 import '../models/category_item.dart';
+import '../widgets/categories/category_item.dart' as cat_item;
 import 'add_edit_category_page.dart';
 
 class CategoriesListPage extends StatefulWidget {
   final bool loadIncomes;
+  final bool isInSelectionMode;
+  final CategoryItem selectedCategory;
 
-  CategoriesListPage({
+  const CategoriesListPage({
     Key key,
-    this.loadIncomes,
+    @required this.loadIncomes,
+    this.isInSelectionMode = false,
+    this.selectedCategory,
   }) : super(key: key);
 
   @override
   _CategoriesListPageState createState() => _CategoriesListPageState();
 }
 
-class _CategoriesListPageState extends State<CategoriesListPage> {
-  Widget _buildCategoryItem(CategoryItem category) {
-    var icon = IconTheme(
-      data: new IconThemeData(color: category.iconColor),
-      child: new Icon(category.icon),
-    );
-    return ListTile(
-      leading: icon,
-      title: Text(category.name),
-      onTap: () {},
-    );
-  }
+class _CategoriesListPageState extends State<CategoriesListPage>
+    with AutomaticKeepAliveClientMixin<CategoriesListPage> {
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    context
-        .bloc<CategoriesListBloc>()
-        .add(GetCategories(loadIncomes: widget.loadIncomes));
+    final event = GetCategories(
+      loadIncomes: widget.loadIncomes,
+      selectedCategory: widget.selectedCategory,
+    );
+    if (widget.loadIncomes) {
+      context.bloc<IncomesCategoriesBloc>().add(event);
+    } else {
+      context.bloc<ExpensesCategoriesBloc>().add(event);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return Scaffold(
-      body: BlocBuilder<CategoriesListBloc, CategoriesListState>(
-          builder: (ctx, state) {
-        if (state is CategoriesLoadedState) {
-          return ListView.builder(
-            itemCount: state.categories.length,
-            itemBuilder: (ctx, index) =>
-                _buildCategoryItem(state.categories[index]),
-          );
-        } else {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-      }),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.red,
-        child: Icon(Icons.add),
-        onPressed: () {
-          var route =
-              MaterialPageRoute(builder: (ctx) => AddEditCategoryPage());
-          Navigator.push(context, route);
-        },
-      ),
+      body: widget.loadIncomes
+          ? BlocBuilder<IncomesCategoriesBloc, CategoriesListState>(
+              builder: (ctx, state) => _buildPage(state),
+            )
+          : BlocBuilder<ExpensesCategoriesBloc, CategoriesListState>(
+              builder: (ctx, state) => _buildPage(state),
+            ),
+      floatingActionButton: !widget.isInSelectionMode
+          ? FloatingActionButton(
+              heroTag: widget.loadIncomes ? 'AddIncomesFab' : 'AddExpensesFab',
+              backgroundColor: Colors.red,
+              onPressed: () {
+                final route = MaterialPageRoute(
+                  builder: (ctx) => AddEditCategoryPage(),
+                );
+                Navigator.of(context).push(route);
+              },
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
+  }
+
+  Widget _buildPage(CategoriesListState state) {
+    if (state is CategoriesLoadedState) {
+      return ListView.builder(
+        itemCount: state.categories.length,
+        itemBuilder: (ctx, index) => cat_item.CategoryItem(
+          category: state.categories[index],
+          isInSelectionMode: widget.isInSelectionMode,
+        ),
+      );
+    } else {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
   }
 }

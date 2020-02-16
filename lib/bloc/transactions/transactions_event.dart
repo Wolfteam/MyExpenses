@@ -1,7 +1,9 @@
 part of 'transactions_bloc.dart';
 
 @immutable
-abstract class TransactionsEvent {}
+abstract class TransactionsEvent {
+  const TransactionsEvent();
+}
 
 class GetTransactions extends TransactionsEvent {
   final DateTime inThisDate;

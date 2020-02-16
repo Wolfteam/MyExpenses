@@ -60,4 +60,15 @@ class RepetitionCycleChanged extends TransactionFormEvent {
   List<Object> get props => [repetitionCycle];
 }
 
+class CategoryWasUpdated extends TransactionFormEvent {
+  final CategoryItem category;
+
+  const CategoryWasUpdated(this.category);
+
+  @override
+  List<Object> get props => [category];
+}
+
+class FormSubmitted extends TransactionFormEvent {}
+
 class FormClosed extends TransactionFormEvent {}

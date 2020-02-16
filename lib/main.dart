@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
 import './bloc/bloc.dart';
+import './models/current_selected_category.dart';
 import './models/entities/database.dart';
 import 'pages/main_page.dart';
 
@@ -17,14 +18,23 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return Provider(
-      create: (ctx) => AppDatabase(),
+    return MultiProvider(
+      providers: [
+        Provider(create: (ctx) => AppDatabase()),
+        ChangeNotifierProvider(create: (ctx) => CurrentSelectedCategory()),
+      ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
             create: (ctx) {
               final db = Provider.of<AppDatabase>(ctx, listen: false);
-              return CategoriesListBloc(db);
+              return IncomesCategoriesBloc(db);
+            },
+          ),
+          BlocProvider(
+            create: (ctx) {
+              final db = Provider.of<AppDatabase>(ctx, listen: false);
+              return ExpensesCategoriesBloc(db);
             },
           ),
           BlocProvider(
@@ -33,7 +43,10 @@ class MyApp extends StatelessWidget {
               return TransactionsBloc(db: db);
             },
           ),
-          BlocProvider(create: (ctx) => TransactionFormBloc()),
+          BlocProvider(create: (ctx) {
+            final db = Provider.of<AppDatabase>(ctx, listen: false);
+            return TransactionFormBloc(db);
+          }),
           BlocProvider(create: (ctx) => TransactionsLast7DaysBloc()),
         ],
         child: MaterialApp(

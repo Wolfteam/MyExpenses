@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/models/current_selected_category.dart';
+import 'package:provider/provider.dart';
 
 import '../pages/add_edit_transasctiton_page.dart';
 import '../pages/categories_page.dart';
@@ -17,18 +19,21 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   int _currentPageIndex = 0;
-  var _pages = <Widget>[
+  final _pages = <Widget>[
     TransactionsPage(),
     ChartsPage(),
-    CategoriesPage(),
+    const CategoriesPage(),
     SettingsPage(),
   ];
   TabController _tabController;
 
   @override
   void initState() {
-    _tabController =
-        TabController(initialIndex: 0, length: _pages.length, vsync: this);
+    _tabController = TabController(
+      initialIndex: 0,
+      length: _pages.length,
+      vsync: this,
+    );
     super.initState();
   }
 
@@ -42,13 +47,12 @@ class _HomePageState extends State<HomePage>
       ),
       drawer: AppDrawer(),
       body: TabBarView(
-        children: _pages,
         controller: _tabController,
-        physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
+        children: _pages,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
         backgroundColor: colorScheme.secondary,
         mini: false,
         heroTag: "CreateTransactionFab",
@@ -59,6 +63,7 @@ class _HomePageState extends State<HomePage>
           await Navigator.of(context).push(route);
           context.bloc<TransactionFormBloc>().add(FormClosed());
         },
+        child: const Icon(Icons.add),
       ),
       bottomNavigationBar: BottomNavigationBar(
         showUnselectedLabels: true,

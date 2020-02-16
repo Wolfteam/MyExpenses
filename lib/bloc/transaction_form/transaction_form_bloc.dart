@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
+import 'package:my_expenses/models/entities/database.dart';
 
 import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/extensions/string_extensions.dart';
@@ -16,6 +17,10 @@ part 'transaction_form_state.dart';
 
 class TransactionFormBloc
     extends Bloc<TransactionFormEvent, TransactionFormState> {
+  final AppDatabase _db;
+
+  TransactionFormBloc(this._db);
+
   TransactionFormLoadedState get currentState =>
       state as TransactionFormLoadedState;
 
@@ -32,6 +37,7 @@ class TransactionFormBloc
 
     if (event is EditTransaction) {
       yield TransactionFormLoadedState.initial().copyWith(
+        id: event.item.id,
         amount: event.item.amount,
         isAmountValid: true,
         isAmountDirty: true,
@@ -44,6 +50,7 @@ class TransactionFormBloc
         isRepetitionsValid: true,
         isRepetitionsDirty: true,
         repetitionCycle: event.item.repetitionCycleType,
+        areRepetitionCyclesVisible: event.item.repetitions > 0,
         transactionDate: event.item.transactionDate,
         isTransactionDateValid: true,
       );
@@ -81,10 +88,21 @@ class TransactionFormBloc
       );
     }
 
-    if (event is RepetitionCycleChanged){
+    if (event is RepetitionCycleChanged) {
       yield currentState.copyWith(
         repetitionCycle: event.repetitionCycle,
       );
+    }
+
+    if (event is CategoryWasUpdated) {
+      yield currentState.copyWith(
+        category: event.category,
+        isCategoryValid: true,
+      );
+    }
+
+    if (event is FormSubmitted) {
+      yield* _saveTransaction(currentState.buildTransactionItem());
     }
 
     if (event is FormClosed) {
@@ -98,4 +116,19 @@ class TransactionFormBloc
       !description.isNullOrEmpty(minLength: 1);
 
   bool _areRepetitionsValid(int repetitions) => repetitions >= 0;
+
+  Stream<TransactionFormState> _saveTransaction(
+    TransactionItem transaction,
+  ) async* {
+    try {
+      final createdTrans = await _db.transactionsDao.save(transaction);
+
+      yield TransactionSavedState(createdTrans);
+
+    } catch (e) {
+      yield currentState.copyWith(
+        error: 'Unknown error while trying to save into db',
+      );
+    }
+  }
 }

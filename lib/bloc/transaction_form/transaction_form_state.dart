@@ -1,7 +1,9 @@
 part of 'transaction_form_bloc.dart';
 
 @immutable
-abstract class TransactionFormState extends Equatable {}
+abstract class TransactionFormState extends Equatable {
+  const TransactionFormState();
+}
 
 class TransactionInitialState extends TransactionFormState {
   @override
@@ -9,6 +11,8 @@ class TransactionInitialState extends TransactionFormState {
 }
 
 class TransactionFormLoadedState extends TransactionFormState {
+  final int id;
+
   final double amount;
   final bool isAmountValid;
   final bool isAmountDirty;
@@ -30,6 +34,8 @@ class TransactionFormLoadedState extends TransactionFormState {
   final CategoryItem category;
   final bool isCategoryValid;
 
+  final String error;
+
   bool get isFormValid =>
       isAmountValid &&
       isDescriptionValid &&
@@ -37,7 +43,8 @@ class TransactionFormLoadedState extends TransactionFormState {
       isRepetitionsValid &&
       isCategoryValid;
 
-  TransactionFormLoadedState({
+  const TransactionFormLoadedState({
+    @required this.id,
     @required this.amount,
     @required this.isAmountValid,
     @required this.isAmountDirty,
@@ -53,14 +60,21 @@ class TransactionFormLoadedState extends TransactionFormState {
     @required this.areRepetitionCyclesVisible,
     @required this.category,
     @required this.isCategoryValid,
+    this.error,
   });
 
   factory TransactionFormLoadedState.initial() {
     final cat = CategoryUtils.getByName(CategoryUtils.question);
-    final category =
-        CategoryItem(0, false, cat.name, cat.icon.icon, Colors.blue);
+    final category = CategoryItem(
+      id: 0,
+      isAnIncome: false,
+      name: cat.name,
+      icon: cat.icon.icon,
+      iconColor: Colors.blue,
+    );
 
     return TransactionFormLoadedState(
+      id: 0,
       amount: 0,
       isAmountValid: false,
       isAmountDirty: false,
@@ -75,11 +89,13 @@ class TransactionFormLoadedState extends TransactionFormState {
       repetitionCycle: RepetitionCycleType.none,
       areRepetitionCyclesVisible: false,
       category: category,
-      isCategoryValid: true,
+      isCategoryValid: false,
+      error: null,
     );
   }
 
   TransactionFormLoadedState copyWith({
+    int id,
     double amount,
     bool isAmountValid,
     bool isAmountDirty,
@@ -95,8 +111,10 @@ class TransactionFormLoadedState extends TransactionFormState {
     bool areRepetitionCyclesVisible,
     CategoryItem category,
     bool isCategoryValid,
+    String error,
   }) {
     return TransactionFormLoadedState(
+      id: id ?? this.id,
       amount: amount ?? this.amount,
       isAmountValid: isAmountValid ?? this.isAmountValid,
       isAmountDirty: isAmountDirty ?? this.isAmountDirty,
@@ -114,28 +132,48 @@ class TransactionFormLoadedState extends TransactionFormState {
           areRepetitionCyclesVisible ?? this.areRepetitionCyclesVisible,
       category: category ?? this.category,
       isCategoryValid: isCategoryValid ?? this.isCategoryValid,
+      error: error ?? this.error,
+    );
+  }
+
+  TransactionItem buildTransactionItem() {
+    return TransactionItem(
+      id: id,
+      amount: amount,
+      category: category,
+      description: description,
+      repetitionCycleType: repetitionCycle,
+      repetitions: repetitions,
+      transactionDate: transactionDate,
     );
   }
 
   @override
   List<Object> get props => [
+        id,
         amount,
         isAmountValid,
         isAmountDirty,
-        
         description,
         isDescriptionValid,
         isDescriptionDirty,
-        
         transactionDate,
         isTransactionDateValid,
-        
         repetitions,
         isRepetitionsValid,
         isRepetitionsDirty,
         repetitionCycle,
-
         category,
         isCategoryValid,
+        error,
       ];
+}
+
+class TransactionSavedState extends TransactionFormState {
+  final TransactionItem transaction;
+
+  const TransactionSavedState(this.transaction);
+
+  @override
+  List<Object> get props => [transaction];
 }

@@ -34,13 +34,14 @@ LazyDatabase _openConnection() {
     // put the database file, called db.sqlite here, into the documents folder
     // for your app.
     final dbFolder = await getApplicationDocumentsDirectory();
-    print(dbFolder.path);
     final file = File(p.join(dbFolder.path, 'my_expenses.sqlite'));
     //TODO: CHANGE THIS
     if (await file.exists()) {
+      print("Deleting database");
+      print("Db path =  ${dbFolder.path}");
       await file.delete();
     }
-    return VmDatabase(file, logStatements: true);
+    return VmDatabase(file);
   });
 }
 

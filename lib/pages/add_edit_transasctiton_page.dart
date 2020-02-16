@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../bloc/bloc.dart';
 import '../common/enums/repetition_cycle_type.dart';
+import '../common/extensions/string_extensions.dart';
 import '../common/utils/repetition_cycle_utils.dart';
+import '../common/utils/toast_utils.dart';
+import '../models/category_item.dart';
+import '../models/current_selected_category.dart';
 import '../models/transaction_item.dart';
+import 'categories_page.dart';
 
 class AddEditTransactionPage extends StatefulWidget {
   final TransactionItem item;
@@ -28,6 +34,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   final _dateFormat = DateFormat('MM/dd/yyyy');
 
   final _formKey = GlobalKey<FormState>();
+  bool _didChangeDependencies = false;
 
   final _repetitionCycles = [
     RepetitionCycleType.none,
@@ -56,62 +63,89 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
+    if (_didChangeDependencies) return;
     if (widget.item != null) {
       context.bloc<TransactionFormBloc>().add(EditTransaction(widget.item));
     } else {
       context.bloc<TransactionFormBloc>().add(AddTransaction());
     }
+
+    _didChangeDependencies = true;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title:
-            Text(widget.item == null ? "Add transaction" : "Edit transaction"),
-        leading: const BackButton(),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.save),
-            onPressed: () {},
+    return BlocBuilder<TransactionFormBloc, TransactionFormState>(
+      builder: (ctx, state) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(
+                widget.item == null ? "Add transaction" : "Edit transaction"),
+            leading: const BackButton(),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(
+                  Icons.save,
+                ),
+                onPressed:
+                    state is TransactionFormLoadedState && state.isFormValid
+                        ? _saveTransaction
+                        : null,
+              ),
+              if (widget.item != null)
+                IconButton(
+                  icon: Icon(Icons.delete, color: Colors.red),
+                  onPressed: state is TransactionFormLoadedState
+                      ? _deleteTransaction
+                      : null,
+                ),
+            ],
           ),
-          if (widget.item != null)
-            IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () {},
-            ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: BlocBuilder<TransactionFormBloc, TransactionFormState>(
-          builder: (ctx, state) {
-            return Column(
+          body: SingleChildScrollView(
+            child: Column(
               children: _buildPage(ctx, state),
-            );
-          },
-        ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 
   @override
   void dispose() {
+    _amountController.dispose();
+    _descriptionController.dispose();
+    _repetitionsController.dispose();
     super.dispose();
-    // _amountController.dispose();
-    // _descriptionController.dispose();
-    // _repetitionsController.dispose();
   }
 
   List<Widget> _buildPage(BuildContext context, TransactionFormState state) {
     if (state is TransactionFormLoadedState) {
+      if (!state.error.isNullEmptyOrWhitespace) {
+        showWarningToast(state.error);
+      }
+
       return [_buildHeader(context, state), _buildForm(context, state)];
+    }
+    if (state is TransactionSavedState) {
+      showSucceedToast('Transaction was succesfully saved');
+
+      final now = DateTime.now();
+      context.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: now));
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pop();
+      });
     }
     return [];
   }
 
   Container _buildHeader(
-      final BuildContext context, final TransactionFormLoadedState state) {
+    final BuildContext context,
+    final TransactionFormLoadedState state,
+  ) {
     final createdAt = _dateFormat.format(state.transactionDate);
+    const cornerRadius = Radius.circular(20);
 
     return Container(
       height: 240.0,
@@ -130,7 +164,12 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
             ),
             child: Material(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: cornerRadius,
+                  bottomRight: cornerRadius,
+                  topLeft: cornerRadius,
+                  topRight: cornerRadius,
+                ),
               ),
               elevation: 5.0,
               color: Colors.white,
@@ -216,15 +255,16 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Material(
-                  elevation: 5.0,
+                  elevation: 10,
                   shape: const CircleBorder(),
                   child: CircleAvatar(
                     backgroundColor: Colors.white,
                     radius: 40.0,
-                    child: Icon(
-                      state.category.icon,
+                    child: IconButton(
+                      iconSize: 65,
+                      icon: Icon(state.category.icon),
                       color: state.category.iconColor,
-                      size: 40,
+                      onPressed: () => _changeCategory(state),
                     ),
                   ),
                 ),
@@ -237,7 +277,9 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   }
 
   Widget _buildForm(
-      final BuildContext context, final TransactionFormLoadedState state) {
+    final BuildContext context,
+    final TransactionFormLoadedState state,
+  ) {
     final transactionDate = _dateFormat.format(state.transactionDate);
 
     return Padding(
@@ -247,96 +289,8 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  margin: const EdgeInsets.only(right: 10),
-                  child: Icon(
-                    Icons.attach_money,
-                    size: 30,
-                  ),
-                ),
-                Expanded(
-                  child: TextFormField(
-                    controller: _amountController,
-                    maxLines: 1,
-                    minLines: 1,
-                    maxLength: 255,
-                    focusNode: _amountFocus,
-                    textInputAction: TextInputAction.next,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      alignLabelWithHint: true,
-                      hintText: "0\$",
-                      labelText: "Amount",
-                    ),
-                    autovalidate: state.isAmountDirty,
-                    onFieldSubmitted: (_) {
-                      _fieldFocusChange(
-                          context, _amountFocus, _descriptionFocus);
-                    },
-                    validator: (_) =>
-                        state.isAmountValid ? null : 'Invalid Amount',
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  margin: const EdgeInsets.only(right: 10),
-                  child: Icon(
-                    Icons.note,
-                    size: 30,
-                  ),
-                ),
-                Expanded(
-                  child: TextFormField(
-                    controller: _descriptionController,
-                    keyboardType: TextInputType.text,
-                    maxLines: 2,
-                    minLines: 1,
-                    maxLength: 255,
-                    focusNode: _descriptionFocus,
-                    textInputAction: TextInputAction.next,
-                    decoration: InputDecoration(
-                      alignLabelWithHint: true,
-                      labelText: "Description",
-                      hintText: "A description of this transaction",
-                    ),
-                    autovalidate: state.isDescriptionDirty,
-                    onFieldSubmitted: (_) {
-                      _fieldFocusChange(
-                        context,
-                        _descriptionFocus,
-                        _repetitionsFocus,
-                      );
-                    },
-                    validator: (_) =>
-                        state.isDescriptionValid ? null : 'Invalid Description',
-                  ),
-                ),
-              ],
-            ),
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.start,
-            //   children: <Widget>[
-            //     Icon(
-            //       Icons.category,
-            //       size: 30,
-            //     ),
-            //     Expanded(
-            //       child: FlatButton(
-            //         child: Align(
-            //             alignment: Alignment.centerLeft,
-            //             child: Text("Incomes")),
-            //         onPressed: () {},
-            //       ),
-            //     ),
-            //   ],
-            // ),
+            _buildAmountInput(context, state),
+            _buildDescriptionInput(state),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
@@ -346,18 +300,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                 ),
                 Expanded(
                   child: FlatButton(
-                    onPressed: () async {
-                      final now = DateTime.now();
-                      final selectedDate = await showDatePicker(
-                        context: context,
-                        initialDate: now,
-                        firstDate: DateTime(now.year - 1),
-                        lastDate: DateTime(now.year + 10),
-                      );
-                      context
-                          .bloc<TransactionFormBloc>()
-                          .add(TransactionDateChanged(selectedDate));
-                    },
+                    onPressed: _transactionDateClicked,
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(transactionDate),
@@ -366,86 +309,9 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                 ),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  margin: const EdgeInsets.only(right: 10),
-                  child: Icon(
-                    Icons.repeat_one,
-                    size: 30,
-                  ),
-                ),
-                Expanded(
-                  child: TextFormField(
-                    controller: _repetitionsController,
-                    maxLines: 1,
-                    minLines: 1,
-                    maxLength: 255,
-                    focusNode: _repetitionsFocus,
-                    textInputAction: TextInputAction.done,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      hintText: "0",
-                      alignLabelWithHint: true,
-                      labelText: "Repetitions",
-                    ),
-                    autovalidate: state.isRepetitionsDirty,
-                    onFieldSubmitted: (_) {
-                      _repetitionsFocus.unfocus();
-                    },
-                    validator: (_) =>
-                        state.isRepetitionsValid ? null : 'Invalid Repetitions',
-                  ),
-                ),
-              ],
-            ),
+            _buildRepetitionsInput(state),
             if (state.areRepetitionCyclesVisible)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Icon(
-                    Icons.date_range,
-                    size: 30,
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        left: 16,
-                        right: 16,
-                      ),
-                      child: DropdownButton<RepetitionCycleType>(
-                        isExpanded: true,
-                        hint: Text(
-                          getRepetitionCycleTypeName(state.repetitionCycle),
-                          style: TextStyle(color: Colors.red),
-                        ),
-                        value: state.repetitionCycle,
-                        icon: Icon(Icons.arrow_downward),
-                        iconSize: 24,
-                        style: TextStyle(color: Colors.black),
-                        underline: Container(
-                          height: 0,
-                          color: Colors.transparent,
-                        ),
-                        onChanged: (newValue) {
-                          context
-                              .bloc<TransactionFormBloc>()
-                              .add(RepetitionCycleChanged(newValue));
-                        },
-                        items: _repetitionCycles
-                            .map<DropdownMenuItem<RepetitionCycleType>>(
-                                (value) {
-                          return DropdownMenuItem<RepetitionCycleType>(
-                            value: value,
-                            child: Text(getRepetitionCycleTypeName(value)),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              _buildRepetitionCyclesDropDown(state),
             Text(
               "Add a picture",
               textAlign: TextAlign.center,
@@ -472,6 +338,207 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     );
   }
 
+  Widget _buildAmountInput(
+    final BuildContext context,
+    final TransactionFormLoadedState state,
+  ) {
+    final suffixIcon = _buildSuffixIconButton(
+      _amountController,
+      _amountFocus,
+    );
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        Container(
+          margin: const EdgeInsets.only(right: 10),
+          child: Icon(
+            Icons.attach_money,
+            size: 30,
+          ),
+        ),
+        Expanded(
+          child: TextFormField(
+            controller: _amountController,
+            maxLines: 1,
+            minLines: 1,
+            maxLength: 255,
+            focusNode: _amountFocus,
+            textInputAction: TextInputAction.next,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              suffixIcon: suffixIcon,
+              alignLabelWithHint: true,
+              hintText: "0\$",
+              labelText: "Amount",
+            ),
+            autovalidate: state.isAmountDirty,
+            onFieldSubmitted: (_) {
+              _fieldFocusChange(context, _amountFocus, _descriptionFocus);
+            },
+            validator: (_) => state.isAmountValid ? null : 'Invalid Amount',
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDescriptionInput(
+    final TransactionFormLoadedState state,
+  ) {
+    final suffixIcon = _buildSuffixIconButton(
+      _descriptionController,
+      _descriptionFocus,
+    );
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        Container(
+          margin: const EdgeInsets.only(right: 10),
+          child: Icon(
+            Icons.note,
+            size: 30,
+          ),
+        ),
+        Expanded(
+          child: TextFormField(
+            controller: _descriptionController,
+            keyboardType: TextInputType.text,
+            maxLines: 2,
+            minLines: 1,
+            maxLength: 255,
+            focusNode: _descriptionFocus,
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+              suffixIcon: suffixIcon,
+              alignLabelWithHint: true,
+              labelText: "Description",
+              hintText: "A description of this transaction",
+            ),
+            autovalidate: state.isDescriptionDirty,
+            onFieldSubmitted: (_) {
+              _fieldFocusChange(
+                context,
+                _descriptionFocus,
+                _repetitionsFocus,
+              );
+            },
+            validator: (_) =>
+                state.isDescriptionValid ? null : 'Invalid Description',
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRepetitionsInput(
+    final TransactionFormLoadedState state,
+  ) {
+    final suffixIcon = _buildSuffixIconButton(
+      _repetitionsController,
+      _repetitionsFocus,
+    );
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        Container(
+          margin: const EdgeInsets.only(right: 10),
+          child: Icon(
+            Icons.repeat_one,
+            size: 30,
+          ),
+        ),
+        Expanded(
+          child: TextFormField(
+            controller: _repetitionsController,
+            maxLines: 1,
+            minLines: 1,
+            maxLength: 255,
+            focusNode: _repetitionsFocus,
+            textInputAction: TextInputAction.done,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              suffixIcon: suffixIcon,
+              hintText: "0",
+              alignLabelWithHint: true,
+              labelText: "Repetitions",
+            ),
+            autovalidate: state.isRepetitionsDirty,
+            onFieldSubmitted: (_) {
+              _repetitionsFocus.unfocus();
+            },
+            validator: (_) =>
+                state.isRepetitionsValid ? null : 'Invalid Repetitions',
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRepetitionCyclesDropDown(
+    final TransactionFormLoadedState state,
+  ) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        Icon(
+          Icons.date_range,
+          size: 30,
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+            ),
+            child: DropdownButton<RepetitionCycleType>(
+              isExpanded: true,
+              hint: Text(
+                getRepetitionCycleTypeName(state.repetitionCycle),
+                style: TextStyle(color: Colors.red),
+              ),
+              value: state.repetitionCycle,
+              icon: Icon(Icons.arrow_downward),
+              iconSize: 24,
+              style: TextStyle(color: Colors.black),
+              underline: Container(
+                height: 0,
+                color: Colors.transparent,
+              ),
+              onChanged: _repetitionCycleChanged,
+              items: _repetitionCycles
+                  .map<DropdownMenuItem<RepetitionCycleType>>((value) {
+                return DropdownMenuItem<RepetitionCycleType>(
+                  value: value,
+                  child: Text(getRepetitionCycleTypeName(value)),
+                );
+              }).toList(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSuffixIconButton(
+    TextEditingController controller,
+    FocusNode focusNode,
+  ) {
+    final suffixIcon =
+        !controller.text.isNullEmptyOrWhitespace && focusNode.hasFocus
+            ? IconButton(
+                alignment: Alignment.bottomCenter,
+                icon: Icon(Icons.close),
+                onPressed: () =>
+                    //For some reason an exception is thrown https://github.com/flutter/flutter/issues/35848
+                    Future.microtask(() => controller.clear()),
+              )
+            : null;
+
+    return suffixIcon;
+  }
+
   void _amountChanged() {
     final amount = double.tryParse(_amountController.text) ?? 0;
     context.bloc<TransactionFormBloc>().add(AmountChanged(amount));
@@ -488,7 +555,24 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     context.bloc<TransactionFormBloc>().add(RepetitionsChanged(repetitions));
   }
 
-  _fieldFocusChange(
+  void _repetitionCycleChanged(RepetitionCycleType newValue) {
+    context.bloc<TransactionFormBloc>().add(RepetitionCycleChanged(newValue));
+  }
+
+  Future _transactionDateClicked() async {
+    final now = DateTime.now();
+    final selectedDate = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: DateTime(now.year - 1),
+      lastDate: DateTime(now.year + 10),
+    );
+    context
+        .bloc<TransactionFormBloc>()
+        .add(TransactionDateChanged(selectedDate));
+  }
+
+  void _fieldFocusChange(
     BuildContext context,
     FocusNode currentFocus,
     FocusNode nextFocus,
@@ -496,4 +580,32 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     currentFocus.unfocus();
     FocusScope.of(context).requestFocus(nextFocus);
   }
+
+  Future _changeCategory(TransactionFormLoadedState state) async {
+    final selectedCatProvider = Provider.of<CurrentSelectedCategory>(
+      context,
+      listen: false,
+    );
+    selectedCatProvider.currentSelectedItem = state.category;
+
+    final route = MaterialPageRoute<CategoryItem>(
+      builder: (ctx) => CategoriesPage(
+        isInSelectionMode: true,
+        selectedCategory: state.category,
+      ),
+    );
+    final selectedCat = await Navigator.of(context).push(route);
+
+    selectedCatProvider.currentSelectedItem = null;
+
+    if (selectedCat != null) {
+      context.bloc<TransactionFormBloc>().add(CategoryWasUpdated(selectedCat));
+    }
+  }
+
+  void _saveTransaction() {
+    context.bloc<TransactionFormBloc>().add(FormSubmitted());
+  }
+
+  void _deleteTransaction() {}
 }

@@ -229,7 +229,7 @@ List<Transaction> getDefaultTransactions() {
       categoryId: 1,
       description: "Cheques",
       transactionDate: DateTime.now().add(Duration(days: -1)),
-      repetitions: 0,
+      repetitions: 1,
       repetitionCycle: RepetitionCycleType.eachWeek,
       createdBy: createdBy,
     ),
