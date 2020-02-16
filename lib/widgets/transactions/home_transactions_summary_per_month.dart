@@ -25,9 +25,9 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
         data: data,
         domainFn: (item, _) => item.order,
         //The values here must be positives and the sum of them must be equal to 100%
-        measureFn: (item, _) => item.amount.abs(),
+        measureFn: (item, _) => item.percentage,
         colorFn: (item, _) => charts.ColorUtil.fromDartColor(item.color),
-        labelAccessorFn: (row, _) => '${row.amount}',
+        labelAccessorFn: (row, _) => '${row.percentage} %',
       )
     ];
   }

@@ -36,13 +36,13 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
       final to = (from.month < 12)
           ? DateTime(from.year, from.month + 1, 0)
           : DateTime(from.year + 1, 1, 0);
-      final transactions = await db.transactionsDao.getAllTransactions(from, to);
+      final transactions =
+          await db.transactionsDao.getAllTransactions(from, to);
 
       final incomes = _getTotalIncomes(transactions);
       final expenses = _getTotalExpenses(transactions);
       final balance = incomes + expenses;
-      final monthBalance =
-          _buildMonthBalance(incomes, expenses, balance, transactions);
+      final monthBalance = _buildMonthBalance(incomes, expenses, transactions);
 
       final incomeTransPerWeek =
           await _buildTransactionSummaryPerDay(onlyIncomes: true);
@@ -72,15 +72,23 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
   List<TransactionsSummaryPerMonth> _buildMonthBalance(
     double incomes,
     double expenses,
-    double balance,
     List<TransactionItem> transactions,
   ) {
-    final expensesPercentage = (expenses * 100 / balance.abs()).round();
+    final balance = expenses.abs() + incomes;
+    final expensesPercentage = (expenses * 100 / balance.abs()).abs().round();
     final incomesPercentage = (incomes * 100 / balance.abs()).round();
 
     return [
-      TransactionsSummaryPerMonth(0, expensesPercentage),
-      TransactionsSummaryPerMonth(1, incomesPercentage),
+      TransactionsSummaryPerMonth(
+        order: 0,
+        percentage: expensesPercentage,
+        isAnIncome: false,
+      ),
+      TransactionsSummaryPerMonth(
+        order: 1,
+        percentage: incomesPercentage,
+        isAnIncome: true,
+      ),
     ];
   }
 
@@ -98,8 +106,8 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     final to = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
     final transactions = (await db.transactionsDao.getAllTransactions(from, to))
-      .where((t) => t.category.isAnIncome == onlyIncomes)
-      .toList();
+        .where((t) => t.category.isAnIncome == onlyIncomes)
+        .toList();
 
     final map = <DateTime, double>{};
     for (final transaction in transactions) {

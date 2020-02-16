@@ -1,10 +1,17 @@
-import 'package:my_expenses/models/base_transaction.dart';
+import 'package:flutter/material.dart';
 
-class TransactionsSummaryPerMonth extends BaseTransaction {
-  int order;
+class TransactionsSummaryPerMonth {
+  final int order;
+  final int percentage;
+  final bool isAnIncome;
 
-  TransactionsSummaryPerMonth(
+  Color get color {
+    return isAnIncome ? Colors.green : Colors.red;
+  }
+
+  TransactionsSummaryPerMonth({
     this.order,
-    int amount,
-  ) : super(amount: amount);
+    this.percentage,
+    this.isAnIncome,
+  });
 }

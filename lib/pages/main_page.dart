@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_expenses/models/current_selected_category.dart';
-import 'package:provider/provider.dart';
 
 import '../pages/add_edit_transasctiton_page.dart';
 import '../pages/categories_page.dart';
