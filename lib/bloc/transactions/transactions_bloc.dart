@@ -36,7 +36,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
       final to = (from.month < 12)
           ? DateTime(from.year, from.month + 1, 0)
           : DateTime(from.year + 1, 1, 0);
-      final transactions = await db.transactionsDao.getAll(from, to);
+      final transactions = await db.transactionsDao.getAllTransactions(from, to);
 
       final incomes = _getTotalIncomes(transactions);
       final expenses = _getTotalExpenses(transactions);
@@ -97,7 +97,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
 
     final to = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
-    final transactions = (await db.transactionsDao.getAll(from, to))
+    final transactions = (await db.transactionsDao.getAllTransactions(from, to))
       .where((t) => t.category.isAnIncome == onlyIncomes)
       .toList();
 

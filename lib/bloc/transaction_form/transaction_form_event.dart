@@ -69,6 +69,10 @@ class CategoryWasUpdated extends TransactionFormEvent {
   List<Object> get props => [category];
 }
 
+class DeleteTransaction extends TransactionFormEvent {
+
+}
+
 class FormSubmitted extends TransactionFormEvent {}
 
 class FormClosed extends TransactionFormEvent {}

@@ -3,12 +3,12 @@ part of 'transaction_form_bloc.dart';
 @immutable
 abstract class TransactionFormState extends Equatable {
   const TransactionFormState();
-}
 
-class TransactionInitialState extends TransactionFormState {
   @override
   List<Object> get props => [];
 }
+
+class TransactionInitialState extends TransactionFormState {}
 
 class TransactionFormLoadedState extends TransactionFormState {
   final int id;
@@ -177,3 +177,5 @@ class TransactionSavedState extends TransactionFormState {
   @override
   List<Object> get props => [transaction];
 }
+
+class TransactionDeletedState extends TransactionFormState {}

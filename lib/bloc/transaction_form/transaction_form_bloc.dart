@@ -101,6 +101,10 @@ class TransactionFormBloc
       );
     }
 
+    if (event is DeleteTransaction) {
+      yield* _deleteTransaction(currentState.id);
+    }
+
     if (event is FormSubmitted) {
       yield* _saveTransaction(currentState.buildTransactionItem());
     }
@@ -121,13 +125,24 @@ class TransactionFormBloc
     TransactionItem transaction,
   ) async* {
     try {
-      final createdTrans = await _db.transactionsDao.save(transaction);
+      final createdTrans =
+          await _db.transactionsDao.saveTransaction(transaction);
 
       yield TransactionSavedState(createdTrans);
-
     } catch (e) {
       yield currentState.copyWith(
         error: 'Unknown error while trying to save into db',
+      );
+    }
+  }
+
+  Stream<TransactionFormState> _deleteTransaction(int id) async* {
+    try {
+      await _db.transactionsDao.deleteTransaction(id);
+      yield TransactionDeletedState();
+    } catch (e) {
+      yield currentState.copyWith(
+        error: 'Unknown error while trying to delete transaction',
       );
     }
   }

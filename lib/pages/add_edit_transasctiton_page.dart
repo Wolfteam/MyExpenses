@@ -97,7 +97,9 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                 IconButton(
                   icon: Icon(Icons.delete, color: Colors.red),
                   onPressed: state is TransactionFormLoadedState
-                      ? _deleteTransaction
+                      ? () {
+                          _showDeleteConfirmationDialog(state.description);
+                        }
                       : null,
                 ),
             ],
@@ -128,8 +130,10 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
 
       return [_buildHeader(context, state), _buildForm(context, state)];
     }
-    if (state is TransactionSavedState) {
-      showSucceedToast('Transaction was succesfully saved');
+
+    if (state is TransactionSavedState || state is TransactionDeletedState) {
+      final msg = state is TransactionSavedState ? 'saved' : 'deleted';
+      showSucceedToast('Transaction was succesfully $msg');
 
       final now = DateTime.now();
       context.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: now));
@@ -137,6 +141,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         Navigator.of(context).pop();
       });
     }
+
     return [];
   }
 
@@ -607,5 +612,28 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     context.bloc<TransactionFormBloc>().add(FormSubmitted());
   }
 
-  void _deleteTransaction() {}
+  void _showDeleteConfirmationDialog(String transDescription) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Delete $transDescription ?'),
+        content: Text('Are you sure you wanna delete this transaction ?'),
+        actions: <Widget>[
+          OutlineButton(
+            child: Text("Close"),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          ),
+          OutlineButton(
+            child: Text("Yes"),
+            onPressed: () {
+              context.bloc<TransactionFormBloc>().add(DeleteTransaction());
+              Navigator.of(ctx).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }

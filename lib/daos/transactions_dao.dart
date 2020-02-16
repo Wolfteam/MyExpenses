@@ -5,7 +5,7 @@ class TransactionsDao extends DatabaseAccessor<AppDatabase>
     with _$TransactionsDaoMixin {
   TransactionsDao(AppDatabase db) : super(db);
 
-  Future<List<TransactionItem>> getAll(DateTime from, DateTime to) {
+  Future<List<TransactionItem>> getAllTransactions(DateTime from, DateTime to) {
     final query = (select(transactions)
           ..where((t) => t.transactionDate.isBetweenValues(from, to)))
         .join([
@@ -36,7 +36,7 @@ class TransactionsDao extends DatabaseAccessor<AppDatabase>
     return query.get();
   }
 
-  Future<TransactionItem> save(TransactionItem transaction) async {
+  Future<TransactionItem> saveTransaction(TransactionItem transaction) async {
     Transaction savedTransaction;
 
     if (transaction.id <= 0) {
@@ -80,5 +80,10 @@ class TransactionsDao extends DatabaseAccessor<AppDatabase>
       repetitions: savedTransaction.repetitions,
       transactionDate: savedTransaction.transactionDate,
     );
+  }
+
+  Future<bool> deleteTransaction(int id) async {
+    await (delete(transactions)..where((t) => t.id.equals(id))).go();
+    return true;
   }
 }
