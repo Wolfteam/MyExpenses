@@ -20,7 +20,6 @@ dependencies:
   flutter:
     sdk: flutter
   charts_flutter: ^0.8.1
-  intl: ^0.16.1
   url_launcher: ^5.4.1
   flutter_colorpicker: ^0.2.6
   # The following adds the Cupertino Icons font to your application.
@@ -34,7 +33,11 @@ dependencies:
   flutter_bloc: ^3.2.0
   equatable: ^1.1.0
   flutter_flexible_toast: ^0.1.3
-
+  flutter_localizations:
+    sdk: flutter
+  flutter_cupertino_localizations: ^1.0.1
+  shared_preferences: ^0.5.6+1
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,0 +1,41 @@
+{
+    "appName": "Mis Gastos",
+    "dark": "Oscuro",
+    "light": "Ligero",
+    "english": "Inglés",
+    "spanish": "Español",
+    "incomes": "Ingresos",
+    "expenses": "Gastos",
+    "none": "Ninguno",
+    "eachDay": "Cada día",
+    "repetitionCycle": {
+        "eachWeek": "Cada semana",
+        "eachMonth": "Cada mes",
+        "eachYear": "Cada año"
+    },
+    "syncInterval": {
+        "eachHour": "Cada hora",
+        "each3Hours": "Cada 3 horas",
+        "each6Hours": "Cada 6 horas",
+        "each12Hours": "Cada 12 horas"
+    },
+    "settings": {
+        "theme": "Tema",
+        "selectAppTheme": "Selecciona un tema",
+        "chooseAppTheme": "Escoge un color base para la app",
+        "useDarkAmoled": "Usar el tema oscuro para pantallas Amoled",
+        "accentColor": "Color de acento",
+        "chooseAccentColor": "Escoge un color de acento",
+        "language": "Lenguaje",
+        "chooseLanguage": "Escoge un lenguaje",
+        "selectLanguage": "Selecciona un lenguaje",
+        "sync": "Sincronización",
+        "selectSyncInterval": "Selecciona un intervalo",
+        "chooseSyncInterval": "Escoge un intervalo de sincronización",
+        "about": "Acerca de",
+        "aboutSummary": "Una aplicación que te ayuda a mantener un registro de tus gastos.",
+        "donations": "Donaciones",
+        "donationsMsg": "Espero que disfrutes al usar esta aplicación, si te gustaría comprarme un cafe o una cerveza, envíame un email.",
+        "donationSupport": "Hice esta aplicación en mi tiempo libre y también es de código abierto. Si desea ayudarme, informar un problema, tienes una idea, deseas que se implemente una función, etc., crea un issue aquí:"
+    }
+}
