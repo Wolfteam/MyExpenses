@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../generated/i18n.dart';
 import '../pages/add_edit_transasctiton_page.dart';
 import '../pages/categories_page.dart';
 import '../pages/charts_page.dart';
@@ -41,7 +42,7 @@ class _HomePageState extends State<HomePage>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("My expenses"),
+        title: Text(I18n.of(context).appName),
       ),
       drawer: AppDrawer(),
       body: TabBarView(

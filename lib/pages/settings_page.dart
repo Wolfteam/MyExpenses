@@ -1,39 +1,105 @@
-import 'dart:ffi';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class SettingsPage extends StatelessWidget {
-  final String _selectedLanguage = 'English';
-  final String _selectedAppTheme = 'Dark';
-  final String _selectedSyncInterval = 'Each hour';
-  final List<Color> _accentColors = [
-    Colors.blue,
-    Colors.green,
-    Colors.pink,
-    Colors.brown,
-    Colors.red,
-    Colors.cyan,
-    Colors.greenAccent,
-    Colors.purple,
-    Colors.deepPurple,
-    Colors.grey,
-    Colors.orange,
-    Colors.yellow,
-    Colors.blueGrey,
-    Colors.deepPurpleAccent,
-    Colors.amberAccent,
-  ];
+import '../bloc/bloc.dart';
+import '../common/enums/app_accent_color_type.dart';
+import '../common/enums/app_language_type.dart';
+import '../common/enums/app_theme_type.dart';
+import '../common/enums/sync_intervals_type.dart';
+import '../common/extensions/app_theme_type_extensions.dart';
+import '../common/extensions/i18n_extensions.dart';
+import '../generated/i18n.dart';
 
-  Widget _buildThemeSettings(BuildContext context) {
+class SettingsPage extends StatefulWidget {
+  @override
+  _SettingsPageState createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    context.bloc<SettingsBloc>().add(const LoadSettings());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white54,
+      child: Padding(
+        padding: const EdgeInsets.all(5),
+        child: BlocBuilder<SettingsBloc, SettingsState>(
+          builder: (ctx, state) {
+            return ListView(
+              children: _buildPage(context, state),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildPage(
+    BuildContext context,
+    SettingsState state,
+  ) {
+    if (state is SettingsInitialState) {
+      final i18n = I18n.of(context);
+      return [
+        _buildThemeSettings(context, state, i18n),
+        _buildAccentColorSettings(context, state, i18n),
+        _buildLanguageSettings(context, state, i18n),
+        _buildSyncSettings(context, state, i18n),
+        _buildAboutSettings(context, state, i18n),
+      ];
+    }
+
+    return [
+      const Center(
+        child: CircularProgressIndicator(),
+      )
+    ];
+  }
+
+  Widget _buildThemeSettings(
+    BuildContext context,
+    SettingsInitialState state,
+    I18n i18n,
+  ) {
+    final dropdown = DropdownButton<AppThemeType>(
+      isExpanded: true,
+      hint: Text(i18n.settingsSelectAppTheme),
+      value: state.appTheme,
+      icon: Icon(Icons.arrow_downward),
+      iconSize: 24,
+      style: TextStyle(color: Colors.deepPurple),
+      underline: Container(
+        height: 0,
+        color: Colors.transparent,
+      ),
+      onChanged: _appThemeChanged,
+      items: AppThemeType.values
+          .map<DropdownMenuItem<AppThemeType>>(
+            (theme) => DropdownMenuItem<AppThemeType>(
+              value: theme,
+              child: Text(i18n.translateAppThemeType(theme)),
+            ),
+          )
+          .toList(),
+    );
+
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      margin: EdgeInsets.all(10),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      margin: const EdgeInsets.all(10),
       elevation: 3,
       child: Container(
-        margin: EdgeInsets.all(10),
-        padding: EdgeInsets.all(5),
+        margin: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(5),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -42,9 +108,9 @@ class SettingsPage extends StatelessWidget {
               children: <Widget>[
                 Icon(Icons.color_lens),
                 Container(
-                  margin: EdgeInsets.only(left: 5),
+                  margin: const EdgeInsets.only(left: 5),
                   child: Text(
-                    "Theme",
+                    i18n.settingsTheme,
                     style: Theme.of(context).textTheme.title,
                   ),
                 ),
@@ -53,7 +119,7 @@ class SettingsPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: 5),
               child: Text(
-                "Choose a base app color",
+                i18n.settingsChooseAppTheme,
                 style: TextStyle(
                   color: Colors.grey,
                 ),
@@ -64,29 +130,10 @@ class SettingsPage extends StatelessWidget {
                 left: 16,
                 right: 16,
               ),
-              child: DropdownButton<String>(
-                isExpanded: true,
-                hint: Text("Please select an app theme"),
-                value: _selectedAppTheme,
-                icon: Icon(Icons.arrow_downward),
-                iconSize: 24,
-                style: TextStyle(color: Colors.deepPurple),
-                underline: Container(
-                  height: 0,
-                  color: Colors.transparent,
-                ),
-                onChanged: (newValue) {},
-                items: <String>['Dark', 'Ligth']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
+              child: dropdown,
             ),
             SwitchListTile(
-              title: Text("Use dark amoled theme"),
+              title: Text(i18n.settingsUseDarkAmoled),
               // subtitle: Text("Usefull on amoled screens"),
               value: true,
               onChanged: (newValue) {},
@@ -97,92 +144,29 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildLanguageSettings(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      margin: EdgeInsets.all(10),
-      elevation: 3,
-      child: Container(
-        margin: EdgeInsets.all(10),
-        padding: EdgeInsets.all(5),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Icon(Icons.language),
-                Container(
-                  margin: EdgeInsets.only(left: 5),
-                  child: Text(
-                    "Language",
-                    style: Theme.of(context).textTheme.title,
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 5),
-              child: Text(
-                "Choose a language",
-                style: TextStyle(
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 16,
-                right: 16,
-              ),
-              child: DropdownButton<String>(
-                isExpanded: true,
-                hint: Text("Please select a language"),
-                value: _selectedLanguage,
-                icon: Icon(Icons.arrow_downward),
-                iconSize: 24,
-                style: TextStyle(color: Colors.deepPurple),
-                underline: Container(
-                  height: 0,
-                  color: Colors.transparent,
-                ),
-                onChanged: (newValue) {},
-                items: <String>['English', 'Spanish']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAccentColorSettings(BuildContext context) {
-    bool isSelected = true;
-    var accentColors = _accentColors.map((color) {
-      var widget = Container(
+  Widget _buildAccentColorSettings(
+    BuildContext context,
+    SettingsInitialState state,
+    I18n i18n,
+  ) {
+    final accentColors = AppAccentColorType.values.map((accentColor) {
+      final color = accentColor.getAccentColor();
+      final widget = Container(
         padding: const EdgeInsets.all(8),
-        child: isSelected ? Icon(Icons.check) : null,
         color: color,
+        child: state.accentColor == accentColor ? Icon(Icons.check) : null,
       );
-
-      isSelected = false;
 
       return widget;
     }).toList();
 
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      margin: EdgeInsets.all(10),
+      margin: const EdgeInsets.all(10),
       elevation: 3,
       child: Container(
-        margin: EdgeInsets.all(10),
-        padding: EdgeInsets.all(5),
+        margin: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(5),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -191,9 +175,9 @@ class SettingsPage extends StatelessWidget {
               children: <Widget>[
                 Icon(Icons.colorize),
                 Container(
-                  margin: EdgeInsets.only(left: 5),
+                  margin: const EdgeInsets.only(left: 5),
                   child: Text(
-                    "Accent Color",
+                    i18n.settingsAccentColor,
                     style: Theme.of(context).textTheme.title,
                   ),
                 ),
@@ -204,7 +188,7 @@ class SettingsPage extends StatelessWidget {
                 top: 5,
               ),
               child: Text(
-                "Choose an accent color",
+                i18n.settingsChooseAccentColor,
                 style: TextStyle(
                   color: Colors.grey,
                 ),
@@ -213,13 +197,14 @@ class SettingsPage extends StatelessWidget {
             Container(
               height: 235,
               child: GridView.count(
-                  physics: NeverScrollableScrollPhysics(),
-                  primary: false,
-                  padding: const EdgeInsets.all(20),
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  crossAxisCount: 5,
-                  children: accentColors),
+                physics: const NeverScrollableScrollPhysics(),
+                primary: false,
+                padding: const EdgeInsets.all(20),
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                crossAxisCount: 5,
+                children: accentColors,
+              ),
             )
           ],
         ),
@@ -227,36 +212,46 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSyncSettings(BuildContext context) {
+  Widget _buildLanguageSettings(
+    BuildContext context,
+    SettingsInitialState state,
+    I18n i18n,
+  ) {
+    final dropdown = [AppLanguageType.english, AppLanguageType.spanish]
+        .map<DropdownMenuItem<AppLanguageType>>(
+          (lang) => DropdownMenuItem<AppLanguageType>(
+            value: lang,
+            child: Text(i18n.translateAppLanguageType(lang)),
+          ),
+        )
+        .toList();
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      margin: EdgeInsets.all(10),
+      margin: const EdgeInsets.all(10),
       elevation: 3,
       child: Container(
-        margin: EdgeInsets.all(10),
-        padding: EdgeInsets.all(5),
+        margin: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(5),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Icon(Icons.sync),
+                Icon(Icons.language),
                 Container(
-                  margin: EdgeInsets.only(left: 5),
+                  margin: const EdgeInsets.only(left: 5),
                   child: Text(
-                    "Sync",
+                    i18n.settingsLanguage,
                     style: Theme.of(context).textTheme.title,
                   ),
                 ),
               ],
             ),
             Padding(
-              padding: const EdgeInsets.only(
-                top: 5,
-              ),
+              padding: const EdgeInsets.only(top: 5),
               child: Text(
-                "Choose a sync interval",
+                i18n.settingsChooseLanguage,
                 style: TextStyle(
                   color: Colors.grey,
                 ),
@@ -267,10 +262,10 @@ class SettingsPage extends StatelessWidget {
                 left: 16,
                 right: 16,
               ),
-              child: DropdownButton<String>(
+              child: DropdownButton<AppLanguageType>(
                 isExpanded: true,
-                hint: Text("Please select an interval"),
-                value: _selectedSyncInterval,
+                hint: Text(i18n.settingsSelectLanguage),
+                value: AppLanguageType.english,
                 icon: Icon(Icons.arrow_downward),
                 iconSize: 24,
                 style: TextStyle(color: Colors.deepPurple),
@@ -278,19 +273,8 @@ class SettingsPage extends StatelessWidget {
                   height: 0,
                   color: Colors.transparent,
                 ),
-                onChanged: (newValue) {},
-                items: <String>[
-                  'Each hour',
-                  'Each 3 hours',
-                  'Each 6 hours',
-                  'Each 12 hours',
-                  'Each day'
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
+                onChanged: _languageChanged,
+                items: dropdown,
               ),
             ),
           ],
@@ -299,15 +283,95 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAboutSettings(BuildContext context) {
-    var textTheme = Theme.of(context).textTheme;
+  Widget _buildSyncSettings(
+    BuildContext context,
+    SettingsInitialState state,
+    I18n i18n,
+  ) {
+    final dropdown = DropdownButton<SyncIntervalType>(
+      isExpanded: true,
+      hint: Text(i18n.settingsSelectSyncInterval),
+      value: state.syncInterval,
+      icon: Icon(Icons.arrow_downward),
+      iconSize: 24,
+      style: TextStyle(color: Colors.deepPurple),
+      underline: Container(
+        height: 0,
+        color: Colors.transparent,
+      ),
+      onChanged: _syncIntervalChanged,
+      items: SyncIntervalType.values
+          .map<DropdownMenuItem<SyncIntervalType>>(
+            (interval) => DropdownMenuItem<SyncIntervalType>(
+              value: interval,
+              child: Text(i18n.translateSyncIntervalType(interval)),
+            ),
+          )
+          .toList(),
+    );
+
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      margin: EdgeInsets.all(10),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      margin: const EdgeInsets.all(10),
       elevation: 3,
       child: Container(
-        margin: EdgeInsets.all(10),
-        padding: EdgeInsets.all(5),
+        margin: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Icon(Icons.sync),
+                Container(
+                  margin: const EdgeInsets.only(left: 5),
+                  child: Text(
+                    i18n.settingsSync,
+                    style: Theme.of(context).textTheme.title,
+                  ),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(
+                top: 5,
+              ),
+              child: Text(
+                i18n.settingsChooseSyncInterval,
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(
+                left: 16,
+                right: 16,
+              ),
+              child: dropdown,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAboutSettings(
+    BuildContext context,
+    SettingsInitialState state,
+    I18n i18n,
+  ) {
+    final textTheme = Theme.of(context).textTheme;
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      margin: const EdgeInsets.all(10),
+      elevation: 3,
+      child: Container(
+        margin: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(5),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -318,7 +382,7 @@ class SettingsPage extends StatelessWidget {
                 Container(
                   margin: EdgeInsets.only(left: 5),
                   child: Text(
-                    "About",
+                    i18n.settingsAbout,
                     style: textTheme.title,
                   ),
                 ),
@@ -345,30 +409,31 @@ class SettingsPage extends StatelessWidget {
                     style: textTheme.subtitle,
                   ),
                   Text(
-                    "An app that helps you to keep track of your expenses.",
+                    i18n.settingsAboutSummary,
                     textAlign: TextAlign.center,
                   ),
                   Container(
                     margin: EdgeInsets.only(top: 5),
                     child: Text(
-                      "Donations",
+                      i18n.settingsDonations,
                       style: textTheme.subtitle,
                     ),
                   ),
                   Text(
-                    "I hope you are enjoying using this app, if you would like to buy me a coffee/beer, just send me an email.",
+                    i18n.settingsDonationsMsg,
                   ),
                   Container(
                     margin: EdgeInsets.only(top: 5),
                     child: Text(
-                      "Support",
+                      i18n.settingsDonationSupport,
                       style: textTheme.subtitle,
                     ),
                   ),
                   Text(
-                      "I made this app in my free time and it is also open source. If you would like to help me, report an issue, have an idea, want a feature to be implemented, etc please open an issue here:"),
+                    i18n.settingsDonationSupport,
+                  ),
                   Container(
-                    margin: EdgeInsets.only(top: 5),
+                    margin: const EdgeInsets.only(top: 5),
                     child: RichText(
                       textAlign: TextAlign.center,
                       text: TextSpan(
@@ -405,35 +470,17 @@ class SettingsPage extends StatelessWidget {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white54,
-      child: Padding(
-        padding: const EdgeInsets.all(5),
-        child: ListView(
-          children: <Widget>[
-            _buildThemeSettings(context),
-            // Divider(
-            //   color: Colors.black,
-            //   thickness: 1,
-            // ),
-            _buildAccentColorSettings(context),
-            // Divider(
-            //   color: Colors.black,
-            //   thickness: 1,
-            // ),
-            _buildLanguageSettings(context),
-            // Divider(
-            //   color: Colors.black,
-            //   thickness: 1,
-            // ),
-            _buildSyncSettings(context),
+  void _appThemeChanged(AppThemeType newValue) =>
+      context.bloc<SettingsBloc>().add(AppThemeChanged(newValue));
 
-            _buildAboutSettings(context),
-          ],
-        ),
-      ),
-    );
+  void _accentColorChanged(AppAccentColorType newValue) =>
+      context.bloc<SettingsBloc>().add(AppAccentColorChanged(newValue));
+
+  void _syncIntervalChanged(SyncIntervalType newValue) =>
+      context.bloc<SettingsBloc>().add(SyncIntervalChanged(newValue));
+
+  void _languageChanged(AppLanguageType newValue) {
+    final locale = I18n.delegate.supportedLocales[newValue.index];
+    I18n.onLocaleChanged(locale);
   }
 }
