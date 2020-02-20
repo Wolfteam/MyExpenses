@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../bloc/bloc.dart';
+import '../bloc/transaction_form/transaction_form_bloc.dart';
+import '../bloc/transactions/transactions_bloc.dart';
 import '../common/enums/repetition_cycle_type.dart';
 import '../common/extensions/string_extensions.dart';
 import '../common/utils/repetition_cycle_utils.dart';
@@ -13,6 +14,7 @@ import '../models/current_selected_category.dart';
 import '../models/transaction_item.dart';
 import 'categories_page.dart';
 
+//TODO: IF THE SELECTED CATEGORY IS AN EXPENSE, YOU MUST SET A NEGATIVE AMOUNT
 class AddEditTransactionPage extends StatefulWidget {
   final TransactionItem item;
 
@@ -95,7 +97,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               ),
               if (widget.item != null)
                 IconButton(
-                  icon: Icon(Icons.delete, color: Colors.red),
+                  icon: Icon(Icons.delete),
                   onPressed: state is TransactionFormLoadedState
                       ? () {
                           _showDeleteConfirmationDialog(state.description);
@@ -151,6 +153,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   ) {
     final createdAt = _dateFormat.format(state.transactionDate);
     const cornerRadius = Radius.circular(20);
+    final theme = Theme.of(context);
 
     return Container(
       height: 240.0,
@@ -168,7 +171,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               bottom: 10.0,
             ),
             child: Material(
-              shape: RoundedRectangleBorder(
+              shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.only(
                   bottomLeft: cornerRadius,
                   bottomRight: cornerRadius,
@@ -177,7 +180,6 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                 ),
               ),
               elevation: 5.0,
-              color: Colors.white,
               child: Column(
                 children: <Widget>[
                   const SizedBox(
@@ -190,7 +192,10 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                   const SizedBox(
                     height: 5.0,
                   ),
-                  Text("Date: $createdAt"),
+                  Text(
+                    "Date: $createdAt",
+                    style: theme.textTheme.subtitle,
+                  ),
                   const SizedBox(
                     height: 16.0,
                   ),
@@ -205,13 +210,12 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                               "${state.amount} \$",
                               textAlign: TextAlign.center,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontSize: 16.0, fontWeight: FontWeight.bold),
+                              style: theme.textTheme.title,
                             ),
                             subtitle: Text(
                               "Amount".toUpperCase(),
                               textAlign: TextAlign.center,
-                              style: const TextStyle(fontSize: 11.0),
+                              style: theme.textTheme.caption,
                             ),
                           ),
                         ),
@@ -221,13 +225,12 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                               state.category.isAnIncome ? "Income" : "Expense",
                               textAlign: TextAlign.center,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontSize: 16.0, fontWeight: FontWeight.bold),
+                              style: theme.textTheme.title,
                             ),
                             subtitle: Text(
                               "Category".toUpperCase(),
                               textAlign: TextAlign.center,
-                              style: const TextStyle(fontSize: 11.0),
+                              style: theme.textTheme.caption,
                             ),
                           ),
                         ),
@@ -237,13 +240,12 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                               getRepetitionCycleTypeName(state.repetitionCycle),
                               textAlign: TextAlign.center,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontSize: 16.0, fontWeight: FontWeight.bold),
+                              style: theme.textTheme.title,
                             ),
                             subtitle: Text(
                               "Repetitons".toUpperCase(),
                               textAlign: TextAlign.center,
-                              style: const TextStyle(fontSize: 11.0),
+                              style: theme.textTheme.caption,
                             ),
                           ),
                         ),
@@ -265,11 +267,13 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                   child: CircleAvatar(
                     backgroundColor: Colors.white,
                     radius: 40.0,
-                    child: IconButton(
-                      iconSize: 65,
-                      icon: Icon(state.category.icon),
-                      color: state.category.iconColor,
-                      onPressed: () => _changeCategory(state),
+                    child: Center(
+                      child: IconButton(
+                        iconSize: 50,
+                        icon: Icon(state.category.icon),
+                        color: state.category.iconColor,
+                        onPressed: () => _changeCategory(state),
+                      ),
                     ),
                   ),
                 ),
@@ -286,6 +290,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     final TransactionFormLoadedState state,
   ) {
     final transactionDate = _dateFormat.format(state.transactionDate);
+    final theme = Theme.of(context);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -326,11 +331,13 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               alignment: MainAxisAlignment.center,
               children: <Widget>[
                 FlatButton.icon(
+                  textColor: theme.primaryColor,
                   onPressed: () {},
                   icon: Icon(Icons.photo_library),
                   label: Text("From Gallery"),
                 ),
                 FlatButton.icon(
+                  textColor: theme.primaryColor,
                   onPressed: () {},
                   icon: Icon(Icons.camera_enhance),
                   label: Text("From Camera"),
@@ -504,9 +511,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                 style: TextStyle(color: Colors.red),
               ),
               value: state.repetitionCycle,
-              icon: Icon(Icons.arrow_downward),
               iconSize: 24,
-              style: TextStyle(color: Colors.black),
               underline: Container(
                 height: 0,
                 color: Colors.transparent,
@@ -591,7 +596,10 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
       context,
       listen: false,
     );
-    selectedCatProvider.currentSelectedItem = state.category;
+
+    if (state.category.id > 0) {
+      selectedCatProvider.currentSelectedItem = state.category;
+    }
 
     final route = MaterialPageRoute<CategoryItem>(
       builder: (ctx) => CategoriesPage(
@@ -620,12 +628,16 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         content: Text('Are you sure you wanna delete this transaction ?'),
         actions: <Widget>[
           OutlineButton(
-            child: Text("Close"),
+            textColor: Theme.of(context).primaryColor,
+            child: Text(
+              "Close",
+            ),
             onPressed: () {
               Navigator.of(ctx).pop();
             },
           ),
-          OutlineButton(
+          RaisedButton(
+            color: Theme.of(ctx).primaryColor,
             child: Text("Yes"),
             onPressed: () {
               context.bloc<TransactionFormBloc>().add(DeleteTransaction());

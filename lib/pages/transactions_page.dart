@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../bloc/bloc.dart';
+import '../bloc/transactions/transactions_bloc.dart';
 import '../widgets/transactions/home_last_7_days_summary.dart';
 import '../widgets/transactions/home_transactions_summary_per_month.dart';
 import '../widgets/transactions/transactions_card_container.dart';
@@ -50,12 +50,12 @@ class _TransactionsPageState extends State<TransactionsPage>
     super.build(context);
 
     return Scaffold(
-      backgroundColor: Colors.white54,
       floatingActionButton: FadeTransition(
         opacity: _hideFabAnimController,
         child: ScaleTransition(
           scale: _hideFabAnimController,
           child: FloatingActionButton(
+            backgroundColor: Theme.of(context).primaryColor,
             mini: true,
             onPressed: () {
               _scrollController.animateTo(

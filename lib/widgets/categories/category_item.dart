@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_expenses/models/current_selected_category.dart';
 import 'package:provider/provider.dart';
 
-import '../../bloc/bloc.dart';
+import '../../bloc/categories_list/categories_list_bloc.dart';
 import '../../models/category_item.dart' as models;
+import '../../models/current_selected_category.dart';
 
 class CategoryItem extends StatelessWidget {
   final bool isInSelectionMode;
@@ -17,10 +17,12 @@ class CategoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     bool isAnotherItemSelected = false;
 
     if (isInSelectionMode) {
-      final selectedCatProvider = Provider.of<CurrentSelectedCategory>(context, listen: false);
+      final selectedCatProvider =
+          Provider.of<CurrentSelectedCategory>(context, listen: false);
       isAnotherItemSelected = selectedCatProvider.currentSelectedItem != null &&
           selectedCatProvider.currentSelectedItem.id != category.id;
     }
@@ -32,7 +34,7 @@ class CategoryItem extends StatelessWidget {
     return Container(
       decoration:
           isInSelectionMode && !isAnotherItemSelected && category.isSeleted
-              ? BoxDecoration(color: Colors.red)
+              ? BoxDecoration(color: theme.primaryColorLight)
               : null,
       child: ListTile(
         leading: icon,
@@ -45,7 +47,8 @@ class CategoryItem extends StatelessWidget {
   }
 
   void _handleItemClickOnSelectionMode(BuildContext context) {
-    final selectedCatProvider = Provider.of<CurrentSelectedCategory>(context, listen: false);
+    final selectedCatProvider =
+        Provider.of<CurrentSelectedCategory>(context, listen: false);
     selectedCatProvider.currentSelectedItem = category;
 
     if (category.isAnIncome) {

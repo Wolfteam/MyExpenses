@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_flexible_toast/flutter_flexible_toast.dart';
 import 'package:my_expenses/models/category_item.dart';
 import 'package:my_expenses/models/current_selected_category.dart';
-import 'package:my_expenses/widgets/colored_tabbar.dart';
 import 'package:provider/provider.dart';
 import '../pages/categories_list_page.dart';
 
@@ -65,10 +64,12 @@ class _CategoriesPageState extends State<CategoriesPage>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final tabBar = TabBar(
-      indicatorColor: Colors.blueGrey,
-      labelColor: Colors.red,
-      unselectedLabelColor: Colors.grey,
+      indicatorColor: theme.primaryColor,
+      labelColor:
+          theme.brightness == Brightness.dark ? Colors.white : Colors.black,
+      // unselectedLabelColor: theme.unselectedWidgetColor,
       controller: _tabController,
       tabs: _tabs,
     );
@@ -92,7 +93,7 @@ class _CategoriesPageState extends State<CategoriesPage>
           ),
         ],
         title: Text("Select a category"),
-        bottom: ColoredTabBar(Colors.white, tabBar),
+        bottom: tabBar,
       ),
       body: TabBarView(
         controller: _tabController,
@@ -108,8 +109,10 @@ class _CategoriesPageState extends State<CategoriesPage>
   }
 
   void _onDone() {
-    final selectedCatProvider =
-        Provider.of<CurrentSelectedCategory>(context, listen: false);
+    final selectedCatProvider = Provider.of<CurrentSelectedCategory>(
+      context,
+      listen: false,
+    );
 
     if (selectedCatProvider.currentSelectedItem != null) {
       Navigator.of(context).pop(selectedCatProvider.currentSelectedItem);

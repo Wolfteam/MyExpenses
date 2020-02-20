@@ -62,8 +62,8 @@ class ChartsPage extends StatelessWidget {
         _createSampleDataForBarChart(),
         animate: true,
         vertical: true,
-        barRendererDecorator: new charts.BarLabelDecorator<String>(),
-        domainAxis: new charts.OrdinalAxisSpec(
+        barRendererDecorator: charts.BarLabelDecorator<String>(),
+        domainAxis: charts.OrdinalAxisSpec(
           showAxisLine: false,
           renderSpec: charts.SmallTickRendererSpec(
             labelRotation: 45,
@@ -79,7 +79,6 @@ class ChartsPage extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _buildIncomesAndExpensesCharts(BuildContext context) {
     var titleStyle = Theme.of(context).textTheme.subtitle;
@@ -156,7 +155,8 @@ class ChartsPage extends StatelessWidget {
   }
 
   void _goToDetailsPage(BuildContext context, bool onlyIncomes) {
-    var route = MaterialPageRoute(builder: (ctx) => ChartDetailsPage(onlyIncomes));
+    var route =
+        MaterialPageRoute(builder: (ctx) => ChartDetailsPage(onlyIncomes));
 
     Navigator.of(context).push(route);
   }

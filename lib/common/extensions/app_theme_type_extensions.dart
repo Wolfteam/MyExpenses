@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_expenses/common/enums/app_theme_type.dart';
 
 import '../enums/app_accent_color_type.dart';
 
@@ -17,8 +18,8 @@ extension AppThemeTypeExtensions on AppAccentColorType {
         return Colors.red;
       case AppAccentColorType.cyan:
         return Colors.cyan;
-      case AppAccentColorType.greenAccent:
-        return Colors.greenAccent;
+      case AppAccentColorType.indigo:
+        return Colors.indigo;
       case AppAccentColorType.purple:
         return Colors.purple;
       case AppAccentColorType.deepPurple:
@@ -31,12 +32,74 @@ extension AppThemeTypeExtensions on AppAccentColorType {
         return Colors.yellow;
       case AppAccentColorType.blueGrey:
         return Colors.blueGrey;
-      case AppAccentColorType.deepPurpleAccent:
-        return Colors.deepPurpleAccent;
-      case AppAccentColorType.amberAccent:
-        return Colors.amberAccent;
+      case AppAccentColorType.teal:
+        return Colors.teal;
+      case AppAccentColorType.amber:
+        return Colors.amber;
       default:
         throw Exception('The provided accent color = $this is not valid ');
     }
+  }
+
+  ThemeData getThemeData(AppThemeType theme) {
+    final color = getAccentColor();
+
+    switch (theme) {
+      case AppThemeType.dark:
+        return ThemeData(
+          brightness: Brightness.dark,
+          accentColor: color,
+          primaryColor: color,
+          primaryColorLight: color.withOpacity(0.5),
+          primaryColorDark: color,
+          primarySwatch: MaterialColor(color.value, getSwatch(color)),
+        );
+        break;
+      case AppThemeType.light:
+        return ThemeData(
+          brightness: Brightness.light,
+          accentColor: color,
+          primaryColor: color,
+          primaryColorLight: color.withOpacity(0.5),
+          primaryColorDark: color,
+          primarySwatch: MaterialColor(color.value, getSwatch(color)),
+        );
+        break;
+      default:
+        throw Exception('The provided theme  = $theme is not valid ');
+    }
+  }
+
+  Map<int, Color> getSwatch(Color color) {
+    final hslColor = HSLColor.fromColor(color);
+    final lightness = hslColor.lightness;
+
+    /// if [500] is the default color, there are at LEAST five
+    /// steps below [500]. (i.e. 400, 300, 200, 100, 50.) A
+    /// divisor of 5 would mean [50] is a lightness of 1.0 or
+    /// a color of #ffffff. A value of six would be near white
+    /// but not quite.
+    final lowDivisor = 6;
+
+    /// if [500] is the default color, there are at LEAST four
+    /// steps above [500]. A divisor of 4 would mean [900] is
+    /// a lightness of 0.0 or color of #000000
+    final highDivisor = 5;
+
+    final lowStep = (1.0 - lightness) / lowDivisor;
+    final highStep = lightness / highDivisor;
+
+    return {
+      50: (hslColor.withLightness(lightness + (lowStep * 5))).toColor(),
+      100: (hslColor.withLightness(lightness + (lowStep * 4))).toColor(),
+      200: (hslColor.withLightness(lightness + (lowStep * 3))).toColor(),
+      300: (hslColor.withLightness(lightness + (lowStep * 2))).toColor(),
+      400: (hslColor.withLightness(lightness + lowStep)).toColor(),
+      500: (hslColor.withLightness(lightness)).toColor(),
+      600: (hslColor.withLightness(lightness - highStep)).toColor(),
+      700: (hslColor.withLightness(lightness - (highStep * 2))).toColor(),
+      800: (hslColor.withLightness(lightness - (highStep * 3))).toColor(),
+      900: (hslColor.withLightness(lightness - (highStep * 4))).toColor(),
+    };
   }
 }

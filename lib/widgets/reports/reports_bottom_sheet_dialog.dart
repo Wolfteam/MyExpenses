@@ -11,41 +11,44 @@ class ReportsBottomSheetDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return SingleChildScrollView(
       child: Container(
-        margin: EdgeInsets.only(
+        margin: const EdgeInsets.only(
           left: 10,
           right: 10,
           bottom: 10,
         ),
         // color: Colors.green,
-        padding: EdgeInsets.only(left: 20, right: 20, top: 20),
+        padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Center(
-              child: SizedBox(
-                width: 100,
-                height: 10,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(20),
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 20),
+                child: SizedBox(
+                  width: 100,
+                  height: 10,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: theme.primaryColor,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
                 ),
               ),
             ),
             Text(
               "Export from",
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
+              style: Theme.of(context).textTheme.title,
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 10),
+              padding: const EdgeInsets.only(
+                top: 20,
+              ),
               child: Text("Start date:"),
             ),
             FlatButton(
@@ -87,9 +90,7 @@ class ReportsBottomSheetDialog extends StatelessWidget {
               child: DropdownButton<String>(
                 isExpanded: true,
                 hint: Text("Please select a format"),
-                icon: Icon(Icons.arrow_downward),
                 iconSize: 24,
-                style: TextStyle(color: Colors.deepPurple),
                 underline: Container(
                   height: 0,
                   color: Colors.transparent,
@@ -167,7 +168,7 @@ class ReportsBottomSheetDialog extends StatelessWidget {
                   child: Text(
                     "Cancel",
                     style: TextStyle(
-                      color: Colors.red,
+                      color: theme.primaryColor,
                     ),
                   ),
                   onPressed: () {
@@ -175,7 +176,6 @@ class ReportsBottomSheetDialog extends StatelessWidget {
                   },
                 ),
                 RaisedButton(
-                  color: Colors.blue,
                   child: Text(
                     "Generate",
                   ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../bloc/transaction_form/transaction_form_bloc.dart';
 import '../generated/i18n.dart';
 import '../pages/add_edit_transasctiton_page.dart';
 import '../pages/categories_page.dart';
@@ -8,7 +9,6 @@ import '../pages/charts_page.dart';
 import '../pages/settings_page.dart';
 import '../pages/transactions_page.dart';
 import '../widgets/app_drawer.dart';
-import './../bloc/bloc.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -38,8 +38,6 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(I18n.of(context).appName),
@@ -52,7 +50,7 @@ class _HomePageState extends State<HomePage>
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
-        backgroundColor: colorScheme.secondary,
+        backgroundColor: Theme.of(context).primaryColor,
         mini: false,
         heroTag: "CreateTransactionFab",
         onPressed: () async {
@@ -66,11 +64,9 @@ class _HomePageState extends State<HomePage>
       ),
       bottomNavigationBar: BottomNavigationBar(
         showUnselectedLabels: true,
+        selectedItemColor: Theme.of(context).primaryColor,
         type: BottomNavigationBarType.fixed,
         currentIndex: _currentPageIndex,
-        selectedItemColor: colorScheme.onPrimary,
-        unselectedItemColor: colorScheme.onPrimary.withOpacity(0.5),
-        backgroundColor: colorScheme.primary,
         onTap: (index) {
           setState(() {
             _currentPageIndex = index;

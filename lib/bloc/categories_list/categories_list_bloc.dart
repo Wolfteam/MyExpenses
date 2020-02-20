@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:my_expenses/bloc/bloc.dart';
 
 import '../../models/category_item.dart';
 import '../../models/entities/database.dart';

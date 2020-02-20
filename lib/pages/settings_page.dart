@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../bloc/bloc.dart';
+import '../bloc/app/app_bloc.dart' as app_bloc;
+import '../bloc/settings/settings_bloc.dart';
 import '../common/enums/app_accent_color_type.dart';
 import '../common/enums/app_language_type.dart';
 import '../common/enums/app_theme_type.dart';
@@ -28,7 +29,6 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white54,
       child: Padding(
         padding: const EdgeInsets.all(5),
         child: BlocBuilder<SettingsBloc, SettingsState>(
@@ -73,9 +73,7 @@ class _SettingsPageState extends State<SettingsPage> {
       isExpanded: true,
       hint: Text(i18n.settingsSelectAppTheme),
       value: state.appTheme,
-      icon: Icon(Icons.arrow_downward),
       iconSize: 24,
-      style: TextStyle(color: Colors.deepPurple),
       underline: Container(
         height: 0,
         color: Colors.transparent,
@@ -85,7 +83,9 @@ class _SettingsPageState extends State<SettingsPage> {
           .map<DropdownMenuItem<AppThemeType>>(
             (theme) => DropdownMenuItem<AppThemeType>(
               value: theme,
-              child: Text(i18n.translateAppThemeType(theme)),
+              child: Text(
+                i18n.translateAppThemeType(theme),
+              ),
             ),
           )
           .toList(),
@@ -151,10 +151,14 @@ class _SettingsPageState extends State<SettingsPage> {
   ) {
     final accentColors = AppAccentColorType.values.map((accentColor) {
       final color = accentColor.getAccentColor();
-      final widget = Container(
-        padding: const EdgeInsets.all(8),
-        color: color,
-        child: state.accentColor == accentColor ? Icon(Icons.check) : null,
+
+      final widget = InkWell(
+        onTap: () => _accentColorChanged(accentColor),
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          color: color,
+          child: state.accentColor == accentColor ? Icon(Icons.check) : null,
+        ),
       );
 
       return widget;
@@ -194,18 +198,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
             ),
-            Container(
-              height: 235,
-              child: GridView.count(
-                physics: const NeverScrollableScrollPhysics(),
-                primary: false,
-                padding: const EdgeInsets.all(20),
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                crossAxisCount: 5,
-                children: accentColors,
-              ),
-            )
+            GridView.count(
+              shrinkWrap: true,
+              primary: false,
+              padding: const EdgeInsets.all(20),
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              crossAxisCount: 5,
+              children: accentColors,
+            ),
           ],
         ),
       ),
@@ -266,9 +267,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 isExpanded: true,
                 hint: Text(i18n.settingsSelectLanguage),
                 value: AppLanguageType.english,
-                icon: Icon(Icons.arrow_downward),
                 iconSize: 24,
-                style: TextStyle(color: Colors.deepPurple),
                 underline: Container(
                   height: 0,
                   color: Colors.transparent,
@@ -292,9 +291,7 @@ class _SettingsPageState extends State<SettingsPage> {
       isExpanded: true,
       hint: Text(i18n.settingsSelectSyncInterval),
       value: state.syncInterval,
-      icon: Icon(Icons.arrow_downward),
       iconSize: 24,
-      style: TextStyle(color: Colors.deepPurple),
       underline: Container(
         height: 0,
         color: Colors.transparent,
@@ -470,11 +467,17 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  void _appThemeChanged(AppThemeType newValue) =>
-      context.bloc<SettingsBloc>().add(AppThemeChanged(newValue));
+  void _appThemeChanged(AppThemeType newValue) {
+    context.bloc<SettingsBloc>().add(AppThemeChanged(newValue));
+    context.bloc<app_bloc.AppBloc>().add(app_bloc.AppThemeChanged(newValue));
+  }
 
-  void _accentColorChanged(AppAccentColorType newValue) =>
-      context.bloc<SettingsBloc>().add(AppAccentColorChanged(newValue));
+  void _accentColorChanged(AppAccentColorType newValue) {
+    context.bloc<SettingsBloc>().add(AppAccentColorChanged(newValue));
+    context
+        .bloc<app_bloc.AppBloc>()
+        .add(app_bloc.AppAccentColorChanged(newValue));
+  }
 
   void _syncIntervalChanged(SyncIntervalType newValue) =>
       context.bloc<SettingsBloc>().add(SyncIntervalChanged(newValue));

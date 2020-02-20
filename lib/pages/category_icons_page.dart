@@ -1,47 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:my_expenses/common/utils/category_utils.dart';
 
 import '../common/enums/category_icon_type.dart';
+import '../common/utils/category_utils.dart';
 import '../models/category_icon.dart';
 
 class CategoryIconsPage extends StatelessWidget {
-  final _controller = ScrollController();
-
-  final _selectedKey = new GlobalKey();
+  final _selectedKey = GlobalKey();
 
   List<Widget> _buildCategoryIconsPerType(
     BuildContext context,
     String categoryType,
     List<CategoryIcon> icons,
   ) {
-    var textTheme = Theme.of(context).textTheme;
-    var orientation = MediaQuery.of(context).orientation;
-    var grid = GridView.count(
+    final theme = Theme.of(context);
+    final orientation = MediaQuery.of(context).orientation;
+    final grid = GridView.count(
       childAspectRatio: orientation == Orientation.portrait ? 1.5 : 2,
       crossAxisCount: 4,
-      padding: EdgeInsets.all(0),
+      padding: const EdgeInsets.all(0),
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       children: List.generate(
         icons.length,
         (index) {
           return IconButton(
             key: icons[index].isSelected ? _selectedKey : null,
             iconSize: 30,
-            color: icons[index].isSelected ? Colors.redAccent : Colors.black87,
+            color: icons[index].isSelected ? theme.primaryColor : Colors.black87,
             icon: icons[index].icon,
             onPressed: () {},
           );
         },
       ),
     );
-    var widgets = [
+    final widgets = [
       Container(
-        margin: EdgeInsets.only(top: 10),
+        margin: const EdgeInsets.only(top: 10),
         child: Text(
           categoryType,
-          style: textTheme.subhead,
+          style: theme.textTheme.subhead,
           textAlign: TextAlign.center,
         ),
       ),
