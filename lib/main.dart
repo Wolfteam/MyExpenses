@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import './ui/pages/main_page.dart';
 import 'bloc/app/app_bloc.dart' as app_bloc;
 import 'bloc/categories_list/categories_list_bloc.dart';
+import 'bloc/drawer/drawer_bloc.dart';
 import 'bloc/settings/settings_bloc.dart';
 import 'bloc/transaction_form/transaction_form_bloc.dart';
 import 'bloc/transactions/transactions_bloc.dart';
@@ -80,6 +81,7 @@ class _MyAppState extends State<MyApp> {
             );
             return app_bloc.AppBloc(settingsService);
           }),
+          BlocProvider(create: (ctx) => DrawerBloc()),
         ],
         child: BlocBuilder<app_bloc.AppBloc, app_bloc.AppState>(
           builder: (ctx, state) => _buildApp(ctx, state),
@@ -92,7 +94,7 @@ class _MyAppState extends State<MyApp> {
     if (state is app_bloc.AppInitializedState) {
       return MaterialApp(
         theme: state.theme,
-        home: HomePage(),
+        home: MainPage(),
         localizationsDelegates: [
           // A class which loads the translations from JSON files
           i18n,

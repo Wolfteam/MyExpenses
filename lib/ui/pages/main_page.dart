@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../bloc/drawer/drawer_bloc.dart';
 import '../../bloc/transaction_form/transaction_form_bloc.dart';
+import '../../common/enums/app_drawer_item_type.dart';
 import '../../generated/i18n.dart';
 import '../pages/add_edit_transasctiton_page.dart';
 import '../pages/categories_page.dart';
@@ -10,12 +12,12 @@ import '../pages/settings_page.dart';
 import '../pages/transactions_page.dart';
 import '../widgets/app_drawer.dart';
 
-class HomePage extends StatefulWidget {
+class MainPage extends StatefulWidget {
   @override
-  _HomePageState createState() => _HomePageState();
+  _MainPageState createState() => _MainPageState();
 }
 
-class _HomePageState extends State<HomePage>
+class _MainPageState extends State<MainPage>
     with SingleTickerProviderStateMixin {
   int _currentPageIndex = 0;
   final _pages = <Widget>[
@@ -62,35 +64,23 @@ class _HomePageState extends State<HomePage>
         },
         child: const Icon(Icons.add),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        showUnselectedLabels: true,
-        selectedItemColor: Theme.of(context).primaryColor,
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _currentPageIndex,
-        onTap: (index) {
-          setState(() {
-            _currentPageIndex = index;
-            _tabController.animateTo(_currentPageIndex);
-          });
+      bottomNavigationBar: BlocBuilder<DrawerBloc, DrawerState>(
+        builder: (ctx, state) {
+          final index = _getSelectedIndex(state.selectedPage);
+
+          WidgetsBinding.instance.addPostFrameCallback(
+            (duration) => _tabController.animateTo(index),
+          );
+
+          return BottomNavigationBar(
+            showUnselectedLabels: true,
+            selectedItemColor: Theme.of(context).primaryColor,
+            type: BottomNavigationBarType.fixed,
+            currentIndex: index,
+            onTap: _changeCurrentTab,
+            items: _buildBottomNavBars(),
+          );
         },
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            title: Text("Transactions"),
-            icon: Icon(Icons.account_balance),
-          ),
-          BottomNavigationBarItem(
-            title: Text("Charts"),
-            icon: Icon(Icons.pie_chart),
-          ),
-          BottomNavigationBarItem(
-            title: Text("Categories"),
-            icon: Icon(Icons.category),
-          ),
-          BottomNavigationBarItem(
-            title: Text("Settings"),
-            icon: Icon(Icons.settings),
-          ),
-        ],
       ),
     );
   }
@@ -99,5 +89,66 @@ class _HomePageState extends State<HomePage>
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  List<BottomNavigationBarItem> _buildBottomNavBars() {
+    return [
+      BottomNavigationBarItem(
+        title: Text("Transactions"),
+        icon: Icon(Icons.account_balance),
+      ),
+      BottomNavigationBarItem(
+        title: Text("Charts"),
+        icon: Icon(Icons.pie_chart),
+      ),
+      BottomNavigationBarItem(
+        title: Text("Categories"),
+        icon: Icon(Icons.category),
+      ),
+      BottomNavigationBarItem(
+        title: Text("Settings"),
+        icon: Icon(Icons.settings),
+      ),
+    ];
+  }
+
+  int _getSelectedIndex(AppDrawerItemType item) {
+    int index;
+    switch (item) {
+      case AppDrawerItemType.transactions:
+        index = 0;
+        break;
+      case AppDrawerItemType.charts:
+        index = 1;
+        break;
+      case AppDrawerItemType.categories:
+        index = 2;
+        break;
+      case AppDrawerItemType.settings:
+        index = 3;
+        break;
+      default:
+        throw Exception(
+          'The selected drawer item = $item is not valid in the bottom nav bar items',
+        );
+    }
+
+    return index;
+  }
+
+  AppDrawerItemType _getSelectedDrawerItem(int index) {
+    if (index == 0) return AppDrawerItemType.transactions;
+    if (index == 1) return AppDrawerItemType.charts;
+    if (index == 2) return AppDrawerItemType.categories;
+    if (index == 3) return AppDrawerItemType.settings;
+
+    throw Exception(
+      'The provided inxed = $index is not valid in the bottom nav bar items',
+    );
+  }
+
+  void _changeCurrentTab(int index) {
+    final item = _getSelectedDrawerItem(index);
+    context.bloc<DrawerBloc>().add(DrawerItemSelectionChanged(item));
   }
 }
