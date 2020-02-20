@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../bloc/transaction_form/transaction_form_bloc.dart';
-import '../../models/transaction_item.dart' as trans_item;
+import '../../../bloc/transaction_form/transaction_form_bloc.dart';
+import '../../../models/transaction_item.dart' as trans_item;
 import '../../pages/add_edit_transasctiton_page.dart';
 
 class TransactionItem extends StatelessWidget {

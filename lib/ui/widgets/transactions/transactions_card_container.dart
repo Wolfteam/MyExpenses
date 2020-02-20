@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../models/transaction_card_items.dart';
+import '../../../models/transaction_card_items.dart';
 import '../../widgets/transactions/transaction_item.dart'
     as transaction;
 

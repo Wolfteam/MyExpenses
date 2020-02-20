@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
-import '../models/transactions_summary_per_date.dart';
+import '../../models/transactions_summary_per_date.dart';
 import '../widgets/charts/pie_chart_transactions_per_month.dart';
 import 'chart_details_page.dart';
 

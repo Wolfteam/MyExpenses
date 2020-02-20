@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../bloc/app/app_bloc.dart' as app_bloc;
-import '../bloc/settings/settings_bloc.dart';
-import '../common/enums/app_accent_color_type.dart';
-import '../common/enums/app_language_type.dart';
-import '../common/enums/app_theme_type.dart';
-import '../common/enums/sync_intervals_type.dart';
-import '../common/extensions/app_theme_type_extensions.dart';
-import '../common/extensions/i18n_extensions.dart';
-import '../generated/i18n.dart';
+import '../../bloc/app/app_bloc.dart' as app_bloc;
+import '../../bloc/settings/settings_bloc.dart';
+import '../../common/enums/app_accent_color_type.dart';
+import '../../common/enums/app_language_type.dart';
+import '../../common/enums/app_theme_type.dart';
+import '../../common/enums/sync_intervals_type.dart';
+import '../../common/extensions/app_theme_type_extensions.dart';
+import '../../common/extensions/i18n_extensions.dart';
+import '../../generated/i18n.dart';
 
 class SettingsPage extends StatefulWidget {
   @override

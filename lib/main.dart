@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
+import './ui/pages/main_page.dart';
 import 'bloc/app/app_bloc.dart' as app_bloc;
 import 'bloc/categories_list/categories_list_bloc.dart';
 import 'bloc/settings/settings_bloc.dart';
@@ -12,12 +13,8 @@ import 'bloc/transactions_last_7_days/transactions_last_7_days_bloc.dart';
 import 'generated/i18n.dart';
 import 'models/current_selected_category.dart';
 import 'models/entities/database.dart';
-import 'pages/main_page.dart';
 import 'services/settings_service.dart';
 
-//TODO: USE THE CONST KEYWORD!!!
-//TODO: MOVE THE ASSETS TO A COMMON CLASS
-//
 void main() {
   runApp(MyApp());
 }

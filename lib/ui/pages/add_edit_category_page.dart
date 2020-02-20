@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/block_picker.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_colorpicker/material_picker.dart';
-import 'package:my_expenses/pages/category_icons_page.dart';
 
-import '../common/presentation/custom_icons.dart';
+import '../../common/presentation/custom_icons.dart';
+import '../pages/category_icons_page.dart';
 
 class AddEditCategoryPage extends StatelessWidget {
   final _selectedTransactionType = "Income";

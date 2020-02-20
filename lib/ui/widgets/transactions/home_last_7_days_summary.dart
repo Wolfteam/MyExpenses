@@ -2,10 +2,10 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../bloc/transactions_last_7_days/transactions_last_7_days_bloc.dart';
-import '../../common/enums/transaction_type.dart';
-import '../../common/utils/date_utils.dart';
-import '../../models/transactions_summary_per_day.dart';
+import '../../../bloc/transactions_last_7_days/transactions_last_7_days_bloc.dart';
+import '../../../common/enums/transaction_type.dart';
+import '../../../common/utils/date_utils.dart';
+import '../../../models/transactions_summary_per_day.dart';
 
 class HomeLast7DaysSummary extends StatelessWidget {
   final List<TransactionsSummaryPerDay> incomes;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../bloc/categories_list/categories_list_bloc.dart';
-import '../models/category_item.dart';
+import '../../bloc/categories_list/categories_list_bloc.dart';
+import '../../models/category_item.dart';
 import '../widgets/categories/category_item.dart' as cat_item;
 import 'add_edit_category_page.dart';
 

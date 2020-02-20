@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
-import '../../models/chart_transaction_item.dart';
+import '../../../models/chart_transaction_item.dart';
 
 class PieChartTransactionsPerMonths extends StatelessWidget {
   final pieIncomesChartData = [

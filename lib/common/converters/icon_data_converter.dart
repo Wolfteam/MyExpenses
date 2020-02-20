@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:moor/moor.dart';
 
-import '../../../common/utils/category_utils.dart';
+import '../../common/utils/category_utils.dart';
 
 class IconDataConverter extends TypeConverter<IconData, String> {
   const IconDataConverter();

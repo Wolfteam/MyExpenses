@@ -3,15 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../bloc/transaction_form/transaction_form_bloc.dart';
-import '../bloc/transactions/transactions_bloc.dart';
-import '../common/enums/repetition_cycle_type.dart';
-import '../common/extensions/string_extensions.dart';
-import '../common/utils/repetition_cycle_utils.dart';
-import '../common/utils/toast_utils.dart';
-import '../models/category_item.dart';
-import '../models/current_selected_category.dart';
-import '../models/transaction_item.dart';
+import '../../bloc/transaction_form/transaction_form_bloc.dart';
+import '../../bloc/transactions/transactions_bloc.dart';
+import '../../common/enums/repetition_cycle_type.dart';
+import '../../common/extensions/string_extensions.dart';
+import '../../common/utils/repetition_cycle_utils.dart';
+import '../../common/utils/toast_utils.dart';
+import '../../models/category_item.dart';
+import '../../models/current_selected_category.dart';
+import '../../models/transaction_item.dart';
 import 'categories_page.dart';
 
 //TODO: IF THE SELECTED CATEGORY IS AN EXPENSE, YOU MUST SET A NEGATIVE AMOUNT

@@ -6,14 +6,12 @@ import 'package:moor_ffi/moor_ffi.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import '../../common/converters/db_converters.dart';
 import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/utils/db_seed_util.dart';
 import '../../models/category_item.dart';
 import '../../models/transaction_item.dart';
 import 'base_entity.dart';
-import 'converters/color_converter.dart';
-import 'converters/icon_data_converter.dart';
-import 'converters/repetition_cycle_converter.dart';
 
 //Tables
 part 'users.dart';

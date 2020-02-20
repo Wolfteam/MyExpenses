@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
-import '../../models/transactions_summary_per_month.dart';
+import '../../../models/transactions_summary_per_month.dart';
 
 class HomeTransactionSummaryPerMonth extends StatelessWidget {
   final String month;

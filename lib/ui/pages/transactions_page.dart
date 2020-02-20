@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../bloc/transactions/transactions_bloc.dart';
+import '../../bloc/transactions/transactions_bloc.dart';
 import '../widgets/transactions/home_last_7_days_summary.dart';
 import '../widgets/transactions/home_transactions_summary_per_month.dart';
 import '../widgets/transactions/transactions_card_container.dart';

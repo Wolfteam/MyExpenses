@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-import '../common/enums/category_icon_type.dart';
-import '../common/utils/category_utils.dart';
-import '../models/category_icon.dart';
+import '../../common/enums/category_icon_type.dart';
+import '../../common/utils/category_utils.dart';
+import '../../models/category_icon.dart';
 
 class CategoryIconsPage extends StatelessWidget {
   final _selectedKey = GlobalKey();

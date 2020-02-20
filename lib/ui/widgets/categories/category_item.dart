@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
-import '../../bloc/categories_list/categories_list_bloc.dart';
-import '../../models/category_item.dart' as models;
-import '../../models/current_selected_category.dart';
+import '../../../bloc/categories_list/categories_list_bloc.dart';
+import '../../../models/category_item.dart' as models;
+import '../../../models/current_selected_category.dart';
 
 class CategoryItem extends StatelessWidget {
   final bool isInSelectionMode;

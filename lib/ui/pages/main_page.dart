@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../bloc/transaction_form/transaction_form_bloc.dart';
-import '../generated/i18n.dart';
+import '../../bloc/transaction_form/transaction_form_bloc.dart';
+import '../../generated/i18n.dart';
 import '../pages/add_edit_transasctiton_page.dart';
 import '../pages/categories_page.dart';
 import '../pages/charts_page.dart';
