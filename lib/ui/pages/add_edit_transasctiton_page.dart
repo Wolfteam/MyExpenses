@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:my_expenses/generated/i18n.dart';
 import 'package:provider/provider.dart';
 
 import '../../bloc/transaction_form/transaction_form_bloc.dart';
 import '../../bloc/transactions/transactions_bloc.dart';
 import '../../common/enums/repetition_cycle_type.dart';
+import '../../common/extensions/i18n_extensions.dart';
 import '../../common/extensions/string_extensions.dart';
-import '../../common/utils/repetition_cycle_utils.dart';
 import '../../common/utils/toast_utils.dart';
+import '../../generated/i18n.dart';
 import '../../models/category_item.dart';
 import '../../models/current_selected_category.dart';
 import '../../models/transaction_item.dart';
@@ -247,7 +247,9 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                         Expanded(
                           child: ListTile(
                             title: Text(
-                              getRepetitionCycleTypeName(state.repetitionCycle),
+                              i18n.translateRepetitionCycleType(
+                                state.repetitionCycle,
+                              ),
                               textAlign: TextAlign.center,
                               overflow: TextOverflow.ellipsis,
                               style: theme.textTheme.title,
@@ -464,7 +466,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
       _repetitionsController,
       _repetitionsFocus,
     );
-final i18n = I18n.of(context);
+    final i18n = I18n.of(context);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -506,6 +508,8 @@ final i18n = I18n.of(context);
   Widget _buildRepetitionCyclesDropDown(
     final TransactionFormLoadedState state,
   ) {
+    final i18n = I18n.of(context);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
@@ -522,7 +526,7 @@ final i18n = I18n.of(context);
             child: DropdownButton<RepetitionCycleType>(
               isExpanded: true,
               hint: Text(
-                getRepetitionCycleTypeName(state.repetitionCycle),
+                i18n.translateRepetitionCycleType(state.repetitionCycle),
                 style: TextStyle(color: Colors.red),
               ),
               value: state.repetitionCycle,
@@ -536,7 +540,9 @@ final i18n = I18n.of(context);
                   .map<DropdownMenuItem<RepetitionCycleType>>((value) {
                 return DropdownMenuItem<RepetitionCycleType>(
                   value: value,
-                  child: Text(getRepetitionCycleTypeName(value)),
+                  child: Text(
+                    i18n.translateRepetitionCycleType(value),
+                  ),
                 );
               }).toList(),
             ),
@@ -648,9 +654,7 @@ final i18n = I18n.of(context);
             onPressed: () {
               Navigator.of(ctx).pop();
             },
-            child: Text(
-              i18n.close
-            ),
+            child: Text(i18n.close),
           ),
           RaisedButton(
             color: Theme.of(ctx).primaryColor,
