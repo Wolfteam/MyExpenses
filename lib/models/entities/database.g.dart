@@ -1501,14 +1501,15 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       _transactions ??= $TransactionsTable(this);
   $CategoriesTable _categories;
   $CategoriesTable get categories => _categories ??= $CategoriesTable(this);
-  UsersDao _usersDao;
-  UsersDao get usersDao => _usersDao ??= UsersDao(this as AppDatabase);
-  TransactionsDao _transactionsDao;
-  TransactionsDao get transactionsDao =>
-      _transactionsDao ??= TransactionsDao(this as AppDatabase);
-  CategoriesDao _categoriesDao;
-  CategoriesDao get categoriesDao =>
-      _categoriesDao ??= CategoriesDao(this as AppDatabase);
+  UsersDaoImpl _usersDaoImpl;
+  UsersDaoImpl get usersDaoImpl =>
+      _usersDaoImpl ??= UsersDaoImpl(this as AppDatabase);
+  TransactionsDaoImpl _transactionsDaoImpl;
+  TransactionsDaoImpl get transactionsDaoImpl =>
+      _transactionsDaoImpl ??= TransactionsDaoImpl(this as AppDatabase);
+  CategoriesDaoImpl _categoriesDaoImpl;
+  CategoriesDaoImpl get categoriesDaoImpl =>
+      _categoriesDaoImpl ??= CategoriesDaoImpl(this as AppDatabase);
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override
@@ -1520,13 +1521,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 // DaoGenerator
 // **************************************************************************
 
-mixin _$UsersDaoMixin on DatabaseAccessor<AppDatabase> {
+mixin _$UsersDaoImplMixin on DatabaseAccessor<AppDatabase> {
   $UsersTable get users => db.users;
 }
-mixin _$CategoriesDaoMixin on DatabaseAccessor<AppDatabase> {
+mixin _$CategoriesDaoImplMixin on DatabaseAccessor<AppDatabase> {
   $CategoriesTable get categories => db.categories;
 }
-mixin _$TransactionsDaoMixin on DatabaseAccessor<AppDatabase> {
+mixin _$TransactionsDaoImplMixin on DatabaseAccessor<AppDatabase> {
   $TransactionsTable get transactions => db.transactions;
   $CategoriesTable get categories => db.categories;
 }

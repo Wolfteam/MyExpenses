@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_expenses/generated/i18n.dart';
+import 'package:intl/intl.dart';
 
 import '../../../models/transaction_card_items.dart';
 import '../../widgets/transactions/transaction_item.dart' as transaction;
@@ -11,6 +12,35 @@ class TransactionsCardContainer extends StatelessWidget {
     Key key,
     this.model,
   }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      margin: const EdgeInsets.all(10),
+      child: Column(
+        children: <Widget>[
+          _buildHeader(context),
+          Divider(
+            color: Colors.grey,
+          ),
+          ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            scrollDirection: Axis.vertical,
+            itemCount: model.transactions.length,
+            itemBuilder: (context, index) {
+              return transaction.TransactionItem(
+                item: model.transactions[index],
+              );
+            },
+          )
+        ],
+      ),
+    );
+  }
 
   Widget _buildHeader(BuildContext context) {
     final i18n = I18n.of(context);
@@ -45,35 +75,6 @@ class TransactionsCardContainer extends StatelessWidget {
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      margin: const EdgeInsets.all(10),
-      child: Column(
-        children: <Widget>[
-          _buildHeader(context),
-          Divider(
-            color: Colors.grey,
-          ),
-          ListView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            scrollDirection: Axis.vertical,
-            itemCount: model.transactions.length,
-            itemBuilder: (context, index) {
-              return transaction.TransactionItem(
-                item: model.transactions[index],
-              );
-            },
-          )
         ],
       ),
     );

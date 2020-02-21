@@ -4,11 +4,11 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
-import 'package:my_expenses/models/entities/database.dart';
 
 import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/extensions/string_extensions.dart';
 import '../../common/utils/category_utils.dart';
+import '../../daos/transactions_dao.dart';
 import '../../models/category_item.dart';
 import '../../models/transaction_item.dart';
 
@@ -17,9 +17,9 @@ part 'transaction_form_state.dart';
 
 class TransactionFormBloc
     extends Bloc<TransactionFormEvent, TransactionFormState> {
-  final AppDatabase _db;
+  final TransactionsDao _transactionsDao;
 
-  TransactionFormBloc(this._db);
+  TransactionFormBloc(this._transactionsDao);
 
   TransactionFormLoadedState get currentState =>
       state as TransactionFormLoadedState;
@@ -126,7 +126,7 @@ class TransactionFormBloc
   ) async* {
     try {
       final createdTrans =
-          await _db.transactionsDao.saveTransaction(transaction);
+          await _transactionsDao.saveTransaction(transaction);
 
       yield TransactionSavedState(createdTrans);
     } catch (e) {
@@ -138,7 +138,7 @@ class TransactionFormBloc
 
   Stream<TransactionFormState> _deleteTransaction(int id) async* {
     try {
-      await _db.transactionsDao.deleteTransaction(id);
+      await _transactionsDao.deleteTransaction(id);
       yield TransactionDeletedState();
     } catch (e) {
       yield currentState.copyWith(

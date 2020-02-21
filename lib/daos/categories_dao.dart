@@ -1,50 +1,11 @@
-part of '../models/entities/database.dart';
+import '../models/category_item.dart';
 
-@UseDao(tables: [Categories])
-class CategoriesDao extends DatabaseAccessor<AppDatabase>
-    with _$CategoriesDaoMixin {
-  CategoriesDao(AppDatabase db) : super(db);
+abstract class CategoriesDao {
+  Future<List<CategoryItem>> getAll();
 
-  Future<List<CategoryItem>> getAll() {
-    var query = select(categories).map((row) => CategoryItem(
-          id: row.id,
-          isAnIncome: row.isAnIncome,
-          name: row.name,
-          icon: row.icon,
-          iconColor: row.iconColor,
-        ));
+  Future<List<CategoryItem>> getAllCategories(bool onlyIncomes);
 
-    return query.get();
-  }
+  Future<List<CategoryItem>> getAllIncomes();
 
-  Future<List<CategoryItem>> getAllCategories(bool onlyIncomes) {
-    if (onlyIncomes) return getAllIncomes();
-    return getAllExpenses();
-  }
-
-  Future<List<CategoryItem>> getAllIncomes() {
-    var query = select(categories)..where((c) => c.isAnIncome.equals(true));
-    return query
-        .map((row) => CategoryItem(
-              id: row.id,
-              isAnIncome: row.isAnIncome,
-              name: row.name,
-              icon: row.icon,
-              iconColor: row.iconColor,
-            ))
-        .get();
-  }
-
-  Future<List<CategoryItem>> getAllExpenses() {
-    var query = select(categories)..where((c) => c.isAnIncome.equals(false));
-    return query
-        .map((row) => CategoryItem(
-              id: row.id,
-              isAnIncome: row.isAnIncome,
-              name: row.name,
-              icon: row.icon,
-              iconColor: row.iconColor,
-            ))
-        .get();
-  }
+  Future<List<CategoryItem>> getAllExpenses();
 }

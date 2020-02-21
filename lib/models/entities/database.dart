@@ -9,6 +9,9 @@ import 'package:path_provider/path_provider.dart';
 import '../../common/converters/db_converters.dart';
 import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/utils/db_seed_util.dart';
+import '../../daos/categories_dao.dart';
+import '../../daos/transactions_dao.dart';
+import '../../daos/users_dao.dart';
 import '../../models/category_item.dart';
 import '../../models/transaction_item.dart';
 import 'base_entity.dart';
@@ -19,9 +22,9 @@ part 'transactions.dart';
 part 'categories.dart';
 
 //daos
-part '../../daos/users_dao.dart';
-part '../../daos/categories_dao.dart';
-part '../../daos/transactions_dao.dart';
+part '../../daos/users_dao_impl.dart';
+part '../../daos/categories_dao_impl.dart';
+part '../../daos/transactions_dao_impl.dart';
 
 //Generated db
 part 'database.g.dart';
@@ -50,9 +53,9 @@ LazyDatabase _openConnection() {
     Categories,
   ],
   daos: [
-    UsersDao,
-    TransactionsDao,
-    CategoriesDao,
+    UsersDaoImpl,
+    TransactionsDaoImpl,
+    CategoriesDaoImpl,
   ],
 )
 class AppDatabase extends _$AppDatabase {

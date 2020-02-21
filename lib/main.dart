@@ -11,14 +11,16 @@ import 'bloc/settings/settings_bloc.dart';
 import 'bloc/transaction_form/transaction_form_bloc.dart';
 import 'bloc/transactions/transactions_bloc.dart';
 import 'bloc/transactions_last_7_days/transactions_last_7_days_bloc.dart';
+import 'daos/categories_dao.dart';
+import 'daos/transactions_dao.dart';
 import 'generated/i18n.dart';
+import 'injection.dart';
 import 'models/current_selected_category.dart';
-import 'models/entities/database.dart';
 import 'services/settings_service.dart';
-
 
 //TODO: MOVE THE ASSETS TO A CLASS
 void main() {
+  configure();
   runApp(MyApp());
 }
 
@@ -40,47 +42,40 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider(create: (ctx) => AppDatabase()),
         ChangeNotifierProvider(create: (ctx) => CurrentSelectedCategory()),
-        Provider(create: (ctx) => SettingsServiceImpl()),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
             create: (ctx) {
-              final db = Provider.of<AppDatabase>(ctx, listen: false);
-              return IncomesCategoriesBloc(db);
+              final categoriesDao = getIt<CategoriesDao>();
+              return IncomesCategoriesBloc(categoriesDao);
             },
           ),
           BlocProvider(
             create: (ctx) {
-              final db = Provider.of<AppDatabase>(ctx, listen: false);
-              return ExpensesCategoriesBloc(db);
+              final categoriesDao = getIt<CategoriesDao>();
+              return ExpensesCategoriesBloc(categoriesDao);
             },
           ),
           BlocProvider(
             create: (ctx) {
-              final db = Provider.of<AppDatabase>(ctx, listen: false);
-              return TransactionsBloc(db: db);
+              final transactionsDao = getIt<TransactionsDao>();
+              final settingsService = getIt<SettingsService>();
+              return TransactionsBloc(transactionsDao, settingsService);
             },
           ),
           BlocProvider(create: (ctx) {
-            final db = Provider.of<AppDatabase>(ctx, listen: false);
-            return TransactionFormBloc(db);
+            final transactionsDao = getIt<TransactionsDao>();
+            return TransactionFormBloc(transactionsDao);
           }),
           BlocProvider(create: (ctx) => TransactionsLast7DaysBloc()),
           BlocProvider(create: (ctx) {
-            final settingsService = Provider.of<SettingsServiceImpl>(
-              ctx,
-              listen: false,
-            );
+            final settingsService = getIt<SettingsService>();
             return SettingsBloc(settingsService);
           }),
           BlocProvider(create: (ctx) {
-            final settingsService = Provider.of<SettingsServiceImpl>(
-              ctx,
-              listen: false,
-            );
+            final settingsService = getIt<SettingsService>();
             return app_bloc.AppBloc(settingsService);
           }),
           BlocProvider(create: (ctx) => DrawerBloc()),

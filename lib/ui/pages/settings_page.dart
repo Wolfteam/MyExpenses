@@ -221,11 +221,14 @@ class _SettingsPageState extends State<SettingsPage> {
     SettingsInitialState state,
     I18n i18n,
   ) {
+    final theme = Theme.of(context);
     final dropdown = [AppLanguageType.english, AppLanguageType.spanish]
         .map<DropdownMenuItem<AppLanguageType>>(
           (lang) => DropdownMenuItem<AppLanguageType>(
             value: lang,
-            child: Text(i18n.translateAppLanguageType(lang)),
+            child: Text(
+              i18n.translateAppLanguageType(lang),
+            ),
           ),
         )
         .toList();
@@ -269,7 +272,7 @@ class _SettingsPageState extends State<SettingsPage> {
               child: DropdownButton<AppLanguageType>(
                 isExpanded: true,
                 hint: Text(i18n.settingsSelectLanguage),
-                value: AppLanguageType.english,
+                value: state.appLanguage,
                 iconSize: 24,
                 underline: Container(
                   height: 0,
@@ -485,8 +488,6 @@ class _SettingsPageState extends State<SettingsPage> {
   void _syncIntervalChanged(SyncIntervalType newValue) =>
       context.bloc<SettingsBloc>().add(SyncIntervalChanged(newValue));
 
-  void _languageChanged(AppLanguageType newValue) {
-    final locale = I18n.delegate.supportedLocales[newValue.index];
-    I18n.onLocaleChanged(locale);
-  }
+  void _languageChanged(AppLanguageType newValue) =>
+      context.bloc<SettingsBloc>().add(AppLanguageChanged(newValue));
 }

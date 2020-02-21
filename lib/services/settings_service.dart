@@ -1,3 +1,4 @@
+import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../common/enums/app_accent_color_type.dart';
@@ -24,11 +25,15 @@ abstract class SettingsService {
   Future init();
 }
 
+@RegisterAs(SettingsService)
+@injectable
+@singleton
 class SettingsServiceImpl implements SettingsService {
   final _appThemeKey = 'AppTheme';
   final _accentColorKey = 'AccentColor';
   final _appLanguageKey = 'AppLanguage';
   final _syncIntervalKey = 'SyncInterval';
+  bool _initialized = false;
 
   SharedPreferences _prefs;
 
@@ -72,6 +77,11 @@ class SettingsServiceImpl implements SettingsService {
 
   @override
   Future init() async {
+    if (_initialized) {
+      print('already initialized');
+      return;
+    }
+
     _prefs = await SharedPreferences.getInstance();
 
     if (_prefs.get(_appThemeKey) == null) {
@@ -89,5 +99,7 @@ class SettingsServiceImpl implements SettingsService {
     if (_prefs.get(_syncIntervalKey) == null) {
       _prefs.setInt(_syncIntervalKey, SyncIntervalType.none.index);
     }
+
+    _initialized = true;
   }
 }

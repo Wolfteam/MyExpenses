@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:my_expenses/generated/i18n.dart';
 
 import '../../common/enums/app_accent_color_type.dart';
 import '../../common/enums/app_language_type.dart';
@@ -44,6 +45,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
     if (event is AppLanguageChanged) {
       _settingsService.language = event.selectedLanguage;
+      final locale = I18n.delegate.supportedLocales[event.selectedLanguage.index];
+      I18n.onLocaleChanged(locale);
       yield currentState.copyWith(appLanguage: event.selectedLanguage);
     }
 
@@ -54,7 +57,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   }
 
   Stream<SettingsState> _buildInitialState() async* {
-    await _settingsService.init();
     final appSettings = _settingsService.appSettings;
     yield SettingsInitialState(
       appTheme: appSettings.appTheme,

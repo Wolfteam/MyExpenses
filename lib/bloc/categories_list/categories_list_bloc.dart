@@ -4,17 +4,17 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
+import '../../daos/categories_dao.dart';
 import '../../models/category_item.dart';
-import '../../models/entities/database.dart';
 
 part 'categories_list_event.dart';
 part 'categories_list_state.dart';
 
 abstract class _CategoriesListBloc
     extends Bloc<CategoriesListEvent, CategoriesListState> {
-  final AppDatabase _db;
+  final CategoriesDao _categoriesDao;
 
-  _CategoriesListBloc(this._db);
+  _CategoriesListBloc(this._categoriesDao);
 
   @override
   CategoriesListState get initialState => CategoriesLoadingState();
@@ -43,7 +43,7 @@ abstract class _CategoriesListBloc
 
   Stream<CategoriesLoadedState> _loadCategories(GetCategories event) async* {
     final categories =
-        await _db.categoriesDao.getAllCategories(event.loadIncomes);
+        await _categoriesDao.getAllCategories(event.loadIncomes);
 
     if (event.selectedCategory != null &&
         categories.any((t) => t.id == event.selectedCategory.id)) {
@@ -63,6 +63,7 @@ abstract class _CategoriesListBloc
       categories: categories,
     );
   }
+  
 
   List<CategoryItem> _changeSelectedState(bool isSelected) {
     final categories =
@@ -86,7 +87,7 @@ abstract class _CategoriesListBloc
 }
 
 class IncomesCategoriesBloc extends _CategoriesListBloc {
-  IncomesCategoriesBloc(AppDatabase db) : super(db);
+  IncomesCategoriesBloc(CategoriesDao categoriesDao) : super(categoriesDao);
 
   @override
   CategoriesLoadedState buildCategoriesLoadedState(
@@ -100,7 +101,7 @@ class IncomesCategoriesBloc extends _CategoriesListBloc {
 }
 
 class ExpensesCategoriesBloc extends _CategoriesListBloc {
-  ExpensesCategoriesBloc(AppDatabase db) : super(db);
+  ExpensesCategoriesBloc(CategoriesDao categoriesDao) : super(categoriesDao);
 
   @override
   CategoriesLoadedState buildCategoriesLoadedState(

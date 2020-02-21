@@ -1,25 +1,30 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
+import 'package:my_expenses/generated/i18n.dart';
 
 import '../../common/utils/transaction_utils.dart';
-import '../../models/entities/database.dart';
+import '../../daos/transactions_dao.dart';
 import '../../models/transaction_card_items.dart';
 import '../../models/transaction_item.dart';
 import '../../models/transactions_summary_per_day.dart';
 import '../../models/transactions_summary_per_month.dart';
+import '../../services/settings_service.dart';
 
 part 'transactions_event.dart';
 part 'transactions_state.dart';
 
 class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
-  final AppDatabase db;
+  final TransactionsDao _transactionsDao;
+  final SettingsService _settingsService;
 
-  TransactionsBloc({
-    @required this.db,
-  });
+  TransactionsBloc(
+    this._transactionsDao,
+    this._settingsService,
+  );
 
   @override
   TransactionsState get initialState => TransactionsInitialState();
@@ -31,13 +36,12 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     yield TransactionsInitialState();
 
     if (event is GetTransactions) {
-      final month = DateFormat("MMMM").format(event.inThisDate);
+      final month = DateFormat('MMMM').format(event.inThisDate);
       final from = DateTime(event.inThisDate.year, event.inThisDate.month, 1);
       final to = (from.month < 12)
           ? DateTime(from.year, from.month + 1, 0)
           : DateTime(from.year + 1, 1, 0);
-      final transactions =
-          await db.transactionsDao.getAllTransactions(from, to);
+      final transactions = await _transactionsDao.getAllTransactions(from, to);
 
       final incomes = _getTotalIncomes(transactions);
       final expenses = _getTotalExpenses(transactions);
@@ -48,6 +52,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
           await _buildTransactionSummaryPerDay(onlyIncomes: true);
       final expenseTransPerWeek =
           await _buildTransactionSummaryPerDay(onlyIncomes: false);
+
       final transPerMonth = _buildTransactionsPerMonth(transactions);
 
       yield TransactionsLoadedState(
@@ -105,7 +110,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
 
     final to = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
-    final transactions = (await db.transactionsDao.getAllTransactions(from, to))
+    final transactions = (await _transactionsDao.getAllTransactions(from, to))
         .where((t) => t.category.isAnIncome == onlyIncomes)
         .toList();
 
@@ -163,12 +168,24 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
       }
     }
 
+    final currentLocale =
+        I18n.delegate.supportedLocales[_settingsService.language.index];
+
     final models = <TransactionCardItems>[];
+
     for (final kvp in transPerMonth.entries) {
-      final dateString = DateFormat('MM/dd EEEE').format(kvp.key);
+      final dateString =
+          DateFormat('MM/dd', currentLocale.languageCode).format(kvp.key);
+
+      final dayString =
+          DateFormat('EEEE', currentLocale.languageCode).format(kvp.key);
+
+      final dateSummary =
+          '$dateString ${toBeginningOfSentenceCase(dayString, currentLocale.languageCode)}';
+
       models.add(TransactionCardItems(
         date: kvp.key,
-        dateString: dateString,
+        dateString: dateSummary,
         transactions: kvp.value,
       ));
     }
