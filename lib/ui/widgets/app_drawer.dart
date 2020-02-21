@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/generated/i18n.dart';
 
 import '../../bloc/drawer/drawer_bloc.dart';
 import '../../common/enums/app_drawer_item_type.dart';
@@ -86,18 +87,18 @@ class AppDrawer extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Image.asset(
-              "assets/images/cost.png",
+              'assets/images/cost.png',
               width: 80,
               height: 80,
             ),
             Flexible(
               child: Text(
-                "Efrain Bastidas",
+                'Efrain Bastidas',
               ),
             ),
             Flexible(
               child: Text(
-                "ebastidas@smartersolutions.com.ve",
+                'ebastidas@smartersolutions.com.ve',
               ),
             )
           ],
@@ -113,33 +114,34 @@ class AppDrawer extends StatelessWidget {
     Function(AppDrawerItemType, BuildContext) onTap,
   ) {
     final theme = Theme.of(context);
+    final i18n = I18n.of(context);
     String text;
     Icon icon;
 
     switch (item) {
       case AppDrawerItemType.transactions:
         icon = Icon(Icons.account_balance);
-        text = 'Transactions';
+        text = i18n.transactions;
         break;
       case AppDrawerItemType.reports:
         icon = Icon(Icons.insert_drive_file);
-        text = 'Reports';
+        text = i18n.reports;
         break;
       case AppDrawerItemType.charts:
         icon = Icon(Icons.pie_chart);
-        text = 'Charts';
+        text = i18n.charts;
         break;
       case AppDrawerItemType.categories:
         icon = Icon(Icons.settings);
-        text = 'Categories';
+        text = i18n.categories;
         break;
       case AppDrawerItemType.settings:
         icon = Icon(Icons.settings);
-        text = 'Settings';
+        text = i18n.config;
         break;
       case AppDrawerItemType.logout:
         icon = Icon(Icons.arrow_back);
-        text = 'Logout';
+        text = i18n.logout;
         break;
       default:
         throw Exception('Invalid drawer item = $item');

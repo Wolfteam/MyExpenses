@@ -35,7 +35,7 @@ class TransactionItem extends StatelessWidget {
         ),
         title: Text(item.description),
         trailing: Text(
-          "${item.amount} \$",
+          '${item.amount} \$',
           style: TextStyle(
             color: item.category.isAnIncome ? Colors.green : Colors.red,
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/generated/i18n.dart';
 
 import '../../bloc/transactions/transactions_bloc.dart';
 import '../widgets/transactions/home_last_7_days_summary.dart';
@@ -118,6 +119,7 @@ class _TransactionsPageState extends State<TransactionsPage>
     }
 
     if (state is TransactionsLoadedState) {
+      final i18n = I18n.of(context);
       return [
         HomeTransactionSummaryPerMonth(
           expenses: state.expenseAmount,
@@ -133,7 +135,7 @@ class _TransactionsPageState extends State<TransactionsPage>
         Padding(
           padding: const EdgeInsets.only(left: 28, top: 15),
           child: Text(
-            "Transactions",
+            i18n.transactions,
             textAlign: TextAlign.start,
             style: Theme.of(context).textTheme.title,
           ),

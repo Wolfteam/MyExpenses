@@ -19,7 +19,6 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage>
     with SingleTickerProviderStateMixin {
-  int _currentPageIndex = 0;
   final _pages = <Widget>[
     TransactionsPage(),
     ChartsPage(),
@@ -54,7 +53,7 @@ class _MainPageState extends State<MainPage>
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColor,
         mini: false,
-        heroTag: "CreateTransactionFab",
+        heroTag: 'CreateTransactionFab',
         onPressed: () async {
           final route = MaterialPageRoute(
             builder: (ctx) => const AddEditTransactionPage(),
@@ -92,21 +91,22 @@ class _MainPageState extends State<MainPage>
   }
 
   List<BottomNavigationBarItem> _buildBottomNavBars() {
+    final i18n = I18n.of(context);
     return [
       BottomNavigationBarItem(
-        title: Text("Transactions"),
+        title: Text(i18n.transactions),
         icon: Icon(Icons.account_balance),
       ),
       BottomNavigationBarItem(
-        title: Text("Charts"),
+        title: Text(i18n.charts),
         icon: Icon(Icons.pie_chart),
       ),
       BottomNavigationBarItem(
-        title: Text("Categories"),
+        title: Text(i18n.categories),
         icon: Icon(Icons.category),
       ),
       BottomNavigationBarItem(
-        title: Text("Settings"),
+        title: Text(i18n.config),
         icon: Icon(Icons.settings),
       ),
     ];

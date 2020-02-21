@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:my_expenses/generated/i18n.dart';
 
 import '../../models/transactions_summary_per_date.dart';
 import '../widgets/charts/pie_chart_transactions_per_month.dart';
@@ -39,27 +40,75 @@ class ChartsPage extends StatelessWidget {
     ),
   ];
 
+  @override
+  Widget build(BuildContext context) {
+    final i18n = I18n.of(context);
+
+    return SingleChildScrollView(
+      child: Container(
+        margin: const EdgeInsets.only(
+          top: 10,
+          right: 10,
+          left: 10,
+          bottom: 10,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(left: 5),
+              child: Text(
+                '${i18n.incomes} & ${i18n.expenses}',
+                style: Theme.of(context).textTheme.title,
+              ),
+            ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: FlatButton.icon(
+                onPressed: () {},
+                icon: Icon(Icons.calendar_today),
+                label: Text("January 2020"),
+              ),
+            ),
+            _buildBarChart(context),
+            _buildIncomesAndExpensesCharts(context),
+          ],
+        ),
+      ),
+    );
+  }
+
   List<charts.Series<TransactionsSummaryPerDate, String>>
-      _createSampleDataForBarChart() {
+      _createSampleDataForBarChart(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final labelStyle = charts.TextStyleSpec(
+      color: charts.ColorUtil.fromDartColor(
+        isDark ? Colors.white : Colors.black,
+      ),
+    );
     return [
       charts.Series<TransactionsSummaryPerDate, String>(
-          id: 'BarChartMonthSummary',
-          data: barChartData,
-          colorFn: (sales, _) => sales.isAnIncome
-              ? charts.MaterialPalette.green.shadeDefault
-              : charts.MaterialPalette.red.shadeDefault,
-          domainFn: (sales, _) => sales.dateRange,
-          measureFn: (sales, _) => sales.amount,
-          labelAccessorFn: (sales, _) => '${sales.amount}\$'),
+        id: 'BarChartMonthSummary',
+        data: barChartData,
+        colorFn: (sales, _) => sales.isAnIncome
+            ? charts.MaterialPalette.green.shadeDefault
+            : charts.MaterialPalette.red.shadeDefault,
+        domainFn: (sales, _) => sales.dateRange,
+        measureFn: (sales, _) => sales.amount,
+        insideLabelStyleAccessorFn: (item, index) => labelStyle,
+        outsideLabelStyleAccessorFn: (item, index) => labelStyle,
+        labelAccessorFn: (sales, _) => '${sales.amount}\$',
+      ),
     ];
   }
 
-  Widget _buildBarChart() {
+  Widget _buildBarChart(BuildContext context) {
     return Container(
       height: 180,
-      margin: EdgeInsets.only(bottom: 30),
+      margin: const EdgeInsets.only(bottom: 30),
       child: charts.BarChart(
-        _createSampleDataForBarChart(),
+        _createSampleDataForBarChart(context),
         animate: true,
         vertical: true,
         barRendererDecorator: charts.BarLabelDecorator<String>(),
@@ -81,8 +130,11 @@ class ChartsPage extends StatelessWidget {
   }
 
   Widget _buildIncomesAndExpensesCharts(BuildContext context) {
-    var titleStyle = Theme.of(context).textTheme.subtitle;
-    var textStyle = Theme.of(context).textTheme.title;
+    final theme = Theme.of(context);
+    final i18n = I18n.of(context);
+    final titleStyle = theme.textTheme.subtitle;
+    final textStyle = theme.textTheme.title;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
@@ -91,14 +143,14 @@ class ChartsPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Container(
-                margin: EdgeInsets.only(left: 20),
+                margin: const EdgeInsets.only(left: 20),
                 child: Text(
-                  "Incomes",
+                  i18n.incomes,
                   style: titleStyle,
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(left: 20),
+                margin: const EdgeInsets.only(left: 20),
                 child: Text(
                   "2400 \$",
                   style: textStyle.copyWith(color: Colors.green),
@@ -106,13 +158,13 @@ class ChartsPage extends StatelessWidget {
               ),
               PieChartTransactionsPerMonths(true),
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 30),
+                margin: const EdgeInsets.symmetric(horizontal: 30),
                 child: OutlineButton.icon(
                   onPressed: () {
                     _goToDetailsPage(context, true);
                   },
                   icon: Icon(Icons.chevron_right),
-                  label: Text("Details"),
+                  label: Text(i18n.details),
                 ),
               )
             ],
@@ -123,14 +175,14 @@ class ChartsPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Container(
-                margin: EdgeInsets.only(left: 20),
+                margin: const EdgeInsets.only(left: 20),
                 child: Text(
-                  "Expenses",
+                  i18n.expenses,
                   style: titleStyle,
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(left: 20),
+                margin: const EdgeInsets.only(left: 20),
                 child: Text(
                   "-800 \$",
                   style: textStyle.copyWith(color: Colors.red),
@@ -138,13 +190,13 @@ class ChartsPage extends StatelessWidget {
               ),
               PieChartTransactionsPerMonths(false),
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 30),
+                margin: const EdgeInsets.symmetric(horizontal: 30),
                 child: OutlineButton.icon(
                   onPressed: () {
                     _goToDetailsPage(context, false);
                   },
                   icon: Icon(Icons.chevron_right),
-                  label: Text("Details"),
+                  label: Text(i18n.details),
                 ),
               ),
             ],
@@ -155,45 +207,10 @@ class ChartsPage extends StatelessWidget {
   }
 
   void _goToDetailsPage(BuildContext context, bool onlyIncomes) {
-    var route =
-        MaterialPageRoute(builder: (ctx) => ChartDetailsPage(onlyIncomes));
+    final route = MaterialPageRoute(
+      builder: (ctx) => ChartDetailsPage(onlyIncomes: onlyIncomes),
+    );
 
     Navigator.of(context).push(route);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        margin: EdgeInsets.only(
-          top: 10,
-          right: 10,
-          left: 10,
-          bottom: 10,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(left: 5),
-              child: Text(
-                "Incomes & Expenses",
-                style: Theme.of(context).textTheme.title,
-              ),
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: FlatButton.icon(
-                onPressed: () {},
-                icon: Icon(Icons.calendar_today),
-                label: Text("January 2020"),
-              ),
-            ),
-            _buildBarChart(),
-            _buildIncomesAndExpensesCharts(context),
-          ],
-        ),
-      ),
-    );
   }
 }

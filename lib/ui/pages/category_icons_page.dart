@@ -50,18 +50,18 @@ class CategoryIconsPage extends StatelessWidget {
   }
 
   List<Widget> _buildCategoryIcons(BuildContext context) {
-    var categoryIcons = List<Widget>();
-    var icons = CategoryUtils.getAllCategoryIcons();
+    final categoryIcons = <Widget>[];
+    final icons = CategoryUtils.getAllCategoryIcons();
 
-    for (CategoryIconType type in CategoryIconType.values) {
-      var filteredIcons = icons.where((i) => i.type == type).toList();
-      if (filteredIcons.length <= 0) {
-        print("Couldnt find categories icon for type = $type");
+    for (final type in CategoryIconType.values) {
+      final filteredIcons = icons.where((i) => i.type == type).toList();
+      if (filteredIcons.isEmpty) {
+        print('Couldnt find categories icon for type = $type');
         continue;
       }
 
-      String categoryType = CategoryUtils.getCategoryIconTypeName(type);
-      var widgets = _buildCategoryIconsPerType(
+      final categoryType = CategoryUtils.getCategoryIconTypeName(type);
+      final widgets = _buildCategoryIconsPerType(
         context,
         categoryType,
         filteredIcons,

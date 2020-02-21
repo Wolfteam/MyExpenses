@@ -1,6 +1,7 @@
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/generated/i18n.dart';
 
 import '../../../bloc/transactions_last_7_days/transactions_last_7_days_bloc.dart';
 import '../../../common/enums/transaction_type.dart';
@@ -57,25 +58,39 @@ class HomeLast7DaysSummary extends StatelessWidget {
 
     return [
       _buildTitle(incomesIsChecked, context),
-      _buildBarChart(incomesIsChecked),
+      _buildBarChart(incomesIsChecked, context),
     ];
   }
 
   List<charts.Series<TransactionsSummaryPerDay, String>> _createSampleData(
     List<TransactionsSummaryPerDay> data,
+    BuildContext context,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final labelStyle = charts.TextStyleSpec(
+      color: charts.ColorUtil.fromDartColor(
+        isDark ? Colors.white : Colors.black,
+      ),
+    );
+
     return [
       charts.Series<TransactionsSummaryPerDay, String>(
-          id: 'HomeLast7DaysSummary',
-          data: data,
-          colorFn: (sale, __) => charts.ColorUtil.fromDartColor(sale.color),
-          domainFn: (sales, _) => DateUtils.formatDate(sales.createdAt),
-          measureFn: (sales, _) => sales.amount,
-          labelAccessorFn: (sales, _) => '${sales.amount}\$'),
+        id: 'HomeLast7DaysSummary',
+        data: data,
+        colorFn: (item, __) => charts.ColorUtil.fromDartColor(item.color),
+        domainFn: (item, _) => DateUtils.formatDate(item.createdAt),
+        measureFn: (item, _) => item.amount,
+        insideLabelStyleAccessorFn: (item, index) => labelStyle,
+        outsideLabelStyleAccessorFn: (item, index) => labelStyle,
+        labelAccessorFn: (item, _) => '${item.amount}\$',
+      ),
     ];
   }
 
   Widget _buildTitle(bool incomesIsChecked, BuildContext context) {
+    final i18n = I18n.of(context);
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -83,7 +98,7 @@ class HomeLast7DaysSummary extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(left: 5),
           child: Text(
-            "Last 7 days",
+            i18n.last7Days,
             style: Theme.of(context).textTheme.title,
           ),
         ),
@@ -101,12 +116,12 @@ class HomeLast7DaysSummary extends StatelessWidget {
             CheckedPopupMenuItem<TransactionType>(
               checked: incomesIsChecked,
               value: TransactionType.incomes,
-              child: Text("Incomes"),
+              child: Text(i18n.incomes),
             ),
             CheckedPopupMenuItem<TransactionType>(
               checked: !incomesIsChecked,
               value: TransactionType.expenses,
-              child: Text("Expenses"),
+              child: Text(i18n.expenses),
             )
           ],
         )
@@ -114,11 +129,14 @@ class HomeLast7DaysSummary extends StatelessWidget {
     );
   }
 
-  Widget _buildBarChart(bool incomesIsChecked) {
+  Widget _buildBarChart(
+    bool incomesIsChecked,
+    BuildContext context,
+  ) {
     return Container(
       height: 180,
       child: charts.BarChart(
-        _createSampleData(incomesIsChecked ? incomes : expenses),
+        _createSampleData(incomesIsChecked ? incomes : expenses, context),
         animate: true,
         vertical: true,
         barRendererDecorator: charts.BarLabelDecorator<String>(),
@@ -127,10 +145,11 @@ class HomeLast7DaysSummary extends StatelessWidget {
           renderSpec: charts.SmallTickRendererSpec(
             labelRotation: 45,
             axisLineStyle: charts.LineStyleSpec(
-                color: charts.ColorUtil.fromDartColor(
-                  Colors.brown,
-                ),
-                thickness: 5),
+              color: charts.ColorUtil.fromDartColor(
+                Colors.white,
+              ),
+              thickness: 5,
+            ),
             labelStyle: charts.TextStyleSpec(
               color: charts.ColorUtil.fromDartColor(
                 incomesIsChecked ? Colors.green : Colors.red,

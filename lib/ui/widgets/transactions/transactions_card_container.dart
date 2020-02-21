@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:my_expenses/generated/i18n.dart';
 
 import '../../../models/transaction_card_items.dart';
-import '../../widgets/transactions/transaction_item.dart'
-    as transaction;
+import '../../widgets/transactions/transaction_item.dart' as transaction;
 
 class TransactionsCardContainer extends StatelessWidget {
   final TransactionCardItems model;
@@ -12,7 +12,8 @@ class TransactionsCardContainer extends StatelessWidget {
     this.model,
   }) : super(key: key);
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
+    final i18n = I18n.of(context);
     return Padding(
       padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
       child: Row(
@@ -35,11 +36,11 @@ class TransactionsCardContainer extends StatelessWidget {
               ),
               children: <TextSpan>[
                 TextSpan(
-                  text: 'Expenses: ${model.dayExpenses}',
+                  text: '${i18n.expenses}: ${model.dayExpenses}',
                 ),
                 const TextSpan(text: '  '),
                 TextSpan(
-                  text: 'Income: ${model.dayIncomes}',
+                  text: '${i18n.incomes}: ${model.dayIncomes}',
                 ),
               ],
             ),
@@ -58,7 +59,7 @@ class TransactionsCardContainer extends StatelessWidget {
       margin: const EdgeInsets.all(10),
       child: Column(
         children: <Widget>[
-          _buildHeader(),
+          _buildHeader(context),
           Divider(
             color: Colors.grey,
           ),

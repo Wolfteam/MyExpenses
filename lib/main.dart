@@ -16,6 +16,8 @@ import 'models/current_selected_category.dart';
 import 'models/entities/database.dart';
 import 'services/settings_service.dart';
 
+
+//TODO: MOVE THE ASSETS TO A CLASS
 void main() {
   runApp(MyApp());
 }

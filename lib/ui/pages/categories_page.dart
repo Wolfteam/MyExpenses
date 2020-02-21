@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_flexible_toast/flutter_flexible_toast.dart';
-import 'package:my_expenses/models/category_item.dart';
-import 'package:my_expenses/models/current_selected_category.dart';
 import 'package:provider/provider.dart';
+
+import '../../generated/i18n.dart';
+import '../../models/category_item.dart';
+import '../../models/current_selected_category.dart';
 import '../pages/categories_list_page.dart';
 
 class CategoriesPage extends StatefulWidget {
@@ -20,21 +22,6 @@ class CategoriesPage extends StatefulWidget {
 
 class _CategoriesPageState extends State<CategoriesPage>
     with SingleTickerProviderStateMixin {
-  final _tabs = [
-    Tab(
-      icon: Icon(
-        Icons.more,
-      ),
-      text: "Incomes",
-    ),
-    Tab(
-      icon: Icon(
-        Icons.pages,
-      ),
-      text: "Expenses",
-    ),
-  ];
-
   TabController _tabController;
 
   List<CategoriesListPage> _buildCategoriesListPages() {
@@ -56,7 +43,7 @@ class _CategoriesPageState extends State<CategoriesPage>
   void initState() {
     _tabController = TabController(
       initialIndex: 0,
-      length: _tabs.length,
+      length: 2,
       vsync: this,
     );
     super.initState();
@@ -65,13 +52,15 @@ class _CategoriesPageState extends State<CategoriesPage>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final i18n = I18n.of(context);
+    final tabs = _buildTabs(context);
     final tabBar = TabBar(
       indicatorColor: theme.primaryColor,
       labelColor:
           theme.brightness == Brightness.dark ? Colors.white : Colors.black,
       // unselectedLabelColor: theme.unselectedWidgetColor,
       controller: _tabController,
-      tabs: _tabs,
+      tabs: tabs,
     );
 
     if (!widget.isInSelectionMode) {
@@ -92,7 +81,7 @@ class _CategoriesPageState extends State<CategoriesPage>
             onPressed: _onDone,
           ),
         ],
-        title: Text("Select a category"),
+        title: Text(i18n.selectCategory),
         bottom: tabBar,
       ),
       body: TabBarView(
@@ -108,6 +97,24 @@ class _CategoriesPageState extends State<CategoriesPage>
     super.dispose();
   }
 
+  List<Tab> _buildTabs(BuildContext context) {
+    final i18n = I18n.of(context);
+    return [
+      Tab(
+        icon: Icon(
+          Icons.more,
+        ),
+        text: i18n.incomes,
+      ),
+      Tab(
+        icon: Icon(
+          Icons.pages,
+        ),
+        text: i18n.expenses,
+      ),
+    ];
+  }
+
   void _onDone() {
     final selectedCatProvider = Provider.of<CurrentSelectedCategory>(
       context,
@@ -119,8 +126,10 @@ class _CategoriesPageState extends State<CategoriesPage>
       return;
     }
 
+    final i18n = I18n.of(context);
+
     FlutterFlexibleToast.showToast(
-      message: 'You must select a category',
+      message: i18n.mustSelectCategory,
       toastLength: Toast.LENGTH_SHORT,
       toastGravity: ToastGravity.BOTTOM,
       icon: ICON.INFO,

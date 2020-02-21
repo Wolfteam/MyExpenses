@@ -64,10 +64,9 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
     );
   }
 
-  Widget _buildSummary() {
-    final textStyle = TextStyle(
-      color: Colors.black,
-      fontSize: 16,
+  Widget _buildSummary(BuildContext context) {
+    final theme = Theme.of(context);
+    final textStyle = theme.textTheme.subhead.copyWith(
       fontWeight: FontWeight.bold,
     );
     final expenseTextStyle = textStyle.copyWith(color: Colors.red);
@@ -157,7 +156,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 _buildPieChart(),
-                _buildSummary(),
+                _buildSummary(context),
               ],
             ),
           ],

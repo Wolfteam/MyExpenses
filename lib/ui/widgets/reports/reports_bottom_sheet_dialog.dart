@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_expenses/generated/i18n.dart';
 
 class ReportsBottomSheetDialog extends StatelessWidget {
   final _selectedReportItem = "Pdf";
@@ -12,6 +13,7 @@ class ReportsBottomSheetDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final i18n = I18n.of(context);
 
     return SingleChildScrollView(
       child: Container(
@@ -28,7 +30,7 @@ class ReportsBottomSheetDialog extends StatelessWidget {
           children: <Widget>[
             Center(
               child: Container(
-                margin: const EdgeInsets.only(bottom: 20),
+                margin: const EdgeInsets.only(bottom: 15),
                 child: SizedBox(
                   width: 100,
                   height: 10,
@@ -42,14 +44,14 @@ class ReportsBottomSheetDialog extends StatelessWidget {
               ),
             ),
             Text(
-              "Export from",
+              i18n.exportFrom,
               style: Theme.of(context).textTheme.title,
             ),
             Padding(
               padding: const EdgeInsets.only(
                 top: 20,
               ),
-              child: Text("Start date:"),
+              child: Text('${i18n.startDate}:'),
             ),
             FlatButton(
                 onPressed: () {
@@ -66,7 +68,7 @@ class ReportsBottomSheetDialog extends StatelessWidget {
                     "2012-10-30",
                   ),
                 )),
-            Text("End date:"),
+            Text('${i18n.endDate}:'),
             FlatButton(
               onPressed: () {
                 showDatePicker(
@@ -81,7 +83,7 @@ class ReportsBottomSheetDialog extends StatelessWidget {
                 child: Text("2019-10-30"),
               ),
             ),
-            Text("Report format"),
+            Text(i18n.reportFormat),
             Padding(
               padding: const EdgeInsets.only(
                 left: 16,
@@ -89,7 +91,7 @@ class ReportsBottomSheetDialog extends StatelessWidget {
               ),
               child: DropdownButton<String>(
                 isExpanded: true,
-                hint: Text("Please select a format"),
+                hint: Text(i18n.selectFormat),
                 iconSize: 24,
                 underline: Container(
                   height: 0,
@@ -162,22 +164,23 @@ class ReportsBottomSheetDialog extends StatelessWidget {
             ),
             */
             ButtonBar(
-              buttonPadding: EdgeInsets.symmetric(horizontal: 20),
+              buttonPadding: const EdgeInsets.symmetric(horizontal: 20),
               children: <Widget>[
                 OutlineButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
                   child: Text(
-                    "Cancel",
+                    i18n.cancel,
                     style: TextStyle(
                       color: theme.primaryColor,
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
                 ),
                 RaisedButton(
+                  color: theme.primaryColor,
                   child: Text(
-                    "Generate",
+                    i18n.generate,
                   ),
                   onPressed: () {},
                 ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:my_expenses/generated/i18n.dart';
 import 'package:provider/provider.dart';
 
 import '../../bloc/transaction_form/transaction_form_bloc.dart';
@@ -78,12 +79,15 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = I18n.of(context);
+
     return BlocBuilder<TransactionFormBloc, TransactionFormState>(
       builder: (ctx, state) {
         return Scaffold(
           appBar: AppBar(
             title: Text(
-                widget.item == null ? "Add transaction" : "Edit transaction"),
+              widget.item == null ? i18n.addTransaction : i18n.editTransaction,
+            ),
             leading: const BackButton(),
             actions: <Widget>[
               IconButton(
@@ -134,8 +138,11 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     }
 
     if (state is TransactionSavedState || state is TransactionDeletedState) {
-      final msg = state is TransactionSavedState ? 'saved' : 'deleted';
-      showSucceedToast('Transaction was succesfully $msg');
+      final i18n = I18n.of(context);
+      final msg = state is TransactionSavedState
+          ? i18n.transactionsWasSuccessfullySaved
+          : i18n.transactionsWasSuccessfullyDeleted;
+      showSucceedToast(msg);
 
       final now = DateTime.now();
       context.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: now));
@@ -154,6 +161,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     final createdAt = _dateFormat.format(state.transactionDate);
     const cornerRadius = Radius.circular(20);
     final theme = Theme.of(context);
+    final i18n = I18n.of(context);
 
     return Container(
       height: 240.0,
@@ -193,7 +201,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                     height: 5.0,
                   ),
                   Text(
-                    "Date: $createdAt",
+                    '${i18n.date}: $createdAt',
                     style: theme.textTheme.subtitle,
                   ),
                   const SizedBox(
@@ -207,13 +215,13 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                         Expanded(
                           child: ListTile(
                             title: Text(
-                              "${state.amount} \$",
+                              '${state.amount} \$',
                               textAlign: TextAlign.center,
                               overflow: TextOverflow.ellipsis,
                               style: theme.textTheme.title,
                             ),
                             subtitle: Text(
-                              "Amount".toUpperCase(),
+                              i18n.amount.toUpperCase(),
                               textAlign: TextAlign.center,
                               style: theme.textTheme.caption,
                             ),
@@ -222,13 +230,15 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                         Expanded(
                           child: ListTile(
                             title: Text(
-                              state.category.isAnIncome ? "Income" : "Expense",
+                              state.category.isAnIncome
+                                  ? i18n.income
+                                  : i18n.expense,
                               textAlign: TextAlign.center,
                               overflow: TextOverflow.ellipsis,
                               style: theme.textTheme.title,
                             ),
                             subtitle: Text(
-                              "Category".toUpperCase(),
+                              i18n.category.toUpperCase(),
                               textAlign: TextAlign.center,
                               style: theme.textTheme.caption,
                             ),
@@ -243,7 +253,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                               style: theme.textTheme.title,
                             ),
                             subtitle: Text(
-                              "Repetitons".toUpperCase(),
+                              i18n.repetitions.toUpperCase(),
                               textAlign: TextAlign.center,
                               style: theme.textTheme.caption,
                             ),
@@ -291,6 +301,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   ) {
     final transactionDate = _dateFormat.format(state.transactionDate);
     final theme = Theme.of(context);
+    final i18n = I18n.of(context);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -323,7 +334,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
             if (state.areRepetitionCyclesVisible)
               _buildRepetitionCyclesDropDown(state),
             Text(
-              "Add a picture",
+              i18n.addPicture,
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
@@ -334,13 +345,13 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                   textColor: theme.primaryColor,
                   onPressed: () {},
                   icon: Icon(Icons.photo_library),
-                  label: Text("From Gallery"),
+                  label: Text(i18n.fromGallery),
                 ),
                 FlatButton.icon(
                   textColor: theme.primaryColor,
                   onPressed: () {},
                   icon: Icon(Icons.camera_enhance),
-                  label: Text("From Camera"),
+                  label: Text(i18n.fromCamera),
                 ),
               ],
             )
@@ -358,6 +369,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
       _amountController,
       _amountFocus,
     );
+    final i18n = I18n.of(context);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -381,14 +393,14 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
             decoration: InputDecoration(
               suffixIcon: suffixIcon,
               alignLabelWithHint: true,
-              hintText: "0\$",
-              labelText: "Amount",
+              hintText: '0\$',
+              labelText: i18n.amount,
             ),
             autovalidate: state.isAmountDirty,
             onFieldSubmitted: (_) {
               _fieldFocusChange(context, _amountFocus, _descriptionFocus);
             },
-            validator: (_) => state.isAmountValid ? null : 'Invalid Amount',
+            validator: (_) => state.isAmountValid ? null : i18n.invalidAmount,
           ),
         ),
       ],
@@ -402,6 +414,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
       _descriptionController,
       _descriptionFocus,
     );
+    final i18n = I18n.of(context);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -425,8 +438,8 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
             decoration: InputDecoration(
               suffixIcon: suffixIcon,
               alignLabelWithHint: true,
-              labelText: "Description",
-              hintText: "A description of this transaction",
+              labelText: i18n.description,
+              hintText: i18n.descriptionOfThisTransaction,
             ),
             autovalidate: state.isDescriptionDirty,
             onFieldSubmitted: (_) {
@@ -437,7 +450,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               );
             },
             validator: (_) =>
-                state.isDescriptionValid ? null : 'Invalid Description',
+                state.isDescriptionValid ? null : i18n.invalidDescription,
           ),
         ),
       ],
@@ -451,6 +464,8 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
       _repetitionsController,
       _repetitionsFocus,
     );
+final i18n = I18n.of(context);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
@@ -472,16 +487,16 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
             keyboardType: TextInputType.number,
             decoration: InputDecoration(
               suffixIcon: suffixIcon,
-              hintText: "0",
+              hintText: '0',
               alignLabelWithHint: true,
-              labelText: "Repetitions",
+              labelText: i18n.repetitions,
             ),
             autovalidate: state.isRepetitionsDirty,
             onFieldSubmitted: (_) {
               _repetitionsFocus.unfocus();
             },
             validator: (_) =>
-                state.isRepetitionsValid ? null : 'Invalid Repetitions',
+                state.isRepetitionsValid ? null : i18n.invalidRepetitions,
           ),
         ),
       ],
@@ -621,28 +636,29 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   }
 
   void _showDeleteConfirmationDialog(String transDescription) {
+    final i18n = I18n.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Delete $transDescription ?'),
-        content: Text('Are you sure you wanna delete this transaction ?'),
+        title: Text(i18n.deleteX(transDescription)),
+        content: Text(i18n.confirmDeleteTransaction),
         actions: <Widget>[
           OutlineButton(
             textColor: Theme.of(context).primaryColor,
-            child: Text(
-              "Close",
-            ),
             onPressed: () {
               Navigator.of(ctx).pop();
             },
+            child: Text(
+              i18n.close
+            ),
           ),
           RaisedButton(
             color: Theme.of(ctx).primaryColor,
-            child: Text("Yes"),
             onPressed: () {
               context.bloc<TransactionFormBloc>().add(DeleteTransaction());
               Navigator.of(ctx).pop();
             },
+            child: Text(i18n.yes),
           ),
         ],
       ),

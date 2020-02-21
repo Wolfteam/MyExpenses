@@ -44,12 +44,118 @@ class I18n implements WidgetsLocalizations {
   String get spanish => "Spanish";
   /// "Incomes"
   String get incomes => "Incomes";
-  /// "expenses"
-  String get expenses => "expenses";
+  /// "Expenses"
+  String get expenses => "Expenses";
   /// "None"
   String get none => "None";
   /// "Each day"
   String get eachDay => "Each day";
+  /// "Transactions"
+  String get transactions => "Transactions";
+  /// "Reports"
+  String get reports => "Reports";
+  /// "Charts"
+  String get charts => "Charts";
+  /// "Categories"
+  String get categories => "Categories";
+  /// "Settings"
+  String get config => "Settings";
+  /// "Logout"
+  String get logout => "Logout";
+  /// "Last 7 days"
+  String get last7Days => "Last 7 days";
+  /// "Total"
+  String get total => "Total";
+  /// "Add transaction"
+  String get addTransaction => "Add transaction";
+  /// "Edit tranasction"
+  String get editTransaction => "Edit tranasction";
+  /// "Saved"
+  String get saved => "Saved";
+  /// "Deleted"
+  String get deleted => "Deleted";
+  /// "Amount"
+  String get amount => "Amount";
+  /// "Category"
+  String get category => "Category";
+  /// "Date"
+  String get date => "Date";
+  /// "Income"
+  String get income => "Income";
+  /// "Expense"
+  String get expense => "Expense";
+  /// "Repetitions"
+  String get repetitions => "Repetitions";
+  /// "Add a picture"
+  String get addPicture => "Add a picture";
+  /// "From Galery"
+  String get fromGallery => "From Galery";
+  /// "From Camera"
+  String get fromCamera => "From Camera";
+  /// "Invalid"
+  String get invalid => "Invalid";
+  /// "Invalid Amount"
+  String get invalidAmount => "Invalid Amount";
+  /// "Invalid Description"
+  String get invalidDescription => "Invalid Description";
+  /// "Invalid Repetitions"
+  String get invalidRepetitions => "Invalid Repetitions";
+  /// "Description"
+  String get description => "Description";
+  /// "A description of this transaction"
+  String get descriptionOfThisTransaction => "A description of this transaction";
+  /// "Transaction was successfully saved"
+  String get transactionsWasSuccessfullySaved => "Transaction was successfully saved";
+  /// "Transaction was successfully deleted"
+  String get transactionsWasSuccessfullyDeleted => "Transaction was successfully deleted";
+  /// "Delete"
+  String get delete => "Delete";
+  /// "Delete ${name} ?"
+  String deleteX(String name) => "Delete ${name} ?";
+  /// "Are you sure you wanna delete this transaction ?"
+  String get confirmDeleteTransaction => "Are you sure you wanna delete this transaction ?";
+  /// "ok"
+  String get ok => "ok";
+  /// "Yes"
+  String get yes => "Yes";
+  /// "Close"
+  String get close => "Close";
+  /// "Cancel"
+  String get cancel => "Cancel";
+  /// "Generate"
+  String get generate => "Generate";
+  /// "Name"
+  String get name => "Name";
+  /// "Category name"
+  String get categoryName => "Category name";
+  /// "N/A"
+  String get na => "N/A";
+  /// "Parent"
+  String get parent => "Parent";
+  /// "Pick a color"
+  String get pickColor => "Pick a color";
+  /// "Add a category"
+  String get addCategory => "Add a category";
+  /// "Select a category"
+  String get selectCategory => "Select a category";
+  /// "You must select a category"
+  String get mustSelectCategory => "You must select a category";
+  /// "Pick an icon"
+  String get pickIcon => "Pick an icon";
+  /// "Details"
+  String get details => "Details";
+  /// "Version: ${version}"
+  String appVersion(String version) => "Version: ${version}";
+  /// "Export from"
+  String get exportFrom => "Export from";
+  /// "Start date"
+  String get startDate => "Start date";
+  /// "End date"
+  String get endDate => "End date";
+  /// "Report format"
+  String get reportFormat => "Report format";
+  /// "Please select a format"
+  String get selectFormat => "Please select a format";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -137,6 +243,165 @@ class _I18n_es_VE extends I18n {
   /// "Cada día"
   @override
   String get eachDay => "Cada día";
+  /// "Transacciones"
+  @override
+  String get transactions => "Transacciones";
+  /// "Reportes"
+  @override
+  String get reports => "Reportes";
+  /// "Gráficos"
+  @override
+  String get charts => "Gráficos";
+  /// "Categorías"
+  @override
+  String get categories => "Categorías";
+  /// "Ajustes"
+  @override
+  String get config => "Ajustes";
+  /// "Logout"
+  @override
+  String get logout => "Logout";
+  /// "Últimos 7 días"
+  @override
+  String get last7Days => "Últimos 7 días";
+  /// "Total"
+  @override
+  String get total => "Total";
+  /// "Agregar transacción"
+  @override
+  String get addTransaction => "Agregar transacción";
+  /// "Editar transacción"
+  @override
+  String get editTransaction => "Editar transacción";
+  /// "Guardado"
+  @override
+  String get saved => "Guardado";
+  /// "Borrado"
+  @override
+  String get deleted => "Borrado";
+  /// "Monto"
+  @override
+  String get amount => "Monto";
+  /// "Categoría"
+  @override
+  String get category => "Categoría";
+  /// "Fecha"
+  @override
+  String get date => "Fecha";
+  /// "Ingreso"
+  @override
+  String get income => "Ingreso";
+  /// "Gasto"
+  @override
+  String get expense => "Gasto";
+  /// "Repeticiones"
+  @override
+  String get repetitions => "Repeticiones";
+  /// "Agregar una imagen"
+  @override
+  String get addPicture => "Agregar una imagen";
+  /// "Desde la galería"
+  @override
+  String get fromGallery => "Desde la galería";
+  /// "Desde la cámara"
+  @override
+  String get fromCamera => "Desde la cámara";
+  /// "Inválido"
+  @override
+  String get invalid => "Inválido";
+  /// "Monto inválido"
+  @override
+  String get invalidAmount => "Monto inválido";
+  /// "Descripción inválida"
+  @override
+  String get invalidDescription => "Descripción inválida";
+  /// "Repeticiones inválidas"
+  @override
+  String get invalidRepetitions => "Repeticiones inválidas";
+  /// "Descripción"
+  @override
+  String get description => "Descripción";
+  /// "Una descripción de esta transacción"
+  @override
+  String get descriptionOfThisTransaction => "Una descripción de esta transacción";
+  /// "La transacción fue guardada exitósamente"
+  @override
+  String get transactionsWasSuccessfullySaved => "La transacción fue guardada exitósamente";
+  /// "La transacción fue borrada exitósamente"
+  @override
+  String get transactionsWasSuccessfullyDeleted => "La transacción fue borrada exitósamente";
+  /// "Borrar"
+  @override
+  String get delete => "Borrar";
+  /// "¿ Borrar ${name} ?"
+  @override
+  String deleteX(String name) => "¿ Borrar ${name} ?";
+  /// " ¿Estás seguro que deseas borrar esta transacción?"
+  @override
+  String get confirmDeleteTransaction => " ¿Estás seguro que deseas borrar esta transacción?";
+  /// "ok"
+  @override
+  String get ok => "ok";
+  /// "Si"
+  @override
+  String get yes => "Si";
+  /// "Cerrar"
+  @override
+  String get close => "Cerrar";
+  /// "Cancelar"
+  @override
+  String get cancel => "Cancelar";
+  /// "Generar"
+  @override
+  String get generate => "Generar";
+  /// "Nombre"
+  @override
+  String get name => "Nombre";
+  /// "Nombre de la categoría"
+  @override
+  String get categoryName => "Nombre de la categoría";
+  /// "N/A"
+  @override
+  String get na => "N/A";
+  /// "Padre"
+  @override
+  String get parent => "Padre";
+  /// "Selecciona un color"
+  @override
+  String get pickColor => "Selecciona un color";
+  /// "Agregar una categoría"
+  @override
+  String get addCategory => "Agregar una categoría";
+  /// "Seleccione una categoría"
+  @override
+  String get selectCategory => "Seleccione una categoría";
+  /// "Debes seleccionar una categoría"
+  @override
+  String get mustSelectCategory => "Debes seleccionar una categoría";
+  /// "Selecciona un ícono"
+  @override
+  String get pickIcon => "Selecciona un ícono";
+  /// "Detalles"
+  @override
+  String get details => "Detalles";
+  /// "Version: ${version}"
+  @override
+  String appVersion(String version) => "Version: ${version}";
+  /// "Exportar desde"
+  @override
+  String get exportFrom => "Exportar desde";
+  /// "Fecha inicio"
+  @override
+  String get startDate => "Fecha inicio";
+  /// "Fecha fin"
+  @override
+  String get endDate => "Fecha fin";
+  /// "Formato del reporte"
+  @override
+  String get reportFormat => "Formato del reporte";
+  /// "Por favor seleccione un formato"
+  @override
+  String get selectFormat => "Por favor seleccione un formato";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";

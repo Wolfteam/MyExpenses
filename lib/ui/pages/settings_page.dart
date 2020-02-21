@@ -28,16 +28,14 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Padding(
-        padding: const EdgeInsets.all(5),
-        child: BlocBuilder<SettingsBloc, SettingsState>(
-          builder: (ctx, state) {
-            return ListView(
-              children: _buildPage(context, state),
-            );
-          },
-        ),
+    return Padding(
+      padding: const EdgeInsets.all(5),
+      child: BlocBuilder<SettingsBloc, SettingsState>(
+        builder: (ctx, state) {
+          return ListView(
+            children: _buildPage(context, state),
+          );
+        },
       ),
     );
   }
@@ -157,7 +155,12 @@ class _SettingsPageState extends State<SettingsPage> {
         child: Container(
           padding: const EdgeInsets.all(8),
           color: color,
-          child: state.accentColor == accentColor ? Icon(Icons.check) : null,
+          child: state.accentColor == accentColor
+              ? Icon(
+                  Icons.check,
+                  color: Colors.white,
+                )
+              : null,
         ),
       );
 
@@ -377,7 +380,7 @@ class _SettingsPageState extends State<SettingsPage> {
               children: <Widget>[
                 Icon(Icons.info_outline),
                 Container(
-                  margin: EdgeInsets.only(left: 5),
+                  margin: const EdgeInsets.only(left: 5),
                   child: Text(
                     i18n.settingsAbout,
                     style: textTheme.title,
@@ -386,22 +389,22 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
             Container(
-              margin: EdgeInsets.only(top: 5, left: 16, right: 16),
+              margin: const EdgeInsets.only(top: 5, left: 16, right: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   Image.asset(
-                    "assets/images/cost.png",
+                    'assets/images/cost.png',
                     width: 70,
                     height: 70,
                   ),
                   Text(
-                    "My Expenses",
+                    i18n.appName,
                     textAlign: TextAlign.center,
                     style: textTheme.subtitle,
                   ),
                   Text(
-                    "Version: 1.0.0.0",
+                    i18n.appVersion('1.0.0.0'),
                     textAlign: TextAlign.center,
                     style: textTheme.subtitle,
                   ),
@@ -410,7 +413,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     textAlign: TextAlign.center,
                   ),
                   Container(
-                    margin: EdgeInsets.only(top: 5),
+                    margin: const EdgeInsets.only(top: 5),
                     child: Text(
                       i18n.settingsDonations,
                       style: textTheme.subtitle,
@@ -420,7 +423,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     i18n.settingsDonationsMsg,
                   ),
                   Container(
-                    margin: EdgeInsets.only(top: 5),
+                    margin: const EdgeInsets.only(top: 5),
                     child: Text(
                       i18n.settingsDonationSupport,
                       style: textTheme.subtitle,

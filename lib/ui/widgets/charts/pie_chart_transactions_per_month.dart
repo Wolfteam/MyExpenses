@@ -31,7 +31,7 @@ class PieChartTransactionsPerMonths extends StatelessWidget {
       bool onlyIncomes) {
     var data = onlyIncomes ? pieIncomesChartData : pieExpensesChartData;
     return [
-      new charts.Series<ChartTransactionItem, int>(
+      charts.Series<ChartTransactionItem, int>(
         id: onlyIncomes ? 'IncomesPieChart' : 'ExpensesPieChart',
         data: data,
         domainFn: (item, _) => item.order,
@@ -49,7 +49,7 @@ class PieChartTransactionsPerMonths extends StatelessWidget {
       child: charts.PieChart(
         data,
         animate: true,
-        defaultRenderer: new charts.ArcRendererConfig(
+        defaultRenderer: charts.ArcRendererConfig(
           arcRatio: 1,
           arcRendererDecorators: [
             charts.ArcLabelDecorator(
@@ -63,7 +63,7 @@ class PieChartTransactionsPerMonths extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var data = _createSampleDataForPieChart(this.onlyIncomes);
+    final data = _createSampleDataForPieChart(this.onlyIncomes);
     return _buildPieChart(data);
   }
 }
