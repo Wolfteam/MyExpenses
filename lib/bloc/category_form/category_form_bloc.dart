@@ -9,14 +9,16 @@ import '../../common/extensions/string_extensions.dart';
 import '../../common/utils/category_utils.dart';
 import '../../daos/categories_dao.dart';
 import '../../models/category_item.dart';
+import '../../services/logging_service.dart';
 
 part 'category_form_event.dart';
 part 'category_form_state.dart';
 
 class CategoryFormBloc extends Bloc<CategoryFormEvent, CategoryState> {
+  final LoggingService _logger;
   final CategoriesDao _categoriesDao;
 
-  CategoryFormBloc(this._categoriesDao);
+  CategoryFormBloc(this._logger, this._categoriesDao);
 
   @override
   CategoryState get initialState => CategoryFormState.initial();
@@ -88,18 +90,38 @@ class CategoryFormBloc extends Bloc<CategoryFormEvent, CategoryState> {
 
   Stream<CategoryState> _saveCategory(CategoryItem category) async* {
     try {
+      _logger.info(
+        runtimeType,
+        '_saveCategory: Trying to save category = ${category.toJson()}',
+      );
       final savedCategory = await _categoriesDao.saveCategory(category);
       yield CategorySavedState(savedCategory);
-    } catch (e) {
+    } on Exception catch (e, s) {
+      _logger.error(
+        runtimeType,
+        '_saveCategory: An unknown error occurred',
+        e,
+        s,
+      );
       yield currentState.copyWith(errorOccurred: true);
     }
   }
 
   Stream<CategoryState> _deleteCategory(CategoryItem category) async* {
     try {
+      _logger.info(
+        runtimeType,
+        '_deleteCategory: Trying to delete categoryId = ${category.id}',
+      );
       await _categoriesDao.deleteCategory(category.id);
       yield CategoryDeletedState(category);
-    } catch (e) {
+    } on Exception catch (e, s) {
+      _logger.error(
+        runtimeType,
+        '_deleteCategory: An unknown error occurred',
+        e,
+        s,
+      );
       yield currentState.copyWith(errorOccurred: true);
     }
   }

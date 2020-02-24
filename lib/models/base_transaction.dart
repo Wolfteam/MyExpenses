@@ -15,14 +15,14 @@ class BaseTransaction {
 
   BaseTransaction({
     @required this.amount,
-    this.description = "Default",
+    this.description = 'Default',
   }) {
-    this.createdAt = DateTime.now();
+    createdAt = DateTime.now();
   }
 
   BaseTransaction.withDate({
     @required this.amount,
     @required this.createdAt,
-    this.description = "",
+    this.description = '',
   });
 }

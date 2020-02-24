@@ -1,6 +1,6 @@
 part of 'database.dart';
 
-@DataClassName("Category")
+@DataClassName('Category')
 class Categories extends BaseEntity {
   TextColumn get name => text().withLength(min: 0, max: 255)();
   BoolColumn get isAnIncome => boolean()();

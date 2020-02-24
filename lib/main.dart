@@ -16,13 +16,16 @@ import 'daos/categories_dao.dart';
 import 'daos/transactions_dao.dart';
 import 'generated/i18n.dart';
 import 'injection.dart';
+import 'logger.dart';
 import 'models/current_selected_category.dart';
+import 'services/logging_service.dart';
 import 'services/settings_service.dart';
 import 'ui/pages/main_page.dart';
 
 //TODO: MOVE THE ASSETS TO A CLASS
-void main() {
+Future main() async {
   configure();
+  await setupLogging();
   runApp(MyApp());
 }
 
@@ -50,26 +53,30 @@ class _MyAppState extends State<MyApp> {
         providers: [
           BlocProvider(
             create: (ctx) {
+              final logger = getIt<LoggingService>();
               final categoriesDao = getIt<CategoriesDao>();
-              return IncomesCategoriesBloc(categoriesDao);
+              return IncomesCategoriesBloc(logger, categoriesDao);
             },
           ),
           BlocProvider(
             create: (ctx) {
+              final logger = getIt<LoggingService>();
               final categoriesDao = getIt<CategoriesDao>();
-              return ExpensesCategoriesBloc(categoriesDao);
+              return ExpensesCategoriesBloc(logger, categoriesDao);
             },
           ),
           BlocProvider(
             create: (ctx) {
+              final logger = getIt<LoggingService>();
               final transactionsDao = getIt<TransactionsDao>();
               final settingsService = getIt<SettingsService>();
-              return TransactionsBloc(transactionsDao, settingsService);
+              return TransactionsBloc(logger, transactionsDao, settingsService);
             },
           ),
           BlocProvider(create: (ctx) {
+            final logger = getIt<LoggingService>();
             final transactionsDao = getIt<TransactionsDao>();
-            return TransactionFormBloc(transactionsDao);
+            return TransactionFormBloc(logger, transactionsDao);
           }),
           BlocProvider(create: (ctx) => TransactionsLast7DaysBloc()),
           BlocProvider(create: (ctx) {
@@ -77,11 +84,16 @@ class _MyAppState extends State<MyApp> {
             return SettingsBloc(settingsService);
           }),
           BlocProvider(create: (ctx) {
+            final logger = getIt<LoggingService>();
             final settingsService = getIt<SettingsService>();
-            return app_bloc.AppBloc(settingsService);
+            return app_bloc.AppBloc(logger, settingsService);
           }),
           BlocProvider(create: (ctx) => DrawerBloc()),
-          BlocProvider(create: (ctx) => CategoryFormBloc(getIt<CategoriesDao>())),
+          BlocProvider(create: (ctx) {
+            final logger = getIt<LoggingService>();
+            final categoriesDao = getIt<CategoriesDao>();
+            return CategoryFormBloc(logger, categoriesDao);
+          }),
           BlocProvider(create: (ctx) => CategoryIconBloc()),
         ],
         child: BlocBuilder<app_bloc.AppBloc, app_bloc.AppState>(

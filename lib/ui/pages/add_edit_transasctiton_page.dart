@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../bloc/transaction_form/transaction_form_bloc.dart';
@@ -8,6 +7,7 @@ import '../../bloc/transactions/transactions_bloc.dart';
 import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/extensions/i18n_extensions.dart';
 import '../../common/extensions/string_extensions.dart';
+import '../../common/utils/date_utils.dart';
 import '../../common/utils/toast_utils.dart';
 import '../../generated/i18n.dart';
 import '../../models/category_item.dart';
@@ -33,8 +33,6 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   final FocusNode _amountFocus = FocusNode();
   final FocusNode _descriptionFocus = FocusNode();
   final FocusNode _repetitionsFocus = FocusNode();
-
-  final _dateFormat = DateFormat('MM/dd/yyyy');
 
   final _formKey = GlobalKey<FormState>();
   bool _didChangeDependencies = false;
@@ -159,7 +157,10 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     final BuildContext context,
     final TransactionFormLoadedState state,
   ) {
-    final createdAt = _dateFormat.format(state.transactionDate);
+    final createdAt = DateUtils.formatDateWithoutLocale(
+      state.transactionDate,
+      DateUtils.monthDayAndYear,
+    );
     const cornerRadius = Radius.circular(20);
     final theme = Theme.of(context);
     final i18n = I18n.of(context);
@@ -301,7 +302,10 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     final BuildContext context,
     final TransactionFormLoadedState state,
   ) {
-    final transactionDate = _dateFormat.format(state.transactionDate);
+    final transactionDate = DateUtils.formatDateWithoutLocale(
+      state.transactionDate,
+      DateUtils.monthDayAndYear,
+    );
     final theme = Theme.of(context);
     final i18n = I18n.of(context);
 

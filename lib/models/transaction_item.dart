@@ -1,7 +1,11 @@
-import '../common/enums/repetition_cycle_type.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+import '../common/enums/repetition_cycle_type.dart';
 import 'category_item.dart';
 
+part 'transaction_item.g.dart';
+
+@JsonSerializable()
 class TransactionItem {
   int id;
   double amount;
@@ -20,4 +24,8 @@ class TransactionItem {
     this.repetitionCycleType,
     this.category,
   });
+
+  factory TransactionItem.fromJson(Map<String, dynamic> json) =>
+      _$TransactionItemFromJson(json);
+  Map<String, dynamic> toJson() => _$TransactionItemToJson(this);
 }

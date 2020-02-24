@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:flutter/material.dart';
 
+import '../../../generated/i18n.dart';
 import '../../../models/transactions_summary_per_month.dart';
 
 class HomeTransactionSummaryPerMonth extends StatelessWidget {
@@ -66,6 +67,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
 
   Widget _buildSummary(BuildContext context) {
     final theme = Theme.of(context);
+    final i18n = I18n.of(context);
     final textStyle = theme.textTheme.subhead.copyWith(
       fontWeight: FontWeight.bold,
     );
@@ -84,15 +86,15 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
                     Text(
-                      "Income:",
+                      '${i18n.income}:',
                       style: textStyle,
                     ),
                     Text(
-                      "Expense:",
+                      '${i18n.expense}:',
                       style: textStyle,
                     ),
                     Text(
-                      "Total:",
+                      '${i18n.total}:',
                       style: textStyle,
                     ),
                   ],
@@ -107,19 +109,19 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
                     Text(
-                      "\$ $incomes",
+                      '\$ $incomes',
                       textAlign: TextAlign.end,
                       maxLines: 1,
                       style: incomeTextStyle,
                     ),
                     Text(
-                      "\$ $expenses",
+                      '\$ $expenses',
                       textAlign: TextAlign.end,
                       maxLines: 1,
                       style: expenseTextStyle,
                     ),
                     Text(
-                      "\$ $total",
+                      '\$ $total',
                       textAlign: TextAlign.end,
                       maxLines: 1,
                       style: total >= 0 ? incomeTextStyle : expenseTextStyle,

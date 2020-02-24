@@ -5,10 +5,10 @@ class TransactionsSummaryPerDate extends BaseTransaction {
   DateTime from;
   DateTime to;
   String get dateRange {
-    var start = DateUtils.formatDate(from);
-    var end = DateUtils.formatDate(to);
+    final start = DateUtils.formatDateWithoutLocale(from, DateUtils.monthAndDayFormat);
+    final end = DateUtils.formatDateWithoutLocale(to, DateUtils.monthAndDayFormat);
 
-    return "$start - $end";
+    return '$start - $end';
   }
 
   TransactionsSummaryPerDate(

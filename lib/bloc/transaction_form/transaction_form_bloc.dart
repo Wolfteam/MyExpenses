@@ -11,15 +11,17 @@ import '../../common/utils/category_utils.dart';
 import '../../daos/transactions_dao.dart';
 import '../../models/category_item.dart';
 import '../../models/transaction_item.dart';
+import '../../services/logging_service.dart';
 
 part 'transaction_form_event.dart';
 part 'transaction_form_state.dart';
 
 class TransactionFormBloc
     extends Bloc<TransactionFormEvent, TransactionFormState> {
+  final LoggingService _logger;
   final TransactionsDao _transactionsDao;
 
-  TransactionFormBloc(this._transactionsDao);
+  TransactionFormBloc(this._logger, this._transactionsDao);
 
   TransactionFormLoadedState get currentState =>
       state as TransactionFormLoadedState;
@@ -127,19 +129,39 @@ class TransactionFormBloc
     TransactionItem transaction,
   ) async* {
     try {
+      _logger.info(
+        runtimeType,
+        '_saveTransaction: Trying to save transaction = ${transaction.toJson()}',
+      );
       final createdTrans = await _transactionsDao.saveTransaction(transaction);
 
       yield TransactionSavedState(createdTrans);
-    } catch (e) {
+    } on Exception catch (e, s) {
+      _logger.error(
+        runtimeType,
+        '_saveTransaction: Unknown error occurred:',
+        e,
+        s,
+      );
       yield currentState.copyWith(errorOccurred: true);
     }
   }
 
   Stream<TransactionFormState> _deleteTransaction(int id) async* {
     try {
+      _logger.info(
+        runtimeType,
+        '_deleteTransaction: Trying to delete transactionId = $id',
+      );
       await _transactionsDao.deleteTransaction(id);
       yield TransactionDeletedState();
-    } catch (e) {
+    } on Exception catch (e, s) {
+      _logger.error(
+        runtimeType,
+        '_deleteTransaction: Unknown error occurred:',
+        e,
+        s,
+      );
       yield currentState.copyWith(errorOccurred: true);
     }
   }

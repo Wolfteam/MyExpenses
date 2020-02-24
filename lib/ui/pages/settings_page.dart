@@ -221,7 +221,6 @@ class _SettingsPageState extends State<SettingsPage> {
     SettingsInitialState state,
     I18n i18n,
   ) {
-    final theme = Theme.of(context);
     final dropdown = [AppLanguageType.english, AppLanguageType.spanish]
         .map<DropdownMenuItem<AppLanguageType>>(
           (lang) => DropdownMenuItem<AppLanguageType>(
@@ -451,7 +450,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
                                 _lauchUrl(
-                                    "https://github.com/Wolfteam/MyExpenses/Issues");
+                                    'https://github.com/Wolfteam/MyExpenses/Issues');
                               },
                           ),
                         ],

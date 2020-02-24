@@ -6,15 +6,17 @@ import 'package:meta/meta.dart';
 
 import '../../daos/categories_dao.dart';
 import '../../models/category_item.dart';
+import '../../services/logging_service.dart';
 
 part 'categories_list_event.dart';
 part 'categories_list_state.dart';
 
 abstract class _CategoriesListBloc
     extends Bloc<CategoriesListEvent, CategoriesListState> {
+  final LoggingService _logger;
   final CategoriesDao _categoriesDao;
 
-  _CategoriesListBloc(this._categoriesDao);
+  _CategoriesListBloc(this._logger, this._categoriesDao);
 
   @override
   CategoriesListState get initialState => CategoriesLoadingState();
@@ -42,14 +44,28 @@ abstract class _CategoriesListBloc
   }
 
   Stream<CategoriesLoadedState> _loadCategories(GetCategories event) async* {
-    final categories =
-        await _categoriesDao.getAllCategories(event.loadIncomes);
+    try {
+      _logger.info(
+        runtimeType,
+        '_loadCategories: Trying to get all the ${event.loadIncomes ? "incomes" : "expenses"} categories',
+      );
+      final categories =
+          await _categoriesDao.getAllCategories(event.loadIncomes);
 
-    if (event.selectedCategory != null &&
-        categories.any((t) => t.id == event.selectedCategory.id)) {
-      _setSelectedItem(event.selectedCategory.id, categories);
+      if (event.selectedCategory != null &&
+          categories.any((t) => t.id == event.selectedCategory.id)) {
+        _setSelectedItem(event.selectedCategory.id, categories);
+      }
+      yield buildCategoriesLoadedState(categories);
+    } on Exception catch (e, s) {
+      _logger.error(
+        runtimeType,
+        '_loadCategories: Unknown error occurred',
+        e,
+        s,
+      );
+      yield buildCategoriesLoadedState([]);
     }
-    yield buildCategoriesLoadedState(categories);
   }
 
   Stream<CategoriesLoadedState> _categorySelected(
@@ -63,7 +79,6 @@ abstract class _CategoriesListBloc
       categories: categories,
     );
   }
-  
 
   List<CategoryItem> _changeSelectedState(bool isSelected) {
     final categories =
@@ -75,6 +90,8 @@ abstract class _CategoriesListBloc
   }
 
   void _setSelectedItem(int selectedId, List<CategoryItem> categories) {
+    _logger.info(runtimeType, '_setSelectedItem: Setting the selected categoryId = $selectedId');
+
     final int index = categories.indexWhere((t) => t.id == selectedId);
     final cat = categories.elementAt(index).copyWith(isSeleted: true);
     categories.insert(index, cat);
@@ -87,7 +104,8 @@ abstract class _CategoriesListBloc
 }
 
 class IncomesCategoriesBloc extends _CategoriesListBloc {
-  IncomesCategoriesBloc(CategoriesDao categoriesDao) : super(categoriesDao);
+  IncomesCategoriesBloc(LoggingService logger, CategoriesDao categoriesDao)
+      : super(logger, categoriesDao);
 
   @override
   CategoriesLoadedState buildCategoriesLoadedState(
@@ -101,7 +119,8 @@ class IncomesCategoriesBloc extends _CategoriesListBloc {
 }
 
 class ExpensesCategoriesBloc extends _CategoriesListBloc {
-  ExpensesCategoriesBloc(CategoriesDao categoriesDao) : super(categoriesDao);
+  ExpensesCategoriesBloc(LoggingService logger, CategoriesDao categoriesDao)
+      : super(logger, categoriesDao);
 
   @override
   CategoriesLoadedState buildCategoriesLoadedState(

@@ -1,4 +1,3 @@
-import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../common/enums/app_accent_color_type.dart';
@@ -6,6 +5,7 @@ import '../common/enums/app_language_type.dart';
 import '../common/enums/app_theme_type.dart';
 import '../common/enums/sync_intervals_type.dart';
 import '../models/app_settings.dart';
+import 'logging_service.dart';
 
 abstract class SettingsService {
   AppSettings get appSettings;
@@ -25,14 +25,13 @@ abstract class SettingsService {
   Future init();
 }
 
-@RegisterAs(SettingsService)
-@injectable
-@singleton
 class SettingsServiceImpl implements SettingsService {
   final _appThemeKey = 'AppTheme';
   final _accentColorKey = 'AccentColor';
   final _appLanguageKey = 'AppLanguage';
   final _syncIntervalKey = 'SyncInterval';
+  final LoggingService _logger;
+
   bool _initialized = false;
 
   SharedPreferences _prefs;
@@ -73,33 +72,40 @@ class SettingsServiceImpl implements SettingsService {
   set syncInterval(SyncIntervalType interval) =>
       _prefs.setInt(_syncIntervalKey, interval.index);
 
-  SettingsServiceImpl();
+  SettingsServiceImpl(this._logger);
 
   @override
   Future init() async {
     if (_initialized) {
-      print('already initialized');
+      _logger.warning(runtimeType, 'Settings are already initialized!');
       return;
     }
+
+    _logger.info(runtimeType, 'Getting shared prefs instance...');
 
     _prefs = await SharedPreferences.getInstance();
 
     if (_prefs.get(_appThemeKey) == null) {
+      _logger.info(runtimeType, 'Setting default dark theme');
       _prefs.setInt(_appThemeKey, AppThemeType.dark.index);
     }
 
     if (_prefs.get(_accentColorKey) == null) {
+      _logger.info(runtimeType, 'Setting default blue accent color');
       _prefs.setInt(_accentColorKey, AppAccentColorType.blue.index);
     }
 
     if (_prefs.get(_appLanguageKey) == null) {
+      _logger.info(runtimeType, 'Setting english as the default lang');
       _prefs.setInt(_appLanguageKey, AppLanguageType.english.index);
     }
 
     if (_prefs.get(_syncIntervalKey) == null) {
+      _logger.info(runtimeType, 'Setting sync type to none...');
       _prefs.setInt(_syncIntervalKey, SyncIntervalType.none.index);
     }
 
     _initialized = true;
+    _logger.info(runtimeType, 'Settings were initialized successfully');
   }
 }

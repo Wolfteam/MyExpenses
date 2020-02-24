@@ -1,11 +1,19 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'category_item.g.dart';
+
+@JsonSerializable()
 class CategoryItem extends Equatable {
   final int id;
   final bool isAnIncome;
   final String name;
+
+  @JsonKey(ignore: true)
   final IconData icon;
+
+  @JsonKey(ignore: true)
   final Color iconColor;
   final bool isSeleted;
 
@@ -38,4 +46,8 @@ class CategoryItem extends Equatable {
       isSeleted: isSeleted ?? this.isSeleted,
     );
   }
+
+  factory CategoryItem.fromJson(Map<String, dynamic> json) =>
+      _$CategoryItemFromJson(json);
+  Map<String, dynamic> toJson() => _$CategoryItemToJson(this);
 }

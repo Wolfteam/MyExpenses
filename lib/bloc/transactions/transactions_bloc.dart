@@ -5,24 +5,28 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
-import 'package:my_expenses/generated/i18n.dart';
 
+import '../../common/utils/date_utils.dart';
+import '../../common/utils/i18n_utils.dart';
 import '../../common/utils/transaction_utils.dart';
 import '../../daos/transactions_dao.dart';
 import '../../models/transaction_card_items.dart';
 import '../../models/transaction_item.dart';
 import '../../models/transactions_summary_per_day.dart';
 import '../../models/transactions_summary_per_month.dart';
+import '../../services/logging_service.dart';
 import '../../services/settings_service.dart';
 
 part 'transactions_event.dart';
 part 'transactions_state.dart';
 
 class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
+  final LoggingService _logger;
   final TransactionsDao _transactionsDao;
   final SettingsService _settingsService;
 
   TransactionsBloc(
+    this._logger,
     this._transactionsDao,
     this._settingsService,
   );
@@ -37,11 +41,20 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     yield TransactionsInitialState();
 
     if (event is GetTransactions) {
-      final month = DateFormat('MMMM').format(event.inThisDate);
+      final month = DateUtils.formatAppDate(
+        event.inThisDate,
+        _settingsService.language,
+        DateUtils.monthFormat,
+      );
       final from = DateTime(event.inThisDate.year, event.inThisDate.month, 1);
       final to = (from.month < 12)
           ? DateTime(from.year, from.month + 1, 0)
           : DateTime(from.year + 1, 1, 0);
+
+      _logger.info(
+        runtimeType,
+        'Getting all the transactions from = $from to = $to',
+      );
       final transactions = await _transactionsDao.getAllTransactions(from, to);
 
       final incomes = _getTotalIncomes(transactions);
@@ -111,41 +124,56 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
 
     final to = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
-    final transactions = (await _transactionsDao.getAllTransactions(from, to))
-        .where((t) => t.category.isAnIncome == onlyIncomes)
-        .toList();
+    _logger.info(
+      runtimeType,
+      '_buildTransactionSummaryPerDay: Getting ${onlyIncomes ? "income" : "expense"} transactions summary from = $from to = $to',
+    );
 
-    final map = <DateTime, double>{};
-    for (final transaction in transactions) {
-      final date = DateTime(
-        transaction.transactionDate.year,
-        transaction.transactionDate.month,
-        transaction.transactionDate.day,
-      );
+    try {
+      final transactions = (await _transactionsDao.getAllTransactions(from, to))
+          .where((t) => t.category.isAnIncome == onlyIncomes)
+          .toList();
 
-      if (map.keys.any((key) => key == date)) {
-        map[date] += transaction.amount;
-      } else {
-        map.addAll({date: transaction.amount});
+      final map = <DateTime, double>{};
+      for (final transaction in transactions) {
+        final date = DateTime(
+          transaction.transactionDate.year,
+          transaction.transactionDate.month,
+          transaction.transactionDate.day,
+        );
+
+        if (map.keys.any((key) => key == date)) {
+          map[date] += transaction.amount;
+        } else {
+          map.addAll({date: transaction.amount});
+        }
       }
+
+      for (var i = 0; i <= 6; i++) {
+        final mustExistDate = from.add(Duration(days: i));
+        if (map.containsKey(mustExistDate)) continue;
+
+        map.addAll({mustExistDate: 0.0});
+      }
+
+      final models = map.entries
+          .map((kvp) => TransactionsSummaryPerDay(
+                date: kvp.key,
+                amount: kvp.value.round(),
+              ))
+          .toList();
+
+      models.sort((t1, t2) => t1.createdAt.compareTo(t2.createdAt));
+      return models;
+    } on Exception catch (e, s) {
+      _logger.error(
+        runtimeType,
+        '_buildTransactionSummaryPerDay: Unknown error ocurred',
+        e,
+        s,
+      );
+      return [];
     }
-
-    for (var i = 0; i <= 6; i++) {
-      final mustExistDate = from.add(Duration(days: i));
-      if (map.containsKey(mustExistDate)) continue;
-
-      map.addAll({mustExistDate: 0.0});
-    }
-
-    final models = map.entries
-        .map((kvp) => TransactionsSummaryPerDay(
-              date: kvp.key,
-              amount: kvp.value.round(),
-            ))
-        .toList();
-
-    models.sort((t1, t2) => t1.createdAt.compareTo(t2.createdAt));
-    return models;
   }
 
   List<TransactionCardItems> _buildTransactionsPerMonth(
@@ -169,20 +197,25 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
       }
     }
 
-    final currentLocale =
-        I18n.delegate.supportedLocales[_settingsService.language.index];
-
     final models = <TransactionCardItems>[];
 
     for (final kvp in transPerMonth.entries) {
-      final dateString =
-          DateFormat('MM/dd', currentLocale.languageCode).format(kvp.key);
+      final dateString = DateUtils.formatAppDate(
+        kvp.key,
+        _settingsService.language,
+        DateUtils.monthAndDayFormat,
+      );
 
-      final dayString =
-          DateFormat('EEEE', currentLocale.languageCode).format(kvp.key);
+      final dayString = DateUtils.formatAppDate(
+        kvp.key,
+        _settingsService.language,
+        DateUtils.dayStringFormat,
+      );
+
+      final locale = currentLocale(_settingsService.language);
 
       final dateSummary =
-          '$dateString ${toBeginningOfSentenceCase(dayString, currentLocale.languageCode)}';
+          '$dateString ${toBeginningOfSentenceCase(dayString, locale)}';
 
       models.add(TransactionCardItems(
         date: kvp.key,

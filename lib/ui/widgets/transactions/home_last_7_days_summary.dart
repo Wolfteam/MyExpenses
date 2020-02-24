@@ -79,7 +79,7 @@ class HomeLast7DaysSummary extends StatelessWidget {
         id: 'HomeLast7DaysSummary',
         data: data,
         colorFn: (item, __) => charts.ColorUtil.fromDartColor(item.color),
-        domainFn: (item, _) => DateUtils.formatDate(item.createdAt),
+        domainFn: (item, _) => DateUtils.formatDateWithoutLocale(item.createdAt, DateUtils.dayAndMonthFormat),
         measureFn: (item, _) => item.amount,
         insideLabelStyleAccessorFn: (item, index) => labelStyle,
         outsideLabelStyleAccessorFn: (item, index) => labelStyle,

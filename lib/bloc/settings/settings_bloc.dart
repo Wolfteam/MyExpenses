@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:my_expenses/generated/i18n.dart';
 
 import '../../common/enums/app_accent_color_type.dart';
 import '../../common/enums/app_language_type.dart';
 import '../../common/enums/app_theme_type.dart';
 import '../../common/enums/sync_intervals_type.dart';
+import '../../generated/i18n.dart';
 import '../../services/settings_service.dart';
 
 part 'settings_event.dart';
@@ -29,7 +29,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     SettingsEvent event,
   ) async* {
     if (event is LoadSettings) {
-      print("Loading settings");
       yield* _buildInitialState();
     }
 

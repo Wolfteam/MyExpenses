@@ -52,7 +52,6 @@ class CategoryIconsPage extends StatelessWidget {
     for (final type in CategoryIconType.values) {
       final filteredIcons = icons.where((i) => i.type == type).toList();
       if (filteredIcons.isEmpty) {
-        print('Couldnt find categories icon for type = $type');
         continue;
       }
 

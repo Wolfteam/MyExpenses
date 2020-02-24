@@ -2,18 +2,15 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_expenses/generated/i18n.dart';
 
 import '../../bloc/drawer/drawer_bloc.dart';
 import '../../common/enums/app_drawer_item_type.dart';
-
+import '../../generated/i18n.dart';
 import 'reports/reports_bottom_sheet_dialog.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return BlocBuilder<DrawerBloc, DrawerState>(
       builder: (ctx, state) {
         return Drawer(
