@@ -1,138 +1,139 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
-import '../../common/presentation/custom_icons.dart';
 import '../../common/enums/category_icon_type.dart';
+import '../../common/presentation/custom_icons.dart';
 import '../../models/category_icon.dart';
 
 class CategoryUtils {
   //Education
-  static const school = "School";
-  static const pallete = "Pallete";
+  static const school = 'School';
+  static const pallete = 'Pallete';
 
   //Electronics
-  static const headset = "Headset";
-  static const radio = "Radio";
-  static const laptop = "Laptop";
-  static const pc = "PC";
-  static const gamepad = "Gamepad";
-  static const phone = "Phone";
-  static const smartphone = "Smartphone";
-  static const watch = "Watch";
-  static const tv = "TV";
-  static const printer = "Printer";
-  static const battery = "Battery";
+  static const headset = 'Headset';
+  static const radio = 'Radio';
+  static const laptop = 'Laptop';
+  static const pc = 'PC';
+  static const gamepad = 'Gamepad';
+  static const phone = 'Phone';
+  static const smartphone = 'Smartphone';
+  static const watch = 'Watch';
+  static const tv = 'TV';
+  static const printer = 'Printer';
+  static const battery = 'Battery';
 
   //Family
-  static const people = "People";
-  static const child = "Child";
-  static const childFriendly = "Child_Friendly";
-  static const hospital = "Hospital";
-  static const pharmacy = "Pharmacy";
-  static const gift = "Gift";
+  static const people = 'People';
+  static const child = 'Child';
+  static const childFriendly = 'Child_Friendly';
+  static const hospital = 'Hospital';
+  static const pharmacy = 'Pharmacy';
+  static const gift = 'Gift';
 
   //Food icons
-  static const fastFood = "Fast Food";
-  static const food = "Food";
-  static const dinning = "Dinning";
-  static const bar = "Bar";
-  static const cafe = "Cafe";
-  static const pizza = "Pizza";
-  static const restaurant = "Restaurant";
+  static const fastFood = 'Fast Food';
+  static const food = 'Food';
+  static const dinning = 'Dinning';
+  static const bar = 'Bar';
+  static const cafe = 'Cafe';
+  static const pizza = 'Pizza';
+  static const restaurant = 'Restaurant';
 
   //Furniture
-  static const seat = "Seat";
-  static const weekend = "Weekend";
-  static const archive = "Archive";
-  static const bed = "Bed";
+  static const seat = 'Seat';
+  static const weekend = 'Weekend';
+  static const archive = 'Archive';
+  static const bed = 'Bed';
 
   //Income
-  static const money = "Money";
-  static const dollar = "Dollar";
-  static const money2 = "Money_2";
-  static const gWallet = "GWallet";
-  static const bank = "Bank";
-  static const wallet = "Wallet";
-  static const atm = "ATM";
-  static const giftcard = "GitfCard";
-  static const creditcard = "CreditCard";
-  static const mastercard = "Mastercard";
-  static const stipe = "Stipe";
-  static const discover = "Discover";
-  static const amex = "Amex";
-  static const paypal = "Paypal";
+  static const money = 'Money';
+  static const dollar = 'Dollar';
+  static const money2 = 'Money_2';
+  static const gWallet = 'GWallet';
+  static const bank = 'Bank';
+  static const wallet = 'Wallet';
+  static const atm = 'ATM';
+  static const giftcard = 'GitfCard';
+  static const creditcard = 'CreditCard';
+  static const mastercard = 'Mastercard';
+  static const stipe = 'Stipe';
+  static const discover = 'Discover';
+  static const amex = 'Amex';
+  static const paypal = 'Paypal';
 
   //Life
-  static const movie = "Movie";
-  static const camera = "Camera";
-  static const flight = "Flight";
-  static const web = "Web";
-  static const internet = "Internet";
-  static const email = "Email";
-  static const forum = "Forum";
-  static const sms = "Sms";
-  static const games = "Games";
-  static const bike = "Bike";
-  static const run = "Run";
-  static const movies = "Movies";
-  static const hotel = "Hotel";
-  static const map = "Map";
-  static const book = "Book";
-  static const pool = "Pool";
-  static const beach = "Beach";
-  static const music = "Music";
-  static const fitness = "Fitness";
-  static const cloudsun = "CloudSun";
-  static const sun = "Sun";
-  static const landscape = "Landscape";
-  static const picture = "Picture";
-  static const picture1 = "Picture1";
-  static const amazon = "Amazon";
-  static const facebook = "Facebook";
-  static const spotify = "Spotify";
-  static const steam = "Steam";
-  static const soundcloud = "Soundcloud";
-  static const skype = "Skype";
-  static const youtube = "Youtube";
-  static const soccerBall = "Sports";
+  static const movie = 'Movie';
+  static const camera = 'Camera';
+  static const flight = 'Flight';
+  static const web = 'Web';
+  static const internet = 'Internet';
+  static const email = 'Email';
+  static const forum = 'Forum';
+  static const sms = 'Sms';
+  static const games = 'Games';
+  static const bike = 'Bike';
+  static const run = 'Run';
+  static const movies = 'Movies';
+  static const hotel = 'Hotel';
+  static const map = 'Map';
+  static const book = 'Book';
+  static const pool = 'Pool';
+  static const beach = 'Beach';
+  static const music = 'Music';
+  static const fitness = 'Fitness';
+  static const cloudsun = 'CloudSun';
+  static const sun = 'Sun';
+  static const landscape = 'Landscape';
+  static const picture = 'Picture';
+  static const picture1 = 'Picture1';
+  static const amazon = 'Amazon';
+  static const facebook = 'Facebook';
+  static const spotify = 'Spotify';
+  static const steam = 'Steam';
+  static const soundcloud = 'Soundcloud';
+  static const skype = 'Skype';
+  static const youtube = 'Youtube';
+  static const soccerBall = 'Sports';
 
   //Personal
-  static const home = "Home";
-  static const work = "Work";
-  static const pets = "Pets";
-  static const language = "Langugage";
-  static const build = "Build";
-  static const gas = "Gas";
-  static const tshirt = "T_Shirt";
-  static const laundry = "Laundry";
-  static const religious = "Religious";
-  static const lgihter = "Lighter";
-  static const chartArea = "ChartArea";
-  static const tools = "Tools";
-  static const healing = "Healing";
+  static const home = 'Home';
+  static const work = 'Work';
+  static const pets = 'Pets';
+  static const language = 'Langugage';
+  static const build = 'Build';
+  static const gas = 'Gas';
+  static const tshirt = 'T_Shirt';
+  static const laundry = 'Laundry';
+  static const religious = 'Religious';
+  static const lgihter = 'Lighter';
+  static const chartArea = 'ChartArea';
+  static const tools = 'Tools';
+  static const healing = 'Healing';
 
   //Shopping
-  static const shoppingCart = "ShoppingCart";
-  static const offer = "Offer";
-  static const diamond = "Diamond";
-  static const shop = "Shop";
-  static const mall = "Mall";
-  static const shoppingBag = "ShoppingBag";
-  static const shoopingBasket = "ShoppingBasket";
+  static const shoppingCart = 'ShoppingCart';
+  static const offer = 'Offer';
+  static const diamond = 'Diamond';
+  static const shop = 'Shop';
+  static const mall = 'Mall';
+  static const shoppingBag = 'ShoppingBag';
+  static const shoopingBasket = 'ShoppingBasket';
 
   //Transportation
-  static const boat = "Boat";
-  static const bus = "Bus";
-  static const car = "Car";
-  static const subway = "Subway";
-  static const airplane = "Airplane";
-  static const taxi = "Taxi";
+  static const boat = 'Boat';
+  static const bus = 'Bus';
+  static const car = 'Car';
+  static const subway = 'Subway';
+  static const airplane = 'Airplane';
+  static const taxi = 'Taxi';
 
   //Others
-  static const na = "NA";
-  static const tree = "Tree";
-  static const waterDrop = "Water";
-  static const question = "Help";
+  static const na = 'NA';
+  static const tree = 'Tree';
+  static const waterDrop = 'Water';
+  static const question = 'Help';
 
   static final educationIcons = <CategoryIcon>[
     CategoryIcon(
@@ -694,12 +695,11 @@ class CategoryUtils {
       icon: Icon(CustomIcons.help_circled),
       name: question,
       type: CategoryIconType.others,
-      isSelected: true,
     ),
   ];
 
   static List<CategoryIcon> getAllCategoryIcons() {
-    var icons = educationIcons +
+    final icons = educationIcons +
         electronicIcons +
         familyIcons +
         foodIcons +
@@ -713,47 +713,19 @@ class CategoryUtils {
     return icons;
   }
 
-  static CategoryIcon getByName(String name) {
-    return getAllCategoryIcons().firstWhere((c) => c.name == name);
-  }
+  static CategoryIcon getByName(String name) =>
+      getAllCategoryIcons().firstWhere((c) => c.name == name);
 
-  static CategoryIcon getByNameAndType(String name, CategoryIconType type) {
-    return getAllCategoryIcons()
-        .where((i) => i.type == type)
-        .firstWhere((c) => c.name == name);
-  }
+  static CategoryIcon getByNameAndType(String name, CategoryIconType type) =>
+      getAllCategoryIcons()
+          .where((i) => i.type == type)
+          .firstWhere((c) => c.name == name);
 
-  static String getCategoryIconTypeName(CategoryIconType type) {
-    switch (type) {
-      case CategoryIconType.education:
-        return "Education";
-      case CategoryIconType.electronics:
-        return "Electronics";
-      case CategoryIconType.family:
-        return "Family";
-      case CategoryIconType.food:
-        return "Food";
-      case CategoryIconType.furniture:
-        return "Furniture";
-      case CategoryIconType.income:
-        return "Income";
-      case CategoryIconType.life:
-        return "Life";
-      case CategoryIconType.personal:
-        return "Personal";
-      case CategoryIconType.shopping:
-        return "Shopping";
-      case CategoryIconType.transportation:
-        return "Transportation";
-      case CategoryIconType.others:
-        return "Others";
-      default:
-        return "N/A";
-    }
-  }
+  static CategoryIcon getByIconData(IconData iconData) =>
+      getAllCategoryIcons().firstWhere((c) => c.icon.icon == iconData);
 
   static String toJSONString(IconData data) {
-    Map<String, dynamic> map = <String, dynamic>{};
+    final map = <String, dynamic>{};
     map['codePoint'] = data.codePoint;
     map['fontFamily'] = data.fontFamily;
     map['fontPackage'] = data.fontPackage;

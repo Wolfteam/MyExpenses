@@ -130,12 +130,12 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               child: dropdown,
             ),
-            SwitchListTile(
-              title: Text(i18n.settingsUseDarkAmoled),
-              // subtitle: Text("Usefull on amoled screens"),
-              value: true,
-              onChanged: (newValue) {},
-            ),
+            // SwitchListTile(
+            //   title: Text(i18n.settingsUseDarkAmoled),
+            //   // subtitle: Text("Usefull on amoled screens"),
+            //   value: true,
+            //   onChanged: (newValue) {},
+            // ),
           ],
         ),
       ),

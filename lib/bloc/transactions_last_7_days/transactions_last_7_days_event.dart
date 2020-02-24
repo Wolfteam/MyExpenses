@@ -1,7 +1,7 @@
 part of 'transactions_last_7_days_bloc.dart';
 
 @immutable
-abstract class TransactionsLast7DaysEvent {}
+abstract class TransactionsLast7DaysEvent extends Equatable {}
 
 class Last7DaysTransactionTypeChanged extends TransactionsLast7DaysEvent {
   final TransactionType selectedType;
@@ -9,4 +9,7 @@ class Last7DaysTransactionTypeChanged extends TransactionsLast7DaysEvent {
   Last7DaysTransactionTypeChanged({
     @required this.selectedType,
   });
+
+  @override
+  List<Object> get props => [selectedType];
 }

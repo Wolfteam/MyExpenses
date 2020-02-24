@@ -3,9 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
-import './ui/pages/main_page.dart';
 import 'bloc/app/app_bloc.dart' as app_bloc;
 import 'bloc/categories_list/categories_list_bloc.dart';
+import 'bloc/category_form/category_form_bloc.dart';
+import 'bloc/category_icon/category_icon_bloc.dart';
 import 'bloc/drawer/drawer_bloc.dart';
 import 'bloc/settings/settings_bloc.dart';
 import 'bloc/transaction_form/transaction_form_bloc.dart';
@@ -17,6 +18,7 @@ import 'generated/i18n.dart';
 import 'injection.dart';
 import 'models/current_selected_category.dart';
 import 'services/settings_service.dart';
+import 'ui/pages/main_page.dart';
 
 //TODO: MOVE THE ASSETS TO A CLASS
 void main() {
@@ -79,6 +81,8 @@ class _MyAppState extends State<MyApp> {
             return app_bloc.AppBloc(settingsService);
           }),
           BlocProvider(create: (ctx) => DrawerBloc()),
+          BlocProvider(create: (ctx) => CategoryFormBloc(getIt<CategoriesDao>())),
+          BlocProvider(create: (ctx) => CategoryIconBloc()),
         ],
         child: BlocBuilder<app_bloc.AppBloc, app_bloc.AppState>(
           builder: (ctx, state) => _buildApp(ctx, state),

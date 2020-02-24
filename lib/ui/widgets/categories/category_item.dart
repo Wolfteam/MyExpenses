@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
 import '../../../bloc/categories_list/categories_list_bloc.dart';
+import '../../../bloc/category_form/category_form_bloc.dart';
 import '../../../models/category_item.dart' as models;
 import '../../../models/current_selected_category.dart';
+import '../../../ui/pages/add_edit_category_page.dart';
 
 class CategoryItem extends StatelessWidget {
   final bool isInSelectionMode;
@@ -39,11 +41,17 @@ class CategoryItem extends StatelessWidget {
       child: ListTile(
         leading: icon,
         title: Text(category.name),
-        onTap: () {
-          if (isInSelectionMode) _handleItemClickOnSelectionMode(context);
-        },
+        onTap: () => _onItemClick(context),
       ),
     );
+  }
+
+  void _onItemClick(BuildContext context) {
+    if (isInSelectionMode) {
+      _handleItemClickOnSelectionMode(context);
+    } else {
+      _handleItemClick(context);
+    }
   }
 
   void _handleItemClickOnSelectionMode(BuildContext context) {
@@ -64,5 +72,15 @@ class CategoryItem extends StatelessWidget {
           ));
       context.bloc<IncomesCategoriesBloc>().add(UnSelectAllCategories());
     }
+  }
+
+  Future _handleItemClick(BuildContext context) async {
+    final route = MaterialPageRoute(
+      builder: (ctx) => AddEditCategoryPage(category),
+    );
+
+    context.bloc<CategoryFormBloc>().add(EditCategory(category));
+    await Navigator.of(context).push(route);
+    context.bloc<CategoryFormBloc>().add(FormClosed());
   }
 }

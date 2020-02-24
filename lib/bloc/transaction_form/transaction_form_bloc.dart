@@ -116,8 +116,10 @@ class TransactionFormBloc
 
   bool _isAmountValid(double amount) => amount != 0;
 
-  bool _isDescriptionValid(String description) =>
-      !description.isNullOrEmpty(minLength: 1);
+  bool _isDescriptionValid(String description) => !description.isNullOrEmpty(
+        minLength: 1,
+        maxLength: 255,
+      );
 
   bool _areRepetitionsValid(int repetitions) => repetitions >= 0;
 
@@ -125,14 +127,11 @@ class TransactionFormBloc
     TransactionItem transaction,
   ) async* {
     try {
-      final createdTrans =
-          await _transactionsDao.saveTransaction(transaction);
+      final createdTrans = await _transactionsDao.saveTransaction(transaction);
 
       yield TransactionSavedState(createdTrans);
     } catch (e) {
-      yield currentState.copyWith(
-        error: 'Unknown error while trying to save into db',
-      );
+      yield currentState.copyWith(errorOccurred: true);
     }
   }
 
@@ -141,9 +140,7 @@ class TransactionFormBloc
       await _transactionsDao.deleteTransaction(id);
       yield TransactionDeletedState();
     } catch (e) {
-      yield currentState.copyWith(
-        error: 'Unknown error while trying to delete transaction',
-      );
+      yield currentState.copyWith(errorOccurred: true);
     }
   }
 }

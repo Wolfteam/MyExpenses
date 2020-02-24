@@ -1,5 +1,6 @@
 import '../../common/enums/app_language_type.dart';
 import '../../common/enums/app_theme_type.dart';
+import '../../common/enums/category_icon_type.dart';
 import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/enums/sync_intervals_type.dart';
 import '../../common/enums/transaction_type.dart';
@@ -16,7 +17,7 @@ extension I18nExtensions on I18n {
         throw Exception('The provided app theme = $theme is not valid');
     }
   }
- 
+
   String translateAppLanguageType(AppLanguageType lang) {
     switch (lang) {
       case AppLanguageType.english:
@@ -72,6 +73,35 @@ extension I18nExtensions on I18n {
         return eachDay;
       default:
         throw Exception('The provided sync interval = $interval is not valid');
+    }
+  }
+
+  String getCategoryIconTypeName(CategoryIconType type) {
+    switch (type) {
+      case CategoryIconType.education:
+        return categoryIconTypeEducation;
+      case CategoryIconType.electronics:
+        return categoryIconTypeElectronics;
+      case CategoryIconType.family:
+        return categoryIconTypeFamily;
+      case CategoryIconType.food:
+        return categoryIconTypeFood;
+      case CategoryIconType.furniture:
+        return categoryIconTypeFurniture;
+      case CategoryIconType.income:
+        return income;
+      case CategoryIconType.life:
+        return categoryIconTypeLife;
+      case CategoryIconType.personal:
+        return categoryIconTypePersonal;
+      case CategoryIconType.shopping:
+        return categoryIconTypeShopping;
+      case CategoryIconType.transportation:
+        return categoryIconTypeTransportation;
+      case CategoryIconType.others:
+        return categoryIconTypeOthers;
+      default:
+        return na;
     }
   }
 }

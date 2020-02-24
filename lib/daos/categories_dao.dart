@@ -8,4 +8,8 @@ abstract class CategoriesDao {
   Future<List<CategoryItem>> getAllIncomes();
 
   Future<List<CategoryItem>> getAllExpenses();
+
+  Future<CategoryItem> saveCategory(CategoryItem category);
+
+  Future<bool> deleteCategory(int id);
 }

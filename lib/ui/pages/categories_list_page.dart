@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../bloc/categories_list/categories_list_bloc.dart';
+import '../../bloc/category_form/category_form_bloc.dart';
 import '../../models/category_item.dart';
 import '../widgets/categories/category_item.dart' as cat_item;
 import 'add_edit_category_page.dart';
@@ -31,15 +32,7 @@ class _CategoriesListPageState extends State<CategoriesListPage>
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final event = GetCategories(
-      loadIncomes: widget.loadIncomes,
-      selectedCategory: widget.selectedCategory,
-    );
-    if (widget.loadIncomes) {
-      context.bloc<IncomesCategoriesBloc>().add(event);
-    } else {
-      context.bloc<ExpensesCategoriesBloc>().add(event);
-    }
+    _loadCategories();
   }
 
   @override
@@ -57,12 +50,7 @@ class _CategoriesListPageState extends State<CategoriesListPage>
       floatingActionButton: !widget.isInSelectionMode
           ? FloatingActionButton(
               heroTag: widget.loadIncomes ? 'AddIncomesFab' : 'AddExpensesFab',
-              onPressed: () {
-                final route = MaterialPageRoute(
-                  builder: (ctx) => AddEditCategoryPage(),
-                );
-                Navigator.of(context).push(route);
-              },
+              onPressed: _gotoAddCategoryPage,
               child: const Icon(Icons.add),
             )
           : null,
@@ -83,5 +71,27 @@ class _CategoriesListPageState extends State<CategoriesListPage>
         child: CircularProgressIndicator(),
       );
     }
+  }
+
+  void _loadCategories() {
+    final event = GetCategories(
+      loadIncomes: widget.loadIncomes,
+      selectedCategory: widget.selectedCategory,
+    );
+    if (widget.loadIncomes) {
+      context.bloc<IncomesCategoriesBloc>().add(event);
+    } else {
+      context.bloc<ExpensesCategoriesBloc>().add(event);
+    }
+  }
+
+  Future _gotoAddCategoryPage() async {
+    final route = MaterialPageRoute(
+      builder: (ctx) => const AddEditCategoryPage(null),
+    );
+
+    context.bloc<CategoryFormBloc>().add(AddCategory());
+    await Navigator.of(context).push(route);
+    context.bloc<CategoryFormBloc>().add(FormClosed());
   }
 }

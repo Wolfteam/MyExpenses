@@ -34,7 +34,7 @@ class TransactionFormLoadedState extends TransactionFormState {
   final CategoryItem category;
   final bool isCategoryValid;
 
-  final String error;
+  final bool errorOccurred;
 
   bool get isFormValid =>
       isAmountValid &&
@@ -60,7 +60,7 @@ class TransactionFormLoadedState extends TransactionFormState {
     @required this.areRepetitionCyclesVisible,
     @required this.category,
     @required this.isCategoryValid,
-    this.error,
+    this.errorOccurred = false,
   });
 
   factory TransactionFormLoadedState.initial() {
@@ -90,7 +90,7 @@ class TransactionFormLoadedState extends TransactionFormState {
       areRepetitionCyclesVisible: false,
       category: category,
       isCategoryValid: false,
-      error: null,
+      errorOccurred: false,
     );
   }
 
@@ -111,7 +111,7 @@ class TransactionFormLoadedState extends TransactionFormState {
     bool areRepetitionCyclesVisible,
     CategoryItem category,
     bool isCategoryValid,
-    String error,
+    bool errorOccurred,
   }) {
     return TransactionFormLoadedState(
       id: id ?? this.id,
@@ -132,7 +132,7 @@ class TransactionFormLoadedState extends TransactionFormState {
           areRepetitionCyclesVisible ?? this.areRepetitionCyclesVisible,
       category: category ?? this.category,
       isCategoryValid: isCategoryValid ?? this.isCategoryValid,
-      error: error ?? this.error,
+      errorOccurred: errorOccurred ?? this.errorOccurred,
     );
   }
 
@@ -165,7 +165,7 @@ class TransactionFormLoadedState extends TransactionFormState {
         repetitionCycle,
         category,
         isCategoryValid,
-        error,
+        errorOccurred,
       ];
 }
 

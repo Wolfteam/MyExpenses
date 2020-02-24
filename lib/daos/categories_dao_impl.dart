@@ -8,15 +8,16 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
 
   @override
   Future<List<CategoryItem>> getAll() {
-    var query = select(categories).map((row) => CategoryItem(
-          id: row.id,
-          isAnIncome: row.isAnIncome,
-          name: row.name,
-          icon: row.icon,
-          iconColor: row.iconColor,
-        ));
-
-    return query.get();
+    return (select(categories)
+          ..orderBy([(t) => OrderingTerm(expression: t.name)]))
+        .map((row) => CategoryItem(
+              id: row.id,
+              isAnIncome: row.isAnIncome,
+              name: row.name,
+              icon: row.icon,
+              iconColor: row.iconColor,
+            ))
+        .get();
   }
 
   @override
@@ -27,7 +28,9 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
 
   @override
   Future<List<CategoryItem>> getAllIncomes() {
-    var query = select(categories)..where((c) => c.isAnIncome.equals(true));
+    final query = select(categories)
+      ..where((c) => c.isAnIncome.equals(true))
+      ..orderBy([(t) => OrderingTerm(expression: t.name)]);
     return query
         .map((row) => CategoryItem(
               id: row.id,
@@ -41,7 +44,9 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
 
   @override
   Future<List<CategoryItem>> getAllExpenses() {
-    var query = select(categories)..where((c) => c.isAnIncome.equals(false));
+    final query = select(categories)
+      ..where((c) => c.isAnIncome.equals(false))
+      ..orderBy([(t) => OrderingTerm(expression: t.name)]);
     return query
         .map((row) => CategoryItem(
               id: row.id,
@@ -51,5 +56,51 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
               iconColor: row.iconColor,
             ))
         .get();
+  }
+
+  @override
+  Future<CategoryItem> saveCategory(CategoryItem category) async {
+    Category savedCategory;
+    int id = 0;
+
+    if (category.id <= 0) {
+      id = await into(categories).insert(Category(
+        createdBy: 'someone',
+        icon: category.icon,
+        iconColor: category.iconColor,
+        isAnIncome: category.isAnIncome,
+        name: category.name,
+      ));
+    } else {
+      id = category.id;
+      final updatedFields = CategoriesCompanion(
+        icon: Value(category.icon),
+        iconColor: Value(category.iconColor),
+        isAnIncome: Value(category.isAnIncome),
+        name: Value(category.name),
+        updatedAt: Value(DateTime.now()),
+        updatedBy: Value('somebody'),
+      );
+
+      await (update(categories)..where((t) => t.id.equals(id)))
+          .write(updatedFields);
+    }
+
+    final query = select(categories)..where((t) => t.id.equals(id));
+    savedCategory = (await query.get()).first;
+
+    return CategoryItem(
+      icon: savedCategory.icon,
+      iconColor: savedCategory.iconColor,
+      id: savedCategory.id,
+      isAnIncome: savedCategory.isAnIncome,
+      name: savedCategory.name,
+    );
+  }
+
+  @override
+  Future<bool> deleteCategory(int id) async {
+    await (delete(categories)..where((t) => t.id.equals(id))).go();
+    return true;
   }
 }

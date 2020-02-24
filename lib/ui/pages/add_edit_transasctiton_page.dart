@@ -129,16 +129,17 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   }
 
   List<Widget> _buildPage(BuildContext context, TransactionFormState state) {
+    final i18n = I18n.of(context);
+
     if (state is TransactionFormLoadedState) {
-      if (!state.error.isNullEmptyOrWhitespace) {
-        showWarningToast(state.error);
+      if (state.errorOccurred) {
+        showWarningToast(i18n.unknownErrorOcurred);
       }
 
       return [_buildHeader(context, state), _buildForm(context, state)];
     }
 
     if (state is TransactionSavedState || state is TransactionDeletedState) {
-      final i18n = I18n.of(context);
       final msg = state is TransactionSavedState
           ? i18n.transactionsWasSuccessfullySaved
           : i18n.transactionsWasSuccessfullyDeleted;
@@ -164,16 +165,16 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     final i18n = I18n.of(context);
 
     return Container(
-      height: 240.0,
+      height: 260.0,
       child: Stack(
         children: <Widget>[
           Container(
             height: 150,
-            color: state.category.iconColor,
+            color: theme.primaryColorDark,
           ),
           Container(
             padding: const EdgeInsets.only(
-              top: 40.0,
+              top: 60.0,
               left: 20.0,
               right: 20.0,
               bottom: 10.0,
@@ -275,17 +276,16 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               children: <Widget>[
                 Material(
                   elevation: 10,
-                  shape: const CircleBorder(),
-                  child: CircleAvatar(
-                    backgroundColor: Colors.white,
-                    radius: 40.0,
-                    child: Center(
-                      child: IconButton(
-                        iconSize: 50,
-                        icon: Icon(state.category.icon),
-                        color: state.category.iconColor,
-                        onPressed: () => _changeCategory(state),
-                      ),
+                  color: theme.cardColor.withOpacity(0.8),
+                  borderOnForeground: true,
+                  type: MaterialType.circle,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: IconButton(
+                      iconSize: 60,
+                      icon: Icon(state.category.icon),
+                      color: state.category.iconColor,
+                      onPressed: () => _changeCategory(state),
                     ),
                   ),
                 ),

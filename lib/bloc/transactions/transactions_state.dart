@@ -1,8 +1,11 @@
 part of 'transactions_bloc.dart';
 
 @immutable
-abstract class TransactionsState {
+abstract class TransactionsState extends Equatable {
   const TransactionsState();
+
+  @override
+  List<Object> get props => [];
 }
 
 class TransactionsInitialState extends TransactionsState {}
@@ -28,4 +31,16 @@ class TransactionsLoadedState extends TransactionsState {
     @required this.incomeTransactionsPerWeek,
     @required this.expenseTransactionsPerWeek,
   });
+
+  @override
+  List<Object> get props => [
+        month,
+        incomeAmount,
+        expenseAmount,
+        balanceAmount,
+        monthBalance,
+        transactionsPerMonth,
+        incomeTransactionsPerWeek,
+        expenseTransactionsPerWeek
+      ];
 }
