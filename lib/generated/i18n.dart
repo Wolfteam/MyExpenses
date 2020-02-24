@@ -114,8 +114,8 @@ class I18n implements WidgetsLocalizations {
   String deleteX(String name) => "Delete ${name} ?";
   /// "Are you sure you wanna delete this transaction ?"
   String get confirmDeleteTransaction => "Are you sure you wanna delete this transaction ?";
-  /// "ok"
-  String get ok => "ok";
+  /// "Ok"
+  String get ok => "Ok";
   /// "Yes"
   String get yes => "Yes";
   /// "Close"
@@ -136,6 +136,8 @@ class I18n implements WidgetsLocalizations {
   String get pickColor => "Pick a color";
   /// "Add a category"
   String get addCategory => "Add a category";
+  /// "Edit category"
+  String get editCategory => "Edit category";
   /// "Select a category"
   String get selectCategory => "Select a category";
   /// "You must select a category"
@@ -156,6 +158,16 @@ class I18n implements WidgetsLocalizations {
   String get reportFormat => "Report format";
   /// "Please select a format"
   String get selectFormat => "Please select a format";
+  /// "Invalid name"
+  String get invalidName => "Invalid name";
+  /// "An unknown error occurred"
+  String get unknownErrorOcurred => "An unknown error occurred";
+  /// "Category was successfully saved"
+  String get categoryWasSuccessfullySaved => "Category was successfully saved";
+  /// "Category was successfully deleted"
+  String get categoryWasSuccessfullyDeleted => "Category was successfully deleted";
+  /// "Are you sure you wanna delete this category ?"
+  String get confirmDeleteCategory => "Are you sure you wanna delete this category ?";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -170,6 +182,26 @@ class I18n implements WidgetsLocalizations {
   String get syncIntervalEach6Hours => "Each 6 hours";
   /// "Each 12 hours"
   String get syncIntervalEach12Hours => "Each 12 hours";
+  /// "Education"
+  String get categoryIconTypeEducation => "Education";
+  /// "Electronics"
+  String get categoryIconTypeElectronics => "Electronics";
+  /// "Family"
+  String get categoryIconTypeFamily => "Family";
+  /// "Food"
+  String get categoryIconTypeFood => "Food";
+  /// "Furniture"
+  String get categoryIconTypeFurniture => "Furniture";
+  /// "Life"
+  String get categoryIconTypeLife => "Life";
+  /// "Personal"
+  String get categoryIconTypePersonal => "Personal";
+  /// "Shopping"
+  String get categoryIconTypeShopping => "Shopping";
+  /// "Transportation"
+  String get categoryIconTypeTransportation => "Transportation";
+  /// "Others"
+  String get categoryIconTypeOthers => "Others";
   /// "Theme"
   String get settingsTheme => "Theme";
   /// "Select an app theme"
@@ -339,9 +371,9 @@ class _I18n_es_VE extends I18n {
   /// " ¿Estás seguro que deseas borrar esta transacción?"
   @override
   String get confirmDeleteTransaction => " ¿Estás seguro que deseas borrar esta transacción?";
-  /// "ok"
+  /// "Ok"
   @override
-  String get ok => "ok";
+  String get ok => "Ok";
   /// "Si"
   @override
   String get yes => "Si";
@@ -372,6 +404,9 @@ class _I18n_es_VE extends I18n {
   /// "Agregar una categoría"
   @override
   String get addCategory => "Agregar una categoría";
+  /// "Editar categoría"
+  @override
+  String get editCategory => "Editar categoría";
   /// "Seleccione una categoría"
   @override
   String get selectCategory => "Seleccione una categoría";
@@ -402,6 +437,21 @@ class _I18n_es_VE extends I18n {
   /// "Por favor seleccione un formato"
   @override
   String get selectFormat => "Por favor seleccione un formato";
+  /// "Nombre inválido"
+  @override
+  String get invalidName => "Nombre inválido";
+  /// "Un error inesperado ha ocurrido"
+  @override
+  String get unknownErrorOcurred => "Un error inesperado ha ocurrido";
+  /// "La categoría fue guardada exitósamente"
+  @override
+  String get categoryWasSuccessfullySaved => "La categoría fue guardada exitósamente";
+  /// "La categoría fue borrada exitósamente"
+  @override
+  String get categoryWasSuccessfullyDeleted => "La categoría fue borrada exitósamente";
+  /// " ¿Estás seguro que deseas borrar esta categoría?"
+  @override
+  String get confirmDeleteCategory => " ¿Estás seguro que deseas borrar esta categoría?";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";
@@ -423,6 +473,36 @@ class _I18n_es_VE extends I18n {
   /// "Cada 12 horas"
   @override
   String get syncIntervalEach12Hours => "Cada 12 horas";
+  /// "Educación"
+  @override
+  String get categoryIconTypeEducation => "Educación";
+  /// "Electrónicos"
+  @override
+  String get categoryIconTypeElectronics => "Electrónicos";
+  /// "Familia"
+  @override
+  String get categoryIconTypeFamily => "Familia";
+  /// "Comida"
+  @override
+  String get categoryIconTypeFood => "Comida";
+  /// "Mobiliario"
+  @override
+  String get categoryIconTypeFurniture => "Mobiliario";
+  /// "Vida"
+  @override
+  String get categoryIconTypeLife => "Vida";
+  /// "Personal"
+  @override
+  String get categoryIconTypePersonal => "Personal";
+  /// "Compras"
+  @override
+  String get categoryIconTypeShopping => "Compras";
+  /// "Trasnporte"
+  @override
+  String get categoryIconTypeTransportation => "Trasnporte";
+  /// "Otros"
+  @override
+  String get categoryIconTypeOthers => "Otros";
   /// "Tema"
   @override
   String get settingsTheme => "Tema";
