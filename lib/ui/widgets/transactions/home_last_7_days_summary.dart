@@ -1,11 +1,11 @@
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_expenses/generated/i18n.dart';
 
 import '../../../bloc/transactions_last_7_days/transactions_last_7_days_bloc.dart';
 import '../../../common/enums/transaction_type.dart';
 import '../../../common/utils/date_utils.dart';
+import '../../../generated/i18n.dart';
 import '../../../models/transactions_summary_per_day.dart';
 
 class HomeLast7DaysSummary extends StatelessWidget {
@@ -79,7 +79,10 @@ class HomeLast7DaysSummary extends StatelessWidget {
         id: 'HomeLast7DaysSummary',
         data: data,
         colorFn: (item, __) => charts.ColorUtil.fromDartColor(item.color),
-        domainFn: (item, _) => DateUtils.formatDateWithoutLocale(item.createdAt, DateUtils.dayAndMonthFormat),
+        domainFn: (item, _) => DateUtils.formatDateWithoutLocale(
+          item.createdAt,
+          DateUtils.dayAndMonthFormat,
+        ),
         measureFn: (item, _) => item.amount,
         insideLabelStyleAccessorFn: (item, index) => labelStyle,
         outsideLabelStyleAccessorFn: (item, index) => labelStyle,
@@ -133,6 +136,9 @@ class HomeLast7DaysSummary extends StatelessWidget {
     bool incomesIsChecked,
     BuildContext context,
   ) {
+    final theme = Theme.of(context);
+    final lineColor =
+        theme.brightness == Brightness.dark ? Colors.white : Colors.black;
     return Container(
       height: 180,
       child: charts.BarChart(
@@ -154,6 +160,20 @@ class HomeLast7DaysSummary extends StatelessWidget {
               color: charts.ColorUtil.fromDartColor(
                 incomesIsChecked ? Colors.green : Colors.red,
               ),
+            ),
+          ),
+        ),
+        primaryMeasureAxis: charts.NumericAxisSpec(
+          showAxisLine: false,
+          renderSpec: charts.GridlineRendererSpec(
+            axisLineStyle: charts.LineStyleSpec(
+              color: charts.ColorUtil.fromDartColor(lineColor),
+            ),
+            labelStyle: charts.TextStyleSpec(
+              color: charts.ColorUtil.fromDartColor(lineColor),
+            ),
+            lineStyle: charts.LineStyleSpec(
+              color: charts.ColorUtil.fromDartColor(lineColor),
             ),
           ),
         ),

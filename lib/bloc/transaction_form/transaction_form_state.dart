@@ -23,6 +23,7 @@ class TransactionFormLoadedState extends TransactionFormState {
 
   final DateTime transactionDate;
   final bool isTransactionDateValid;
+  final String transactionDateString;
 
   final int repetitions;
   final bool isRepetitionsValid;
@@ -33,6 +34,8 @@ class TransactionFormLoadedState extends TransactionFormState {
 
   final CategoryItem category;
   final bool isCategoryValid;
+
+  final AppLanguageType language;
 
   final bool errorOccurred;
 
@@ -53,6 +56,7 @@ class TransactionFormLoadedState extends TransactionFormState {
     @required this.isDescriptionDirty,
     @required this.transactionDate,
     @required this.isTransactionDateValid,
+    @required this.transactionDateString,
     @required this.repetitions,
     @required this.isRepetitionsValid,
     @required this.isRepetitionsDirty,
@@ -60,10 +64,11 @@ class TransactionFormLoadedState extends TransactionFormState {
     @required this.areRepetitionCyclesVisible,
     @required this.category,
     @required this.isCategoryValid,
+    @required this.language,
     this.errorOccurred = false,
   });
 
-  factory TransactionFormLoadedState.initial() {
+  factory TransactionFormLoadedState.initial(AppLanguageType language) {
     final cat = CategoryUtils.getByName(CategoryUtils.question);
     final category = CategoryItem(
       id: 0,
@@ -71,6 +76,12 @@ class TransactionFormLoadedState extends TransactionFormState {
       name: cat.name,
       icon: cat.icon.icon,
       iconColor: Colors.blue,
+    );
+    final now = DateTime.now();
+    final transactionDateString = DateUtils.formatAppDate(
+      now,
+      language,
+      DateUtils.monthDayAndYearFormat,
     );
 
     return TransactionFormLoadedState(
@@ -81,7 +92,8 @@ class TransactionFormLoadedState extends TransactionFormState {
       description: '',
       isDescriptionValid: false,
       isDescriptionDirty: false,
-      transactionDate: DateTime.now(),
+      transactionDate: now,
+      transactionDateString: transactionDateString,
       isTransactionDateValid: true,
       repetitions: 0,
       isRepetitionsValid: true,
@@ -90,6 +102,7 @@ class TransactionFormLoadedState extends TransactionFormState {
       areRepetitionCyclesVisible: false,
       category: category,
       isCategoryValid: false,
+      language: language,
       errorOccurred: false,
     );
   }
@@ -111,8 +124,16 @@ class TransactionFormLoadedState extends TransactionFormState {
     bool areRepetitionCyclesVisible,
     CategoryItem category,
     bool isCategoryValid,
+    AppLanguageType language,
     bool errorOccurred,
   }) {
+    final date = transactionDate ?? this.transactionDate;
+    final transactionDateString = DateUtils.formatAppDate(
+      date,
+      language ?? this.language,
+      DateUtils.monthDayAndYearFormat,
+    );
+
     return TransactionFormLoadedState(
       id: id ?? this.id,
       amount: amount ?? this.amount,
@@ -124,6 +145,7 @@ class TransactionFormLoadedState extends TransactionFormState {
       transactionDate: transactionDate ?? this.transactionDate,
       isTransactionDateValid:
           isTransactionDateValid ?? this.isTransactionDateValid,
+      transactionDateString: transactionDateString,
       repetitions: repetitions ?? this.repetitions,
       isRepetitionsValid: isRepetitionsValid ?? this.isRepetitionsValid,
       isRepetitionsDirty: isRepetitionsDirty ?? this.isRepetitionsDirty,
@@ -132,6 +154,7 @@ class TransactionFormLoadedState extends TransactionFormState {
           areRepetitionCyclesVisible ?? this.areRepetitionCyclesVisible,
       category: category ?? this.category,
       isCategoryValid: isCategoryValid ?? this.isCategoryValid,
+      language: language ?? this.language,
       errorOccurred: errorOccurred ?? this.errorOccurred,
     );
   }
@@ -159,12 +182,14 @@ class TransactionFormLoadedState extends TransactionFormState {
         isDescriptionDirty,
         transactionDate,
         isTransactionDateValid,
+        transactionDateString,
         repetitions,
         isRepetitionsValid,
         isRepetitionsDirty,
         repetitionCycle,
         category,
         isCategoryValid,
+        language,
         errorOccurred,
       ];
 }

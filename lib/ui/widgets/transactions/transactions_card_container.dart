@@ -45,7 +45,7 @@ class TransactionsCardContainer extends StatelessWidget {
   Widget _buildHeader(BuildContext context) {
     final i18n = I18n.of(context);
     return Padding(
-      padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
+      padding: const EdgeInsets.only(top: 10, left: 16, right: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[

@@ -4,6 +4,8 @@ import '../../common/enums/category_icon_type.dart';
 import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/enums/sync_intervals_type.dart';
 import '../../common/enums/transaction_type.dart';
+import '../../common/enums/sort_direction_type.dart';
+import '../../common/enums/chart_details_filter_type.dart';
 import '../../generated/i18n.dart';
 
 extension I18nExtensions on I18n {
@@ -102,6 +104,30 @@ extension I18nExtensions on I18n {
         return categoryIconTypeOthers;
       default:
         return na;
+    }
+  }
+
+  String getChartDetailsFilterName(ChartDetailsFilterType filter) {
+    switch (filter) {
+      case ChartDetailsFilterType.name:
+        return name;
+      case ChartDetailsFilterType.amount:
+        return amount;
+      case ChartDetailsFilterType.date:
+        return date;
+      default:
+        throw Exception('Invalid chart details filter');
+    }
+  }
+
+  String getSortDirectionName(SortDirectionType direction) {
+    switch (direction) {
+      case SortDirectionType.asc:
+        return ascending;
+      case SortDirectionType.desc:
+        return descending;
+      default:
+        throw Exception('Invalid sort direction');
     }
   }
 }

@@ -18,7 +18,11 @@ class SettingsPage extends StatefulWidget {
   _SettingsPageState createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class _SettingsPageState extends State<SettingsPage>
+    with AutomaticKeepAliveClientMixin<SettingsPage> {
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -28,6 +32,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Padding(
       padding: const EdgeInsets.all(5),
       child: BlocBuilder<SettingsBloc, SettingsState>(

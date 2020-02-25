@@ -44,12 +44,10 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
       final month = DateUtils.formatAppDate(
         event.inThisDate,
         _settingsService.language,
-        DateUtils.monthFormat,
+        DateUtils.fullMonthFormat,
       );
-      final from = DateTime(event.inThisDate.year, event.inThisDate.month, 1);
-      final to = (from.month < 12)
-          ? DateTime(from.year, from.month + 1, 0)
-          : DateTime(from.year + 1, 1, 0);
+      final from = DateUtils.getFirstDayDateOfTheMonth(event.inThisDate);
+      final to = DateUtils.getLastDayDateOfTheMonth(from);
 
       _logger.info(
         runtimeType,
@@ -203,7 +201,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
       final dateString = DateUtils.formatAppDate(
         kvp.key,
         _settingsService.language,
-        DateUtils.monthAndDayFormat,
+        DateUtils.dayAndMonthFormat,
       );
 
       final dayString = DateUtils.formatAppDate(
@@ -212,7 +210,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         DateUtils.dayStringFormat,
       );
 
-      final locale = currentLocale(_settingsService.language);
+      final locale = currentLocaleString(_settingsService.language);
 
       final dateSummary =
           '$dateString ${toBeginningOfSentenceCase(dayString, locale)}';

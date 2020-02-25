@@ -24,21 +24,6 @@ class _CategoriesPageState extends State<CategoriesPage>
     with SingleTickerProviderStateMixin {
   TabController _tabController;
 
-  List<CategoriesListPage> _buildCategoriesListPages() {
-    final incomes = CategoriesListPage(
-      loadIncomes: true,
-      isInSelectionMode: widget.isInSelectionMode,
-      selectedCategory: widget.selectedCategory,
-    );
-    final expenses = CategoriesListPage(
-      loadIncomes: false,
-      isInSelectionMode: widget.isInSelectionMode,
-      selectedCategory: widget.selectedCategory,
-    );
-
-    return [incomes, expenses];
-  }
-
   @override
   void initState() {
     _tabController = TabController(
@@ -113,6 +98,21 @@ class _CategoriesPageState extends State<CategoriesPage>
         text: i18n.expenses,
       ),
     ];
+  }
+
+  List<CategoriesListPage> _buildCategoriesListPages() {
+    final incomes = CategoriesListPage(
+      loadIncomes: true,
+      isInSelectionMode: widget.isInSelectionMode,
+      selectedCategory: widget.selectedCategory,
+    );
+    final expenses = CategoriesListPage(
+      loadIncomes: false,
+      isInSelectionMode: widget.isInSelectionMode,
+      selectedCategory: widget.selectedCategory,
+    );
+
+    return [incomes, expenses];
   }
 
   void _onDone() {

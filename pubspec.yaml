@@ -41,6 +41,7 @@ dependencies:
   get_it: ^3.1.0
   log_4_dart_2: ^0.4.0
   json_annotation: ^3.0.1
+  month_picker_dialog: ^0.3.1
 
 dev_dependencies:
   flutter_test:

@@ -5,13 +5,16 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
+import '../../common/enums/app_language_type.dart';
 import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/extensions/string_extensions.dart';
 import '../../common/utils/category_utils.dart';
+import '../../common/utils/date_utils.dart';
 import '../../daos/transactions_dao.dart';
 import '../../models/category_item.dart';
 import '../../models/transaction_item.dart';
 import '../../services/logging_service.dart';
+import '../../services/settings_service.dart';
 
 part 'transaction_form_event.dart';
 part 'transaction_form_state.dart';
@@ -20,8 +23,10 @@ class TransactionFormBloc
     extends Bloc<TransactionFormEvent, TransactionFormState> {
   final LoggingService _logger;
   final TransactionsDao _transactionsDao;
+  final SettingsService _settingsService;
 
-  TransactionFormBloc(this._logger, this._transactionsDao);
+  TransactionFormBloc(
+      this._logger, this._transactionsDao, this._settingsService);
 
   TransactionFormLoadedState get currentState =>
       state as TransactionFormLoadedState;
@@ -33,12 +38,14 @@ class TransactionFormBloc
   Stream<TransactionFormState> mapEventToState(
     TransactionFormEvent event,
   ) async* {
+
     if (event is AddTransaction) {
-      yield TransactionFormLoadedState.initial();
+      yield TransactionFormLoadedState.initial(_settingsService.language);
     }
 
     if (event is EditTransaction) {
-      yield TransactionFormLoadedState.initial().copyWith(
+      yield TransactionFormLoadedState.initial(_settingsService.language)
+          .copyWith(
         id: event.item.id,
         amount: event.item.amount,
         isAmountValid: true,

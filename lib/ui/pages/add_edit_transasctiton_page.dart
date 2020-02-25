@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
+import '../../bloc/charts/charts_bloc.dart';
 import '../../bloc/transaction_form/transaction_form_bloc.dart';
 import '../../bloc/transactions/transactions_bloc.dart';
 import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/extensions/i18n_extensions.dart';
 import '../../common/extensions/string_extensions.dart';
-import '../../common/utils/date_utils.dart';
+import '../../common/utils/i18n_utils.dart';
 import '../../common/utils/toast_utils.dart';
 import '../../generated/i18n.dart';
 import '../../models/category_item.dart';
@@ -145,6 +146,8 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
 
       final now = DateTime.now();
       context.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: now));
+      context.bloc<ChartsBloc>().add(LoadChart(now));
+      
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pop();
       });
@@ -157,10 +160,6 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     final BuildContext context,
     final TransactionFormLoadedState state,
   ) {
-    final createdAt = DateUtils.formatDateWithoutLocale(
-      state.transactionDate,
-      DateUtils.monthDayAndYear,
-    );
     const cornerRadius = Radius.circular(20);
     final theme = Theme.of(context);
     final i18n = I18n.of(context);
@@ -203,7 +202,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                     height: 5.0,
                   ),
                   Text(
-                    '${i18n.date}: $createdAt',
+                    '${i18n.date}: ${state.transactionDateString}',
                     style: theme.textTheme.subtitle,
                   ),
                   const SizedBox(
@@ -302,10 +301,6 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     final BuildContext context,
     final TransactionFormLoadedState state,
   ) {
-    final transactionDate = DateUtils.formatDateWithoutLocale(
-      state.transactionDate,
-      DateUtils.monthDayAndYear,
-    );
     final theme = Theme.of(context);
     final i18n = I18n.of(context);
 
@@ -327,10 +322,10 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                 ),
                 Expanded(
                   child: FlatButton(
-                    onPressed: _transactionDateClicked,
+                    onPressed: () => _transactionDateClicked(state),
                     child: Align(
                       alignment: Alignment.centerLeft,
-                      child: Text(transactionDate),
+                      child: Text(state.transactionDateString),
                     ),
                   ),
                 ),
@@ -594,14 +589,17 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     context.bloc<TransactionFormBloc>().add(RepetitionCycleChanged(newValue));
   }
 
-  Future _transactionDateClicked() async {
+  Future _transactionDateClicked(TransactionFormLoadedState state) async {
     final now = DateTime.now();
     final selectedDate = await showDatePicker(
       context: context,
       initialDate: now,
       firstDate: DateTime(now.year - 1),
       lastDate: DateTime(now.year + 10),
+      locale: currentLocale(state.language),
     );
+    if (selectedDate == null) return;
+
     context
         .bloc<TransactionFormBloc>()
         .add(TransactionDateChanged(selectedDate));

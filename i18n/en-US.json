@@ -67,6 +67,10 @@
     "categoryWasSuccessfullySaved": "Category was successfully saved",
     "categoryWasSuccessfullyDeleted": "Category was successfully deleted",
     "confirmDeleteCategory": "Are you sure you wanna delete this category ?",
+    "noTransactionsForThisPeriod": "No transactions were found for ths period",
+    "ascending": "Ascending",
+    "descending": "Descending",
+    "percentage": "Percentage",
     "repetitionCycle": {
         "eachWeek": "Each week",
         "eachMonth": "Each month",

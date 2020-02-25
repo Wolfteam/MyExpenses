@@ -92,7 +92,7 @@ class SettingsServiceImpl implements SettingsService {
 
     if (_prefs.get(_accentColorKey) == null) {
       _logger.info(runtimeType, 'Setting default blue accent color');
-      _prefs.setInt(_accentColorKey, AppAccentColorType.blue.index);
+      _prefs.setInt(_accentColorKey, AppAccentColorType.red.index);
     }
 
     if (_prefs.get(_appLanguageKey) == null) {

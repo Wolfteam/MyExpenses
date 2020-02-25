@@ -39,7 +39,7 @@ class _TransactionsPageState extends State<TransactionsPage>
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-//Once this is fixed, this should not be required anymore  https://github.com/flutter/flutter/issues/39872
+//TODO: Once this is fixed, this should not be required anymore  https://github.com/flutter/flutter/issues/39872
     if (_didChangeDependencies) return;
     final now = DateTime.now();
     context.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: now));

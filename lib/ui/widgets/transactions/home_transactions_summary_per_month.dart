@@ -19,18 +19,37 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
     @required this.data,
   });
 
-  List<charts.Series<TransactionsSummaryPerMonth, int>> _createSampleData() {
-    return [
-      charts.Series<TransactionsSummaryPerMonth, int>(
-        id: 'HomeTransactionsSummaryPerMonth',
-        data: data,
-        domainFn: (item, _) => item.order,
-        //The values here must be positives and the sum of them must be equal to 100%
-        measureFn: (item, _) => item.percentage,
-        colorFn: (item, _) => charts.ColorUtil.fromDartColor(item.color),
-        labelAccessorFn: (row, _) => '${row.percentage} %',
-      )
-    ];
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 3,
+      margin: const EdgeInsets.all(10),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          // bottomLeft: Radius.circular(20),
+          bottomRight: Radius.circular(60),
+          // topRight: Radius.circular(30),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            _buildTitle(context),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                _buildPieChart(),
+                _buildSummary(context),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildTitle(BuildContext context) {
@@ -76,94 +95,76 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
 
     return Expanded(
       child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Text(
-                      '${i18n.income}:',
-                      style: textStyle,
-                    ),
-                    Text(
-                      '${i18n.expense}:',
-                      style: textStyle,
-                    ),
-                    Text(
-                      '${i18n.total}:',
-                      style: textStyle,
-                    ),
-                  ],
-                ),
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Text(
+                    '${i18n.income}:',
+                    style: textStyle,
+                  ),
+                  Text(
+                    '${i18n.expense}:',
+                    style: textStyle,
+                  ),
+                  Text(
+                    '${i18n.total}:',
+                    style: textStyle,
+                  ),
+                ],
               ),
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(right: 20),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Text(
-                      '\$ $incomes',
-                      textAlign: TextAlign.end,
-                      maxLines: 1,
-                      style: incomeTextStyle,
-                    ),
-                    Text(
-                      '\$ $expenses',
-                      textAlign: TextAlign.end,
-                      maxLines: 1,
-                      style: expenseTextStyle,
-                    ),
-                    Text(
-                      '\$ $total',
-                      textAlign: TextAlign.end,
-                      maxLines: 1,
-                      style: total >= 0 ? incomeTextStyle : expenseTextStyle,
-                    ),
-                  ],
-                ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(right: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  Text(
+                    '\$ $incomes',
+                    textAlign: TextAlign.end,
+                    maxLines: 1,
+                    style: incomeTextStyle,
+                  ),
+                  Text(
+                    '\$ $expenses',
+                    textAlign: TextAlign.end,
+                    maxLines: 1,
+                    style: expenseTextStyle,
+                  ),
+                  Text(
+                    '\$ $total',
+                    textAlign: TextAlign.end,
+                    maxLines: 1,
+                    style: total >= 0 ? incomeTextStyle : expenseTextStyle,
+                  ),
+                ],
               ),
             ),
-          ]),
+          ),
+        ],
+      ),
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 3,
-      margin: const EdgeInsets.all(10),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          // bottomLeft: Radius.circular(20),
-          bottomRight: Radius.circular(60),
-          // topRight: Radius.circular(30),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            _buildTitle(context),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                _buildPieChart(),
-                _buildSummary(context),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+  List<charts.Series<TransactionsSummaryPerMonth, int>> _createSampleData() {
+    return [
+      charts.Series<TransactionsSummaryPerMonth, int>(
+        id: 'HomeTransactionsSummaryPerMonth',
+        data: data,
+        domainFn: (item, _) => item.order,
+        //The values here must be positives and the sum of them must be equal to 100%
+        measureFn: (item, _) => item.percentage,
+        colorFn: (item, _) => charts.ColorUtil.fromDartColor(item.color),
+        labelAccessorFn: (row, _) => '${row.percentage} %',
+      )
+    ];
   }
 }

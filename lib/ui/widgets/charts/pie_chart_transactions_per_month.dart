@@ -4,66 +4,77 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import '../../../models/chart_transaction_item.dart';
 
 class PieChartTransactionsPerMonths extends StatelessWidget {
-  final pieIncomesChartData = [
-    ChartTransactionItem(Colors.red, amount: 20, order: 0),
-    ChartTransactionItem(Colors.yellow, amount: 10, order: 1),
-    ChartTransactionItem(Colors.blue, amount: 15, order: 2),
-    ChartTransactionItem(Colors.green, amount: 5, order: 3),
-    ChartTransactionItem(Colors.purple, amount: 5, order: 4),
-    ChartTransactionItem(Colors.pink, amount: 25, order: 5),
-    ChartTransactionItem(Colors.orange, amount: 20, order: 6),
-  ];
+  final double chartHeight;
+  final double arcRatio;
+  final List<ChartTransactionItem> chartData;
 
-  final pieExpensesChartData = [
-    ChartTransactionItem(Colors.red, amount: -20, order: 0),
-    ChartTransactionItem(Colors.yellow, amount: -10, order: 1),
-    ChartTransactionItem(Colors.blue, amount: -15, order: 2),
-    ChartTransactionItem(Colors.green, amount: -5, order: 3),
-    ChartTransactionItem(Colors.purple, amount: -5, order: 4),
-    ChartTransactionItem(Colors.pink, amount: -25, order: 5),
-    ChartTransactionItem(Colors.orange, amount: -20, order: 6),
-  ];
-  final bool onlyIncomes;
+  const PieChartTransactionsPerMonths(
+    this.chartData, [
+    this.chartHeight = 200,
+    this.arcRatio = 1,
+  ]);
 
-  PieChartTransactionsPerMonths(this.onlyIncomes);
+  @override
+  Widget build(BuildContext context) {
+    final data = _createSampleDataForPieChart(context);
+    return _buildPieChart(data);
+  }
 
   List<charts.Series<ChartTransactionItem, int>> _createSampleDataForPieChart(
-      bool onlyIncomes) {
-    var data = onlyIncomes ? pieIncomesChartData : pieExpensesChartData;
+    BuildContext context,
+  ) {
+    final theme = Theme.of(context);
+
+    final onlyIncomes = chartData.any((t) => t.isAnIncome);
+    final labelsStyle = charts.TextStyleSpec(
+      color: charts.ColorUtil.fromDartColor(
+        theme.brightness == Brightness.dark ? Colors.white : Colors.black,
+      ),
+    );
+
+    final dataToUse = chartData.isEmpty
+        ? [
+            ChartTransactionItem(
+              onlyIncomes ? Colors.green : Colors.red,
+              amount: 100,
+              order: 1,
+              dummyItem: true,
+            )
+          ]
+        : chartData;
+
     return [
       charts.Series<ChartTransactionItem, int>(
         id: onlyIncomes ? 'IncomesPieChart' : 'ExpensesPieChart',
-        data: data,
+        data: dataToUse,
         domainFn: (item, _) => item.order,
         //The values here must be positives and the sum of them must be equal to 100%
         measureFn: (item, _) => item.amount.abs(),
         colorFn: (item, _) => charts.ColorUtil.fromDartColor(item.color),
-        labelAccessorFn: (row, _) => '${row.amount}',
+        labelAccessorFn: (item, _) =>
+            item.dummyItem ? '0 \$' : '${item.amount} \$',
+        insideLabelStyleAccessorFn: (item, _) => labelsStyle,
+        outsideLabelStyleAccessorFn: (item, _) => labelsStyle,
       )
     ];
   }
 
   Widget _buildPieChart(List<charts.Series<ChartTransactionItem, int>> data) {
     return Container(
-      height: 200,
+      height: chartHeight,
       child: charts.PieChart(
         data,
         animate: true,
         defaultRenderer: charts.ArcRendererConfig(
-          arcRatio: 1,
+          arcRatio: arcRatio,
           arcRendererDecorators: [
             charts.ArcLabelDecorator(
-              labelPosition: charts.ArcLabelPosition.inside,
+              showLeaderLines: true,
+              labelPosition: charts.ArcLabelPosition.auto,
             )
           ],
         ),
       ),
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final data = _createSampleDataForPieChart(this.onlyIncomes);
-    return _buildPieChart(data);
   }
 }

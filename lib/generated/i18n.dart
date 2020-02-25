@@ -168,6 +168,14 @@ class I18n implements WidgetsLocalizations {
   String get categoryWasSuccessfullyDeleted => "Category was successfully deleted";
   /// "Are you sure you wanna delete this category ?"
   String get confirmDeleteCategory => "Are you sure you wanna delete this category ?";
+  /// "No transactions were found for ths period"
+  String get noTransactionsForThisPeriod => "No transactions were found for ths period";
+  /// "Ascending"
+  String get ascending => "Ascending";
+  /// "Descending"
+  String get descending => "Descending";
+  /// "Percentage"
+  String get percentage => "Percentage";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -452,6 +460,18 @@ class _I18n_es_VE extends I18n {
   /// " ¿Estás seguro que deseas borrar esta categoría?"
   @override
   String get confirmDeleteCategory => " ¿Estás seguro que deseas borrar esta categoría?";
+  /// "No fueron encontradas transacciones para este período"
+  @override
+  String get noTransactionsForThisPeriod => "No fueron encontradas transacciones para este período";
+  /// "Ascending"
+  @override
+  String get ascending => "Ascending";
+  /// "Descending"
+  @override
+  String get descending => "Descending";
+  /// "Percentage"
+  @override
+  String get percentage => "Percentage";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";

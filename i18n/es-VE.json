@@ -67,6 +67,10 @@
     "categoryWasSuccessfullySaved": "La categoría fue guardada exitósamente",
     "categoryWasSuccessfullyDeleted": "La categoría fue borrada exitósamente",
     "confirmDeleteCategory": " ¿Estás seguro que deseas borrar esta categoría?",
+    "noTransactionsForThisPeriod": "No fueron encontradas transacciones para este período",
+    "ascending": "Ascending",
+    "descending": "Descending",
+    "percentage": "Percentage",
     "repetitionCycle": {
         "eachWeek": "Cada semana",
         "eachMonth": "Cada mes",

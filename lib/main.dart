@@ -7,6 +7,8 @@ import 'bloc/app/app_bloc.dart' as app_bloc;
 import 'bloc/categories_list/categories_list_bloc.dart';
 import 'bloc/category_form/category_form_bloc.dart';
 import 'bloc/category_icon/category_icon_bloc.dart';
+import 'bloc/chart_details/chart_details_bloc.dart';
+import 'bloc/charts/charts_bloc.dart';
 import 'bloc/drawer/drawer_bloc.dart';
 import 'bloc/settings/settings_bloc.dart';
 import 'bloc/transaction_form/transaction_form_bloc.dart';
@@ -76,7 +78,8 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(create: (ctx) {
             final logger = getIt<LoggingService>();
             final transactionsDao = getIt<TransactionsDao>();
-            return TransactionFormBloc(logger, transactionsDao);
+            final settingsService = getIt<SettingsService>();
+            return TransactionFormBloc(logger, transactionsDao, settingsService);
           }),
           BlocProvider(create: (ctx) => TransactionsLast7DaysBloc()),
           BlocProvider(create: (ctx) {
@@ -95,6 +98,13 @@ class _MyAppState extends State<MyApp> {
             return CategoryFormBloc(logger, categoriesDao);
           }),
           BlocProvider(create: (ctx) => CategoryIconBloc()),
+          BlocProvider(create: (ctx) {
+            final logger = getIt<LoggingService>();
+            final transactionsDao = getIt<TransactionsDao>();
+            final settingsService = getIt<SettingsService>();
+            return ChartsBloc(logger, transactionsDao, settingsService);
+          }),
+          BlocProvider(create: (ctx) => ChartDetailsBloc()),
         ],
         child: BlocBuilder<app_bloc.AppBloc, app_bloc.AppState>(
           builder: (ctx, state) => _buildApp(ctx, state),

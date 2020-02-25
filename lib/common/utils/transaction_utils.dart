@@ -9,3 +9,6 @@ double getTotalTransactionAmounts(
       .map((t) => t.amount)
       .fold(0, (t1, t2) => t1 + t2);
 }
+
+double getTotalTransactionAmount(List<TransactionItem> transactions) =>
+    transactions.map((t) => t.amount).fold(0, (t1, t2) => t1 + t2);

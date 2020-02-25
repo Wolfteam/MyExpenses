@@ -4,10 +4,10 @@ import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/utils/category_utils.dart';
 import '../../models/entities/database.dart';
 
-const createdBy = "ebastidas";
+const createdBy = 'ebastidas';
 
 List<Category> getDefaultCategories() {
-  var categories = [
+  final categories = [
     //Income
     Category(
       name: 'Money',
@@ -225,6 +225,51 @@ List<Transaction> getDefaultTransactions() {
       createdBy: createdBy,
     ),
     Transaction(
+      amount: -5,
+      categoryId: 8,
+      description: "Putas",
+      transactionDate: DateTime.now().add(Duration(days: -4)),
+      repetitions: 0,
+      repetitionCycle: RepetitionCycleType.none,
+      createdBy: createdBy,
+    ),
+    Transaction(
+      amount: -19,
+      categoryId: 3,
+      description: "Hamburguersas",
+      transactionDate: DateTime.now().add(Duration(days: -5)),
+      repetitions: 0,
+      repetitionCycle: RepetitionCycleType.none,
+      createdBy: createdBy,
+    ),
+    Transaction(
+      amount: -29,
+      categoryId: 6,
+      description: "Pilas",
+      transactionDate: DateTime.now().add(Duration(days: -6)),
+      repetitions: 0,
+      repetitionCycle: RepetitionCycleType.none,
+      createdBy: createdBy,
+    ),
+    Transaction(
+      amount: -109,
+      categoryId: 5,
+      description: "Camas",
+      transactionDate: DateTime.now().add(Duration(days: -7)),
+      repetitions: 0,
+      repetitionCycle: RepetitionCycleType.none,
+      createdBy: createdBy,
+    ),
+    Transaction(
+      amount: -23,
+      categoryId: 8,
+      description: "Sabanas",
+      transactionDate: DateTime.now().add(Duration(days: -8)),
+      repetitions: 0,
+      repetitionCycle: RepetitionCycleType.none,
+      createdBy: createdBy,
+    ),
+    Transaction(
       amount: 350,
       categoryId: 1,
       description: "Cheques",
@@ -235,7 +280,7 @@ List<Transaction> getDefaultTransactions() {
     ),
     Transaction(
       amount: 700,
-      categoryId: 0,
+      categoryId: 1,
       description: "Salario",
       transactionDate: DateTime.now().add(Duration(days: -30)),
       repetitions: 1,
