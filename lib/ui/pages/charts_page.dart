@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 
-import '../../bloc/charts/charts_bloc.dart';
 import '../../bloc/chart_details/chart_details_bloc.dart';
+import '../../bloc/charts/charts_bloc.dart';
 import '../../generated/i18n.dart';
 import '../../models/transactions_summary_per_date.dart';
+import '../../ui/widgets/transactions/no_transactions_found.dart';
 import '../widgets/charts/pie_chart_transactions_per_month.dart';
 import 'chart_details_page.dart';
 
@@ -72,7 +73,7 @@ class _ChartsPageState extends State<ChartsPage>
         if (state.transactions.isNotEmpty)
           _buildIncomesAndExpensesCharts(context, state)
         else
-          _buildEmptyPage(context)
+          NoTransactionsFound()
       ];
     }
 
@@ -81,29 +82,6 @@ class _ChartsPageState extends State<ChartsPage>
         child: CircularProgressIndicator(),
       )
     ];
-  }
-
-  Widget _buildEmptyPage(BuildContext context) {
-    final i18n = I18n.of(context);
-    final theme = Theme.of(context);
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 30, right: 20, left: 20),
-      child: Column(
-        children: <Widget>[
-          Icon(
-            Icons.info,
-            color: theme.primaryColor,
-            size: 60,
-          ),
-          Text(
-            i18n.noTransactionsForThisPeriod,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.title,
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _buildBarChart(

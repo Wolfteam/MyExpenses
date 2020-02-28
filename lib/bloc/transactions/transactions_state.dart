@@ -15,6 +15,8 @@ class TransactionsLoadedState extends TransactionsState {
   final double incomeAmount;
   final double expenseAmount;
   final double balanceAmount;
+  final DateTime currentDate;
+  final bool showLast7Days;
 
   final List<TransactionsSummaryPerMonth> monthBalance;
   final List<TransactionCardItems> transactionsPerMonth;
@@ -26,6 +28,8 @@ class TransactionsLoadedState extends TransactionsState {
     @required this.incomeAmount,
     @required this.expenseAmount,
     @required this.balanceAmount,
+    @required this.currentDate,
+    @required this.showLast7Days,
     @required this.monthBalance,
     @required this.transactionsPerMonth,
     @required this.incomeTransactionsPerWeek,
@@ -38,6 +42,8 @@ class TransactionsLoadedState extends TransactionsState {
         incomeAmount,
         expenseAmount,
         balanceAmount,
+        currentDate,
+        showLast7Days,
         monthBalance,
         transactionsPerMonth,
         incomeTransactionsPerWeek,

@@ -6,6 +6,7 @@ import '../../bloc/transactions/transactions_bloc.dart';
 import '../../generated/i18n.dart';
 import '../widgets/transactions/home_last_7_days_summary.dart';
 import '../widgets/transactions/home_transactions_summary_per_month.dart';
+import '../widgets/transactions/no_transactions_found.dart';
 import '../widgets/transactions/transactions_card_container.dart';
 
 class TransactionsPage extends StatefulWidget {
@@ -128,19 +129,22 @@ class _TransactionsPageState extends State<TransactionsPage>
           total: state.balanceAmount,
           month: state.month,
           data: state.monthBalance,
+          currentDate: state.currentDate,
         ),
-        HomeLast7DaysSummary(
-          incomes: state.incomeTransactionsPerWeek,
-          expenses: state.expenseTransactionsPerWeek,
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 28, top: 15),
-          child: Text(
-            i18n.transactions,
-            textAlign: TextAlign.start,
-            style: Theme.of(context).textTheme.title,
+        if (state.showLast7Days)
+          HomeLast7DaysSummary(
+            incomes: state.incomeTransactionsPerWeek,
+            expenses: state.expenseTransactionsPerWeek,
           ),
-        ),
+        if (state.transactionsPerMonth.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(left: 28, top: 15),
+            child: Text(
+              i18n.transactions,
+              textAlign: TextAlign.start,
+              style: Theme.of(context).textTheme.title,
+            ),
+          ),
         _buildTransactionsCard(state),
       ];
     }
@@ -149,14 +153,18 @@ class _TransactionsPageState extends State<TransactionsPage>
   }
 
   Widget _buildTransactionsCard(TransactionsLoadedState state) {
-    return ListView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      scrollDirection: Axis.vertical,
-      itemCount: state.transactionsPerMonth.length,
-      itemBuilder: (context, index) => TransactionsCardContainer(
-        model: state.transactionsPerMonth[index],
-      ),
-    );
+    if (state.transactionsPerMonth.isNotEmpty) {
+      return ListView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        scrollDirection: Axis.vertical,
+        itemCount: state.transactionsPerMonth.length,
+        itemBuilder: (context, index) => TransactionsCardContainer(
+          model: state.transactionsPerMonth[index],
+        ),
+      );
+    }
+
+    return NoTransactionsFound();
   }
 }

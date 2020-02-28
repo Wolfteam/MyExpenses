@@ -187,107 +187,92 @@ List<Category> getDefaultCategories() {
 
 //TODO: DELETE THIS ONCE THE APP IS COMPLETED
 List<Transaction> getDefaultTransactions() {
-  var transactions = [
-    Transaction(
-      amount: -10,
-      categoryId: 4,
-      description: "SuperMaxi",
-      transactionDate: DateTime.now(),
-      repetitions: 0,
-      repetitionCycle: RepetitionCycleType.none,
-      createdBy: createdBy,
+  final transactions = [
+    _buildTransaction(
+      4,
+      'SuperMaxi',
+      -10,
+      DateTime.now(),
     ),
-    Transaction(
-      amount: -50,
-      categoryId: 5,
-      description: "Almuerzos",
-      transactionDate: DateTime.now(),
-      repetitions: 0,
-      repetitionCycle: RepetitionCycleType.none,
-      createdBy: createdBy,
+    _buildTransaction(
+      5,
+      'Almuerzo',
+      -50,
+      DateTime.now(),
     ),
-    Transaction(
-      amount: -400,
-      categoryId: 7,
-      description: "PS4",
-      transactionDate: DateTime.now().add(Duration(days: -2)),
-      repetitions: 0,
-      repetitionCycle: RepetitionCycleType.none,
-      createdBy: createdBy,
+    _buildTransaction(
+      7,
+      'PS4',
+      -400,
+      DateTime.now().add(const Duration(days: -2)),
     ),
-    Transaction(
-      amount: -59,
-      categoryId: 8,
-      description: "Reparaciones",
-      transactionDate: DateTime.now().add(Duration(days: -3)),
-      repetitions: 0,
-      repetitionCycle: RepetitionCycleType.none,
-      createdBy: createdBy,
+    _buildTransaction(
+      8,
+      'Reparaciones',
+      -59,
+      DateTime.now().add(const Duration(days: -3)),
     ),
-    Transaction(
-      amount: -5,
-      categoryId: 8,
-      description: "Putas",
-      transactionDate: DateTime.now().add(Duration(days: -4)),
-      repetitions: 0,
-      repetitionCycle: RepetitionCycleType.none,
-      createdBy: createdBy,
+    _buildTransaction(
+      8,
+      'Putas',
+      -20,
+      DateTime.now().add(const Duration(days: -4)),
     ),
-    Transaction(
-      amount: -19,
-      categoryId: 3,
-      description: "Hamburguersas",
-      transactionDate: DateTime.now().add(Duration(days: -5)),
-      repetitions: 0,
-      repetitionCycle: RepetitionCycleType.none,
-      createdBy: createdBy,
+    _buildTransaction(
+      3,
+      'Hamburguesas',
+      -19,
+      DateTime.now().add(const Duration(days: -5)),
     ),
-    Transaction(
-      amount: -29,
-      categoryId: 6,
-      description: "Pilas",
-      transactionDate: DateTime.now().add(Duration(days: -6)),
-      repetitions: 0,
-      repetitionCycle: RepetitionCycleType.none,
-      createdBy: createdBy,
+    _buildTransaction(
+      6,
+      'Pilas',
+      -29,
+      DateTime.now().add(const Duration(days: -6)),
     ),
-    Transaction(
-      amount: -109,
-      categoryId: 5,
-      description: "Camas",
-      transactionDate: DateTime.now().add(Duration(days: -7)),
-      repetitions: 0,
-      repetitionCycle: RepetitionCycleType.none,
-      createdBy: createdBy,
+    _buildTransaction(
+      5,
+      'Camas',
+      -109,
+      DateTime.now().add(const Duration(days: -7)),
     ),
-    Transaction(
-      amount: -23,
-      categoryId: 8,
-      description: "Sabanas",
-      transactionDate: DateTime.now().add(Duration(days: -8)),
-      repetitions: 0,
-      repetitionCycle: RepetitionCycleType.none,
-      createdBy: createdBy,
+    _buildTransaction(
+      8,
+      'Sabanas',
+      -23,
+      DateTime.now().add(const Duration(days: -30)),
     ),
-    Transaction(
-      amount: 350,
-      categoryId: 1,
-      description: "Cheques",
-      transactionDate: DateTime.now().add(Duration(days: -1)),
-      repetitions: 1,
-      repetitionCycle: RepetitionCycleType.eachWeek,
-      createdBy: createdBy,
+    _buildTransaction(
+      1,
+      'Cheques',
+      350,
+      DateTime.now().add(const Duration(days: -1)),
     ),
-    Transaction(
-      amount: 700,
-      categoryId: 1,
-      description: "Salario",
-      transactionDate: DateTime.now().add(Duration(days: -30)),
-      repetitions: 1,
-      repetitionCycle: RepetitionCycleType.eachMonth,
-      createdBy: createdBy,
+    _buildTransaction(
+      2,
+      'Salario',
+      700,
+      DateTime.now().add(const Duration(days: -30)),
     ),
   ];
 
   return transactions;
+}
+
+Transaction _buildTransaction(
+  int categoryId,
+  String description,
+  double amount,
+  DateTime date,
+) {
+  return Transaction(
+    amount: amount,
+    categoryId: categoryId,
+    description: description,
+    transactionDate: date,
+    repetitions: amount > 50 ? 1 : 0,
+    repetitionCycle:
+        amount > 50 ? RepetitionCycleType.eachMonth : RepetitionCycleType.none,
+    createdBy: createdBy,
+  );
 }

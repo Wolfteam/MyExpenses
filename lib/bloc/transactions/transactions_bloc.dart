@@ -72,6 +72,8 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         incomeAmount: incomes,
         expenseAmount: expenses,
         balanceAmount: balance,
+        currentDate: event.inThisDate,
+        showLast7Days: DateTime.now().month == event.inThisDate.month,
         monthBalance: monthBalance,
         incomeTransactionsPerWeek: incomeTransPerWeek,
         expenseTransactionsPerWeek: expenseTransPerWeek,
@@ -91,19 +93,29 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     double expenses,
     List<TransactionItem> transactions,
   ) {
-    final balance = expenses.abs() + incomes;
-    final expensesPercentage = (expenses * 100 / balance.abs()).abs().round();
-    final incomesPercentage = (incomes * 100 / balance.abs()).round();
+    final balance = (expenses.abs() + incomes).abs();
+    if (transactions.isNotEmpty) {
+      final expensesPercentage = (expenses * 100 / balance).abs().round();
+      final incomesPercentage = (incomes * 100 / balance).round();
+
+      return [
+        TransactionsSummaryPerMonth(
+          order: 0,
+          percentage: expensesPercentage,
+          isAnIncome: false,
+        ),
+        TransactionsSummaryPerMonth(
+          order: 1,
+          percentage: incomesPercentage,
+          isAnIncome: true,
+        ),
+      ];
+    }
 
     return [
       TransactionsSummaryPerMonth(
-        order: 0,
-        percentage: expensesPercentage,
-        isAnIncome: false,
-      ),
-      TransactionsSummaryPerMonth(
         order: 1,
-        percentage: incomesPercentage,
+        percentage: 100,
         isAnIncome: true,
       ),
     ];

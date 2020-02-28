@@ -1,6 +1,9 @@
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 
+import '../../../bloc/transactions/transactions_bloc.dart';
 import '../../../generated/i18n.dart';
 import '../../../models/transactions_summary_per_month.dart';
 
@@ -10,6 +13,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
   final double incomes;
   final double total;
   final List<TransactionsSummaryPerMonth> data;
+  final DateTime currentDate;
 
   const HomeTransactionSummaryPerMonth({
     @required this.month,
@@ -17,6 +21,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
     @required this.incomes,
     @required this.total,
     @required this.data,
+    @required this.currentDate,
   });
 
   @override
@@ -54,10 +59,19 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
 
   Widget _buildTitle(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 10, bottom: 10, left: 10),
-      child: Text(
-        month,
-        style: Theme.of(context).textTheme.title,
+      padding: const EdgeInsets.only(bottom: 10, left: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Text(
+            month,
+            style: Theme.of(context).textTheme.title,
+          ),
+          IconButton(
+            icon: Icon(Icons.swap_horiz),
+            onPressed: () => _changeCurrentDate(context),
+          ),
+        ],
       ),
     );
   }
@@ -65,14 +79,12 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
   Widget _buildPieChart() {
     return Container(
       // color: Colors.brown,
-      width: 140,
-      height: 140,
+      width: 150,
+      height: 150,
       child: charts.PieChart(
         _createSampleData(),
         animate: true,
         defaultRenderer: charts.ArcRendererConfig(
-          // arcWidth: 20,
-          // minHoleWidthForCenterContent: 10,
           arcRatio: 1,
           arcRendererDecorators: [
             charts.ArcLabelDecorator(
@@ -166,5 +178,19 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
         labelAccessorFn: (row, _) => '${row.percentage} %',
       )
     ];
+  }
+
+  Future _changeCurrentDate(BuildContext context) async {
+    final now = DateTime.now();
+    final selectedDate = await showMonthPicker(
+      context: context,
+      initialDate: currentDate,
+      lastDate: DateTime(now.year + 1),
+    );
+
+    if (selectedDate == null) return;
+    context
+        .bloc<TransactionsBloc>()
+        .add(GetTransactions(inThisDate: selectedDate));
   }
 }
