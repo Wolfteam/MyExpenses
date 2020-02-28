@@ -110,6 +110,7 @@
         "about": "Acerca de",
         "aboutSummary": "Una aplicación que te ayuda a mantener un registro de tus gastos.",
         "donations": "Donaciones",
+        "support":"Soporte",
         "donationsMsg": "Espero que disfrutes al usar esta aplicación, si te gustaría comprarme un cafe o una cerveza, envíame un email.",
         "donationSupport": "Hice esta aplicación en mi tiempo libre y también es de código abierto. Si desea ayudarme, informar un problema, tienes una idea, deseas que se implemente una función, etc., crea un issue aquí:"
     }

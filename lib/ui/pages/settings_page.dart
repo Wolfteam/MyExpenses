@@ -400,10 +400,13 @@ class _SettingsPageState extends State<SettingsPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  Image.asset(
-                    'assets/images/cost.png',
-                    width: 70,
-                    height: 70,
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 10),
+                    child: Image.asset(
+                      'assets/images/cost.png',
+                      width: 70,
+                      height: 70,
+                    ),
                   ),
                   Text(
                     i18n.appName,
@@ -411,7 +414,7 @@ class _SettingsPageState extends State<SettingsPage>
                     style: textTheme.subtitle,
                   ),
                   Text(
-                    i18n.appVersion('1.0.0.0'),
+                    i18n.appVersion(state.appVersion),
                     textAlign: TextAlign.center,
                     style: textTheme.subtitle,
                   ),
@@ -420,14 +423,23 @@ class _SettingsPageState extends State<SettingsPage>
                     textAlign: TextAlign.center,
                   ),
                   Container(
-                    margin: const EdgeInsets.only(top: 5),
+                    margin: const EdgeInsets.only(top: 10),
                     child: Text(
                       i18n.settingsDonations,
-                      style: textTheme.subtitle,
+                      style: textTheme.subhead
+                          .copyWith(fontWeight: FontWeight.bold),
                     ),
                   ),
                   Text(
-                    i18n.settingsDonationsMsg,
+                    i18n.settingsDonationSupport,
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(top: 10),
+                    child: Text(
+                      i18n.settingsSupport,
+                      style: textTheme.subhead
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
                   ),
                   Container(
                     margin: const EdgeInsets.only(top: 5),
@@ -435,9 +447,6 @@ class _SettingsPageState extends State<SettingsPage>
                       i18n.settingsDonationSupport,
                       style: textTheme.subtitle,
                     ),
-                  ),
-                  Text(
-                    i18n.settingsDonationSupport,
                   ),
                   Container(
                     margin: const EdgeInsets.only(top: 5),

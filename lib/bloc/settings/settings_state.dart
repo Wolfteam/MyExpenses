@@ -18,6 +18,9 @@ class SettingsInitialState extends SettingsState {
   final AppLanguageType appLanguage;
   final SyncIntervalType syncInterval;
 
+  final String appName;
+  final String appVersion;
+
   @override
   List<Object> get props => [
         appTheme,
@@ -25,6 +28,8 @@ class SettingsInitialState extends SettingsState {
         accentColor,
         appLanguage,
         syncInterval,
+        appName,
+        appVersion
       ];
 
   const SettingsInitialState({
@@ -33,6 +38,8 @@ class SettingsInitialState extends SettingsState {
     @required this.accentColor,
     @required this.appLanguage,
     @required this.syncInterval,
+    @required this.appName,
+    @required this.appVersion,
   });
 
   SettingsInitialState copyWith({
@@ -41,6 +48,8 @@ class SettingsInitialState extends SettingsState {
     AppAccentColorType accentColor,
     AppLanguageType appLanguage,
     SyncIntervalType syncInterval,
+    String appName,
+    String appVersion,
   }) {
     return SettingsInitialState(
       appTheme: appTheme ?? this.appTheme,
@@ -48,6 +57,8 @@ class SettingsInitialState extends SettingsState {
       appLanguage: appLanguage ?? this.appLanguage,
       syncInterval: syncInterval ?? this.syncInterval,
       useDarkAmoled: useDarkAmoled ?? this.useDarkAmoled,
+      appName: appName ?? this.appName,
+      appVersion: appVersion ?? this.appVersion,
     );
   }
 }

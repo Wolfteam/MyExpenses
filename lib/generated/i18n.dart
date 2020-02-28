@@ -240,6 +240,8 @@ class I18n implements WidgetsLocalizations {
   String get settingsAboutSummary => "An app that helps you to keep track of your expenses.";
   /// "Donations"
   String get settingsDonations => "Donations";
+  /// "Support"
+  String get settingsSupport => "Support";
   /// "I hope you are enjoying using this app, if you would like to buy me a coffee/beer, just send me an email."
   String get settingsDonationsMsg => "I hope you are enjoying using this app, if you would like to buy me a coffee/beer, just send me an email.";
   /// "I made this app in my free time and it is also open source. If you would like to help me, report an issue, have an idea, want a feature to be implemented, etc please open an issue here:"
@@ -568,6 +570,9 @@ class _I18n_es_VE extends I18n {
   /// "Donaciones"
   @override
   String get settingsDonations => "Donaciones";
+  /// "Soporte"
+  @override
+  String get settingsSupport => "Soporte";
   /// "Espero que disfrutes al usar esta aplicación, si te gustaría comprarme un cafe o una cerveza, envíame un email."
   @override
   String get settingsDonationsMsg => "Espero que disfrutes al usar esta aplicación, si te gustaría comprarme un cafe o una cerveza, envíame un email.";
