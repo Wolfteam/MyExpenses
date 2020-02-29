@@ -16,5 +16,5 @@ class AppInitializedState extends AppState {
   const AppInitializedState(this.theme, this.locale);
 
   @override
-  List<Object> get props => [theme];
+  List<Object> get props => [theme, locale];
 }

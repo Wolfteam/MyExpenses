@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../bloc/reports/reports_bloc.dart';
 import '../../../common/enums/report_file_type.dart';
 import '../../../common/extensions/i18n_extensions.dart';
+import '../../../common/utils/notification_utils.dart';
 import '../../../common/utils/toast_utils.dart';
 import '../../../generated/i18n.dart';
 
@@ -18,27 +19,30 @@ class ReportsBottomSheetDialog extends StatelessWidget {
           bottom: 10,
         ),
         padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
-        child: BlocListener<ReportsBloc, ReportState>(
-          listener: (ctx, state) {
+        child: BlocConsumer<ReportsBloc, ReportState>(
+          listener: (ctx, state) async {
             final i18n = I18n.of(context);
-            if (state is ReportSheetState && state.errorOccurred) {
-              showErrorToast(i18n.unknownErrorOcurred);
+            if (state is ReportSheetState) {
+              await requestIOSPermissions();
+
+              if (state.errorOccurred) {
+                showErrorToast(i18n.unknownErrorOcurred);
+              }
             }
 
-//TODO: SHOW A NOTIFICATION THAT OPENS THIS CRAP
             if (state is ReportGeneratedState) {
-              showSucceedToast(
-                i18n.reportWasSuccessfullyGenerated(state.fileName),
+              showNotification(
+                i18n.transactionsReport,
+                '${i18n.reportWasSuccessfullyGenerated(state.fileName)}.\n${i18n.tapToOpen}',
+                payload: state.filePath,
               );
               Navigator.pop(context);
             }
           },
-          child: BlocBuilder<ReportsBloc, ReportState>(
-            builder: (ctx, state) => Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: _buildPage(context, state),
-            ),
+          builder: (ctx, state) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: _buildPage(context, state),
           ),
         ),
       ),

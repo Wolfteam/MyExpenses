@@ -66,6 +66,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
 
   Stream<ReportState> _buildReport(GenerateReport event) async* {
     try {
+      final now = DateTime.now();
       final transactions = await _transactionsDao.getAllTransactions(
         currentState.from,
         currentState.to,
@@ -75,11 +76,23 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
       final dir = await getExternalStorageDirectory();
 
       if (currentState.selectedFileType == ReportFileType.csv) {
-        final path = await _buildCsvReport(dir, transactions, event);
-        yield ReportGeneratedState(path);
+        final filename = '$now.csv';
+        final path = await _buildCsvReport(
+          dir,
+          transactions,
+          event,
+          filename,
+        );
+        yield ReportGeneratedState(filename, path);
       } else {
-        final path = await _buildPdfReport(dir, transactions, event);
-        yield ReportGeneratedState(path);
+        final filename = '$now.pdf';
+        final path = await _buildPdfReport(
+          dir,
+          transactions,
+          event,
+          filename,
+        );
+        yield ReportGeneratedState(filename, path);
       }
     } on Exception catch (e, s) {
       _logger.error(runtimeType, '_buildReport: Unknown error occurred', e, s);
@@ -92,8 +105,8 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
     Directory dir,
     List<TransactionItem> transactions,
     GenerateReport event,
+    String filename,
   ) async {
-    final now = DateTime.now();
     final csvData = [
       <String>[
         event.i18n.id,
@@ -118,7 +131,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
 
     final csv = const ListToCsvConverter().convert(csvData);
 
-    final path = '${dir.path}/report_$now.csv';
+    final path = '${dir.path}/$filename';
 
     final file = File(path);
     await file.writeAsString(csv);
@@ -130,15 +143,15 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
     Directory dir,
     List<TransactionItem> transactions,
     GenerateReport event,
+    String filename,
   ) async {
-    final now = DateTime.now();
     final pdf = await buildPdf(
       transactions,
       event.i18n,
       currentState.from,
       currentState.to,
     );
-    final path = '${dir.path}/report_$now.pdf';
+    final path = '${dir.path}/$filename';
     final file = File(path);
     await file.writeAsBytes(pdf.save());
 

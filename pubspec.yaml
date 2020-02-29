@@ -32,7 +32,7 @@ dependencies:
   provider: ^4.0.3
   flutter_bloc: ^3.2.0
   equatable: ^1.1.0
-  flutter_flexible_toast: ^0.1.3
+  flutter_flexible_toast: ^0.1.4
   flutter_localizations:
     sdk: flutter
   flutter_cupertino_localizations: ^1.0.1
@@ -46,7 +46,9 @@ dependencies:
   csv: ^4.0.3
   pdf: ^1.5.0
   image: ^2.1.4
-
+  flutter_local_notifications: ^1.2.0+4
+  open_file: ^3.0.1
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

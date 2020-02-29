@@ -10,8 +10,10 @@ class ReportSheetState extends ReportState {
   final DateTime to;
   final bool errorOccurred;
 
-  String get fromDateString => DateUtils.formatDateWithoutLocale(from, DateUtils.monthDayAndYearFormat);
-  String get toDateString => DateUtils.formatDateWithoutLocale(to, DateUtils.monthDayAndYearFormat);
+  String get fromDateString =>
+      DateUtils.formatDateWithoutLocale(from, DateUtils.monthDayAndYearFormat);
+  String get toDateString =>
+      DateUtils.formatDateWithoutLocale(to, DateUtils.monthDayAndYearFormat);
 
   @override
   List<Object> get props => [
@@ -55,9 +57,10 @@ class ReportSheetState extends ReportState {
 
 class ReportGeneratedState extends ReportState {
   final String fileName;
+  final String filePath;
 
   @override
-  List<Object> get props => [fileName];
+  List<Object> get props => [fileName, filePath];
 
-  const ReportGeneratedState(this.fileName);
+  const ReportGeneratedState(this.fileName, this.filePath);
 }

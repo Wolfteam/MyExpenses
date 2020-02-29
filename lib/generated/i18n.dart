@@ -180,8 +180,8 @@ class I18n implements WidgetsLocalizations {
   String get pdf => "Pdf";
   /// "Csv"
   String get csv => "Csv";
-  /// "Report ${filename} was successfully generated"
-  String reportWasSuccessfullyGenerated(String filename) => "Report ${filename} was successfully generated";
+  /// "Report: ${filename} was successfully generated"
+  String reportWasSuccessfullyGenerated(String filename) => "Report: ${filename} was successfully generated";
   /// "Id"
   String get id => "Id";
   /// "Type"
@@ -194,6 +194,8 @@ class I18n implements WidgetsLocalizations {
   String generatedOn(String date) => "Generated on: ${date}";
   /// "Page ${x} of ${y}"
   String pageXOfY(String x, String y) => "Page ${x} of ${y}";
+  /// "Tap to open"
+  String get tapToOpen => "Tap to open";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -498,9 +500,9 @@ class _I18n_es_VE extends I18n {
   /// "Csv"
   @override
   String get csv => "Csv";
-  /// "El reporte ${filename} fue generado exitósamente"
+  /// "El reporte: ${filename} fue generado exitósamente"
   @override
-  String reportWasSuccessfullyGenerated(String filename) => "El reporte ${filename} fue generado exitósamente";
+  String reportWasSuccessfullyGenerated(String filename) => "El reporte: ${filename} fue generado exitósamente";
   /// "Id"
   @override
   String get id => "Id";
@@ -519,6 +521,9 @@ class _I18n_es_VE extends I18n {
   /// "Página ${x} de ${y}"
   @override
   String pageXOfY(String x, String y) => "Página ${x} de ${y}";
+  /// "Toca para abrir"
+  @override
+  String get tapToOpen => "Toca para abrir";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";

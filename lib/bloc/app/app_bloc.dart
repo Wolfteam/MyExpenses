@@ -28,7 +28,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   Stream<AppState> mapEventToState(
     AppEvent event,
   ) async* {
-    if (event is! AppThemeChanged) {
+    if (event is InitializeApp) {
+      await Future.delayed(const Duration(seconds: 2));
+
       _logger.info(runtimeType, 'Initializing app settings');
       await _settingsService.init();
 
