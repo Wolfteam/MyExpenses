@@ -1,12 +1,14 @@
 import '../../common/enums/app_language_type.dart';
 import '../../common/enums/app_theme_type.dart';
 import '../../common/enums/category_icon_type.dart';
+import '../../common/enums/chart_details_filter_type.dart';
 import '../../common/enums/repetition_cycle_type.dart';
+import '../../common/enums/report_file_type.dart';
+import '../../common/enums/sort_direction_type.dart';
 import '../../common/enums/sync_intervals_type.dart';
 import '../../common/enums/transaction_type.dart';
-import '../../common/enums/sort_direction_type.dart';
-import '../../common/enums/chart_details_filter_type.dart';
 import '../../generated/i18n.dart';
+import 'package:intl/intl.dart';
 
 extension I18nExtensions on I18n {
   String translateAppThemeType(AppThemeType theme) {
@@ -128,6 +130,17 @@ extension I18nExtensions on I18n {
         return descending;
       default:
         throw Exception('Invalid sort direction');
+    }
+  }
+
+  String getReportFileTypeName(ReportFileType fileType) {
+    switch (fileType) {
+      case ReportFileType.csv:
+        return csv;
+      case ReportFileType.pdf:
+        return pdf;
+      default:
+        throw Exception('Invalid file type');
     }
   }
 }

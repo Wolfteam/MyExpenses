@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../bloc/drawer/drawer_bloc.dart';
+import '../../bloc/reports/reports_bloc.dart';
 import '../../common/enums/app_drawer_item_type.dart';
+import '../../common/presentation/custom_assets.dart';
 import '../../generated/i18n.dart';
 import 'reports/reports_bottom_sheet_dialog.dart';
 
@@ -84,7 +86,7 @@ class AppDrawer extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Image.asset(
-              'assets/images/cost.png',
+              CustomAssets.appIcon,
               width: 80,
               height: 80,
             ),
@@ -165,10 +167,11 @@ class AppDrawer extends StatelessWidget {
     Navigator.pop(context);
   }
 
-  void _showReportSheet(BuildContext context) {
+  Future _showReportSheet(BuildContext context) async {
     Navigator.pop(context);
+    context.bloc<ReportsBloc>().add(const ResetReportSheet());
     //TODO: IF THE CONTENT IS TO LARGE, WE CANT CLOSE THE SHEET
-    showModalBottomSheet(
+    await showModalBottomSheet(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
           topRight: Radius.circular(35),

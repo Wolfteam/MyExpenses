@@ -1,0 +1,1 @@
+enum ReportFileType { csv, pdf }

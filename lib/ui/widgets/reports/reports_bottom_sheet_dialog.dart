@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:my_expenses/generated/i18n.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../bloc/reports/reports_bloc.dart';
+import '../../../common/enums/report_file_type.dart';
+import '../../../common/extensions/i18n_extensions.dart';
+import '../../../common/utils/toast_utils.dart';
+import '../../../generated/i18n.dart';
 
 class ReportsBottomSheetDialog extends StatelessWidget {
-  final _selectedReportItem = "Pdf";
-
-  List<DropdownMenuItem<String>> _buildDropdownItems() {
-    return ["Csv", "Pdf"].map((item) {
-      return DropdownMenuItem<String>(child: Text(item), value: item);
-    }).toList();
-  }
-
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final i18n = I18n.of(context);
-
     return SingleChildScrollView(
       child: Container(
         margin: const EdgeInsets.only(
@@ -22,173 +17,172 @@ class ReportsBottomSheetDialog extends StatelessWidget {
           right: 10,
           bottom: 10,
         ),
-        // color: Colors.green,
         padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            Center(
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 15),
-                child: SizedBox(
-                  width: 100,
-                  height: 10,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: theme.primaryColor,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                ),
-              ),
+        child: BlocListener<ReportsBloc, ReportState>(
+          listener: (ctx, state) {
+            final i18n = I18n.of(context);
+            if (state is ReportSheetState && state.errorOccurred) {
+              showErrorToast(i18n.unknownErrorOcurred);
+            }
+
+//TODO: SHOW A NOTIFICATION THAT OPENS THIS CRAP
+            if (state is ReportGeneratedState) {
+              showSucceedToast(
+                i18n.reportWasSuccessfullyGenerated(state.fileName),
+              );
+              Navigator.pop(context);
+            }
+          },
+          child: BlocBuilder<ReportsBloc, ReportState>(
+            builder: (ctx, state) => Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: _buildPage(context, state),
             ),
-            Text(
-              i18n.exportFrom,
-              style: Theme.of(context).textTheme.title,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 20,
-              ),
-              child: Text('${i18n.startDate}:'),
-            ),
-            FlatButton(
-                onPressed: () {
-                  showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2018),
-                    lastDate: DateTime(2030),
-                  );
-                },
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "2012-10-30",
-                  ),
-                )),
-            Text('${i18n.endDate}:'),
-            FlatButton(
-              onPressed: () {
-                showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime(2018),
-                  lastDate: DateTime(2030),
-                );
-              },
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text("2019-10-30"),
-              ),
-            ),
-            Text(i18n.reportFormat),
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 16,
-                right: 16,
-              ),
-              child: DropdownButton<String>(
-                isExpanded: true,
-                hint: Text(i18n.selectFormat),
-                iconSize: 24,
-                underline: Container(
-                  height: 0,
-                  color: Colors.transparent,
-                ),
-                value: _selectedReportItem,
-                items: _buildDropdownItems(),
-                onChanged: (newValue) {},
-              ),
-            ),
-            /*Padding(
-              padding: const EdgeInsets.only(
-                left: 16,
-                right: 16,
-              ),
-              child: DropdownButton<String>(
-                isExpanded: true,
-                hint: Text("Please select a format"),
-                icon: Icon(Icons.arrow_downward),
-                iconSize: 24,
-                style: TextStyle(color: Colors.deepPurple),
-                underline: Container(
-                  height: 0,
-                  color: Colors.transparent,
-                ),
-                value: _selectedReportItem,
-                items: _buildDropdownItems(),
-                onChanged: (newValue) {},
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 16,
-                right: 16,
-              ),
-              child: DropdownButton<String>(
-                isExpanded: true,
-                hint: Text("Please select a format"),
-                icon: Icon(Icons.arrow_downward),
-                iconSize: 24,
-                style: TextStyle(color: Colors.deepPurple),
-                underline: Container(
-                  height: 0,
-                  color: Colors.transparent,
-                ),
-                value: _selectedReportItem,
-                items: _buildDropdownItems(),
-                onChanged: (newValue) {},
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 16,
-                right: 16,
-              ),
-              child: DropdownButton<String>(
-                isExpanded: true,
-                hint: Text("Please select a format"),
-                icon: Icon(Icons.arrow_downward),
-                iconSize: 24,
-                style: TextStyle(color: Colors.deepPurple),
-                underline: Container(
-                  height: 0,
-                  color: Colors.transparent,
-                ),
-                value: _selectedReportItem,
-                items: _buildDropdownItems(),
-                onChanged: (newValue) {},
-              ),
-            ),
-            */
-            ButtonBar(
-              buttonPadding: const EdgeInsets.symmetric(horizontal: 20),
-              children: <Widget>[
-                OutlineButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    i18n.cancel,
-                    style: TextStyle(
-                      color: theme.primaryColor,
-                    ),
-                  ),
-                ),
-                RaisedButton(
-                  color: theme.primaryColor,
-                  child: Text(
-                    i18n.generate,
-                  ),
-                  onPressed: () {},
-                ),
-              ],
-            )
-          ],
+          ),
         ),
       ),
     );
+  }
+
+  List<Widget> _buildPage(
+    BuildContext context,
+    ReportState state,
+  ) {
+    final theme = Theme.of(context);
+    final i18n = I18n.of(context);
+
+    if (state is ReportSheetState) {
+      if (state.errorOccurred) {
+        showErrorToast(i18n.unknownErrorOcurred);
+      }
+
+      return [
+        Center(
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 15),
+            child: SizedBox(
+              width: 100,
+              height: 10,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: theme.primaryColor,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+            ),
+          ),
+        ),
+        Text(
+          i18n.exportFrom,
+          style: Theme.of(context).textTheme.title,
+        ),
+        Padding(
+          padding: const EdgeInsets.only(
+            top: 20,
+          ),
+          child: Text('${i18n.startDate}:'),
+        ),
+        FlatButton(
+            onPressed: () => _showDatePicker(context, state.from, true),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(state.fromDateString),
+            )),
+        Text('${i18n.endDate}:'),
+        FlatButton(
+          onPressed: () => _showDatePicker(context, state.to, false),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(state.toDateString),
+          ),
+        ),
+        Text(i18n.reportFormat),
+        Padding(
+          padding: const EdgeInsets.only(
+            left: 16,
+            right: 16,
+          ),
+          child: DropdownButton<ReportFileType>(
+            isExpanded: true,
+            hint: Text(i18n.selectFormat),
+            iconSize: 24,
+            underline: Container(
+              height: 0,
+              color: Colors.transparent,
+            ),
+            value: state.selectedFileType,
+            items: _buildDropdownItems(context),
+            onChanged: (newValue) => _reportFileTypeChanged(context, newValue),
+          ),
+        ),
+        ButtonBar(
+          buttonPadding: const EdgeInsets.symmetric(horizontal: 20),
+          children: <Widget>[
+            OutlineButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(
+                i18n.cancel,
+                style: TextStyle(color: theme.primaryColor),
+              ),
+            ),
+            RaisedButton(
+              color: theme.primaryColor,
+              onPressed: () => _generateReport(context),
+              child: Text(i18n.generate),
+            ),
+          ],
+        )
+      ];
+    }
+
+    return [];
+  }
+
+  List<DropdownMenuItem<ReportFileType>> _buildDropdownItems(
+    BuildContext context,
+  ) {
+    final i18n = I18n.of(context);
+    return ReportFileType.values.map((item) {
+      return DropdownMenuItem<ReportFileType>(
+        value: item,
+        child: Text(i18n.getReportFileTypeName(item)),
+      );
+    }).toList();
+  }
+
+  Future _showDatePicker(
+    BuildContext context,
+    DateTime initialDate,
+    bool isFromDate,
+  ) async {
+    final now = DateTime.now();
+    final selectedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(now.year - 10),
+      lastDate: DateTime(now.year, now.month, now.day, 23, 59, 59),
+    );
+
+    if (selectedDate == null) return;
+
+    if (isFromDate) {
+      context.bloc<ReportsBloc>().add(FromDateChanged(selectedDate));
+    } else {
+      context.bloc<ReportsBloc>().add(ToDateChanged(selectedDate));
+    }
+  }
+
+  void _reportFileTypeChanged(
+    BuildContext context,
+    ReportFileType newValue,
+  ) =>
+      context.bloc<ReportsBloc>().add(FileTypeChanged(newValue));
+
+  void _generateReport(BuildContext context) {
+    final i18n = I18n.of(context);
+    context.bloc<ReportsBloc>().add(GenerateReport(i18n));
   }
 }

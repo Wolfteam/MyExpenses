@@ -10,6 +10,7 @@ class DateUtils {
   static const String dayStringFormat = 'EEEE';
   static const String monthDayAndYearFormat = 'dd/MM/yyyy';
   static const String fullMonthAndYearFormat = 'MMMM yyyy';
+  static const String monthDayYearAndHourFormat = 'dd/MM/yyyy hh:mm:ss a';
 
   static String formatAppDate(
     DateTime date,

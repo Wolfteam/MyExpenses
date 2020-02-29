@@ -176,6 +176,24 @@ class I18n implements WidgetsLocalizations {
   String get descending => "Descending";
   /// "Percentage"
   String get percentage => "Percentage";
+  /// "Pdf"
+  String get pdf => "Pdf";
+  /// "Csv"
+  String get csv => "Csv";
+  /// "Report ${filename} was successfully generated"
+  String reportWasSuccessfullyGenerated(String filename) => "Report ${filename} was successfully generated";
+  /// "Id"
+  String get id => "Id";
+  /// "Type"
+  String get type => "Type";
+  /// "Transactions Report"
+  String get transactionsReport => "Transactions Report";
+  /// "Period"
+  String get period => "Period";
+  /// "Generated on: ${date}"
+  String generatedOn(String date) => "Generated on: ${date}";
+  /// "Page ${x} of ${y}"
+  String pageXOfY(String x, String y) => "Page ${x} of ${y}";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -474,6 +492,33 @@ class _I18n_es_VE extends I18n {
   /// "Percentage"
   @override
   String get percentage => "Percentage";
+  /// "Pdf"
+  @override
+  String get pdf => "Pdf";
+  /// "Csv"
+  @override
+  String get csv => "Csv";
+  /// "El reporte ${filename} fue generado exitósamente"
+  @override
+  String reportWasSuccessfullyGenerated(String filename) => "El reporte ${filename} fue generado exitósamente";
+  /// "Id"
+  @override
+  String get id => "Id";
+  /// "Tipo"
+  @override
+  String get type => "Tipo";
+  /// "Reporte de Transacciones"
+  @override
+  String get transactionsReport => "Reporte de Transacciones";
+  /// "Período"
+  @override
+  String get period => "Período";
+  /// "Generado el: ${date}"
+  @override
+  String generatedOn(String date) => "Generado el: ${date}";
+  /// "Página ${x} de ${y}"
+  @override
+  String pageXOfY(String x, String y) => "Página ${x} de ${y}";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";

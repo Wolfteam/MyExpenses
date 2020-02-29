@@ -10,6 +10,7 @@ import 'bloc/category_icon/category_icon_bloc.dart';
 import 'bloc/chart_details/chart_details_bloc.dart';
 import 'bloc/charts/charts_bloc.dart';
 import 'bloc/drawer/drawer_bloc.dart';
+import 'bloc/reports/reports_bloc.dart';
 import 'bloc/settings/settings_bloc.dart';
 import 'bloc/transaction_form/transaction_form_bloc.dart';
 import 'bloc/transactions/transactions_bloc.dart';
@@ -24,7 +25,6 @@ import 'services/logging_service.dart';
 import 'services/settings_service.dart';
 import 'ui/pages/main_page.dart';
 
-//TODO: MOVE THE ASSETS TO A CLASS
 Future main() async {
   configure();
   await setupLogging();
@@ -79,7 +79,8 @@ class _MyAppState extends State<MyApp> {
             final logger = getIt<LoggingService>();
             final transactionsDao = getIt<TransactionsDao>();
             final settingsService = getIt<SettingsService>();
-            return TransactionFormBloc(logger, transactionsDao, settingsService);
+            return TransactionFormBloc(
+                logger, transactionsDao, settingsService);
           }),
           BlocProvider(create: (ctx) => TransactionsLast7DaysBloc()),
           BlocProvider(create: (ctx) {
@@ -105,6 +106,11 @@ class _MyAppState extends State<MyApp> {
             return ChartsBloc(logger, transactionsDao, settingsService);
           }),
           BlocProvider(create: (ctx) => ChartDetailsBloc()),
+          BlocProvider(create: (ctx) {
+            final logger = getIt<LoggingService>();
+            final transactionsDao = getIt<TransactionsDao>();
+            return ReportsBloc(logger, transactionsDao);
+          }),
         ],
         child: BlocBuilder<app_bloc.AppBloc, app_bloc.AppState>(
           builder: (ctx, state) => _buildApp(ctx, state),
@@ -112,7 +118,8 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
-
+//TODO: USE THE BLOCLISTENER !!!
+//TODO: USE BLOC TO BLOC COMMUNICATION
   Widget _buildApp(BuildContext ctx, app_bloc.AppState state) {
     if (state is app_bloc.AppInitializedState) {
       return MaterialApp(

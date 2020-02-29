@@ -43,6 +43,9 @@ dependencies:
   json_annotation: ^3.0.1
   month_picker_dialog: ^0.3.1
   package_info: ^0.4.0+14
+  csv: ^4.0.3
+  pdf: ^1.5.0
+  image: ^2.1.4
 
 dev_dependencies:
   flutter_test:
@@ -73,6 +76,10 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/cost.png
+    - assets/fonts/OpenSans-Regular.ttf
+    - assets/fonts/OpenSans-Bold.ttf
+    - assets/fonts/OpenSans-Italic.ttf
+    - assets/fonts/OpenSans-BoldItalic.ttf
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -11,6 +11,7 @@ import '../../common/enums/app_theme_type.dart';
 import '../../common/enums/sync_intervals_type.dart';
 import '../../common/extensions/app_theme_type_extensions.dart';
 import '../../common/extensions/i18n_extensions.dart';
+import '../../common/presentation/custom_assets.dart';
 import '../../generated/i18n.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -403,7 +404,7 @@ class _SettingsPageState extends State<SettingsPage>
                   Container(
                     margin: const EdgeInsets.symmetric(vertical: 10),
                     child: Image.asset(
-                      'assets/images/cost.png',
+                      CustomAssets.appIcon,
                       width: 70,
                       height: 70,
                     ),
