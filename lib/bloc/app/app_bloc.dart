@@ -29,8 +29,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     AppEvent event,
   ) async* {
     if (event is InitializeApp) {
-      await Future.delayed(const Duration(seconds: 2));
-
       _logger.info(runtimeType, 'Initializing app settings');
       await _settingsService.init();
 
@@ -38,11 +36,15 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         runtimeType,
         'Current settings are: ${_settingsService.appSettings.toJson()}',
       );
+      
+      await Future.delayed(const Duration(seconds: 1));
+      
       yield* _loadThemeData(
         _settingsService.appTheme,
         _settingsService.accentColor,
         _settingsService.language,
       );
+
     }
 
     if (event is AppThemeChanged) {

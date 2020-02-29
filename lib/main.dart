@@ -17,6 +17,7 @@ import 'bloc/settings/settings_bloc.dart';
 import 'bloc/transaction_form/transaction_form_bloc.dart';
 import 'bloc/transactions/transactions_bloc.dart';
 import 'bloc/transactions_last_7_days/transactions_last_7_days_bloc.dart';
+import 'common/presentation/custom_assets.dart';
 import 'common/utils/notification_utils.dart';
 import 'daos/categories_dao.dart';
 import 'daos/transactions_dao.dart';
@@ -156,8 +157,26 @@ class _MyAppState extends State<MyApp> {
 
     ctx.bloc<app_bloc.AppBloc>().add(const app_bloc.InitializeApp());
 
-    return const Center(
-      child: CircularProgressIndicator(),
+    return Container(
+      color: Colors.orange,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              margin: const EdgeInsets.all(10),
+              child: Image.asset(
+                CustomAssets.appIcon,
+                width: 250,
+                height: 250,
+              ),
+            ),
+            const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
