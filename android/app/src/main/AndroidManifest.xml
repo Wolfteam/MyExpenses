@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <application
+        android:allowBackup="false"
         android:name="io.flutter.app.FlutterApplication"
         android:label="My Expenses"
         android:icon="@mipmap/launcher_icon">
