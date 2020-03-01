@@ -150,6 +150,7 @@ class TransactionFormBloc
         s,
       );
       yield currentState.copyWith(errorOccurred: true);
+      yield currentState.copyWith(errorOccurred: false);
     }
   }
 
@@ -169,6 +170,7 @@ class TransactionFormBloc
         s,
       );
       yield currentState.copyWith(errorOccurred: true);
+      yield currentState.copyWith(errorOccurred: false);
     }
   }
 }

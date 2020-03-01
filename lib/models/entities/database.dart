@@ -37,15 +37,15 @@ LazyDatabase _openConnection() {
     final dbFolder = await getApplicationDocumentsDirectory();
     final file = File(p.join(dbFolder.path, 'my_expenses.sqlite'));
     //TODO: CHANGE THIS
-    if (await file.exists()) {
-      print("Deleting database");
-      print("Db path =  ${dbFolder.path}");
-      await file.delete();
-    }
+    // if (await file.exists()) {
+    //   print("Deleting database");
+      // print("Db path =  ${dbFolder.path}");
+    //   await file.delete();
+    // }
     return VmDatabase(file);
   });
 }
-
+//TODO: THE USERNAME SHOULD BE SAVED
 @UseMoor(
   tables: [
     Users,
@@ -73,7 +73,7 @@ class AppDatabase extends _$AppDatabase {
           if (details.wasCreated) {
             await batch((b) {
               b.insertAll(categories, getDefaultCategories());
-              b.insertAll(transactions, getDefaultTransactions());
+              // b.insertAll(transactions, getDefaultTransactions());
             });
           }
         },

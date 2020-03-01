@@ -25,7 +25,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
-  moor: ^2.4.0
+  moor: ^2.4.1
   moor_ffi: ^0.4.0
   path: ^1.6.4
   path_provider: ^1.6.0

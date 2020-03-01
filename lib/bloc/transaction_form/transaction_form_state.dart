@@ -165,7 +165,7 @@ class TransactionFormLoadedState extends TransactionFormState {
       id: id,
       amount: category.isAnIncome ? amountToSave : amountToSave * -1,
       category: category,
-      description: description,
+      description: description.trim(),
       repetitionCycleType: repetitionCycle,
       repetitions: repetitions,
       transactionDate: transactionDate,

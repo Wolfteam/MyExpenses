@@ -104,6 +104,7 @@ class CategoryFormBloc extends Bloc<CategoryFormEvent, CategoryState> {
         s,
       );
       yield currentState.copyWith(errorOccurred: true);
+      yield currentState.copyWith(errorOccurred: false);
     }
   }
 

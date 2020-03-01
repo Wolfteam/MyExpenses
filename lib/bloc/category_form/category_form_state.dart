@@ -108,7 +108,7 @@ class CategoryFormState extends CategoryState {
       iconColor: iconColor,
       id: id,
       isAnIncome: type == TransactionType.incomes,
-      name: name,
+      name: name.trim(),
     );
   }
 }

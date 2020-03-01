@@ -38,21 +38,28 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
   Stream<TransactionsState> mapEventToState(
     TransactionsEvent event,
   ) async* {
-    yield TransactionsInitialState();
-
     if (event is GetTransactions) {
-      final month = DateUtils.formatAppDate(
-        event.inThisDate,
-        _settingsService.language,
-        DateUtils.fullMonthFormat,
-      );
-      final from = DateUtils.getFirstDayDateOfTheMonth(event.inThisDate);
-      final to = DateUtils.getLastDayDateOfTheMonth(from);
+      yield* _buildInitialState(event);
+    }
+  }
 
-      _logger.info(
-        runtimeType,
-        'Getting all the transactions from = $from to = $to',
-      );
+  Stream<TransactionsLoadedState> _buildInitialState(
+    GetTransactions event,
+  ) async* {
+    final month = DateUtils.formatAppDate(
+      event.inThisDate,
+      _settingsService.language,
+      DateUtils.fullMonthFormat,
+    );
+    final from = DateUtils.getFirstDayDateOfTheMonth(event.inThisDate);
+    final to = DateUtils.getLastDayDateOfTheMonth(from);
+
+    _logger.info(
+      runtimeType,
+      '_buildInitialState: Getting all the transactions from = $from to = $to',
+    );
+
+    try {
       final transactions = await _transactionsDao.getAllTransactions(from, to);
 
       final incomes = _getTotalIncomes(transactions);
@@ -78,6 +85,21 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         incomeTransactionsPerWeek: incomeTransPerWeek,
         expenseTransactionsPerWeek: expenseTransPerWeek,
         transactionsPerMonth: transPerMonth,
+      );
+    } on Exception catch (e, s) {
+      _logger.error(
+          runtimeType, '_buildInitialState: An unknown error occurred', e, s);
+      yield TransactionsLoadedState(
+        month: month,
+        incomeAmount: 0,
+        expenseAmount: 0,
+        balanceAmount: 0,
+        currentDate: event.inThisDate,
+        showLast7Days: DateTime.now().month == event.inThisDate.month,
+        monthBalance: _buildMonthBalance(0, 0, []),
+        incomeTransactionsPerWeek: [],
+        expenseTransactionsPerWeek: [],
+        transactionsPerMonth: _buildTransactionsPerMonth([]),
       );
     }
   }

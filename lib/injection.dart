@@ -17,12 +17,15 @@ void configure() {
   getIt.registerSingleton(Logger());
   getIt.registerSingleton<LoggingService>(LoggingServiceImpl(getIt<Logger>()));
   getIt.registerSingleton<SettingsService>(
-      SettingsServiceImpl(getIt<LoggingService>()));
+    SettingsServiceImpl(getIt<LoggingService>()),
+  );
   getIt.registerSingleton<AppDatabase>(AppDatabase());
   getIt.registerSingleton<CategoriesDao>(
-      CategoriesDaoImpl(getIt<AppDatabase>()));
+    CategoriesDaoImpl(getIt<AppDatabase>()),
+  );
   getIt.registerSingleton<TransactionsDao>(
-      TransactionsDaoImpl(getIt<AppDatabase>()));
+    TransactionsDaoImpl(getIt<AppDatabase>()),
+  );
   getIt.registerSingleton<UsersDao>(UsersDaoImpl(getIt<AppDatabase>()));
   $initGetIt(getIt);
 }
