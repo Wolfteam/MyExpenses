@@ -39,7 +39,30 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
   Widget build(BuildContext context) {
     final i18n = I18n.of(context);
 
-    return BlocBuilder<CategoryFormBloc, CategoryState>(builder: (ctx, state) {
+    return BlocConsumer<CategoryFormBloc, CategoryState>(
+        listener: (ctx, state) {
+      if (state is CategoryFormState) {
+        if (state.errorOccurred) {
+          showWarningToast(i18n.unknownErrorOcurred);
+        }
+
+        if (state.categoryCantBeDeleted) {
+          showWarningToast(i18n.categoryCantBeDeleted);
+        }
+      }
+
+      if (state is CategorySavedOrDeletedState) {
+        final i18n = I18n.of(ctx);
+        final msg = state is CategorySavedState
+            ? i18n.categoryWasSuccessfullySaved
+            : i18n.categoryWasSuccessfullyDeleted;
+        showSucceedToast(msg);
+
+        _notifyCategorySavedOrDeleted();
+
+        Navigator.of(ctx).pop();
+      }
+    }, builder: (ctx, state) {
       AppBar appBar;
       if (state is CategoryFormState) {
         appBar = AppBar(
@@ -91,21 +114,6 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
         _buildForm(state),
       ];
     }
-
-    if (state is CategorySavedOrDeletedState) {
-      final i18n = I18n.of(context);
-      final msg = state is CategorySavedState
-          ? i18n.categoryWasSuccessfullySaved
-          : i18n.categoryWasSuccessfullyDeleted;
-      showSucceedToast(msg);
-
-      _notifyCategorySavedOrDeleted();
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pop();
-      });
-    }
-
     return [];
   }
 

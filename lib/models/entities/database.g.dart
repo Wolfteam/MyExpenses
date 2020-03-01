@@ -365,7 +365,7 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   GeneratedBoolColumn get isActive => _isActive ??= _constructIsActive();
   GeneratedBoolColumn _constructIsActive() {
     return GeneratedBoolColumn('is_active', $tableName, false,
-        defaultValue: Constant(true));
+        defaultValue: const Constant(true));
   }
 
   @override
@@ -1526,6 +1526,7 @@ mixin _$UsersDaoImplMixin on DatabaseAccessor<AppDatabase> {
 }
 mixin _$CategoriesDaoImplMixin on DatabaseAccessor<AppDatabase> {
   $CategoriesTable get categories => db.categories;
+  $TransactionsTable get transactions => db.transactions;
 }
 mixin _$TransactionsDaoImplMixin on DatabaseAccessor<AppDatabase> {
   $TransactionsTable get transactions => db.transactions;

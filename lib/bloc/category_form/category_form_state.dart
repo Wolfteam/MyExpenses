@@ -24,6 +24,8 @@ class CategoryFormState extends CategoryState {
 
   final bool errorOccurred;
 
+  final bool categoryCantBeDeleted;
+
   bool get isFormValid => isNameValid && isTypeValid && isIconValid;
   bool get newCategory => id <= 0;
 
@@ -39,6 +41,7 @@ class CategoryFormState extends CategoryState {
         isIconValid,
         iconColor,
         errorOccurred,
+        categoryCantBeDeleted,
       ];
 
   const CategoryFormState({
@@ -52,6 +55,7 @@ class CategoryFormState extends CategoryState {
     @required this.isIconValid,
     @required this.iconColor,
     this.errorOccurred = false,
+    this.categoryCantBeDeleted = false,
   });
 
   factory CategoryFormState.initial() {
@@ -80,18 +84,22 @@ class CategoryFormState extends CategoryState {
     bool isIconValid,
     Color iconColor,
     bool errorOccurred,
+    bool categoryCantBeDeleted,
   }) {
     return CategoryFormState(
-        id: id ?? this.id,
-        name: name ?? this.name,
-        isNameValid: isNameValid ?? this.isNameValid,
-        isNameDirty: isNameDirty ?? this.isNameDirty,
-        type: type ?? this.type,
-        isTypeValid: isTypeValid ?? this.isTypeValid,
-        icon: icon ?? this.icon,
-        isIconValid: isIconValid ?? this.isIconValid,
-        iconColor: iconColor ?? this.iconColor,
-        errorOccurred: errorOccurred ?? this.errorOccurred);
+      id: id ?? this.id,
+      name: name ?? this.name,
+      isNameValid: isNameValid ?? this.isNameValid,
+      isNameDirty: isNameDirty ?? this.isNameDirty,
+      type: type ?? this.type,
+      isTypeValid: isTypeValid ?? this.isTypeValid,
+      icon: icon ?? this.icon,
+      isIconValid: isIconValid ?? this.isIconValid,
+      iconColor: iconColor ?? this.iconColor,
+      errorOccurred: errorOccurred ?? this.errorOccurred,
+      categoryCantBeDeleted:
+          categoryCantBeDeleted ?? this.categoryCantBeDeleted,
+    );
   }
 
   CategoryItem buildCategoryItem() {

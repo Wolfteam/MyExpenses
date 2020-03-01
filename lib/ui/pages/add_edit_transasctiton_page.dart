@@ -16,7 +16,6 @@ import '../../models/current_selected_category.dart';
 import '../../models/transaction_item.dart';
 import 'categories_page.dart';
 
-//TODO: IF THE SELECTED CATEGORY IS AN EXPENSE, YOU MUST SET A NEGATIVE AMOUNT
 class AddEditTransactionPage extends StatefulWidget {
   final TransactionItem item;
 
@@ -80,7 +79,26 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   Widget build(BuildContext context) {
     final i18n = I18n.of(context);
 
-    return BlocBuilder<TransactionFormBloc, TransactionFormState>(
+    return BlocConsumer<TransactionFormBloc, TransactionFormState>(
+      listener: (ctx, state) {
+        if (state is TransactionFormLoadedState && state.errorOccurred) {
+          showWarningToast(i18n.unknownErrorOcurred);
+        }
+        
+        if (state is TransactionSavedState ||
+            state is TransactionDeletedState) {
+          final msg = state is TransactionSavedState
+              ? i18n.transactionsWasSuccessfullySaved
+              : i18n.transactionsWasSuccessfullyDeleted;
+          showSucceedToast(msg);
+
+          final now = DateTime.now();
+          ctx.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: now));
+          ctx.bloc<ChartsBloc>().add(LoadChart(now));
+
+          Navigator.of(ctx).pop();
+        }
+      },
       builder: (ctx, state) {
         return Scaffold(
           appBar: AppBar(
@@ -137,22 +155,6 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
 
       return [_buildHeader(context, state), _buildForm(context, state)];
     }
-
-    if (state is TransactionSavedState || state is TransactionDeletedState) {
-      final msg = state is TransactionSavedState
-          ? i18n.transactionsWasSuccessfullySaved
-          : i18n.transactionsWasSuccessfullyDeleted;
-      showSucceedToast(msg);
-
-      final now = DateTime.now();
-      context.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: now));
-      context.bloc<ChartsBloc>().add(LoadChart(now));
-      
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pop();
-      });
-    }
-
     return [];
   }
 
@@ -635,6 +637,9 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     selectedCatProvider.currentSelectedItem = null;
 
     if (selectedCat != null) {
+      final amount = (double.tryParse(_amountController.text) ?? 0).abs();
+      final amountText = selectedCat.isAnIncome ? '$amount' : '${amount * -1}';
+      _amountController.text = amountText;
       context.bloc<TransactionFormBloc>().add(CategoryWasUpdated(selectedCat));
     }
   }

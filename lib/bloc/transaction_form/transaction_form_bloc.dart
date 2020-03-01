@@ -38,7 +38,6 @@ class TransactionFormBloc
   Stream<TransactionFormState> mapEventToState(
     TransactionFormEvent event,
   ) async* {
-
     if (event is AddTransaction) {
       yield TransactionFormLoadedState.initial(_settingsService.language);
     }

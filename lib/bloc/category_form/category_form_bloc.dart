@@ -113,8 +113,17 @@ class CategoryFormBloc extends Bloc<CategoryFormEvent, CategoryState> {
         runtimeType,
         '_deleteCategory: Trying to delete categoryId = ${category.id}',
       );
-      await _categoriesDao.deleteCategory(category.id);
-      yield CategoryDeletedState(category);
+      final isBeingUsed = await _categoriesDao.isCategoryBeingUsed(
+        category.id,
+      );
+
+      if (!isBeingUsed) {
+        await _categoriesDao.deleteCategory(category.id);
+        yield CategoryDeletedState(category);
+      } else {
+        yield currentState.copyWith(categoryCantBeDeleted: true);
+        yield currentState.copyWith(categoryCantBeDeleted: false);
+      }
     } on Exception catch (e, s) {
       _logger.error(
         runtimeType,
@@ -123,6 +132,7 @@ class CategoryFormBloc extends Bloc<CategoryFormEvent, CategoryState> {
         s,
       );
       yield currentState.copyWith(errorOccurred: true);
+      yield currentState.copyWith(errorOccurred: false);
     }
   }
 }

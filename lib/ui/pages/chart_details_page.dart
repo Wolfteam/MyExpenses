@@ -4,9 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/chart_details/chart_details_bloc.dart';
 import '../../common/enums/chart_details_filter_type.dart';
 import '../../common/enums/sort_direction_type.dart';
-import '../../common/utils/date_utils.dart';
-import '../../common/utils/transaction_utils.dart';
 import '../../common/extensions/i18n_extensions.dart';
+import '../../common/utils/date_utils.dart';
 import '../../generated/i18n.dart';
 import '../../models/chart_transaction_item.dart';
 import '../../models/transaction_item.dart';
@@ -15,12 +14,10 @@ import '../widgets/transactions/transaction_item.dart' as trans_item;
 
 class ChartDetailsPage extends StatelessWidget {
   final bool onlyIncomes;
-  // final List<TransactionItem> transactions;
   final List<ChartTransactionItem> chartData;
 
   const ChartDetailsPage({
     @required this.onlyIncomes,
-    // @required this.transactions,
     @required this.chartData,
   });
 

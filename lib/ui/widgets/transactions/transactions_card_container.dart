@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:my_expenses/generated/i18n.dart';
-import 'package:intl/intl.dart';
 
+import '../../../generated/i18n.dart';
 import '../../../models/transaction_card_items.dart';
 import '../../widgets/transactions/transaction_item.dart' as transaction;
 

@@ -196,6 +196,8 @@ class I18n implements WidgetsLocalizations {
   String pageXOfY(String x, String y) => "Page ${x} of ${y}";
   /// "Tap to open"
   String get tapToOpen => "Tap to open";
+  /// "Category can not be deleted. It is being used by an existing transaction"
+  String get categoryCantBeDeleted => "Category can not be deleted. It is being used by an existing transaction";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -524,6 +526,9 @@ class _I18n_es_VE extends I18n {
   /// "Toca para abrir"
   @override
   String get tapToOpen => "Toca para abrir";
+  /// "La categoría no puede ser borrada. Está siendo usada por una transaccion existente"
+  @override
+  String get categoryCantBeDeleted => "La categoría no puede ser borrada. Está siendo usada por una transaccion existente";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";

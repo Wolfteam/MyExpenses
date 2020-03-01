@@ -63,14 +63,13 @@ class _MainPageState extends State<MainPage>
         },
         child: const Icon(Icons.add),
       ),
-      bottomNavigationBar: BlocBuilder<DrawerBloc, DrawerState>(
+      bottomNavigationBar: BlocConsumer<DrawerBloc, DrawerState>(
+        listener: (ctx, state) {
+          final index = _getSelectedIndex(state.selectedPage);
+          _tabController.animateTo(index);
+        },
         builder: (ctx, state) {
           final index = _getSelectedIndex(state.selectedPage);
-
-          WidgetsBinding.instance.addPostFrameCallback(
-            (duration) => _tabController.animateTo(index),
-          );
-
           return BottomNavigationBar(
             showUnselectedLabels: true,
             selectedItemColor: Theme.of(context).primaryColor,

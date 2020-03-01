@@ -160,9 +160,10 @@ class TransactionFormLoadedState extends TransactionFormState {
   }
 
   TransactionItem buildTransactionItem() {
+    final amountToSave = amount.abs();
     return TransactionItem(
       id: id,
-      amount: amount,
+      amount: category.isAnIncome ? amountToSave : amountToSave * -1,
       category: category,
       description: description,
       repetitionCycleType: repetitionCycle,

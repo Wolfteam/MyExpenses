@@ -1,6 +1,6 @@
 part of '../models/entities/database.dart';
 
-@UseDao(tables: [Categories])
+@UseDao(tables: [Categories, Transactions])
 class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
     with _$CategoriesDaoImplMixin
     implements CategoriesDao {
@@ -102,5 +102,12 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
   Future<bool> deleteCategory(int id) async {
     await (delete(categories)..where((t) => t.id.equals(id))).go();
     return true;
+  }
+
+  @override
+  Future<bool> isCategoryBeingUsed(int id) async {
+    final query = select(transactions)..where((t) => t.categoryId.equals(id));
+    final result = await query.get();
+    return result.isNotEmpty;
   }
 }
