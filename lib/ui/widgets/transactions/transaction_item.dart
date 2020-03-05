@@ -15,6 +15,28 @@ class TransactionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final amountWidget = Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: <Widget>[
+        Text(
+          '${item.amount} \$',
+          style: TextStyle(
+            color: item.category.isAnIncome ? Colors.green : Colors.red,
+          ),
+        ),
+        if (item.isChildTransaction)
+          Container(
+            margin: const EdgeInsets.only(left: 5),
+            child: Icon(
+              Icons.alarm,
+              size: 20,
+            ),
+          ),
+      ],
+    );
+
     return InkWell(
       customBorder: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
@@ -34,12 +56,7 @@ class TransactionItem extends StatelessWidget {
           color: item.category.iconColor,
         ),
         title: Text(item.description),
-        trailing: Text(
-          '${item.amount} \$',
-          style: TextStyle(
-            color: item.category.isAnIncome ? Colors.green : Colors.red,
-          ),
-        ),
+        trailing: amountWidget,
       ),
     );
   }

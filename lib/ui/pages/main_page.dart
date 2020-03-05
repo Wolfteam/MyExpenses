@@ -54,13 +54,7 @@ class _MainPageState extends State<MainPage>
         backgroundColor: Theme.of(context).primaryColor,
         mini: false,
         heroTag: 'CreateTransactionFab',
-        onPressed: () async {
-          final route = MaterialPageRoute(
-            builder: (ctx) => const AddEditTransactionPage(),
-          );
-          await Navigator.of(context).push(route);
-          context.bloc<TransactionFormBloc>().add(FormClosed());
-        },
+        onPressed: _gotoAddTransactionPage,
         child: const Icon(Icons.add),
       ),
       bottomNavigationBar: BlocConsumer<DrawerBloc, DrawerState>(
@@ -149,5 +143,12 @@ class _MainPageState extends State<MainPage>
   void _changeCurrentTab(int index) {
     final item = _getSelectedDrawerItem(index);
     context.bloc<DrawerBloc>().add(DrawerItemSelectionChanged(item));
+  }
+
+  Future<void> _gotoAddTransactionPage() async {
+    final route = MaterialPageRoute(
+      builder: (ctx) => const AddEditTransactionPage(),
+    );
+    await Navigator.of(context).push(route);
   }
 }

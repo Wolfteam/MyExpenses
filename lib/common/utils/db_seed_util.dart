@@ -259,20 +259,39 @@ List<Transaction> getDefaultTransactions() {
   return transactions;
 }
 
+List<Transaction> getDefaultRecurringTransactions() {
+  final now = DateTime.now();
+  final transDate = now.subtract(const Duration(days: 60));
+  return [
+    _buildTransaction(
+      5,
+      'Recurrente A',
+      -100,
+      transDate,
+      repetitions: 1,
+      cycle: RepetitionCycleType.eachDay,
+      nextRecurringDate: transDate,
+    )
+  ];
+}
+
 Transaction _buildTransaction(
   int categoryId,
   String description,
   double amount,
-  DateTime date,
-) {
+  DateTime date, {
+  int repetitions = 0,
+  RepetitionCycleType cycle = RepetitionCycleType.none,
+  DateTime nextRecurringDate,
+}) {
   return Transaction(
     amount: amount,
     categoryId: categoryId,
     description: description,
     transactionDate: date,
-    repetitions: amount > 50 ? 1 : 0,
-    repetitionCycle:
-        amount > 50 ? RepetitionCycleType.eachMonth : RepetitionCycleType.none,
+    repetitionCycle: cycle,
     createdBy: createdBy,
+    isParentTransaction: cycle != RepetitionCycleType.none,
+    nextRecurringDate: nextRecurringDate,
   );
 }

@@ -8,6 +8,7 @@ import '../../bloc/transactions/transactions_bloc.dart';
 import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/extensions/i18n_extensions.dart';
 import '../../common/extensions/string_extensions.dart';
+import '../../common/utils/date_utils.dart';
 import '../../common/utils/i18n_utils.dart';
 import '../../common/utils/toast_utils.dart';
 import '../../generated/i18n.dart';
@@ -28,7 +29,6 @@ class AddEditTransactionPage extends StatefulWidget {
 class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   TextEditingController _amountController;
   TextEditingController _descriptionController;
-  TextEditingController _repetitionsController;
 
   final FocusNode _amountFocus = FocusNode();
   final FocusNode _descriptionFocus = FocusNode();
@@ -42,22 +42,18 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     RepetitionCycleType.eachDay,
     RepetitionCycleType.eachWeek,
     RepetitionCycleType.eachMonth,
-    RepetitionCycleType.eachYear
   ];
 
   @override
   void initState() {
     final double amount = widget.item?.amount ?? 0;
     final description = widget.item?.description ?? '';
-    final repetitions = widget.item?.repetitions ?? 0;
 
     _amountController = TextEditingController(text: '$amount');
     _descriptionController = TextEditingController(text: description);
-    _repetitionsController = TextEditingController(text: '$repetitions');
 
     _amountController.addListener(_amountChanged);
     _descriptionController.addListener(_descriptionChanged);
-    _repetitionsController.addListener(_repetitionsChanged);
     super.initState();
   }
 
@@ -84,7 +80,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         if (state is TransactionFormLoadedState && state.errorOccurred) {
           showWarningToast(i18n.unknownErrorOcurred);
         }
-        
+
         if (state is TransactionSavedState ||
             state is TransactionDeletedState) {
           final msg = state is TransactionSavedState
@@ -106,26 +102,24 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               widget.item == null ? i18n.addTransaction : i18n.editTransaction,
             ),
             leading: const BackButton(),
-            actions: <Widget>[
-              IconButton(
-                icon: Icon(
-                  Icons.save,
-                ),
-                onPressed:
-                    state is TransactionFormLoadedState && state.isFormValid
-                        ? _saveTransaction
-                        : null,
-              ),
-              if (widget.item != null)
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: state is TransactionFormLoadedState
-                      ? () {
-                          _showDeleteConfirmationDialog(state.description);
-                        }
-                      : null,
-                ),
-            ],
+            actions: state is TransactionFormLoadedState
+                ? [
+                    if (!state.isChildTransaction)
+                      IconButton(
+                        icon: Icon(
+                          Icons.save,
+                        ),
+                        onPressed: state.isFormValid ? _saveTransaction : null,
+                      ),
+                    if (!state.isNewTransaction != null &&
+                        !state.isChildTransaction)
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () =>
+                            _showDeleteConfirmationDialog(state.description),
+                      ),
+                  ]
+                : [],
           ),
           body: SingleChildScrollView(
             child: Column(
@@ -141,19 +135,28 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   void dispose() {
     _amountController.dispose();
     _descriptionController.dispose();
-    _repetitionsController.dispose();
     super.dispose();
   }
 
   List<Widget> _buildPage(BuildContext context, TransactionFormState state) {
     final i18n = I18n.of(context);
+    final theme = Theme.of(context);
 
     if (state is TransactionFormLoadedState) {
       if (state.errorOccurred) {
         showWarningToast(i18n.unknownErrorOcurred);
       }
 
-      return [_buildHeader(context, state), _buildForm(context, state)];
+      return [
+        _buildHeader(context, state),
+        if (state.isChildTransaction)
+          Text(
+            i18n.childTransactionCantBeDeleted,
+            style:
+                theme.textTheme.caption.copyWith(color: theme.primaryColorDark),
+          ),
+        _buildForm(context, state),
+      ];
     }
     return [];
   }
@@ -287,7 +290,9 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                       iconSize: 60,
                       icon: Icon(state.category.icon),
                       color: state.category.iconColor,
-                      onPressed: () => _changeCategory(state),
+                      onPressed: !state.isChildTransaction
+                          ? () => _changeCategory(state)
+                          : null,
                     ),
                   ),
                 ),
@@ -324,7 +329,9 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                 ),
                 Expanded(
                   child: FlatButton(
-                    onPressed: () => _transactionDateClicked(state),
+                    onPressed: !state.isChildTransaction
+                        ? () => _transactionDateClicked(state)
+                        : null,
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(state.transactionDateString),
@@ -333,9 +340,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                 ),
               ],
             ),
-            _buildRepetitionsInput(state),
-            if (state.areRepetitionCyclesVisible)
-              _buildRepetitionCyclesDropDown(state),
+            _buildRepetitionCyclesDropDown(state),
             Text(
               i18n.addPicture,
               textAlign: TextAlign.center,
@@ -346,13 +351,13 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               children: <Widget>[
                 FlatButton.icon(
                   textColor: theme.primaryColor,
-                  onPressed: () {},
+                  onPressed: !state.isChildTransaction ? () {} : null,
                   icon: Icon(Icons.photo_library),
                   label: Text(i18n.fromGallery),
                 ),
                 FlatButton.icon(
                   textColor: theme.primaryColor,
-                  onPressed: () {},
+                  onPressed: !state.isChildTransaction ? () {} : null,
                   icon: Icon(Icons.camera_enhance),
                   label: Text(i18n.fromCamera),
                 ),
@@ -386,6 +391,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         ),
         Expanded(
           child: TextFormField(
+            enabled: !state.isChildTransaction,
             controller: _amountController,
             maxLines: 1,
             minLines: 1,
@@ -431,6 +437,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         ),
         Expanded(
           child: TextFormField(
+            enabled: !state.isChildTransaction,
             controller: _descriptionController,
             keyboardType: TextInputType.text,
             maxLines: 2,
@@ -460,96 +467,78 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     );
   }
 
-  Widget _buildRepetitionsInput(
-    final TransactionFormLoadedState state,
-  ) {
-    final suffixIcon = _buildSuffixIconButton(
-      _repetitionsController,
-      _repetitionsFocus,
-    );
-    final i18n = I18n.of(context);
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        Container(
-          margin: const EdgeInsets.only(right: 10),
-          child: Icon(
-            Icons.repeat_one,
-            size: 30,
-          ),
-        ),
-        Expanded(
-          child: TextFormField(
-            controller: _repetitionsController,
-            maxLines: 1,
-            minLines: 1,
-            maxLength: 255,
-            focusNode: _repetitionsFocus,
-            textInputAction: TextInputAction.done,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              suffixIcon: suffixIcon,
-              hintText: '0',
-              alignLabelWithHint: true,
-              labelText: i18n.repetitions,
-            ),
-            autovalidate: state.isRepetitionsDirty,
-            onFieldSubmitted: (_) {
-              _repetitionsFocus.unfocus();
-            },
-            validator: (_) =>
-                state.isRepetitionsValid ? null : i18n.invalidRepetitions,
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildRepetitionCyclesDropDown(
     final TransactionFormLoadedState state,
   ) {
     final i18n = I18n.of(context);
+    final theme = Theme.of(context);
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        Icon(
-          Icons.date_range,
-          size: 30,
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-            ),
-            child: DropdownButton<RepetitionCycleType>(
-              isExpanded: true,
-              hint: Text(
-                i18n.translateRepetitionCycleType(state.repetitionCycle),
-                style: TextStyle(color: Colors.red),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Icon(
+                Icons.repeat,
+                size: 30,
               ),
-              value: state.repetitionCycle,
-              iconSize: 24,
-              underline: Container(
-                height: 0,
-                color: Colors.transparent,
-              ),
-              onChanged: _repetitionCycleChanged,
-              items: _repetitionCycles
-                  .map<DropdownMenuItem<RepetitionCycleType>>((value) {
-                return DropdownMenuItem<RepetitionCycleType>(
-                  value: value,
-                  child: Text(
-                    i18n.translateRepetitionCycleType(value),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    left: 16,
+                    right: 16,
                   ),
-                );
-              }).toList(),
-            ),
+                  child: DropdownButton<RepetitionCycleType>(
+                    isExpanded: true,
+                    hint: Text(
+                      i18n.translateRepetitionCycleType(state.repetitionCycle),
+                      style: TextStyle(color: Colors.red),
+                    ),
+                    value: state.repetitionCycle,
+                    iconSize: 24,
+                    underline: Container(
+                      height: 0,
+                      color: Colors.transparent,
+                    ),
+                    onChanged: !state.isChildTransaction
+                        ? _repetitionCycleChanged
+                        : null,
+                    items: _repetitionCycles
+                        .map<DropdownMenuItem<RepetitionCycleType>>((value) {
+                      return DropdownMenuItem<RepetitionCycleType>(
+                        value: value,
+                        child: Text(
+                          i18n.translateRepetitionCycleType(value),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
+          if (state.repetitionCycle != RepetitionCycleType.none)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 5, left: 8, right: 8),
+              child: Text(
+                i18n.recurringTransactionStartsOn(
+                  DateUtils.formatAppDate(
+                    state.transactionDate,
+                    state.language,
+                    DateUtils.monthDayAndYearFormat,
+                  ),
+                  i18n.translateRepetitionCycleType(state.repetitionCycle).toLowerCase(),
+                ),
+                textAlign: TextAlign.center,
+                style: theme.textTheme.caption
+                    .copyWith(color: theme.primaryColorDark),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -582,22 +571,16 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         .add(DescriptionChanged(_descriptionController.text));
   }
 
-  void _repetitionsChanged() {
-    final repetitions = int.tryParse(_repetitionsController.text) ?? 0;
-    context.bloc<TransactionFormBloc>().add(RepetitionsChanged(repetitions));
-  }
-
   void _repetitionCycleChanged(RepetitionCycleType newValue) {
     context.bloc<TransactionFormBloc>().add(RepetitionCycleChanged(newValue));
   }
 
   Future _transactionDateClicked(TransactionFormLoadedState state) async {
-    final now = DateTime.now();
     final selectedDate = await showDatePicker(
       context: context,
-      initialDate: now,
-      firstDate: DateTime(now.year - 1),
-      lastDate: DateTime(now.year + 10),
+      initialDate: state.transactionDate,
+      firstDate: state.firstDate,
+      lastDate: state.lastDate,
       locale: currentLocale(state.language),
     );
     if (selectedDate == null) return;

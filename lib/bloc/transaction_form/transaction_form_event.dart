@@ -43,14 +43,6 @@ class TransactionDateChanged extends TransactionFormEvent {
   List<Object> get props => [transactionDate];
 }
 
-class RepetitionsChanged extends TransactionFormEvent {
-  final int repetitions;
-  const RepetitionsChanged(this.repetitions);
-
-  @override
-  List<Object> get props => [repetitions];
-}
-
 class RepetitionCycleChanged extends TransactionFormEvent {
   final RepetitionCycleType repetitionCycle;
 

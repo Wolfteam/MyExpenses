@@ -17,7 +17,7 @@
     "last7Days": "Last 7 days",
     "total": "Total",
     "addTransaction": "Add transaction",
-    "editTransaction": "Edit tranasction",
+    "editTransaction": "Edit transaction",
     "saved": "Saved",
     "deleted": "Deleted",
     "amount": "Amount",
@@ -82,10 +82,14 @@
     "pageXOfY": "Page {x} of {y}",
     "tapToOpen": "Tap to open",
     "categoryCantBeDeleted": "Category can not be deleted. It is being used by an existing transaction",
+    "recurringTransactions": "Recurring transactions",
+    "childTransactionCantBeDeleted": "A child transaction can not be deleted nor edited",
+    "recurringTransactionStartsOn":"Recurring transaction starts on {date} {cycle}",
+    "noRecurringTransactionsWereFound":"No recurring transactions were founud",
     "repetitionCycle": {
         "eachWeek": "Each week",
         "eachMonth": "Each month",
-        "eachYear": "eachYear"
+        "eachYear": "Each Year"
     },
     "syncInterval": {
         "eachHour": "Each hour",

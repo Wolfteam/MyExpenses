@@ -109,6 +109,12 @@ class _TransactionsPageState extends State<TransactionsPage>
         _hideFabAnimController.reverse();
         break;
     }
+
+    if (_scrollController.position.pixels == 0 &&
+        _scrollController.position.atEdge) {
+      //User is at the top, so lets hide the fab
+      _hideFabAnimController.reverse();
+    }
   }
 
   List<Widget> _buildPage(TransactionsState state) {
@@ -136,15 +142,27 @@ class _TransactionsPageState extends State<TransactionsPage>
             incomes: state.incomeTransactionsPerWeek,
             expenses: state.expenseTransactionsPerWeek,
           ),
-        if (state.transactionsPerMonth.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(left: 28, top: 15),
-            child: Text(
-              i18n.transactions,
-              textAlign: TextAlign.start,
-              style: Theme.of(context).textTheme.title,
-            ),
+        Padding(
+          padding: const EdgeInsets.only(left: 20, right: 5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text(
+                state.transactionsPerMonth.isEmpty
+                    ? ''
+                    : state.showParentTransactions
+                        ? i18n.recurringTransactions
+                        : i18n.transactions,
+                textAlign: TextAlign.start,
+                style: Theme.of(context).textTheme.title,
+              ),
+              IconButton(
+                icon: Icon(Icons.swap_horiz),
+                onPressed: () => _switchTransactionList(context, state),
+              ),
+            ],
           ),
+        ),
         _buildTransactionsCard(state),
       ];
     }
@@ -165,6 +183,21 @@ class _TransactionsPageState extends State<TransactionsPage>
       );
     }
 
-    return NoTransactionsFound();
+    return NoTransactionsFound(
+      recurringTransactions: state.showParentTransactions,
+    );
+  }
+
+  void _switchTransactionList(
+    BuildContext context,
+    TransactionsLoadedState state,
+  ) {
+    if (!state.showParentTransactions) {
+      context.bloc<TransactionsBloc>().add(const GetAllParentTransactions());
+    } else {
+      context
+          .bloc<TransactionsBloc>()
+          .add(GetTransactions(inThisDate: state.currentDate));
+    }
   }
 }

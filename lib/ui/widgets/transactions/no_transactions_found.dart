@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import '../../../generated/i18n.dart';
 
 class NoTransactionsFound extends StatelessWidget {
+  final bool recurringTransactions;
+
+  const NoTransactionsFound({this.recurringTransactions = false});
+
   @override
   Widget build(BuildContext context) {
     final i18n = I18n.of(context);
@@ -18,7 +22,9 @@ class NoTransactionsFound extends StatelessWidget {
             size: 60,
           ),
           Text(
-            i18n.noTransactionsForThisPeriod,
+            recurringTransactions
+                ? i18n.noRecurringTransactionsWereFound
+                : i18n.noTransactionsForThisPeriod,
             textAlign: TextAlign.center,
             style: theme.textTheme.title,
           ),

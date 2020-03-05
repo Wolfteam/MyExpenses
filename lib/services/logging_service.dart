@@ -1,7 +1,8 @@
 import 'package:log_4_dart_2/log_4_dart_2.dart';
+import 'package:sprintf/sprintf.dart';
 
 abstract class LoggingService {
-  void info(Type type, String msg);
+  void info(Type type, String msg, [List<Object> args]);
 
   void warning(Type type, String msg, [Exception ex, StackTrace trace]);
 
@@ -14,8 +15,12 @@ class LoggingServiceImpl implements LoggingService {
   LoggingServiceImpl(this._logger);
 
   @override
-  void info(Type type, String msg) {
-    _logger.info(type.toString(), msg);
+  void info(Type type, String msg, [List<Object> args]) {
+    if (args != null && args.isNotEmpty) {
+      _logger.info(type.toString(), sprintf(msg, args));
+    } else {
+      _logger.info(type.toString(), msg);
+    }
   }
 
   @override

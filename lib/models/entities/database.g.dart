@@ -503,8 +503,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   final double amount;
   final String description;
   final DateTime transactionDate;
-  final int repetitions;
   final RepetitionCycleType repetitionCycle;
+  final int parentTransactionId;
+  final bool isParentTransaction;
+  final DateTime nextRecurringDate;
   final int categoryId;
   Transaction(
       {@required this.id,
@@ -515,8 +517,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       @required this.amount,
       @required this.description,
       @required this.transactionDate,
-      @required this.repetitions,
       @required this.repetitionCycle,
+      this.parentTransactionId,
+      @required this.isParentTransaction,
+      this.nextRecurringDate,
       @required this.categoryId});
   factory Transaction.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
@@ -525,6 +529,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     final dateTimeType = db.typeSystem.forDartType<DateTime>();
     final stringType = db.typeSystem.forDartType<String>();
     final doubleType = db.typeSystem.forDartType<double>();
+    final boolType = db.typeSystem.forDartType<bool>();
     return Transaction(
       id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id']),
       createdAt: dateTimeType
@@ -541,10 +546,14 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           .mapFromDatabaseResponse(data['${effectivePrefix}description']),
       transactionDate: dateTimeType
           .mapFromDatabaseResponse(data['${effectivePrefix}transaction_date']),
-      repetitions: intType
-          .mapFromDatabaseResponse(data['${effectivePrefix}repetitions']),
       repetitionCycle: $TransactionsTable.$converter0.mapToDart(intType
           .mapFromDatabaseResponse(data['${effectivePrefix}repetition_cycle'])),
+      parentTransactionId: intType.mapFromDatabaseResponse(
+          data['${effectivePrefix}parent_transaction_id']),
+      isParentTransaction: boolType.mapFromDatabaseResponse(
+          data['${effectivePrefix}is_parent_transaction']),
+      nextRecurringDate: dateTimeType.mapFromDatabaseResponse(
+          data['${effectivePrefix}next_recurring_date']),
       categoryId: intType
           .mapFromDatabaseResponse(data['${effectivePrefix}category_id']),
     );
@@ -561,9 +570,14 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       amount: serializer.fromJson<double>(json['amount']),
       description: serializer.fromJson<String>(json['description']),
       transactionDate: serializer.fromJson<DateTime>(json['transactionDate']),
-      repetitions: serializer.fromJson<int>(json['repetitions']),
       repetitionCycle:
           serializer.fromJson<RepetitionCycleType>(json['repetitionCycle']),
+      parentTransactionId:
+          serializer.fromJson<int>(json['parentTransactionId']),
+      isParentTransaction:
+          serializer.fromJson<bool>(json['isParentTransaction']),
+      nextRecurringDate:
+          serializer.fromJson<DateTime>(json['nextRecurringDate']),
       categoryId: serializer.fromJson<int>(json['categoryId']),
     );
   }
@@ -579,9 +593,11 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       'amount': serializer.toJson<double>(amount),
       'description': serializer.toJson<String>(description),
       'transactionDate': serializer.toJson<DateTime>(transactionDate),
-      'repetitions': serializer.toJson<int>(repetitions),
       'repetitionCycle':
           serializer.toJson<RepetitionCycleType>(repetitionCycle),
+      'parentTransactionId': serializer.toJson<int>(parentTransactionId),
+      'isParentTransaction': serializer.toJson<bool>(isParentTransaction),
+      'nextRecurringDate': serializer.toJson<DateTime>(nextRecurringDate),
       'categoryId': serializer.toJson<int>(categoryId),
     };
   }
@@ -610,12 +626,18 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       transactionDate: transactionDate == null && nullToAbsent
           ? const Value.absent()
           : Value(transactionDate),
-      repetitions: repetitions == null && nullToAbsent
-          ? const Value.absent()
-          : Value(repetitions),
       repetitionCycle: repetitionCycle == null && nullToAbsent
           ? const Value.absent()
           : Value(repetitionCycle),
+      parentTransactionId: parentTransactionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(parentTransactionId),
+      isParentTransaction: isParentTransaction == null && nullToAbsent
+          ? const Value.absent()
+          : Value(isParentTransaction),
+      nextRecurringDate: nextRecurringDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nextRecurringDate),
       categoryId: categoryId == null && nullToAbsent
           ? const Value.absent()
           : Value(categoryId),
@@ -631,8 +653,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           double amount,
           String description,
           DateTime transactionDate,
-          int repetitions,
           RepetitionCycleType repetitionCycle,
+          int parentTransactionId,
+          bool isParentTransaction,
+          DateTime nextRecurringDate,
           int categoryId}) =>
       Transaction(
         id: id ?? this.id,
@@ -643,8 +667,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
         amount: amount ?? this.amount,
         description: description ?? this.description,
         transactionDate: transactionDate ?? this.transactionDate,
-        repetitions: repetitions ?? this.repetitions,
         repetitionCycle: repetitionCycle ?? this.repetitionCycle,
+        parentTransactionId: parentTransactionId ?? this.parentTransactionId,
+        isParentTransaction: isParentTransaction ?? this.isParentTransaction,
+        nextRecurringDate: nextRecurringDate ?? this.nextRecurringDate,
         categoryId: categoryId ?? this.categoryId,
       );
   @override
@@ -658,8 +684,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           ..write('amount: $amount, ')
           ..write('description: $description, ')
           ..write('transactionDate: $transactionDate, ')
-          ..write('repetitions: $repetitions, ')
           ..write('repetitionCycle: $repetitionCycle, ')
+          ..write('parentTransactionId: $parentTransactionId, ')
+          ..write('isParentTransaction: $isParentTransaction, ')
+          ..write('nextRecurringDate: $nextRecurringDate, ')
           ..write('categoryId: $categoryId')
           ..write(')'))
         .toString();
@@ -683,9 +711,15 @@ class Transaction extends DataClass implements Insertable<Transaction> {
                               $mrjc(
                                   transactionDate.hashCode,
                                   $mrjc(
-                                      repetitions.hashCode,
-                                      $mrjc(repetitionCycle.hashCode,
-                                          categoryId.hashCode)))))))))));
+                                      repetitionCycle.hashCode,
+                                      $mrjc(
+                                          parentTransactionId.hashCode,
+                                          $mrjc(
+                                              isParentTransaction.hashCode,
+                                              $mrjc(
+                                                  nextRecurringDate.hashCode,
+                                                  categoryId
+                                                      .hashCode)))))))))))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
@@ -698,8 +732,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           other.amount == this.amount &&
           other.description == this.description &&
           other.transactionDate == this.transactionDate &&
-          other.repetitions == this.repetitions &&
           other.repetitionCycle == this.repetitionCycle &&
+          other.parentTransactionId == this.parentTransactionId &&
+          other.isParentTransaction == this.isParentTransaction &&
+          other.nextRecurringDate == this.nextRecurringDate &&
           other.categoryId == this.categoryId);
 }
 
@@ -712,8 +748,10 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   final Value<double> amount;
   final Value<String> description;
   final Value<DateTime> transactionDate;
-  final Value<int> repetitions;
   final Value<RepetitionCycleType> repetitionCycle;
+  final Value<int> parentTransactionId;
+  final Value<bool> isParentTransaction;
+  final Value<DateTime> nextRecurringDate;
   final Value<int> categoryId;
   const TransactionsCompanion({
     this.id = const Value.absent(),
@@ -724,8 +762,10 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.amount = const Value.absent(),
     this.description = const Value.absent(),
     this.transactionDate = const Value.absent(),
-    this.repetitions = const Value.absent(),
     this.repetitionCycle = const Value.absent(),
+    this.parentTransactionId = const Value.absent(),
+    this.isParentTransaction = const Value.absent(),
+    this.nextRecurringDate = const Value.absent(),
     this.categoryId = const Value.absent(),
   });
   TransactionsCompanion.insert({
@@ -737,15 +777,17 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     @required double amount,
     @required String description,
     @required DateTime transactionDate,
-    @required int repetitions,
     @required RepetitionCycleType repetitionCycle,
+    this.parentTransactionId = const Value.absent(),
+    @required bool isParentTransaction,
+    this.nextRecurringDate = const Value.absent(),
     @required int categoryId,
   })  : createdBy = Value(createdBy),
         amount = Value(amount),
         description = Value(description),
         transactionDate = Value(transactionDate),
-        repetitions = Value(repetitions),
         repetitionCycle = Value(repetitionCycle),
+        isParentTransaction = Value(isParentTransaction),
         categoryId = Value(categoryId);
   TransactionsCompanion copyWith(
       {Value<int> id,
@@ -756,8 +798,10 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       Value<double> amount,
       Value<String> description,
       Value<DateTime> transactionDate,
-      Value<int> repetitions,
       Value<RepetitionCycleType> repetitionCycle,
+      Value<int> parentTransactionId,
+      Value<bool> isParentTransaction,
+      Value<DateTime> nextRecurringDate,
       Value<int> categoryId}) {
     return TransactionsCompanion(
       id: id ?? this.id,
@@ -768,8 +812,10 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       amount: amount ?? this.amount,
       description: description ?? this.description,
       transactionDate: transactionDate ?? this.transactionDate,
-      repetitions: repetitions ?? this.repetitions,
       repetitionCycle: repetitionCycle ?? this.repetitionCycle,
+      parentTransactionId: parentTransactionId ?? this.parentTransactionId,
+      isParentTransaction: isParentTransaction ?? this.isParentTransaction,
+      nextRecurringDate: nextRecurringDate ?? this.nextRecurringDate,
       categoryId: categoryId ?? this.categoryId,
     );
   }
@@ -868,20 +914,6 @@ class $TransactionsTable extends Transactions
     );
   }
 
-  final VerificationMeta _repetitionsMeta =
-      const VerificationMeta('repetitions');
-  GeneratedIntColumn _repetitions;
-  @override
-  GeneratedIntColumn get repetitions =>
-      _repetitions ??= _constructRepetitions();
-  GeneratedIntColumn _constructRepetitions() {
-    return GeneratedIntColumn(
-      'repetitions',
-      $tableName,
-      false,
-    );
-  }
-
   final VerificationMeta _repetitionCycleMeta =
       const VerificationMeta('repetitionCycle');
   GeneratedIntColumn _repetitionCycle;
@@ -893,6 +925,48 @@ class $TransactionsTable extends Transactions
       'repetition_cycle',
       $tableName,
       false,
+    );
+  }
+
+  final VerificationMeta _parentTransactionIdMeta =
+      const VerificationMeta('parentTransactionId');
+  GeneratedIntColumn _parentTransactionId;
+  @override
+  GeneratedIntColumn get parentTransactionId =>
+      _parentTransactionId ??= _constructParentTransactionId();
+  GeneratedIntColumn _constructParentTransactionId() {
+    return GeneratedIntColumn(
+      'parent_transaction_id',
+      $tableName,
+      true,
+    );
+  }
+
+  final VerificationMeta _isParentTransactionMeta =
+      const VerificationMeta('isParentTransaction');
+  GeneratedBoolColumn _isParentTransaction;
+  @override
+  GeneratedBoolColumn get isParentTransaction =>
+      _isParentTransaction ??= _constructIsParentTransaction();
+  GeneratedBoolColumn _constructIsParentTransaction() {
+    return GeneratedBoolColumn(
+      'is_parent_transaction',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _nextRecurringDateMeta =
+      const VerificationMeta('nextRecurringDate');
+  GeneratedDateTimeColumn _nextRecurringDate;
+  @override
+  GeneratedDateTimeColumn get nextRecurringDate =>
+      _nextRecurringDate ??= _constructNextRecurringDate();
+  GeneratedDateTimeColumn _constructNextRecurringDate() {
+    return GeneratedDateTimeColumn(
+      'next_recurring_date',
+      $tableName,
+      true,
     );
   }
 
@@ -915,8 +989,10 @@ class $TransactionsTable extends Transactions
         amount,
         description,
         transactionDate,
-        repetitions,
         repetitionCycle,
+        parentTransactionId,
+        isParentTransaction,
+        nextRecurringDate,
         categoryId
       ];
   @override
@@ -970,13 +1046,27 @@ class $TransactionsTable extends Transactions
     } else if (isInserting) {
       context.missing(_transactionDateMeta);
     }
-    if (d.repetitions.present) {
-      context.handle(_repetitionsMeta,
-          repetitions.isAcceptableValue(d.repetitions.value, _repetitionsMeta));
-    } else if (isInserting) {
-      context.missing(_repetitionsMeta);
-    }
     context.handle(_repetitionCycleMeta, const VerificationResult.success());
+    if (d.parentTransactionId.present) {
+      context.handle(
+          _parentTransactionIdMeta,
+          parentTransactionId.isAcceptableValue(
+              d.parentTransactionId.value, _parentTransactionIdMeta));
+    }
+    if (d.isParentTransaction.present) {
+      context.handle(
+          _isParentTransactionMeta,
+          isParentTransaction.isAcceptableValue(
+              d.isParentTransaction.value, _isParentTransactionMeta));
+    } else if (isInserting) {
+      context.missing(_isParentTransactionMeta);
+    }
+    if (d.nextRecurringDate.present) {
+      context.handle(
+          _nextRecurringDateMeta,
+          nextRecurringDate.isAcceptableValue(
+              d.nextRecurringDate.value, _nextRecurringDateMeta));
+    }
     if (d.categoryId.present) {
       context.handle(_categoryIdMeta,
           categoryId.isAcceptableValue(d.categoryId.value, _categoryIdMeta));
@@ -1022,13 +1112,22 @@ class $TransactionsTable extends Transactions
       map['transaction_date'] =
           Variable<DateTime, DateTimeType>(d.transactionDate.value);
     }
-    if (d.repetitions.present) {
-      map['repetitions'] = Variable<int, IntType>(d.repetitions.value);
-    }
     if (d.repetitionCycle.present) {
       final converter = $TransactionsTable.$converter0;
       map['repetition_cycle'] =
           Variable<int, IntType>(converter.mapToSql(d.repetitionCycle.value));
+    }
+    if (d.parentTransactionId.present) {
+      map['parent_transaction_id'] =
+          Variable<int, IntType>(d.parentTransactionId.value);
+    }
+    if (d.isParentTransaction.present) {
+      map['is_parent_transaction'] =
+          Variable<bool, BoolType>(d.isParentTransaction.value);
+    }
+    if (d.nextRecurringDate.present) {
+      map['next_recurring_date'] =
+          Variable<DateTime, DateTimeType>(d.nextRecurringDate.value);
     }
     if (d.categoryId.present) {
       map['category_id'] = Variable<int, IntType>(d.categoryId.value);
@@ -1521,9 +1620,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 // DaoGenerator
 // **************************************************************************
 
-mixin _$UsersDaoImplMixin on DatabaseAccessor<AppDatabase> {
-  $UsersTable get users => db.users;
-}
 mixin _$CategoriesDaoImplMixin on DatabaseAccessor<AppDatabase> {
   $CategoriesTable get categories => db.categories;
   $TransactionsTable get transactions => db.transactions;
@@ -1531,4 +1627,7 @@ mixin _$CategoriesDaoImplMixin on DatabaseAccessor<AppDatabase> {
 mixin _$TransactionsDaoImplMixin on DatabaseAccessor<AppDatabase> {
   $TransactionsTable get transactions => db.transactions;
   $CategoriesTable get categories => db.categories;
+}
+mixin _$UsersDaoImplMixin on DatabaseAccessor<AppDatabase> {
+  $UsersTable get users => db.users;
 }

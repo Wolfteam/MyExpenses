@@ -68,8 +68,8 @@ class I18n implements WidgetsLocalizations {
   String get total => "Total";
   /// "Add transaction"
   String get addTransaction => "Add transaction";
-  /// "Edit tranasction"
-  String get editTransaction => "Edit tranasction";
+  /// "Edit transaction"
+  String get editTransaction => "Edit transaction";
   /// "Saved"
   String get saved => "Saved";
   /// "Deleted"
@@ -198,12 +198,20 @@ class I18n implements WidgetsLocalizations {
   String get tapToOpen => "Tap to open";
   /// "Category can not be deleted. It is being used by an existing transaction"
   String get categoryCantBeDeleted => "Category can not be deleted. It is being used by an existing transaction";
+  /// "Recurring transactions"
+  String get recurringTransactions => "Recurring transactions";
+  /// "A child transaction can not be deleted nor edited"
+  String get childTransactionCantBeDeleted => "A child transaction can not be deleted nor edited";
+  /// "Recurring transaction starts on ${date} ${cycle}"
+  String recurringTransactionStartsOn(String date, String cycle) => "Recurring transaction starts on ${date} ${cycle}";
+  /// "No recurring transactions were founud"
+  String get noRecurringTransactionsWereFound => "No recurring transactions were founud";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
   String get repetitionCycleEachMonth => "Each month";
-  /// "eachYear"
-  String get repetitionCycleEachYear => "eachYear";
+  /// "Each Year"
+  String get repetitionCycleEachYear => "Each Year";
   /// "Each hour"
   String get syncIntervalEachHour => "Each hour";
   /// "Each 3 hours"
@@ -484,9 +492,9 @@ class _I18n_es_VE extends I18n {
   /// " ¿Estás seguro que deseas borrar esta categoría?"
   @override
   String get confirmDeleteCategory => " ¿Estás seguro que deseas borrar esta categoría?";
-  /// "No fueron encontradas transacciones para este período"
+  /// "No se encontraron transacciones para este período"
   @override
-  String get noTransactionsForThisPeriod => "No fueron encontradas transacciones para este período";
+  String get noTransactionsForThisPeriod => "No se encontraron transacciones para este período";
   /// "Ascending"
   @override
   String get ascending => "Ascending";
@@ -529,6 +537,18 @@ class _I18n_es_VE extends I18n {
   /// "La categoría no puede ser borrada. Está siendo usada por una transaccion existente"
   @override
   String get categoryCantBeDeleted => "La categoría no puede ser borrada. Está siendo usada por una transaccion existente";
+  /// "Transacciones recurrentes"
+  @override
+  String get recurringTransactions => "Transacciones recurrentes";
+  /// "Una transacción hija no puede ser modificada ni borrada"
+  @override
+  String get childTransactionCantBeDeleted => "Una transacción hija no puede ser modificada ni borrada";
+  /// "La transacción recurrente empezará el ${date} ${cycle}"
+  @override
+  String recurringTransactionStartsOn(String date, String cycle) => "La transacción recurrente empezará el ${date} ${cycle}";
+  /// "No se encontraron transacciones recurrentes"
+  @override
+  String get noRecurringTransactionsWereFound => "No se encontraron transacciones recurrentes";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";

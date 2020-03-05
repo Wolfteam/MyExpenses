@@ -92,7 +92,7 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
       final next = _getNextDate(first);
       final last = DateTime(next.year, next.month, next.day, 23, 59, 59);
 
-      final amount = getTotalTransactionAmount(transactions
+      final amount = TransactionUtils.getTotalTransactionAmount(transactions
           .where((t) =>
               t.transactionDate.isAfter(first) &&
               t.transactionDate.isBefore(last))

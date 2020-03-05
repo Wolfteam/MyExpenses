@@ -7,10 +7,10 @@ class TransactionCardItems {
   final List<TransactionItem> transactions;
 
   double get dayExpenses =>
-      getTotalTransactionAmounts(transactions, onlyIncomes: false);
+      TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: false);
 
   double get dayIncomes =>
-      getTotalTransactionAmounts(transactions, onlyIncomes: true);
+      TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: true);
 
   TransactionCardItems({
     this.date,

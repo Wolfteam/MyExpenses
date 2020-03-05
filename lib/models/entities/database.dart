@@ -16,18 +16,13 @@ import '../../models/category_item.dart';
 import '../../models/transaction_item.dart';
 import 'base_entity.dart';
 
-//Tables
-part 'users.dart';
-part 'transactions.dart';
-part 'categories.dart';
-
-//daos
-part '../../daos/users_dao_impl.dart';
 part '../../daos/categories_dao_impl.dart';
 part '../../daos/transactions_dao_impl.dart';
-
-//Generated db
+part '../../daos/users_dao_impl.dart';
+part 'categories.dart';
 part 'database.g.dart';
+part 'transactions.dart';
+part 'users.dart';
 
 LazyDatabase _openConnection() {
   // the LazyDatabase util lets us find the right location for the file async.
@@ -38,13 +33,14 @@ LazyDatabase _openConnection() {
     final file = File(p.join(dbFolder.path, 'my_expenses.sqlite'));
     //TODO: CHANGE THIS
     // if (await file.exists()) {
-    //   print("Deleting database");
-      // print("Db path =  ${dbFolder.path}");
+    //   debugPrint('Deleting database');
+    //   debugPrint('Db path =  ${dbFolder.path}');
     //   await file.delete();
     // }
     return VmDatabase(file);
   });
 }
+
 //TODO: THE USERNAME SHOULD BE SAVED
 @UseMoor(
   tables: [
@@ -74,6 +70,7 @@ class AppDatabase extends _$AppDatabase {
             await batch((b) {
               b.insertAll(categories, getDefaultCategories());
               // b.insertAll(transactions, getDefaultTransactions());
+              // b.insertAll(transactions, getDefaultRecurringTransactions());
             });
           }
         },

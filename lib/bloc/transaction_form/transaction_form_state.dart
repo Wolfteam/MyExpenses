@@ -24,13 +24,10 @@ class TransactionFormLoadedState extends TransactionFormState {
   final DateTime transactionDate;
   final bool isTransactionDateValid;
   final String transactionDateString;
-
-  final int repetitions;
-  final bool isRepetitionsValid;
-  final bool isRepetitionsDirty;
+  final DateTime firstDate;
+  final DateTime lastDate;
 
   final RepetitionCycleType repetitionCycle;
-  final bool areRepetitionCyclesVisible;
 
   final CategoryItem category;
   final bool isCategoryValid;
@@ -39,12 +36,42 @@ class TransactionFormLoadedState extends TransactionFormState {
 
   final bool errorOccurred;
 
+  final int parentTransactionId;
+  final bool isParentTransaction;
+
+  bool get isNewTransaction => id <= 0;
+
+  bool get isChildTransaction =>
+      !isParentTransaction && parentTransactionId != null;
+
   bool get isFormValid =>
       isAmountValid &&
       isDescriptionValid &&
-      // isTransactionDateValid &&
-      isRepetitionsValid &&
+      isTransactionDateValid &&
       isCategoryValid;
+
+  @override
+  List<Object> get props => [
+        id,
+        amount,
+        isAmountValid,
+        isAmountDirty,
+        description,
+        isDescriptionValid,
+        isDescriptionDirty,
+        transactionDate,
+        isTransactionDateValid,
+        transactionDateString,
+        firstDate,
+        lastDate,
+        repetitionCycle,
+        category,
+        isCategoryValid,
+        language,
+        errorOccurred,
+        parentTransactionId,
+        isParentTransaction,
+      ];
 
   const TransactionFormLoadedState({
     @required this.id,
@@ -57,15 +84,15 @@ class TransactionFormLoadedState extends TransactionFormState {
     @required this.transactionDate,
     @required this.isTransactionDateValid,
     @required this.transactionDateString,
-    @required this.repetitions,
-    @required this.isRepetitionsValid,
-    @required this.isRepetitionsDirty,
+    @required this.firstDate,
+    @required this.lastDate,
     @required this.repetitionCycle,
-    @required this.areRepetitionCyclesVisible,
     @required this.category,
     @required this.isCategoryValid,
     @required this.language,
     this.errorOccurred = false,
+    this.parentTransactionId,
+    this.isParentTransaction = false,
   });
 
   factory TransactionFormLoadedState.initial(AppLanguageType language) {
@@ -95,11 +122,9 @@ class TransactionFormLoadedState extends TransactionFormState {
       transactionDate: now,
       transactionDateString: transactionDateString,
       isTransactionDateValid: true,
-      repetitions: 0,
-      isRepetitionsValid: true,
-      isRepetitionsDirty: false,
+      firstDate: DateTime(now.year - 1),
+      lastDate: DateTime(now.year + 10),
       repetitionCycle: RepetitionCycleType.none,
-      areRepetitionCyclesVisible: false,
       category: category,
       isCategoryValid: false,
       language: language,
@@ -117,15 +142,14 @@ class TransactionFormLoadedState extends TransactionFormState {
     bool isDescriptionDirty,
     DateTime transactionDate,
     bool isTransactionDateValid,
-    int repetitions,
-    bool isRepetitionsValid,
-    bool isRepetitionsDirty,
+    DateTime firstDate,
     RepetitionCycleType repetitionCycle,
-    bool areRepetitionCyclesVisible,
     CategoryItem category,
     bool isCategoryValid,
     AppLanguageType language,
     bool errorOccurred,
+    int parentTransactionId,
+    bool isParentTransaction,
   }) {
     final date = transactionDate ?? this.transactionDate;
     final transactionDateString = DateUtils.formatAppDate(
@@ -146,53 +170,34 @@ class TransactionFormLoadedState extends TransactionFormState {
       isTransactionDateValid:
           isTransactionDateValid ?? this.isTransactionDateValid,
       transactionDateString: transactionDateString,
-      repetitions: repetitions ?? this.repetitions,
-      isRepetitionsValid: isRepetitionsValid ?? this.isRepetitionsValid,
-      isRepetitionsDirty: isRepetitionsDirty ?? this.isRepetitionsDirty,
+      firstDate: firstDate ?? this.firstDate,
+      lastDate: lastDate,
       repetitionCycle: repetitionCycle ?? this.repetitionCycle,
-      areRepetitionCyclesVisible:
-          areRepetitionCyclesVisible ?? this.areRepetitionCyclesVisible,
       category: category ?? this.category,
       isCategoryValid: isCategoryValid ?? this.isCategoryValid,
       language: language ?? this.language,
       errorOccurred: errorOccurred ?? this.errorOccurred,
+      isParentTransaction: isParentTransaction ?? this.isParentTransaction,
+      parentTransactionId: parentTransactionId ?? this.parentTransactionId,
     );
   }
 
   TransactionItem buildTransactionItem() {
     final amountToSave = amount.abs();
+    final nextecurringDate =
+        repetitionCycle == RepetitionCycleType.none ? null : transactionDate;
     return TransactionItem(
       id: id,
       amount: category.isAnIncome ? amountToSave : amountToSave * -1,
       category: category,
       description: description.trim(),
-      repetitionCycleType: repetitionCycle,
-      repetitions: repetitions,
+      repetitionCycle: repetitionCycle,
       transactionDate: transactionDate,
+      isParentTransaction: nextecurringDate != null,
+      parentTransactionId: parentTransactionId,
+      nextRecurringDate: nextecurringDate,
     );
   }
-
-  @override
-  List<Object> get props => [
-        id,
-        amount,
-        isAmountValid,
-        isAmountDirty,
-        description,
-        isDescriptionValid,
-        isDescriptionDirty,
-        transactionDate,
-        isTransactionDateValid,
-        transactionDateString,
-        repetitions,
-        isRepetitionsValid,
-        isRepetitionsDirty,
-        repetitionCycle,
-        category,
-        isCategoryValid,
-        language,
-        errorOccurred,
-      ];
 }
 
 class TransactionSavedState extends TransactionFormState {

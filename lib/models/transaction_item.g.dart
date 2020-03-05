@@ -14,9 +14,13 @@ TransactionItem _$TransactionItemFromJson(Map<String, dynamic> json) {
     transactionDate: json['transactionDate'] == null
         ? null
         : DateTime.parse(json['transactionDate'] as String),
-    repetitions: json['repetitions'] as int,
     repetitionCycleType: _$enumDecodeNullable(
         _$RepetitionCycleTypeEnumMap, json['repetitionCycleType']),
+    parentTransactionId: json['parentTransactionId'] as int,
+    isParentTransaction: json['isParentTransaction'] as bool,
+    nextRecurringDate: json['nextRecurringDate'] == null
+        ? null
+        : DateTime.parse(json['nextRecurringDate'] as String),
     category: json['category'] == null
         ? null
         : CategoryItem.fromJson(json['category'] as Map<String, dynamic>),
@@ -29,9 +33,11 @@ Map<String, dynamic> _$TransactionItemToJson(TransactionItem instance) =>
       'amount': instance.amount,
       'description': instance.description,
       'transactionDate': instance.transactionDate?.toIso8601String(),
-      'repetitions': instance.repetitions,
       'repetitionCycleType':
           _$RepetitionCycleTypeEnumMap[instance.repetitionCycleType],
+      'parentTransactionId': instance.parentTransactionId,
+      'isParentTransaction': instance.isParentTransaction,
+      'nextRecurringDate': instance.nextRecurringDate?.toIso8601String(),
       'category': instance.category,
     };
 

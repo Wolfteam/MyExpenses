@@ -48,6 +48,7 @@ dependencies:
   image: ^2.1.4
   flutter_local_notifications: ^1.2.0+4
   open_file: ^3.0.1
+  sprintf: ^4.0.2
   
 dev_dependencies:
   flutter_test:

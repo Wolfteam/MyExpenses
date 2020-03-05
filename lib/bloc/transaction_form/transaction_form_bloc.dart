@@ -26,7 +26,10 @@ class TransactionFormBloc
   final SettingsService _settingsService;
 
   TransactionFormBloc(
-      this._logger, this._transactionsDao, this._settingsService);
+    this._logger,
+    this._transactionsDao,
+    this._settingsService,
+  );
 
   TransactionFormLoadedState get currentState =>
       state as TransactionFormLoadedState;
@@ -54,13 +57,15 @@ class TransactionFormBloc
         description: event.item.description,
         isDescriptionValid: true,
         isDescriptionDirty: true,
-        repetitions: event.item.repetitions,
-        isRepetitionsValid: true,
-        isRepetitionsDirty: true,
-        repetitionCycle: event.item.repetitionCycleType,
-        areRepetitionCyclesVisible: event.item.repetitions > 0,
+        repetitionCycle: event.item.repetitionCycle,
         transactionDate: event.item.transactionDate,
-        isTransactionDateValid: true,
+        isTransactionDateValid: _isTransactionDateValid(
+          event.item.transactionDate,
+          event.item.repetitionCycle,
+        ),
+        isParentTransaction: event.item.isParentTransaction,
+        parentTransactionId: event.item.parentTransactionId,
+        firstDate: event.item.transactionDate,
       );
     }
 
@@ -80,15 +85,6 @@ class TransactionFormBloc
       );
     }
 
-    if (event is RepetitionsChanged) {
-      yield currentState.copyWith(
-        repetitions: event.repetitions,
-        isRepetitionsValid: _areRepetitionsValid(event.repetitions),
-        isRepetitionsDirty: true,
-        areRepetitionCyclesVisible: event.repetitions > 0,
-      );
-    }
-
     if (event is TransactionDateChanged) {
       yield currentState.copyWith(
         transactionDate: event.transactionDate,
@@ -97,8 +93,22 @@ class TransactionFormBloc
     }
 
     if (event is RepetitionCycleChanged) {
+      final now = DateTime.now();
+      final tomorrow = now.add(const Duration(days: 1));
+
+      final transactionDate =
+          event.repetitionCycle == RepetitionCycleType.none ? now : tomorrow;
+      final firstDate = event.repetitionCycle == RepetitionCycleType.none
+          ? DateTime(now.year - 1)
+          : tomorrow;
       yield currentState.copyWith(
+        transactionDate: transactionDate,
+        firstDate: firstDate,
         repetitionCycle: event.repetitionCycle,
+        isTransactionDateValid: _isTransactionDateValid(
+          currentState.transactionDate,
+          currentState.repetitionCycle,
+        ),
       );
     }
 
@@ -129,7 +139,10 @@ class TransactionFormBloc
         maxLength: 255,
       );
 
-  bool _areRepetitionsValid(int repetitions) => repetitions >= 0;
+  bool _isTransactionDateValid(DateTime date, RepetitionCycleType cycle) {
+    if (cycle == RepetitionCycleType.none) return true;
+    return date.difference(DateTime.now()).inDays >= 1;
+  }
 
   Stream<TransactionFormState> _saveTransaction(
     TransactionItem transaction,

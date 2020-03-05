@@ -6,7 +6,7 @@ class ChartDetailsState extends Equatable {
   final List<TransactionItem> transactions;
 
   int get transactionsTotalAmount =>
-      getTotalTransactionAmount(transactions).round();
+      TransactionUtils.getTotalTransactionAmount(transactions).round();
 
   @override
   List<Object> get props => [
