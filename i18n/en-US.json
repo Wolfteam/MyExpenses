@@ -84,11 +84,15 @@
     "categoryCantBeDeleted": "Category can not be deleted. It is being used by an existing transaction",
     "recurringTransactions": "Recurring transactions",
     "childTransactionCantBeDeleted": "A child transaction can not be deleted nor edited",
-    "recurringTransactionStartsOn":"Recurring transaction starts on {date} {cycle}",
-    "noRecurringTransactionsWereFound":"No recurring transactions were founud",
+    "recurringTransactionStartsOn": "Recurring transaction starts on {date} {cycle}",
+    "noRecurringTransactionsWereFound": "No recurring transactions were founud",
+    "no": "no",
+    "removeImg": "Remove image",
+    "areYouSure": "Are you sure ?",
     "repetitionCycle": {
         "eachWeek": "Each week",
         "eachMonth": "Each month",
+        "biweekly": "Biweekly",
         "eachYear": "Each Year"
     },
     "syncInterval": {

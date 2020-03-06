@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 import '../../bloc/charts/charts_bloc.dart';
 import '../../bloc/transaction_form/transaction_form_bloc.dart';
@@ -41,6 +45,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     RepetitionCycleType.none,
     RepetitionCycleType.eachDay,
     RepetitionCycleType.eachWeek,
+    RepetitionCycleType.biweekly,
     RepetitionCycleType.eachMonth,
   ];
 
@@ -76,9 +81,11 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     final i18n = I18n.of(context);
 
     return BlocConsumer<TransactionFormBloc, TransactionFormState>(
-      listener: (ctx, state) {
-        if (state is TransactionFormLoadedState && state.errorOccurred) {
-          showWarningToast(i18n.unknownErrorOcurred);
+      listener: (ctx, state) async {
+        if (state is TransactionFormLoadedState) {
+          if (state.errorOccurred) {
+            showWarningToast(i18n.unknownErrorOcurred);
+          }
         }
 
         if (state is TransactionSavedState ||
@@ -96,37 +103,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         }
       },
       builder: (ctx, state) {
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(
-              widget.item == null ? i18n.addTransaction : i18n.editTransaction,
-            ),
-            leading: const BackButton(),
-            actions: state is TransactionFormLoadedState
-                ? [
-                    if (!state.isChildTransaction)
-                      IconButton(
-                        icon: Icon(
-                          Icons.save,
-                        ),
-                        onPressed: state.isFormValid ? _saveTransaction : null,
-                      ),
-                    if (!state.isNewTransaction != null &&
-                        !state.isChildTransaction)
-                      IconButton(
-                        icon: Icon(Icons.delete),
-                        onPressed: () =>
-                            _showDeleteConfirmationDialog(state.description),
-                      ),
-                  ]
-                : [],
-          ),
-          body: SingleChildScrollView(
-            child: Column(
-              children: _buildPage(ctx, state),
-            ),
-          ),
-        );
+        return _buildPage(ctx, state);
       },
     );
   }
@@ -138,27 +115,86 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     super.dispose();
   }
 
-  List<Widget> _buildPage(BuildContext context, TransactionFormState state) {
+  AppBar _buildAppBar(TransactionFormState state) {
+    final i18n = I18n.of(context);
+    if (state is TransactionFormLoadedState) {
+      return AppBar(
+        title: Text(
+          widget.item == null ? i18n.addTransaction : i18n.editTransaction,
+        ),
+        leading: const BackButton(),
+        actions: [
+          if (!state.isChildTransaction)
+            IconButton(
+              icon: Icon(
+                Icons.save,
+              ),
+              onPressed: state.isFormValid ? _saveTransaction : null,
+            ),
+          if (!state.isNewTransaction != null && !state.isChildTransaction)
+            IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () => _showDeleteConfirmationDialog(state.description),
+            ),
+        ],
+      );
+    }
+    return null;
+  }
+
+  Widget _buildPage(BuildContext context, TransactionFormState state) {
     final i18n = I18n.of(context);
     final theme = Theme.of(context);
+
+    const loadingIndicator = Center(
+      child: CircularProgressIndicator(),
+    );
 
     if (state is TransactionFormLoadedState) {
       if (state.errorOccurred) {
         showWarningToast(i18n.unknownErrorOcurred);
       }
 
-      return [
-        _buildHeader(context, state),
-        if (state.isChildTransaction)
-          Text(
-            i18n.childTransactionCantBeDeleted,
-            style:
-                theme.textTheme.caption.copyWith(color: theme.primaryColorDark),
-          ),
-        _buildForm(context, state),
-      ];
+      final scrollView = SingleChildScrollView(
+        child: Column(
+          children: [
+            _buildHeader(context, state),
+            if (state.isChildTransaction)
+              Text(
+                i18n.childTransactionCantBeDeleted,
+                style: theme.textTheme.caption
+                    .copyWith(color: theme.primaryColorDark),
+              ),
+            _buildForm(context, state),
+          ],
+        ),
+      );
+
+      final scaffold = Scaffold(
+        appBar: _buildAppBar(state),
+        body: scrollView,
+      );
+
+      if (state.isSavingForm) {
+        return Stack(
+          children: [
+            scaffold,
+            const Opacity(
+              opacity: 0.5,
+              child: ModalBarrier(
+                dismissible: false,
+                color: Colors.black,
+              ),
+            ),
+            loadingIndicator,
+          ],
+        );
+      }
+
+      return scaffold;
     }
-    return [];
+
+    return loadingIndicator;
   }
 
   Container _buildHeader(
@@ -308,9 +344,6 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     final BuildContext context,
     final TransactionFormLoadedState state,
   ) {
-    final theme = Theme.of(context);
-    final i18n = I18n.of(context);
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 25),
       child: Form(
@@ -341,28 +374,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               ],
             ),
             _buildRepetitionCyclesDropDown(state),
-            Text(
-              i18n.addPicture,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-            ButtonBar(
-              alignment: MainAxisAlignment.center,
-              children: <Widget>[
-                FlatButton.icon(
-                  textColor: theme.primaryColor,
-                  onPressed: !state.isChildTransaction ? () {} : null,
-                  icon: Icon(Icons.photo_library),
-                  label: Text(i18n.fromGallery),
-                ),
-                FlatButton.icon(
-                  textColor: theme.primaryColor,
-                  onPressed: !state.isChildTransaction ? () {} : null,
-                  icon: Icon(Icons.camera_enhance),
-                  label: Text(i18n.fromCamera),
-                ),
-              ],
-            )
+            ..._buildPickImageButtons(context, state),
           ],
         ),
       ),
@@ -530,7 +542,9 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                     state.language,
                     DateUtils.monthDayAndYearFormat,
                   ),
-                  i18n.translateRepetitionCycleType(state.repetitionCycle).toLowerCase(),
+                  i18n
+                      .translateRepetitionCycleType(state.repetitionCycle)
+                      .toLowerCase(),
                 ),
                 textAlign: TextAlign.center,
                 style: theme.textTheme.caption
@@ -560,6 +574,83 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     return suffixIcon;
   }
 
+  List<Widget> _buildPickImageButtons(
+    BuildContext context,
+    TransactionFormLoadedState state,
+  ) {
+    final theme = Theme.of(context);
+    final i18n = I18n.of(context);
+
+    return [
+      Text(
+        i18n.addPicture,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      ),
+      ButtonBar(
+        alignment: MainAxisAlignment.center,
+        children: <Widget>[
+          FlatButton.icon(
+            textColor: theme.primaryColor,
+            onPressed:
+                !state.isChildTransaction ? () => _pickPicture(true) : null,
+            icon: Icon(Icons.photo_library),
+            label: Text(i18n.fromGallery),
+          ),
+          FlatButton.icon(
+            textColor: theme.primaryColor,
+            onPressed:
+                !state.isChildTransaction ? () => _pickPicture(false) : null,
+            icon: Icon(Icons.camera_enhance),
+            label: Text(i18n.fromCamera),
+          ),
+        ],
+      ),
+      if (state.imageExists)
+        Container(
+          margin: const EdgeInsets.only(
+            left: 10,
+            right: 10,
+            bottom: 30,
+          ),
+          child: Stack(
+            children: <Widget>[
+              Container(
+                margin: const EdgeInsets.only(top: 10),
+                child: const Center(child: CircularProgressIndicator()),
+              ),
+              GestureDetector(
+                onTap: _showDeleteImageDialog,
+                child: FadeInImage(
+                  fit: BoxFit.fill,
+                  fadeInDuration: const Duration(seconds: 1),
+                  placeholder: MemoryImage(kTransparentImage),
+                  image: FileImage(File(state.imagePath)),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+      // if (state.imageExists)
+      //   Container(
+      //     margin: const EdgeInsets.only(
+      //       left: 10,
+      //       right: 10,
+      //       bottom: 30,
+      //     ),
+      //     child: GestureDetector(
+      //       onTap: _showDeleteImageDialog,
+      //       child: Image(
+      //         alignment: Alignment.topCenter,
+      //         fit: BoxFit.fill,
+      //         image: FileImage(File(state.imagePath)),
+      //       ),
+      //     ),
+      //   ),
+    ];
+  }
+
   void _amountChanged() {
     final amount = double.tryParse(_amountController.text) ?? 0;
     context.bloc<TransactionFormBloc>().add(AmountChanged(amount));
@@ -576,15 +667,36 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   }
 
   Future _transactionDateClicked(TransactionFormLoadedState state) async {
-    final selectedDate = await showDatePicker(
-      context: context,
-      initialDate: state.transactionDate,
-      firstDate: state.firstDate,
-      lastDate: state.lastDate,
-      locale: currentLocale(state.language),
-    );
-    if (selectedDate == null) return;
+    DateTime selectedDate;
+    if (state.repetitionCycle != RepetitionCycleType.biweekly) {
+      selectedDate = await showDatePicker(
+        context: context,
+        initialDate: state.transactionDate,
+        firstDate: state.firstDate,
+        lastDate: state.lastDate,
+        locale: currentLocale(state.language),
+      );
+    } else {
+      selectedDate = await showDatePicker(
+          context: context,
+          initialDate: state.transactionDate,
+          firstDate: state.firstDate,
+          lastDate: state.lastDate,
+          locale: currentLocale(state.language),
+          selectableDayPredicate: (date) {
+            if (date.isAtSameMomentAs(state.transactionDate) || date.day == 1) {
+              return true;
+            }
 
+            final biweeklyDate = DateUtils.getNextBiweeklyDate(
+              date.subtract(const Duration(days: 1)),
+            );
+
+            return biweeklyDate.day == date.day;
+          });
+    }
+
+    if (selectedDate == null) return;
     context
         .bloc<TransactionFormBloc>()
         .add(TransactionDateChanged(selectedDate));
@@ -657,5 +769,47 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         ],
       ),
     );
+  }
+
+  void _showDeleteImageDialog() {
+    final i18n = I18n.of(context);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(i18n.removeImg),
+        content: Text(i18n.areYouSure),
+        actions: <Widget>[
+          OutlineButton(
+            textColor: Theme.of(context).primaryColor,
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            child: Text(i18n.cancel),
+          ),
+          RaisedButton(
+            color: Theme.of(ctx).primaryColor,
+            onPressed: () {
+              context
+                  .bloc<TransactionFormBloc>()
+                  .add(const ImageChanged(path: '', imageExists: false));
+              Navigator.of(ctx).pop();
+            },
+            child: Text(i18n.yes),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _pickPicture(bool fromGallery) async {
+    final image = await ImagePicker.pickImage(
+      source: fromGallery ? ImageSource.gallery : ImageSource.camera,
+      maxHeight: 600,
+      maxWidth: 600,
+    );
+    if (image == null) return;
+    context
+        .bloc<TransactionFormBloc>()
+        .add(ImageChanged(path: image.path, imageExists: true));
   }
 }

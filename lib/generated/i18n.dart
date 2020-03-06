@@ -206,10 +206,18 @@ class I18n implements WidgetsLocalizations {
   String recurringTransactionStartsOn(String date, String cycle) => "Recurring transaction starts on ${date} ${cycle}";
   /// "No recurring transactions were founud"
   String get noRecurringTransactionsWereFound => "No recurring transactions were founud";
+  /// "no"
+  String get no => "no";
+  /// "Remove image"
+  String get removeImg => "Remove image";
+  /// "Are you sure ?"
+  String get areYouSure => "Are you sure ?";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
   String get repetitionCycleEachMonth => "Each month";
+  /// "Biweekly"
+  String get repetitionCycleBiweekly => "Biweekly";
   /// "Each Year"
   String get repetitionCycleEachYear => "Each Year";
   /// "Each hour"
@@ -489,9 +497,9 @@ class _I18n_es_VE extends I18n {
   /// "La categoría fue borrada exitósamente"
   @override
   String get categoryWasSuccessfullyDeleted => "La categoría fue borrada exitósamente";
-  /// " ¿Estás seguro que deseas borrar esta categoría?"
+  /// "¿Estás seguro que deseas borrar esta categoría?"
   @override
-  String get confirmDeleteCategory => " ¿Estás seguro que deseas borrar esta categoría?";
+  String get confirmDeleteCategory => "¿Estás seguro que deseas borrar esta categoría?";
   /// "No se encontraron transacciones para este período"
   @override
   String get noTransactionsForThisPeriod => "No se encontraron transacciones para este período";
@@ -549,12 +557,24 @@ class _I18n_es_VE extends I18n {
   /// "No se encontraron transacciones recurrentes"
   @override
   String get noRecurringTransactionsWereFound => "No se encontraron transacciones recurrentes";
+  /// "no"
+  @override
+  String get no => "no";
+  /// "Remover imagen"
+  @override
+  String get removeImg => "Remover imagen";
+  /// "¿ Estás seguro ?"
+  @override
+  String get areYouSure => "¿ Estás seguro ?";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";
   /// "Cada mes"
   @override
   String get repetitionCycleEachMonth => "Cada mes";
+  /// "Quincenal"
+  @override
+  String get repetitionCycleBiweekly => "Quincenal";
   /// "Cada año"
   @override
   String get repetitionCycleEachYear => "Cada año";

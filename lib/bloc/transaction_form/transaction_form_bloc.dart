@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../common/enums/app_language_type.dart';
 import '../../common/enums/repetition_cycle_type.dart';
@@ -46,6 +48,11 @@ class TransactionFormBloc
     }
 
     if (event is EditTransaction) {
+      bool imageExists = false;
+      if (!event.item.imagePath.isNullEmptyOrWhitespace) {
+        imageExists = await File(event.item.imagePath).exists();
+      }
+
       yield TransactionFormLoadedState.initial(_settingsService.language)
           .copyWith(
         id: event.item.id,
@@ -66,6 +73,8 @@ class TransactionFormBloc
         isParentTransaction: event.item.isParentTransaction,
         parentTransactionId: event.item.parentTransactionId,
         firstDate: event.item.transactionDate,
+        imagePath: event.item.imagePath,
+        imageExists: imageExists,
       );
     }
 
@@ -95,12 +104,18 @@ class TransactionFormBloc
     if (event is RepetitionCycleChanged) {
       final now = DateTime.now();
       final tomorrow = now.add(const Duration(days: 1));
+      final inFifteenDate = DateUtils.getNextBiweeklyDate(now);
 
-      final transactionDate =
-          event.repetitionCycle == RepetitionCycleType.none ? now : tomorrow;
+      final transactionDate = event.repetitionCycle == RepetitionCycleType.none
+          ? now
+          : event.repetitionCycle == RepetitionCycleType.biweekly
+              ? inFifteenDate
+              : tomorrow;
       final firstDate = event.repetitionCycle == RepetitionCycleType.none
           ? DateTime(now.year - 1)
-          : tomorrow;
+          : event.repetitionCycle == RepetitionCycleType.biweekly
+              ? inFifteenDate
+              : tomorrow;
       yield currentState.copyWith(
         transactionDate: transactionDate,
         firstDate: firstDate,
@@ -119,12 +134,19 @@ class TransactionFormBloc
       );
     }
 
+    if (event is ImageChanged) {
+      yield currentState.copyWith(
+        imagePath: event.path,
+        imageExists: event.imageExists,
+      );
+    }
+
     if (event is DeleteTransaction) {
       yield* _deleteTransaction(currentState.id);
     }
 
     if (event is FormSubmitted) {
-      yield* _saveTransaction(currentState.buildTransactionItem());
+      yield* _saveTransaction();
     }
 
     if (event is FormClosed) {
@@ -144,14 +166,27 @@ class TransactionFormBloc
     return date.difference(DateTime.now()).inDays >= 1;
   }
 
-  Stream<TransactionFormState> _saveTransaction(
-    TransactionItem transaction,
-  ) async* {
+  Stream<TransactionFormState> _saveTransaction() async* {
     try {
+      yield currentState.copyWith(isSavingForm: true);
+
+      String imagePath;
+      if (!currentState.imagePath.isNullEmptyOrWhitespace) {
+        _logger.info(
+          runtimeType,
+          '_saveTransaction: Saving the image...',
+        );
+        final fileExists = await File(currentState.imagePath).exists();
+        if (fileExists) {
+          imagePath = await _saveImage(currentState.imagePath);
+        }
+      }
+      final transaction = currentState.buildTransactionItem(imagePath);
       _logger.info(
         runtimeType,
         '_saveTransaction: Trying to save transaction = ${transaction.toJson()}',
       );
+
       final createdTrans = await _transactionsDao.saveTransaction(transaction);
 
       yield TransactionSavedState(createdTrans);
@@ -162,8 +197,8 @@ class TransactionFormBloc
         e,
         s,
       );
-      yield currentState.copyWith(errorOccurred: true);
-      yield currentState.copyWith(errorOccurred: false);
+      yield currentState.copyWith(errorOccurred: true, isSavingForm: false);
+      yield currentState.copyWith(errorOccurred: false, isSavingForm: false);
     }
   }
 
@@ -184,6 +219,35 @@ class TransactionFormBloc
       );
       yield currentState.copyWith(errorOccurred: true);
       yield currentState.copyWith(errorOccurred: false);
+    }
+  }
+
+  Future<String> _saveImage(String path) async {
+    try {
+      _logger.info(
+        runtimeType,
+        '_saveTransaction: Trying to save image',
+      );
+      final dir = await getApplicationDocumentsDirectory();
+      final now = DateTime.now();
+      final finalPath = '${dir.path}/${now}_img.png';
+
+      await File(finalPath).writeAsBytes(await File(path).readAsBytes());
+
+      _logger.info(
+        runtimeType,
+        '_saveTransaction: Image was successfully saved',
+      );
+
+      return finalPath;
+    } on Exception catch (e, s) {
+      _logger.error(
+        runtimeType,
+        '_saveImage: Unknown error occurred:',
+        e,
+        s,
+      );
+      return null;
     }
   }
 }

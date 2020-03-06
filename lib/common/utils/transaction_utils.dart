@@ -25,23 +25,10 @@ class TransactionUtils {
       case RepetitionCycleType.eachDay:
       case RepetitionCycleType.eachWeek:
         return nextRecurringDate.add(Duration(days: daysToAdd));
+      case RepetitionCycleType.biweekly:
+        return DateUtils.getNextBiweeklyDate(nextRecurringDate);
       case RepetitionCycleType.eachMonth:
-        final date = nextRecurringDate.add(Duration(days: daysToAdd));
-        if (date.day == nextRecurringDate.day) return date;
-
-        final daysInNextMonth = DateUtils.getLastDayDateOfTheMonth(date).day;
-        if (nextRecurringDate.day > daysInNextMonth) {
-          return DateTime(
-            date.year,
-            date.month,
-            daysInNextMonth,
-          );
-        }
-        return DateTime(
-          date.year,
-          date.month,
-          nextRecurringDate.day,
-        );
+        return DateUtils.getNextMonthDate(nextRecurringDate);
       default:
         throw Exception('Invalid repetition cycle');
     }

@@ -61,9 +61,20 @@ class CategoryWasUpdated extends TransactionFormEvent {
   List<Object> get props => [category];
 }
 
-class DeleteTransaction extends TransactionFormEvent {
+class ImageChanged extends TransactionFormEvent {
+  final String path;
+  final bool imageExists;
 
+  const ImageChanged({
+    @required this.path,
+    @required this.imageExists,
+  });
+
+  @override
+  List<Object> get props => [path, imageExists];
 }
+
+class DeleteTransaction extends TransactionFormEvent {}
 
 class FormSubmitted extends TransactionFormEvent {}
 

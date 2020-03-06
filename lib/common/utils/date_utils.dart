@@ -45,4 +45,42 @@ class DateUtils {
   static DateTime getLastDayDateOfTheMonth(DateTime from) => (from.month < 12)
       ? DateTime(from.year, from.month + 1, 0, 23, 59, 59)
       : DateTime(from.year + 1, 1, 0, 23, 59, 59);
+
+  static DateTime getNextMonthDate(DateTime from) {
+    final tentantiveDate = from.add(const Duration(days: 30));
+    if (tentantiveDate.day == from.day) return tentantiveDate;
+
+    final daysInNextMonth = getLastDayDateOfTheMonth(tentantiveDate).day;
+    if (from.day > daysInNextMonth) {
+      return DateTime(
+        tentantiveDate.year,
+        tentantiveDate.month,
+        daysInNextMonth,
+      );
+    }
+    return DateTime(
+      tentantiveDate.year,
+      tentantiveDate.month,
+      from.day,
+    );
+  }
+
+  static DateTime getNextBiweeklyDate(DateTime from) {
+    const fifteen = 15;
+    final lastDateOfTheMonth = getLastDayDateOfTheMonth(from);
+
+    if (from.day == fifteen) {
+      return from
+          .subtract(const Duration(days: fifteen))
+          .add(Duration(days: lastDateOfTheMonth.day));
+    } else if (from.day < fifteen) {
+      return DateTime(from.year, from.month, fifteen);
+    } else {
+      if (from.day == lastDateOfTheMonth.day) {
+        return from.add(const Duration(days: fifteen));
+      } else {
+        return lastDateOfTheMonth;
+      }
+    }
+  }
 }

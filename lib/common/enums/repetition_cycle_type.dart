@@ -3,5 +3,6 @@ enum RepetitionCycleType {
   eachDay,
   eachWeek,
   eachMonth,
+  biweekly,
   eachYear,
 }

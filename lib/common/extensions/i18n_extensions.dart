@@ -43,6 +43,8 @@ extension I18nExtensions on I18n {
         return repetitionCycleEachWeek;
       case RepetitionCycleType.eachMonth:
         return repetitionCycleEachMonth;
+      case RepetitionCycleType.biweekly:
+        return repetitionCycleBiweekly;
       case RepetitionCycleType.eachYear:
         return repetitionCycleEachYear;
       default:

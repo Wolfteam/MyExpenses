@@ -49,6 +49,8 @@ dependencies:
   flutter_local_notifications: ^1.2.0+4
   open_file: ^3.0.1
   sprintf: ^4.0.2
+  image_picker: ^0.6.3+4
+  transparent_image: ^1.0.0
   
 dev_dependencies:
   flutter_test:

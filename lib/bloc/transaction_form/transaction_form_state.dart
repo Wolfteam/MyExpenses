@@ -39,6 +39,12 @@ class TransactionFormLoadedState extends TransactionFormState {
   final int parentTransactionId;
   final bool isParentTransaction;
 
+  final String imagePath;
+  final bool imageExists;
+
+  final bool isSavingForm;
+  
+
   bool get isNewTransaction => id <= 0;
 
   bool get isChildTransaction =>
@@ -71,6 +77,9 @@ class TransactionFormLoadedState extends TransactionFormState {
         errorOccurred,
         parentTransactionId,
         isParentTransaction,
+        imagePath,
+        imageExists,
+        isSavingForm,
       ];
 
   const TransactionFormLoadedState({
@@ -93,6 +102,9 @@ class TransactionFormLoadedState extends TransactionFormState {
     this.errorOccurred = false,
     this.parentTransactionId,
     this.isParentTransaction = false,
+    this.imagePath,
+    this.imageExists = false,
+    this.isSavingForm = false,
   });
 
   factory TransactionFormLoadedState.initial(AppLanguageType language) {
@@ -150,6 +162,9 @@ class TransactionFormLoadedState extends TransactionFormState {
     bool errorOccurred,
     int parentTransactionId,
     bool isParentTransaction,
+    String imagePath,
+    bool imageExists,
+    bool isSavingForm,
   }) {
     final date = transactionDate ?? this.transactionDate;
     final transactionDateString = DateUtils.formatAppDate(
@@ -179,10 +194,13 @@ class TransactionFormLoadedState extends TransactionFormState {
       errorOccurred: errorOccurred ?? this.errorOccurred,
       isParentTransaction: isParentTransaction ?? this.isParentTransaction,
       parentTransactionId: parentTransactionId ?? this.parentTransactionId,
+      imagePath: imagePath ?? this.imagePath,
+      imageExists: imageExists ?? this.imageExists,
+      isSavingForm: isSavingForm ?? this.isSavingForm
     );
   }
 
-  TransactionItem buildTransactionItem() {
+  TransactionItem buildTransactionItem(String imagePath) {
     final amountToSave = amount.abs();
     final nextecurringDate =
         repetitionCycle == RepetitionCycleType.none ? null : transactionDate;
@@ -196,6 +214,7 @@ class TransactionFormLoadedState extends TransactionFormState {
       isParentTransaction: nextecurringDate != null,
       parentTransactionId: parentTransactionId,
       nextRecurringDate: nextecurringDate,
+      imagePath: imagePath,
     );
   }
 }

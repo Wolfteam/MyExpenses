@@ -35,6 +35,8 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
         transactionDate: transaction.transactionDate,
         parentTransactionId: transaction.parentTransactionId,
         isParentTransaction: transaction.isParentTransaction,
+        imagePath: transaction.imagePath,
+        nextRecurringDate: transaction.nextRecurringDate,
       ));
 
       final query = select(transactions)..where((t) => t.id.equals(id));
@@ -50,6 +52,8 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
         updatedBy: Value('somebody'),
         parentTransactionId: Value(transaction.parentTransactionId),
         isParentTransaction: Value(transaction.isParentTransaction),
+        imagePath: Value(transaction.imagePath),
+        nextRecurringDate: Value(transaction.nextRecurringDate),
       );
       await (update(transactions)..where((t) => t.id.equals(transaction.id)))
           .write(updatedFields);
@@ -78,11 +82,9 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
   @override
   Future<List<TransactionItem>> getAllParentTransactions() {
     final query = (select(transactions)
-          ..where(
-            (t) =>
-                t.repetitionCycle.equals(RepetitionCycleType.none.index).not() &
-                isNull(t.parentTransactionId)
-          ))
+          ..where((t) =>
+              t.repetitionCycle.equals(RepetitionCycleType.none.index).not() &
+              isNull(t.parentTransactionId)))
         .join([
       innerJoin(
         categories,
@@ -210,6 +212,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
       parentTransactionId: trans.parentTransactionId,
       isParentTransaction: trans.isParentTransaction,
       nextRecurringDate: trans.nextRecurringDate,
+      imagePath: trans.imagePath,
       category: CategoryItem(
         id: cat.id,
         isAnIncome: cat.isAnIncome,

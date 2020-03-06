@@ -148,11 +148,9 @@ class _TransactionsPageState extends State<TransactionsPage>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Text(
-                state.transactionsPerMonth.isEmpty
-                    ? ''
-                    : state.showParentTransactions
-                        ? i18n.recurringTransactions
-                        : i18n.transactions,
+                state.showParentTransactions
+                    ? i18n.recurringTransactions
+                    : i18n.transactions,
                 textAlign: TextAlign.start,
                 style: Theme.of(context).textTheme.title,
               ),

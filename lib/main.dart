@@ -130,8 +130,8 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
-
-//TODO: USE THE BLOCLISTENER !!!
+//TODO: SHOW THE RECURRING DATE IN THE RECURRING TRANSACTIONS
+//TODO: USE SUPER ENUM
 //TODO: USE BLOC TO BLOC COMMUNICATION
   Widget _buildApp(BuildContext ctx, app_bloc.AppState state) {
     if (state is app_bloc.AppInitializedState) {

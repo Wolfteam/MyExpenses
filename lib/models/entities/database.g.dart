@@ -507,6 +507,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   final int parentTransactionId;
   final bool isParentTransaction;
   final DateTime nextRecurringDate;
+  final String imagePath;
   final int categoryId;
   Transaction(
       {@required this.id,
@@ -521,6 +522,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       this.parentTransactionId,
       @required this.isParentTransaction,
       this.nextRecurringDate,
+      this.imagePath,
       @required this.categoryId});
   factory Transaction.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
@@ -554,6 +556,8 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           data['${effectivePrefix}is_parent_transaction']),
       nextRecurringDate: dateTimeType.mapFromDatabaseResponse(
           data['${effectivePrefix}next_recurring_date']),
+      imagePath: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}image_path']),
       categoryId: intType
           .mapFromDatabaseResponse(data['${effectivePrefix}category_id']),
     );
@@ -578,6 +582,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           serializer.fromJson<bool>(json['isParentTransaction']),
       nextRecurringDate:
           serializer.fromJson<DateTime>(json['nextRecurringDate']),
+      imagePath: serializer.fromJson<String>(json['imagePath']),
       categoryId: serializer.fromJson<int>(json['categoryId']),
     );
   }
@@ -598,6 +603,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       'parentTransactionId': serializer.toJson<int>(parentTransactionId),
       'isParentTransaction': serializer.toJson<bool>(isParentTransaction),
       'nextRecurringDate': serializer.toJson<DateTime>(nextRecurringDate),
+      'imagePath': serializer.toJson<String>(imagePath),
       'categoryId': serializer.toJson<int>(categoryId),
     };
   }
@@ -638,6 +644,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       nextRecurringDate: nextRecurringDate == null && nullToAbsent
           ? const Value.absent()
           : Value(nextRecurringDate),
+      imagePath: imagePath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(imagePath),
       categoryId: categoryId == null && nullToAbsent
           ? const Value.absent()
           : Value(categoryId),
@@ -657,6 +666,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           int parentTransactionId,
           bool isParentTransaction,
           DateTime nextRecurringDate,
+          String imagePath,
           int categoryId}) =>
       Transaction(
         id: id ?? this.id,
@@ -671,6 +681,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
         parentTransactionId: parentTransactionId ?? this.parentTransactionId,
         isParentTransaction: isParentTransaction ?? this.isParentTransaction,
         nextRecurringDate: nextRecurringDate ?? this.nextRecurringDate,
+        imagePath: imagePath ?? this.imagePath,
         categoryId: categoryId ?? this.categoryId,
       );
   @override
@@ -688,6 +699,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           ..write('parentTransactionId: $parentTransactionId, ')
           ..write('isParentTransaction: $isParentTransaction, ')
           ..write('nextRecurringDate: $nextRecurringDate, ')
+          ..write('imagePath: $imagePath, ')
           ..write('categoryId: $categoryId')
           ..write(')'))
         .toString();
@@ -718,8 +730,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
                                               isParentTransaction.hashCode,
                                               $mrjc(
                                                   nextRecurringDate.hashCode,
-                                                  categoryId
-                                                      .hashCode)))))))))))));
+                                                  $mrjc(
+                                                      imagePath.hashCode,
+                                                      categoryId
+                                                          .hashCode))))))))))))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
@@ -736,6 +750,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           other.parentTransactionId == this.parentTransactionId &&
           other.isParentTransaction == this.isParentTransaction &&
           other.nextRecurringDate == this.nextRecurringDate &&
+          other.imagePath == this.imagePath &&
           other.categoryId == this.categoryId);
 }
 
@@ -752,6 +767,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   final Value<int> parentTransactionId;
   final Value<bool> isParentTransaction;
   final Value<DateTime> nextRecurringDate;
+  final Value<String> imagePath;
   final Value<int> categoryId;
   const TransactionsCompanion({
     this.id = const Value.absent(),
@@ -766,6 +782,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.parentTransactionId = const Value.absent(),
     this.isParentTransaction = const Value.absent(),
     this.nextRecurringDate = const Value.absent(),
+    this.imagePath = const Value.absent(),
     this.categoryId = const Value.absent(),
   });
   TransactionsCompanion.insert({
@@ -781,6 +798,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.parentTransactionId = const Value.absent(),
     @required bool isParentTransaction,
     this.nextRecurringDate = const Value.absent(),
+    this.imagePath = const Value.absent(),
     @required int categoryId,
   })  : createdBy = Value(createdBy),
         amount = Value(amount),
@@ -802,6 +820,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       Value<int> parentTransactionId,
       Value<bool> isParentTransaction,
       Value<DateTime> nextRecurringDate,
+      Value<String> imagePath,
       Value<int> categoryId}) {
     return TransactionsCompanion(
       id: id ?? this.id,
@@ -816,6 +835,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       parentTransactionId: parentTransactionId ?? this.parentTransactionId,
       isParentTransaction: isParentTransaction ?? this.isParentTransaction,
       nextRecurringDate: nextRecurringDate ?? this.nextRecurringDate,
+      imagePath: imagePath ?? this.imagePath,
       categoryId: categoryId ?? this.categoryId,
     );
   }
@@ -970,6 +990,18 @@ class $TransactionsTable extends Transactions
     );
   }
 
+  final VerificationMeta _imagePathMeta = const VerificationMeta('imagePath');
+  GeneratedTextColumn _imagePath;
+  @override
+  GeneratedTextColumn get imagePath => _imagePath ??= _constructImagePath();
+  GeneratedTextColumn _constructImagePath() {
+    return GeneratedTextColumn(
+      'image_path',
+      $tableName,
+      true,
+    );
+  }
+
   final VerificationMeta _categoryIdMeta = const VerificationMeta('categoryId');
   GeneratedIntColumn _categoryId;
   @override
@@ -993,6 +1025,7 @@ class $TransactionsTable extends Transactions
         parentTransactionId,
         isParentTransaction,
         nextRecurringDate,
+        imagePath,
         categoryId
       ];
   @override
@@ -1067,6 +1100,10 @@ class $TransactionsTable extends Transactions
           nextRecurringDate.isAcceptableValue(
               d.nextRecurringDate.value, _nextRecurringDateMeta));
     }
+    if (d.imagePath.present) {
+      context.handle(_imagePathMeta,
+          imagePath.isAcceptableValue(d.imagePath.value, _imagePathMeta));
+    }
     if (d.categoryId.present) {
       context.handle(_categoryIdMeta,
           categoryId.isAcceptableValue(d.categoryId.value, _categoryIdMeta));
@@ -1128,6 +1165,9 @@ class $TransactionsTable extends Transactions
     if (d.nextRecurringDate.present) {
       map['next_recurring_date'] =
           Variable<DateTime, DateTimeType>(d.nextRecurringDate.value);
+    }
+    if (d.imagePath.present) {
+      map['image_path'] = Variable<String, StringType>(d.imagePath.value);
     }
     if (d.categoryId.present) {
       map['category_id'] = Variable<int, IntType>(d.categoryId.value);
