@@ -57,8 +57,15 @@ class ReportsBottomSheetDialog extends StatelessWidget {
     final i18n = I18n.of(context);
 
     if (state is ReportSheetState) {
-      if (state.errorOccurred) {
-        showErrorToast(i18n.unknownErrorOcurred);
+      if (state.generatingReport) {
+        return [
+          Container(
+            height: 300,
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
+        ];
       }
 
       return [

@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as image_lib;
 import 'package:package_info/package_info.dart';
@@ -6,6 +8,7 @@ import 'package:pdf/widgets.dart';
 
 import '../../../common/presentation/custom_assets.dart';
 import '../../../common/utils/date_utils.dart';
+import '../../../common/utils/transaction_utils.dart';
 import '../../../generated/i18n.dart';
 import '../../../models/transaction_item.dart';
 
@@ -134,7 +137,19 @@ List<Widget> _buildPdfBody(
     DateUtils.monthDayAndYearFormat,
   );
 
-  final header = Row(
+  final incomeAmount = TransactionUtils.getTotalTransactionAmounts(
+    transactions,
+    onlyIncomes: true,
+  );
+
+  final expenseAmount = TransactionUtils.getTotalTransactionAmounts(
+    transactions,
+    onlyIncomes: false,
+  );
+
+  final balance = TransactionUtils.roundDouble(incomeAmount + expenseAmount);
+
+  final summary = Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
       Container(
@@ -181,6 +196,27 @@ List<Widget> _buildPdfBody(
                 fontWeight: FontWeight.bold,
               ),
             ),
+            Text(
+              '${i18n.incomes}: \$ $incomeAmount',
+              style: TextStyle(
+                color: PdfColors.green,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              '${i18n.expenses}: \$ $expenseAmount',
+              style: TextStyle(
+                color: PdfColors.red,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              '${i18n.total}: \$ $balance',
+              style: TextStyle(
+                color: balance >= 0 ? PdfColors.green : PdfColors.red,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
       ),
@@ -190,21 +226,10 @@ List<Widget> _buildPdfBody(
     ],
   );
 
-  final rows = <TableRow>[
-    //headers
-    _buildRowHeader(i18n),
-    //rows
-    ...transactions
-        .asMap()
-        .map((index, t) => MapEntry(index, _buildRowItem(t, i18n)))
-        .values
-  ];
+  final transactionsMap = _buildTransactionsPerMonth(transactions);
+  final tables = transactionsMap.entries
+      .map((kvp) => _buildTable(kvp.key, kvp.value, i18n));
 
-  final table = Table(
-    border: const TableBorder(),
-    defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-    children: rows,
-  );
   return [
     Align(
       alignment: Alignment.centerLeft,
@@ -215,10 +240,10 @@ List<Widget> _buildPdfBody(
         padding: const EdgeInsets.only(
           bottom: 20,
         ),
-        child: header,
+        child: summary,
       ),
     ),
-    table,
+    ...tables,
   ];
 }
 
@@ -231,7 +256,7 @@ TableRow _buildRowHeader(I18n i18n) {
       alignment: Alignment.center,
       color: PdfColors.black,
       child: Text(
-        i18n.id,
+        '#',
         style: tableCellHeaderStyle,
       ),
     ),
@@ -270,7 +295,7 @@ TableRow _buildRowHeader(I18n i18n) {
       alignment: Alignment.center,
       color: PdfColors.black,
       child: Text(
-        i18n.categoryName,
+        i18n.category,
         textAlign: TextAlign.center,
         style: tableCellHeaderStyle,
       ),
@@ -285,10 +310,21 @@ TableRow _buildRowHeader(I18n i18n) {
         style: tableCellHeaderStyle,
       ),
     ),
+    Container(
+      padding: headerCellPadding,
+      alignment: Alignment.center,
+      color: PdfColors.black,
+      child: Text(
+        i18n.recurring,
+        textAlign: TextAlign.right,
+        style: tableCellHeaderStyle,
+      ),
+    ),
   ]);
 }
 
 TableRow _buildRowItem(
+  int index,
   TransactionItem t,
   I18n i18n,
 ) {
@@ -299,7 +335,7 @@ TableRow _buildRowItem(
         padding: cellPadding,
         alignment: Alignment.center,
         child: Text(
-          t.id.toString(),
+          index.toString(),
           textAlign: TextAlign.center,
         ),
       ),
@@ -349,6 +385,144 @@ TableRow _buildRowItem(
           ),
         ),
       ),
+      Container(
+        padding: cellPadding,
+        alignment: Alignment.center,
+        child: Text(
+          t.isChildTransaction ? i18n.yes : i18n.no,
+          textAlign: TextAlign.center,
+        ),
+      ),
     ],
+  );
+}
+
+Widget _buildTable(
+  DateTime date,
+  List<TransactionItem> transactions,
+  I18n i18n,
+) {
+  final firstDate = DateUtils.getFirstDayDateOfTheMonth(date);
+  final lastDate = DateUtils.getLastDayDateOfTheMonth(date);
+  final firstFormattedDate = DateUtils.formatDateWithoutLocale(
+    firstDate,
+    DateUtils.monthDayAndYearFormat,
+  );
+  final lastFormattedDate = DateUtils.formatDateWithoutLocale(
+    lastDate,
+    DateUtils.monthDayAndYearFormat,
+  );
+
+  final incomeAmount = TransactionUtils.getTotalTransactionAmounts(
+    transactions,
+    onlyIncomes: true,
+  );
+  final expenseAmount = TransactionUtils.getTotalTransactionAmounts(
+    transactions,
+    onlyIncomes: false,
+  );
+  final balance = TransactionUtils.roundDouble(incomeAmount + expenseAmount);
+
+  final rows = <TableRow>[
+    //headers
+    _buildRowHeader(i18n),
+    //rows
+    ...transactions
+        .asMap()
+        .map((index, t) => MapEntry(index, _buildRowItem(index + 1, t, i18n)))
+        .values
+  ];
+  return Container(
+    margin: const EdgeInsets.symmetric(
+      vertical: 20,
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Container(
+          alignment: Alignment.centerRight,
+          margin: const EdgeInsets.only(bottom: 5),
+          child: Text(
+            '${i18n.period}: $firstFormattedDate - $lastFormattedDate',
+            textAlign: TextAlign.right,
+            style: TextStyle(
+              color: PdfColors.grey,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        Table(
+          border: const TableBorder(),
+          defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+          children: rows,
+        ),
+        Container(
+          alignment: Alignment.centerRight,
+          // decoration: const BoxDecoration(
+          //   borderRadius: 5,
+          //   border: BoxBorder(
+          //     bottom: true,
+          //     right: true,
+          //     top: true,
+          //     left: true,
+          //   ),
+          // ),
+          margin: const EdgeInsets.only(top: 5),
+          padding: const EdgeInsets.all(10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '${i18n.incomes}: \$ $incomeAmount',
+                style: TextStyle(
+                  color: PdfColors.green,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                '${i18n.expenses}: \$ $expenseAmount',
+                style: TextStyle(
+                  color: PdfColors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                '${i18n.total}: \$ $balance',
+                style: TextStyle(
+                  color: balance >= 0 ? PdfColors.green : PdfColors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Map<DateTime, List<TransactionItem>> _buildTransactionsPerMonth(
+  List<TransactionItem> transactions,
+) {
+  final transPerMonth = <DateTime, List<TransactionItem>>{};
+
+  for (final transaction in transactions) {
+    final date = DateTime(
+      transaction.transactionDate.year,
+      transaction.transactionDate.month,
+    );
+
+    if (transPerMonth.keys.any((key) => key == date)) {
+      transPerMonth[date].add(transaction);
+    } else {
+      transPerMonth.addAll({
+        date: [transaction]
+      });
+    }
+  }
+
+  return SplayTreeMap<DateTime, List<TransactionItem>>.from(
+    transPerMonth,
+    (a, b) => a.compareTo(b),
   );
 }

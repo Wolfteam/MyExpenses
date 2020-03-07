@@ -66,6 +66,8 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
 
   Stream<ReportState> _buildReport(GenerateReport event) async* {
     try {
+      yield currentState.copyWith(generatingReport: true);
+
       final now = DateTime.now();
       final transactions = await _transactionsDao.getAllTransactions(
         currentState.from,
@@ -96,8 +98,11 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
       }
     } on Exception catch (e, s) {
       _logger.error(runtimeType, '_buildReport: Unknown error occurred', e, s);
-      yield currentState.copyWith(errorOccurred: true);
-      yield currentState.copyWith(errorOccurred: false);
+      yield currentState.copyWith(errorOccurred: true, generatingReport: false);
+      yield currentState.copyWith(
+        errorOccurred: false,
+        generatingReport: false,
+      );
     }
   }
 

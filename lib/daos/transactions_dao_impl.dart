@@ -177,6 +177,15 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
     });
   }
 
+  @override
+  Future<TransactionItem> getTransaction(int id) async {
+    final query = (select(transactions)..where((t) => t.id.equals(id))).join([
+      innerJoin(categories, categories.id.equalsExp(transactions.categoryId)),
+    ]).map(_mapToTransactionItem);
+
+    return query.getSingle();
+  }
+
   List<Transaction> _buildChildTransactions(
     TransactionItem parent,
     List<DateTime> periods,

@@ -75,7 +75,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
 
       final incomes = _getTotalIncomes(transactions);
       final expenses = _getTotalExpenses(transactions);
-      final balance = incomes + expenses;
+      final balance = TransactionUtils.roundDouble(incomes + expenses);
 
       _logger.info(
         runtimeType,

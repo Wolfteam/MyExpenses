@@ -212,6 +212,8 @@ class I18n implements WidgetsLocalizations {
   String get removeImg => "Remove image";
   /// "Are you sure ?"
   String get areYouSure => "Are you sure ?";
+  /// "Recurring"
+  String get recurring => "Recurring";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -566,6 +568,9 @@ class _I18n_es_VE extends I18n {
   /// "¿ Estás seguro ?"
   @override
   String get areYouSure => "¿ Estás seguro ?";
+  /// "Recurrente"
+  @override
+  String get recurring => "Recurrente";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";

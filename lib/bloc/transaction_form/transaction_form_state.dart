@@ -43,7 +43,6 @@ class TransactionFormLoadedState extends TransactionFormState {
   final bool imageExists;
 
   final bool isSavingForm;
-  
 
   bool get isNewTransaction => id <= 0;
 
@@ -196,7 +195,7 @@ class TransactionFormLoadedState extends TransactionFormState {
       parentTransactionId: parentTransactionId ?? this.parentTransactionId,
       imagePath: imagePath ?? this.imagePath,
       imageExists: imageExists ?? this.imageExists,
-      isSavingForm: isSavingForm ?? this.isSavingForm
+      isSavingForm: isSavingForm ?? this.isSavingForm,
     );
   }
 
@@ -219,13 +218,40 @@ class TransactionFormLoadedState extends TransactionFormState {
   }
 }
 
-class TransactionSavedState extends TransactionFormState {
-  final TransactionItem transaction;
+class TransactionChangedState extends TransactionFormState {
+  final bool wasCreated;
+  final bool wasUpdated;
+  final bool wasDeleted;
+  final DateTime transactionDate;
 
-  const TransactionSavedState(this.transaction);
+  const TransactionChangedState({
+    this.wasCreated,
+    this.wasUpdated,
+    this.wasDeleted,
+    this.transactionDate,
+  });
 
-  @override
-  List<Object> get props => [transaction];
+  factory TransactionChangedState.created(DateTime transactionDate) =>
+      TransactionChangedState(
+        wasCreated: true,
+        wasDeleted: false,
+        wasUpdated: false,
+        transactionDate: transactionDate,
+      );
+
+  factory TransactionChangedState.updated(DateTime transactionDate) =>
+      TransactionChangedState(
+        wasCreated: false,
+        wasDeleted: false,
+        wasUpdated: true,
+        transactionDate: transactionDate,
+      );
+
+  factory TransactionChangedState.deleted(DateTime transactionDate) =>
+      TransactionChangedState(
+        wasCreated: false,
+        wasDeleted: true,
+        wasUpdated: false,
+        transactionDate: transactionDate,
+      );
 }
-
-class TransactionDeletedState extends TransactionFormState {}

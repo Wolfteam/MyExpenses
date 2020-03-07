@@ -53,6 +53,8 @@ class TransactionFormBloc
         imageExists = await File(event.item.imagePath).exists();
       }
 
+      final firstDate = _getFirstDateToUse(event.item.repetitionCycle);
+
       yield TransactionFormLoadedState.initial(_settingsService.language)
           .copyWith(
         id: event.item.id,
@@ -72,7 +74,7 @@ class TransactionFormBloc
         ),
         isParentTransaction: event.item.isParentTransaction,
         parentTransactionId: event.item.parentTransactionId,
-        firstDate: event.item.transactionDate,
+        firstDate: firstDate,
         imagePath: event.item.imagePath,
         imageExists: imageExists,
       );
@@ -102,20 +104,9 @@ class TransactionFormBloc
     }
 
     if (event is RepetitionCycleChanged) {
-      final now = DateTime.now();
-      final tomorrow = now.add(const Duration(days: 1));
-      final inFifteenDate = DateUtils.getNextBiweeklyDate(now);
+      final transactionDate = _getInitialDateToUse(event.repetitionCycle);
+      final firstDate = _getFirstDateToUse(event.repetitionCycle);
 
-      final transactionDate = event.repetitionCycle == RepetitionCycleType.none
-          ? now
-          : event.repetitionCycle == RepetitionCycleType.biweekly
-              ? inFifteenDate
-              : tomorrow;
-      final firstDate = event.repetitionCycle == RepetitionCycleType.none
-          ? DateTime(now.year - 1)
-          : event.repetitionCycle == RepetitionCycleType.biweekly
-              ? inFifteenDate
-              : tomorrow;
       yield currentState.copyWith(
         transactionDate: transactionDate,
         firstDate: firstDate,
@@ -189,7 +180,11 @@ class TransactionFormBloc
 
       final createdTrans = await _transactionsDao.saveTransaction(transaction);
 
-      yield TransactionSavedState(createdTrans);
+      if (currentState.isNewTransaction) {
+        yield TransactionChangedState.created(createdTrans.transactionDate);
+      } else {
+        yield TransactionChangedState.updated(createdTrans.transactionDate);
+      }
     } on Exception catch (e, s) {
       _logger.error(
         runtimeType,
@@ -208,8 +203,9 @@ class TransactionFormBloc
         runtimeType,
         '_deleteTransaction: Trying to delete transactionId = $id',
       );
+      final transToDelete = await _transactionsDao.getTransaction(id);
       await _transactionsDao.deleteTransaction(id);
-      yield TransactionDeletedState();
+      yield TransactionChangedState.deleted(transToDelete.transactionDate);
     } on Exception catch (e, s) {
       _logger.error(
         runtimeType,
@@ -249,5 +245,29 @@ class TransactionFormBloc
       );
       return null;
     }
+  }
+
+  DateTime _getFirstDateToUse(RepetitionCycleType cycle) {
+    final now = DateTime.now();
+    final tomorrow = now.add(const Duration(days: 1));
+    final inFifteenDate = DateUtils.getNextBiweeklyDate(now);
+
+    final firstDate = cycle == RepetitionCycleType.none
+        ? DateTime(now.year - 1)
+        : cycle == RepetitionCycleType.biweekly ? inFifteenDate : tomorrow;
+
+    return DateTime(firstDate.year, firstDate.month, firstDate.day);
+  }
+
+  DateTime _getInitialDateToUse(RepetitionCycleType cycle) {
+    final now = DateTime.now();
+    final tomorrow = now.add(const Duration(days: 1));
+    final inFifteenDate = DateUtils.getNextBiweeklyDate(now);
+
+    final transactionDate = cycle == RepetitionCycleType.none
+        ? now
+        : cycle == RepetitionCycleType.biweekly ? inFifteenDate : tomorrow;
+
+    return transactionDate;
   }
 }

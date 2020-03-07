@@ -88,16 +88,16 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
           }
         }
 
-        if (state is TransactionSavedState ||
-            state is TransactionDeletedState) {
-          final msg = state is TransactionSavedState
+        if (state is TransactionChangedState) {
+          final msg = state.wasUpdated || state.wasCreated
               ? i18n.transactionsWasSuccessfullySaved
               : i18n.transactionsWasSuccessfullyDeleted;
           showSucceedToast(msg);
 
-          final now = DateTime.now();
-          ctx.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: now));
-          ctx.bloc<ChartsBloc>().add(LoadChart(now));
+          ctx
+              .bloc<TransactionsBloc>()
+              .add(GetTransactions(inThisDate: state.transactionDate));
+          ctx.bloc<ChartsBloc>().add(LoadChart(state.transactionDate));
 
           Navigator.of(ctx).pop();
         }

@@ -5,12 +5,10 @@ import '../../bloc/chart_details/chart_details_bloc.dart';
 import '../../common/enums/chart_details_filter_type.dart';
 import '../../common/enums/sort_direction_type.dart';
 import '../../common/extensions/i18n_extensions.dart';
-import '../../common/utils/date_utils.dart';
 import '../../generated/i18n.dart';
 import '../../models/chart_transaction_item.dart';
-import '../../models/transaction_item.dart';
+import '../widgets/charts/char_transaction_card_container.dart';
 import '../widgets/charts/pie_chart_transactions_per_month.dart';
-import '../widgets/transactions/transaction_item.dart' as trans_item;
 
 class ChartDetailsPage extends StatelessWidget {
   final bool onlyIncomes;
@@ -89,55 +87,12 @@ class ChartDetailsPage extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         itemCount: state.transactions.length,
-        itemBuilder: (ctx, index) =>
-            _buildTransactionItem(context, state, state.transactions[index]),
+        itemBuilder: (ctx, index) => ChartTransactionCardContainer(
+          state.transactions[index],
+          state.transactionsTotalAmount,
+        ),
       ),
     ];
-  }
-
-  Widget _buildTransactionItem(
-    BuildContext context,
-    ChartDetailsState state,
-    TransactionItem item,
-  ) {
-    final i18n = I18n.of(context);
-    final formattedDate = DateUtils.formatDateWithoutLocale(
-      item.transactionDate,
-      DateUtils.monthDayAndYearFormat,
-    );
-    final dateString = '${i18n.date}: $formattedDate';
-    final percentageString =
-        (item.amount.round() * 100 / state.transactionsTotalAmount)
-            .toStringAsFixed(2);
-
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      margin: const EdgeInsets.all(10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(top: 10, left: 16, right: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  dateString,
-                  textAlign: TextAlign.start,
-                ),
-                Text('$percentageString %'),
-              ],
-            ),
-          ),
-          Divider(
-            color: Colors.grey,
-          ),
-          trans_item.TransactionItem(item: item),
-        ],
-      ),
-    );
   }
 
   PopupMenuButton _buildFilters(

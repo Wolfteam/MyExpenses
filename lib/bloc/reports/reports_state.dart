@@ -1,6 +1,9 @@
 part of 'reports_bloc.dart';
 
 abstract class ReportState extends Equatable {
+  @override
+  List<Object> get props => [];
+
   const ReportState();
 }
 
@@ -9,6 +12,7 @@ class ReportSheetState extends ReportState {
   final DateTime from;
   final DateTime to;
   final bool errorOccurred;
+  final bool generatingReport;
 
   String get fromDateString =>
       DateUtils.formatDateWithoutLocale(from, DateUtils.monthDayAndYearFormat);
@@ -21,6 +25,7 @@ class ReportSheetState extends ReportState {
         from,
         to,
         errorOccurred,
+        generatingReport,
       ];
 
   const ReportSheetState({
@@ -28,13 +33,14 @@ class ReportSheetState extends ReportState {
     @required this.from,
     @required this.to,
     this.errorOccurred = false,
+    this.generatingReport = false,
   });
 
   factory ReportSheetState.initial() {
     final now = DateTime.now();
     final from = DateUtils.getFirstDayDateOfTheMonth(now);
     return ReportSheetState(
-      selectedFileType: ReportFileType.csv,
+      selectedFileType: ReportFileType.pdf,
       from: from,
       to: now,
     );
@@ -45,12 +51,14 @@ class ReportSheetState extends ReportState {
     DateTime from,
     DateTime to,
     bool errorOccurred,
+    bool generatingReport,
   }) {
     return ReportSheetState(
       selectedFileType: selectedFileType ?? this.selectedFileType,
       from: from ?? this.from,
       to: to ?? this.to,
       errorOccurred: errorOccurred ?? this.errorOccurred,
+      generatingReport: generatingReport ?? this.generatingReport,
     );
   }
 }

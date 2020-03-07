@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import '../../models/transaction_item.dart';
 import '../enums/repetition_cycle_type.dart';
 import 'date_utils.dart';
@@ -10,11 +12,13 @@ class TransactionUtils {
     return transactions
         .where((t) => t.category.isAnIncome == onlyIncomes)
         .map((t) => t.amount)
-        .fold(0, (t1, t2) => t1 + t2);
+        .fold(0, (t1, t2) => roundDouble(t1 + t2));
   }
 
   static double getTotalTransactionAmount(List<TransactionItem> transactions) =>
-      transactions.map((t) => t.amount).fold(0, (t1, t2) => t1 + t2);
+      transactions
+          .map((t) => t.amount)
+          .fold(0, (t1, t2) => roundDouble(t1 + t2));
 
   static DateTime getNextRecurringDate(
     RepetitionCycleType cycle,
@@ -49,5 +53,10 @@ class TransactionUtils {
       default:
         return 0;
     }
+  }
+
+  static double roundDouble(double value, {int places = 2}) {
+    final mod = pow(10.0, places);
+    return (value * mod).round().toDouble() / mod;
   }
 }

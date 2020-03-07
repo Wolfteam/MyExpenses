@@ -8,7 +8,7 @@ abstract class TransactionsDao {
   Future<bool> deleteTransaction(int id);
 
   Future<List<TransactionItem>> getAllParentTransactions();
-  
+
   Future<List<TransactionItem>> getAllParentTransactionsUntil(DateTime until);
 
   Future<List<TransactionItem>> getAllChildTransactions(
@@ -24,4 +24,6 @@ abstract class TransactionsDao {
     DateTime nextRecurringDate,
     List<DateTime> periods,
   );
+
+  Future<TransactionItem> getTransaction(int id);
 }
