@@ -233,15 +233,7 @@ List<Widget> _buildPdfBody(
   return [
     Align(
       alignment: Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.symmetric(
-          vertical: 20,
-        ),
-        padding: const EdgeInsets.only(
-          bottom: 20,
-        ),
-        child: summary,
-      ),
+      child: summary,
     ),
     ...tables,
   ];

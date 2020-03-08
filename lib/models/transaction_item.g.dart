@@ -79,5 +79,6 @@ const _$RepetitionCycleTypeEnumMap = {
   RepetitionCycleType.eachDay: 'eachDay',
   RepetitionCycleType.eachWeek: 'eachWeek',
   RepetitionCycleType.eachMonth: 'eachMonth',
+  RepetitionCycleType.biweekly: 'biweekly',
   RepetitionCycleType.eachYear: 'eachYear',
 };
