@@ -13,7 +13,7 @@ import 'services/settings_service.dart';
 final GetIt getIt = GetIt.instance;
 
 @injectableInit
-void configure() {
+void initInjection() {
   getIt.registerSingleton(Logger());
   getIt.registerSingleton<LoggingService>(LoggingServiceImpl(getIt<Logger>()));
   getIt.registerSingleton<SettingsService>(

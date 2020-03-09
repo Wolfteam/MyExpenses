@@ -27,11 +27,13 @@ import 'logger.dart';
 import 'models/current_selected_category.dart';
 import 'services/logging_service.dart';
 import 'services/settings_service.dart';
+import 'telemetry.dart';
 import 'ui/pages/main_page.dart';
 
 Future main() async {
-  configure();
+  initInjection();
   await setupLogging();
+  await initTelemetry();
   runApp(MyApp());
 }
 
@@ -130,6 +132,7 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+
 //TODO: SHOW THE RECURRING DATE IN THE RECURRING TRANSACTIONS
 //TODO: USE SUPER ENUM
 //TODO: USE BLOC TO BLOC COMMUNICATION
