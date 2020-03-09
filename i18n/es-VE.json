@@ -90,6 +90,9 @@
     "removeImg": "Remover imagen",
     "areYouSure": "¿ Estás seguro ?",
     "recurring": "Recurrente",
+    "others": "Otros",
+    "askForFingerPrint": "Solicitar huella al iniciar la aplicación",
+    "authenticate": "Autenticate",
     "repetitionCycle": {
         "eachWeek": "Cada semana",
         "eachMonth": "Cada mes",
@@ -111,8 +114,7 @@
         "life": "Vida",
         "personal": "Personal",
         "shopping": "Compras",
-        "transportation": "Trasnporte",
-        "others": "Otros"
+        "transportation": "Trasnporte"
     },
     "settings": {
         "theme": "Tema",
@@ -133,5 +135,14 @@
         "support": "Soporte",
         "donationsMsg": "Espero que disfrutes al usar esta aplicación, si te gustaría comprarme un cafe o una cerveza, envíame un email.",
         "donationSupport": "Hice esta aplicación en mi tiempo libre y también es de código abierto. Si desea ayudarme, informar un problema, tienes una idea, deseas que se implemente una función, etc., crea un issue aquí:"
+    },
+    "authentication": {
+        "fingerprintHint": "Toca el sensor",
+        "fingerprintNotRecognized": "Huela no reconocida. Intenta de nuevo.",
+        "fingerprintSuccess": "Huella reconozida.",
+        "signInTitle": "Autenticación con huella",
+        "fingerprintRequired": "Huella requireda",
+        "goToSettings": "Ir a la configuración",
+        "goToSettingDescription": "La huella no esta configurada en tu equipo. Ve a la Configuración > Seguridad para añadir tu huella."
     }
 }

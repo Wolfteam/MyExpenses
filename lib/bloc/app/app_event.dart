@@ -28,3 +28,10 @@ class AppAccentColorChanged extends AppEvent {
   @override
   List<Object> get props => [accentColor];
 }
+
+class AuthenticateUser extends AppEvent {
+  @override
+  List<Object> get props => [];
+
+  const AuthenticateUser();
+}

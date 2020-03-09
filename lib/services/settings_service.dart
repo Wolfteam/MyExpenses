@@ -22,6 +22,9 @@ abstract class SettingsService {
   SyncIntervalType get syncInterval;
   set syncInterval(SyncIntervalType interval);
 
+  bool get askForFingerPrint;
+  set askForFingerPrint(bool ask);
+
   Future init();
 }
 
@@ -30,6 +33,7 @@ class SettingsServiceImpl implements SettingsService {
   final _accentColorKey = 'AccentColor';
   final _appLanguageKey = 'AppLanguage';
   final _syncIntervalKey = 'SyncInterval';
+  final _askForFingerPrintKey = 'AskForFingerPrint';
   final LoggingService _logger;
 
   bool _initialized = false;
@@ -43,6 +47,7 @@ class SettingsServiceImpl implements SettingsService {
         accentColor: accentColor,
         appLanguage: language,
         syncInterval: syncInterval,
+        askForFingerPrint: askForFingerPrint,
       );
 
   @override
@@ -64,6 +69,11 @@ class SettingsServiceImpl implements SettingsService {
   @override
   set language(AppLanguageType lang) =>
       _prefs.setInt(_appLanguageKey, lang.index);
+
+  @override
+  bool get askForFingerPrint => _prefs.getBool(_askForFingerPrintKey);
+  @override
+  set askForFingerPrint(bool ask) => _prefs.setBool(_askForFingerPrintKey, ask);
 
   @override
   SyncIntervalType get syncInterval =>
@@ -103,6 +113,11 @@ class SettingsServiceImpl implements SettingsService {
     if (_prefs.get(_syncIntervalKey) == null) {
       _logger.info(runtimeType, 'Setting sync type to none...');
       _prefs.setInt(_syncIntervalKey, SyncIntervalType.none.index);
+    }
+
+    if (_prefs.get(_askForFingerPrintKey) == null) {
+      _logger.info(runtimeType, 'Setting ask for fingerprint to false...');
+      _prefs.setBool(_askForFingerPrintKey, false);
     }
 
     _initialized = true;

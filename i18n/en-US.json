@@ -90,6 +90,9 @@
     "removeImg": "Remove image",
     "areYouSure": "Are you sure ?",
     "recurring": "Recurring",
+    "others": "Others",
+    "askForFingerPrint": "Ask for fingerprint when the app starts",
+    "authenticate": "Authenticate",
     "repetitionCycle": {
         "eachWeek": "Each week",
         "eachMonth": "Each month",
@@ -111,8 +114,7 @@
         "life": "Life",
         "personal": "Personal",
         "shopping": "Shopping",
-        "transportation": "Transportation",
-        "others": "Others"
+        "transportation": "Transportation"
     },
     "settings": {
         "theme": "Theme",
@@ -133,5 +135,14 @@
         "support": "Support",
         "donationsMsg": "I hope you are enjoying using this app, if you would like to buy me a coffee/beer, just send me an email.",
         "donationSupport": "I made this app in my free time and it is also open source. If you would like to help me, report an issue, have an idea, want a feature to be implemented, etc please open an issue here:"
+    },
+    "authentication": {
+        "fingerprintHint": "Touch sensor",
+        "fingerprintNotRecognized": "Fingerprint not recognized. Try again.",
+        "fingerprintSuccess": "Fingerprint recognized.",
+        "signInTitle": "Fingerprint Authentication",
+        "fingerprintRequired": "Fingerprint required",
+        "goToSettings": "Go to settings",
+        "goToSettingDescription": "Fingerprint is not set up on your device. Go to Settings > Security to add your fingerprint."
     }
 }

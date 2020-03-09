@@ -11,10 +11,29 @@ class AppUninitializedState extends AppState {
 
 class AppInitializedState extends AppState {
   final ThemeData theme;
-  final Locale locale;
 
-  const AppInitializedState(this.theme, this.locale);
+  const AppInitializedState(this.theme);
 
   @override
-  List<Object> get props => [theme, locale];
+  List<Object> get props => [theme];
+}
+
+class AuthenticationState extends AppState {
+  //used to just change the state
+  final int retries;
+  final bool askForFingerPrint;
+  final ThemeData theme;
+
+  @override
+  List<Object> get props => [
+        retries,
+        askForFingerPrint,
+        theme,
+      ];
+
+  const AuthenticationState({
+    @required this.retries,
+    @required this.askForFingerPrint,
+    @required this.theme,
+  });
 }

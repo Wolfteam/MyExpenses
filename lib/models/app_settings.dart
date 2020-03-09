@@ -15,6 +15,7 @@ class AppSettings {
   final AppAccentColorType accentColor;
   final AppLanguageType appLanguage;
   final SyncIntervalType syncInterval;
+  final bool askForFingerPrint;
 
   AppSettings({
     @required this.appTheme,
@@ -22,8 +23,10 @@ class AppSettings {
     @required this.accentColor,
     @required this.appLanguage,
     @required this.syncInterval,
+    @required this.askForFingerPrint,
   });
 
-  factory AppSettings.fromJson(Map<String, dynamic> json) => _$AppSettingsFromJson(json);
+  factory AppSettings.fromJson(Map<String, dynamic> json) =>
+      _$AppSettingsFromJson(json);
   Map<String, dynamic> toJson() => _$AppSettingsToJson(this);
 }

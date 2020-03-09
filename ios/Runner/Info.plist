@@ -47,5 +47,7 @@
 	<string>Used to capture audio for image picker plugin</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Used to demonstrate image picker plugin</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Required for authentication</string>
 </dict>
 </plist>

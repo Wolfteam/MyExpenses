@@ -57,6 +57,7 @@ class _SettingsPageState extends State<SettingsPage>
         _buildAccentColorSettings(context, state, i18n),
         _buildLanguageSettings(context, state, i18n),
         _buildSyncSettings(context, state, i18n),
+        if (state.canUseFingerPrint) _buildOtherSettings(context, state, i18n),
         _buildAboutSettings(context, state, i18n),
       ];
     }
@@ -367,6 +368,47 @@ class _SettingsPageState extends State<SettingsPage>
     );
   }
 
+  Widget _buildOtherSettings(
+    BuildContext context,
+    SettingsInitialState state,
+    I18n i18n,
+  ) {
+    final theme = Theme.of(context);
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      margin: const EdgeInsets.all(10),
+      elevation: 3,
+      child: Container(
+        margin: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Icon(Icons.sync),
+                Container(
+                  margin: const EdgeInsets.only(left: 5),
+                  child: Text(
+                    i18n.others,
+                    style: theme.textTheme.title,
+                  ),
+                ),
+              ],
+            ),
+            SwitchListTile(
+              activeColor: theme.accentColor,
+              value: state.askForFingerPrint,
+              title: Text(i18n.askForFingerPrint),
+              onChanged: _askForFingerPrintChanged,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildAboutSettings(
     BuildContext context,
     SettingsInitialState state,
@@ -504,4 +546,7 @@ class _SettingsPageState extends State<SettingsPage>
 
   void _languageChanged(AppLanguageType newValue) =>
       context.bloc<SettingsBloc>().add(AppLanguageChanged(newValue));
+
+  void _askForFingerPrintChanged(bool ask) =>
+      context.bloc<SettingsBloc>().add(AskForFingerPrintChanged(ask: ask));
 }

@@ -105,7 +105,7 @@ extension I18nExtensions on I18n {
       case CategoryIconType.transportation:
         return categoryIconTypeTransportation;
       case CategoryIconType.others:
-        return categoryIconTypeOthers;
+        return others;
       default:
         return na;
     }

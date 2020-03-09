@@ -214,6 +214,12 @@ class I18n implements WidgetsLocalizations {
   String get areYouSure => "Are you sure ?";
   /// "Recurring"
   String get recurring => "Recurring";
+  /// "Others"
+  String get others => "Others";
+  /// "Ask for fingerprint when the app starts"
+  String get askForFingerPrint => "Ask for fingerprint when the app starts";
+  /// "Authenticate"
+  String get authenticate => "Authenticate";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -248,8 +254,6 @@ class I18n implements WidgetsLocalizations {
   String get categoryIconTypeShopping => "Shopping";
   /// "Transportation"
   String get categoryIconTypeTransportation => "Transportation";
-  /// "Others"
-  String get categoryIconTypeOthers => "Others";
   /// "Theme"
   String get settingsTheme => "Theme";
   /// "Select an app theme"
@@ -286,6 +290,20 @@ class I18n implements WidgetsLocalizations {
   String get settingsDonationsMsg => "I hope you are enjoying using this app, if you would like to buy me a coffee/beer, just send me an email.";
   /// "I made this app in my free time and it is also open source. If you would like to help me, report an issue, have an idea, want a feature to be implemented, etc please open an issue here:"
   String get settingsDonationSupport => "I made this app in my free time and it is also open source. If you would like to help me, report an issue, have an idea, want a feature to be implemented, etc please open an issue here:";
+  /// "Touch sensor"
+  String get authenticationFingerprintHint => "Touch sensor";
+  /// "Fingerprint not recognized. Try again."
+  String get authenticationFingerprintNotRecognized => "Fingerprint not recognized. Try again.";
+  /// "Fingerprint recognized."
+  String get authenticationFingerprintSuccess => "Fingerprint recognized.";
+  /// "Fingerprint Authentication"
+  String get authenticationSignInTitle => "Fingerprint Authentication";
+  /// "Fingerprint required"
+  String get authenticationFingerprintRequired => "Fingerprint required";
+  /// "Go to settings"
+  String get authenticationGoToSettings => "Go to settings";
+  /// "Fingerprint is not set up on your device. Go to Settings > Security to add your fingerprint."
+  String get authenticationGoToSettingDescription => "Fingerprint is not set up on your device. Go to Settings > Security to add your fingerprint.";
 }
 
 class _I18n_en_US extends I18n {
@@ -571,6 +589,15 @@ class _I18n_es_VE extends I18n {
   /// "Recurrente"
   @override
   String get recurring => "Recurrente";
+  /// "Otros"
+  @override
+  String get others => "Otros";
+  /// "Solicitar huella al iniciar la aplicación"
+  @override
+  String get askForFingerPrint => "Solicitar huella al iniciar la aplicación";
+  /// "Autenticate"
+  @override
+  String get authenticate => "Autenticate";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";
@@ -622,9 +649,6 @@ class _I18n_es_VE extends I18n {
   /// "Trasnporte"
   @override
   String get categoryIconTypeTransportation => "Trasnporte";
-  /// "Otros"
-  @override
-  String get categoryIconTypeOthers => "Otros";
   /// "Tema"
   @override
   String get settingsTheme => "Tema";
@@ -679,6 +703,27 @@ class _I18n_es_VE extends I18n {
   /// "Hice esta aplicación en mi tiempo libre y también es de código abierto. Si desea ayudarme, informar un problema, tienes una idea, deseas que se implemente una función, etc., crea un issue aquí:"
   @override
   String get settingsDonationSupport => "Hice esta aplicación en mi tiempo libre y también es de código abierto. Si desea ayudarme, informar un problema, tienes una idea, deseas que se implemente una función, etc., crea un issue aquí:";
+  /// "Toca el sensor"
+  @override
+  String get authenticationFingerprintHint => "Toca el sensor";
+  /// "Huela no reconocida. Intenta de nuevo."
+  @override
+  String get authenticationFingerprintNotRecognized => "Huela no reconocida. Intenta de nuevo.";
+  /// "Huella reconozida."
+  @override
+  String get authenticationFingerprintSuccess => "Huella reconozida.";
+  /// "Autenticación con huella"
+  @override
+  String get authenticationSignInTitle => "Autenticación con huella";
+  /// "Huella requireda"
+  @override
+  String get authenticationFingerprintRequired => "Huella requireda";
+  /// "Ir a la configuración"
+  @override
+  String get authenticationGoToSettings => "Ir a la configuración";
+  /// "La huella no esta configurada en tu equipo. Ve a la Configuración > Seguridad para añadir tu huella."
+  @override
+  String get authenticationGoToSettingDescription => "La huella no esta configurada en tu equipo. Ve a la Configuración > Seguridad para añadir tu huella.";
 
   @override
   TextDirection get textDirection => TextDirection.ltr;

@@ -6,7 +6,7 @@ abstract class SettingsEvent extends Equatable {
 
 class LoadSettings extends SettingsEvent {
   const LoadSettings();
-  
+
   @override
   List<Object> get props => [];
 }
@@ -45,4 +45,13 @@ class SyncIntervalChanged extends SettingsEvent {
 
   @override
   List<Object> get props => [selectedSyncInterval];
+}
+
+class AskForFingerPrintChanged extends SettingsEvent {
+  final bool ask;
+
+  @override
+  List<Object> get props => [ask];
+
+  const AskForFingerPrintChanged({this.ask});
 }

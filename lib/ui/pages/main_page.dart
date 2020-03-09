@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../bloc/drawer/drawer_bloc.dart';
-import '../../bloc/transaction_form/transaction_form_bloc.dart';
 import '../../common/enums/app_drawer_item_type.dart';
 import '../../generated/i18n.dart';
 import '../pages/add_edit_transasctiton_page.dart';

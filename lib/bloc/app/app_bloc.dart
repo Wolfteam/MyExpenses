@@ -28,23 +28,27 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   Stream<AppState> mapEventToState(
     AppEvent event,
   ) async* {
+    await _settingsService.init();
+
+    if (event is AuthenticateUser) {
+      yield* _authenticateUser(event);
+    }
+
     if (event is InitializeApp) {
       _logger.info(runtimeType, 'Initializing app settings');
-      await _settingsService.init();
 
       _logger.info(
         runtimeType,
         'Current settings are: ${_settingsService.appSettings.toJson()}',
       );
-      
+
       await Future.delayed(const Duration(seconds: 1));
-      
+
       yield* _loadThemeData(
         _settingsService.appTheme,
         _settingsService.accentColor,
         _settingsService.language,
       );
-
     }
 
     if (event is AppThemeChanged) {
@@ -79,9 +83,31 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     AppLanguageType language,
   ) async* {
     final themeData = accentColor.getThemeData(theme);
+    _setLocale(language);
+    yield AppInitializedState(themeData);
+  }
+
+  void _setLocale(AppLanguageType language) {
     final locale = I18n.delegate.supportedLocales[language.index];
     I18n.onLocaleChanged(locale);
+  }
 
-    yield AppInitializedState(themeData, locale);
+  Stream<AppState> _authenticateUser(AuthenticateUser event) async* {
+    final themeData = _settingsService.accentColor.getThemeData(
+      _settingsService.appTheme,
+    );
+    final currentState = state;
+    int retries = 0;
+    _setLocale(_settingsService.language);
+
+    if (currentState is AuthenticationState) {
+      retries = currentState.retries + 1;
+    }
+
+    yield AuthenticationState(
+      retries: retries,
+      askForFingerPrint: _settingsService.askForFingerPrint,
+      theme: themeData,
+    );
   }
 }

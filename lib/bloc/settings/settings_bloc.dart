@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:package_info/package_info.dart';
 
 import '../../common/enums/app_accent_color_type.dart';
@@ -55,18 +56,28 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       _settingsService.syncInterval = event.selectedSyncInterval;
       yield currentState.copyWith(syncInterval: event.selectedSyncInterval);
     }
+
+    if (event is AskForFingerPrintChanged) {
+      _settingsService.askForFingerPrint = event.ask;
+      yield currentState.copyWith(askForFingerPrint: event.ask);
+    }
   }
 
   Stream<SettingsState> _buildInitialState() async* {
     final appSettings = _settingsService.appSettings;
     final packageInfo = await PackageInfo.fromPlatform();
-    
+    final localAuth = LocalAuthentication();
+    final availableBiometrics = await localAuth.getAvailableBiometrics();
+
     yield SettingsInitialState(
       appTheme: appSettings.appTheme,
       useDarkAmoled: false,
       accentColor: appSettings.accentColor,
       appLanguage: appSettings.appLanguage,
       syncInterval: appSettings.syncInterval,
+      canUseFingerPrint:
+          availableBiometrics.contains(BiometricType.fingerprint),
+      askForFingerPrint: appSettings.askForFingerPrint,
       appName: packageInfo.appName,
       appVersion: packageInfo.version,
     );
