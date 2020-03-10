@@ -6,6 +6,7 @@ import 'package:local_auth/local_auth.dart';
 import '../../bloc/app/app_bloc.dart';
 import '../../common/presentation/custom_assets.dart';
 import '../../generated/i18n.dart';
+import 'settings/password_dialog.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -26,33 +27,9 @@ class _SplashScreenState extends State<SplashScreen> {
     return BlocConsumer<AppBloc, AppState>(
       listener: (ctx, state) async {
         if (state is AuthenticationState && state.askForFingerPrint) {
-          //this one is required, for the language change
-          await Future.delayed(const Duration(seconds: 1));
-
-          final i18n = I18n.of(ctx);
-          final localAuth = LocalAuthentication();
-          final didAuthenticate = await localAuth.authenticateWithBiometrics(
-            localizedReason: '',
-            stickyAuth: true,
-            androidAuthStrings: AndroidAuthMessages(
-              fingerprintHint: i18n.authenticationFingerprintHint,
-              fingerprintNotRecognized:
-                  i18n.authenticationFingerprintNotRecognized,
-              fingerprintSuccess: i18n.authenticationFingerprintSuccess,
-              cancelButton: i18n.cancel,
-              signInTitle: i18n.authenticationSignInTitle,
-              fingerprintRequiredTitle: i18n.authenticationFingerprintRequired,
-              goToSettingsButton: i18n.authenticationGoToSettings,
-              goToSettingsDescription:
-                  i18n.authenticationGoToSettingDescription,
-            ),
-          );
-
-          if (didAuthenticate) {
-            ctx.bloc<AppBloc>().add(const InitializeApp());
-          } else {
-            ctx.bloc<AppBloc>().add(const AuthenticateUser());
-          }
+          await _authenticateViaFingerPrint(ctx);
+        } else if (state is AuthenticationState && state.askForPassword) {
+          await _authenticateViaPassword(ctx);
         } else if (state is! AppInitializedState) {
           ctx.bloc<AppBloc>().add(const InitializeApp());
         }
@@ -79,5 +56,59 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _authenticateViaFingerPrint(BuildContext context) async {
+    //this one is required, for the language change
+    await Future.delayed(const Duration(seconds: 1));
+
+    final i18n = I18n.of(context);
+    final localAuth = LocalAuthentication();
+    final isAuthenticated = await localAuth.authenticateWithBiometrics(
+      localizedReason: '',
+      stickyAuth: true,
+      androidAuthStrings: AndroidAuthMessages(
+        fingerprintHint: i18n.authenticationFingerprintHint,
+        fingerprintNotRecognized: i18n.authenticationFingerprintNotRecognized,
+        fingerprintSuccess: i18n.authenticationFingerprintSuccess,
+        cancelButton: i18n.cancel,
+        signInTitle: i18n.authenticationSignInTitle,
+        fingerprintRequiredTitle: i18n.authenticationFingerprintRequired,
+        goToSettingsButton: i18n.authenticationGoToSettings,
+        goToSettingsDescription: i18n.authenticationGoToSettingDescription,
+      ),
+    );
+
+    _handleAuthenticationResult(context, isAuthenticated);
+  }
+
+  Future<void> _authenticateViaPassword(BuildContext context) async {
+    bool isAuthenticated = await showModalBottomSheet<bool>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(35),
+          topLeft: Radius.circular(35),
+        ),
+      ),
+      isDismissible: false,
+      isScrollControlled: true,
+      builder: (ctx) => const PasswordDialog(promptForPassword: true),
+    );
+
+    isAuthenticated ??= false;
+
+    _handleAuthenticationResult(context, isAuthenticated);
+  }
+
+  void _handleAuthenticationResult(
+    BuildContext context,
+    bool isAuthenticated,
+  ) {
+    if (isAuthenticated) {
+      context.bloc<AppBloc>().add(const InitializeApp());
+    } else {
+      context.bloc<AppBloc>().add(const AuthenticateUser());
+    }
   }
 }

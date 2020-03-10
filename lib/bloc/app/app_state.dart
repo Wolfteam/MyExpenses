@@ -21,18 +21,21 @@ class AppInitializedState extends AppState {
 class AuthenticationState extends AppState {
   //used to just change the state
   final int retries;
+  final bool askForPassword;
   final bool askForFingerPrint;
   final ThemeData theme;
 
   @override
   List<Object> get props => [
         retries,
+        askForPassword,
         askForFingerPrint,
         theme,
       ];
 
   const AuthenticationState({
     @required this.retries,
+    @required this.askForPassword,
     @required this.askForFingerPrint,
     @required this.theme,
   });

@@ -220,6 +220,20 @@ class I18n implements WidgetsLocalizations {
   String get askForFingerPrint => "Ask for fingerprint when the app starts";
   /// "Authenticate"
   String get authenticate => "Authenticate";
+  /// "Ask for a password when the app starts"
+  String get askForPassword => "Ask for a password when the app starts";
+  /// "Password"
+  String get password => "Password";
+  /// "Confirm password"
+  String get confirmPassword => "Confirm password";
+  /// "Type your password"
+  String get typeYourPassword => "Type your password";
+  /// "Password is not valid"
+  String get passwordIsNotValid => "Password is not valid";
+  /// "Confirm password is not valid"
+  String get confirmPasswordIsNotValid => "Confirm password is not valid";
+  /// "Password does not match"
+  String get passwordDoesntMatch => "Password does not match";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -598,6 +612,27 @@ class _I18n_es_VE extends I18n {
   /// "Autenticate"
   @override
   String get authenticate => "Autenticate";
+  /// "Solicitar una contraseña al iniciar la aplicación"
+  @override
+  String get askForPassword => "Solicitar una contraseña al iniciar la aplicación";
+  /// "Contraseña"
+  @override
+  String get password => "Contraseña";
+  /// "Confirme contraseña"
+  @override
+  String get confirmPassword => "Confirme contraseña";
+  /// "Escribe tu contraseña"
+  @override
+  String get typeYourPassword => "Escribe tu contraseña";
+  /// "La contraseña no es valida"
+  @override
+  String get passwordIsNotValid => "La contraseña no es valida";
+  /// "La contraseña de confirmación no es valida"
+  @override
+  String get confirmPasswordIsNotValid => "La contraseña de confirmación no es valida";
+  /// "La contraseña no concuerda"
+  @override
+  String get passwordDoesntMatch => "La contraseña no concuerda";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";

@@ -93,6 +93,13 @@
     "others": "Others",
     "askForFingerPrint": "Ask for fingerprint when the app starts",
     "authenticate": "Authenticate",
+    "askForPassword" : "Ask for a password when the app starts",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "typeYourPassword": "Type your password",
+    "passwordIsNotValid": "Password is not valid",
+    "confirmPasswordIsNotValid": "Confirm password is not valid",
+    "passwordDoesntMatch": "Password does not match",
     "repetitionCycle": {
         "eachWeek": "Each week",
         "eachMonth": "Each month",

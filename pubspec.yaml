@@ -43,6 +43,7 @@ dependencies:
   moor_ffi: ^0.4.0
   open_file: ^3.0.1
   package_info: ^0.4.0+14
+  password: ^1.0.0
   path: ^1.6.4
   path_provider: ^1.6.0
   pdf: ^1.5.0

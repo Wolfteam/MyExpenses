@@ -106,6 +106,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     yield AuthenticationState(
       retries: retries,
+      askForPassword: _settingsService.askForPassword,
       askForFingerPrint: _settingsService.askForFingerPrint,
       theme: themeData,
     );

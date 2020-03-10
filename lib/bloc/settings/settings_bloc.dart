@@ -57,9 +57,34 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       yield currentState.copyWith(syncInterval: event.selectedSyncInterval);
     }
 
+    if (event is AskForPasswordChanged) {
+      _settingsService.askForPassword = event.ask;
+      if (!event.ask) {
+        _settingsService.password = null;
+      }
+
+      if (event.ask) {
+        yield currentState.copyWith(
+          askForPassword: event.ask,
+          askForFingerPrint: false,
+        );
+      } else {
+        yield currentState.copyWith(askForPassword: event.ask);
+      }
+    }
+
     if (event is AskForFingerPrintChanged) {
       _settingsService.askForFingerPrint = event.ask;
-      yield currentState.copyWith(askForFingerPrint: event.ask);
+
+      if (event.ask) {
+        _settingsService.password = null;
+        yield currentState.copyWith(
+          askForPassword: false,
+          askForFingerPrint: event.ask,
+        );
+      } else {
+        yield currentState.copyWith(askForFingerPrint: event.ask);
+      }
     }
   }
 
@@ -75,6 +100,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       accentColor: appSettings.accentColor,
       appLanguage: appSettings.appLanguage,
       syncInterval: appSettings.syncInterval,
+      askForPassword: appSettings.askForPassword,
       canUseFingerPrint:
           availableBiometrics.contains(BiometricType.fingerprint),
       askForFingerPrint: appSettings.askForFingerPrint,

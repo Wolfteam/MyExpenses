@@ -13,6 +13,7 @@ import '../../common/extensions/app_theme_type_extensions.dart';
 import '../../common/extensions/i18n_extensions.dart';
 import '../../common/presentation/custom_assets.dart';
 import '../../generated/i18n.dart';
+import '../widgets/settings/password_dialog.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -399,6 +400,12 @@ class _SettingsPageState extends State<SettingsPage>
             ),
             SwitchListTile(
               activeColor: theme.accentColor,
+              value: state.askForPassword,
+              title: Text(i18n.askForPassword),
+              onChanged: _askForPasswordChanged,
+            ),
+            SwitchListTile(
+              activeColor: theme.accentColor,
               value: state.askForFingerPrint,
               title: Text(i18n.askForFingerPrint),
               onChanged: _askForFingerPrintChanged,
@@ -549,4 +556,28 @@ class _SettingsPageState extends State<SettingsPage>
 
   void _askForFingerPrintChanged(bool ask) =>
       context.bloc<SettingsBloc>().add(AskForFingerPrintChanged(ask: ask));
+
+  Future<void> _askForPasswordChanged(bool ask) async {
+    if (!ask) {
+      context.bloc<SettingsBloc>().add(AskForPasswordChanged(ask: ask));
+      return;
+    }
+
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(35),
+          topLeft: Radius.circular(35),
+        ),
+      ),
+      isDismissible: true,
+      isScrollControlled: true,
+      builder: (ctx) => const PasswordDialog(),
+    );
+
+    if (result == null) return;
+
+    context.bloc<SettingsBloc>().add(AskForPasswordChanged(ask: result));
+  }
 }

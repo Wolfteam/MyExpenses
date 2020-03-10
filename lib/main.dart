@@ -2,8 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:local_auth/auth_strings.dart';
-import 'package:local_auth/local_auth.dart';
 import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
 
@@ -14,12 +12,12 @@ import 'bloc/category_icon/category_icon_bloc.dart';
 import 'bloc/chart_details/chart_details_bloc.dart';
 import 'bloc/charts/charts_bloc.dart';
 import 'bloc/drawer/drawer_bloc.dart';
+import 'bloc/password_dialog/password_dialog_bloc.dart';
 import 'bloc/reports/reports_bloc.dart';
 import 'bloc/settings/settings_bloc.dart';
 import 'bloc/transaction_form/transaction_form_bloc.dart';
 import 'bloc/transactions/transactions_bloc.dart';
 import 'bloc/transactions_last_7_days/transactions_last_7_days_bloc.dart';
-import 'common/presentation/custom_assets.dart';
 import 'common/utils/notification_utils.dart';
 import 'daos/categories_dao.dart';
 import 'daos/transactions_dao.dart';
@@ -119,6 +117,11 @@ class _MyAppState extends State<MyApp> {
             final logger = getIt<LoggingService>();
             final transactionsDao = getIt<TransactionsDao>();
             return ReportsBloc(logger, transactionsDao);
+          }),
+          BlocProvider(create: (ctx) {
+            final logger = getIt<LoggingService>();
+            final settingsService = getIt<SettingsService>();
+            return PasswordDialogBloc(logger, settingsService);
           }),
         ],
         child: BlocConsumer<app_bloc.AppBloc, app_bloc.AppState>(

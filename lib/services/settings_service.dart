@@ -22,6 +22,12 @@ abstract class SettingsService {
   SyncIntervalType get syncInterval;
   set syncInterval(SyncIntervalType interval);
 
+  bool get askForPassword;
+  set askForPassword(bool ask);
+
+  String get password;
+  set password(String password);
+
   bool get askForFingerPrint;
   set askForFingerPrint(bool ask);
 
@@ -33,7 +39,9 @@ class SettingsServiceImpl implements SettingsService {
   final _accentColorKey = 'AccentColor';
   final _appLanguageKey = 'AppLanguage';
   final _syncIntervalKey = 'SyncInterval';
+  final _askForPasswordKey = 'AskForPassword';
   final _askForFingerPrintKey = 'AskForFingerPrint';
+  final _passwordKey = 'Password';
   final LoggingService _logger;
 
   bool _initialized = false;
@@ -47,6 +55,7 @@ class SettingsServiceImpl implements SettingsService {
         accentColor: accentColor,
         appLanguage: language,
         syncInterval: syncInterval,
+        askForPassword: askForPassword,
         askForFingerPrint: askForFingerPrint,
       );
 
@@ -71,16 +80,26 @@ class SettingsServiceImpl implements SettingsService {
       _prefs.setInt(_appLanguageKey, lang.index);
 
   @override
-  bool get askForFingerPrint => _prefs.getBool(_askForFingerPrintKey);
-  @override
-  set askForFingerPrint(bool ask) => _prefs.setBool(_askForFingerPrintKey, ask);
-
-  @override
   SyncIntervalType get syncInterval =>
       SyncIntervalType.values[_prefs.getInt(_syncIntervalKey)];
   @override
   set syncInterval(SyncIntervalType interval) =>
       _prefs.setInt(_syncIntervalKey, interval.index);
+
+  @override
+  bool get askForPassword => _prefs.getBool(_askForPasswordKey);
+  @override
+  set askForPassword(bool ask) => _prefs.setBool(_askForPasswordKey, ask);
+
+  @override
+  bool get askForFingerPrint => _prefs.getBool(_askForFingerPrintKey);
+  @override
+  set askForFingerPrint(bool ask) => _prefs.setBool(_askForFingerPrintKey, ask);
+
+  @override
+  String get password => _prefs.getString(_passwordKey);
+  @override
+  set password(String pass) => _prefs.setString(_passwordKey, pass);
 
   SettingsServiceImpl(this._logger);
 
@@ -113,6 +132,11 @@ class SettingsServiceImpl implements SettingsService {
     if (_prefs.get(_syncIntervalKey) == null) {
       _logger.info(runtimeType, 'Setting sync type to none...');
       _prefs.setInt(_syncIntervalKey, SyncIntervalType.none.index);
+    }
+
+    if (_prefs.get(_askForPasswordKey) == null) {
+      _logger.info(runtimeType, 'Setting ask for password to false...');
+      _prefs.setBool(_askForPasswordKey, false);
     }
 
     if (_prefs.get(_askForFingerPrintKey) == null) {

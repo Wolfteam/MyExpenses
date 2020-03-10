@@ -47,11 +47,20 @@ class SyncIntervalChanged extends SettingsEvent {
   List<Object> get props => [selectedSyncInterval];
 }
 
+class AskForPasswordChanged extends SettingsEvent {
+  final bool ask;
+
+  @override
+  List<Object> get props => [ask];
+
+  const AskForPasswordChanged({@required this.ask});
+}
+
 class AskForFingerPrintChanged extends SettingsEvent {
   final bool ask;
 
   @override
   List<Object> get props => [ask];
 
-  const AskForFingerPrintChanged({this.ask});
+  const AskForFingerPrintChanged({@required this.ask});
 }

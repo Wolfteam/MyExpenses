@@ -93,6 +93,13 @@
     "others": "Otros",
     "askForFingerPrint": "Solicitar huella al iniciar la aplicación",
     "authenticate": "Autenticate",
+    "askForPassword": "Solicitar una contraseña al iniciar la aplicación",
+    "password": "Contraseña",
+    "confirmPassword": "Confirme contraseña",
+    "typeYourPassword": "Escribe tu contraseña",
+    "passwordIsNotValid": "La contraseña no es valida",
+    "confirmPasswordIsNotValid": "La contraseña de confirmación no es valida",
+    "passwordDoesntMatch": "La contraseña no concuerda",
     "repetitionCycle": {
         "eachWeek": "Cada semana",
         "eachMonth": "Cada mes",
