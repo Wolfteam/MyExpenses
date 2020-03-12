@@ -63,12 +63,12 @@ class AppDrawer extends StatelessWidget {
                   ctx,
                 ),
               ),
-              _buildItem(
-                AppDrawerItemType.logout,
-                context,
-                state,
-                (item, ctx) => _logout(ctx),
-              ),
+              // _buildItem(
+              //   AppDrawerItemType.logout,
+              //   context,
+              //   state,
+              //   (item, ctx) => _logout(ctx),
+              // ),
             ],
           ),
         );
@@ -78,28 +78,30 @@ class AppDrawer extends StatelessWidget {
 
   Widget _buildHeader() {
     return DrawerHeader(
+      margin: const EdgeInsets.all(0),
       decoration: BoxDecoration(color: Colors.transparent),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 5),
+        // color: Colors.red,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Image.asset(
               CustomAssets.appIcon,
               width: 80,
               height: 80,
             ),
-            Flexible(
-              child: Text(
-                'Efrain Bastidas',
-              ),
-            ),
-            Flexible(
-              child: Text(
-                'ebastidas@smartersolutions.com.ve',
-              ),
-            )
+            // Flexible(
+            //   child: Text(
+            //     'Efrain Bastidas',
+            //   ),
+            // ),
+            // Flexible(
+            //   child: Text(
+            //     'ebastidas@smartersolutions.com.ve',
+            //   ),
+            // )
           ],
         ),
       ),

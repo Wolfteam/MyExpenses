@@ -1,5 +1,6 @@
 #Secrets
 /lib/secrets.dart
+/android/key.properties
 
 # Miscellaneous
 *.class
