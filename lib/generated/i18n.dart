@@ -202,8 +202,8 @@ class I18n implements WidgetsLocalizations {
   String get recurringTransactions => "Recurring transactions";
   /// "A child transaction can not be deleted nor edited"
   String get childTransactionCantBeDeleted => "A child transaction can not be deleted nor edited";
-  /// "Recurring transaction starts on ${date} ${cycle}"
-  String recurringTransactionStartsOn(String date, String cycle) => "Recurring transaction starts on ${date} ${cycle}";
+  /// "Recurring transaction starts on ${date} and runs ${cycle}"
+  String recurringTransactionStartsOn(String date, String cycle) => "Recurring transaction starts on ${date} and runs ${cycle}";
   /// "No recurring transactions were founud"
   String get noRecurringTransactionsWereFound => "No recurring transactions were founud";
   /// "no"
@@ -234,6 +234,14 @@ class I18n implements WidgetsLocalizations {
   String get confirmPasswordIsNotValid => "Confirm password is not valid";
   /// "Password does not match"
   String get passwordDoesntMatch => "Password does not match";
+  /// "To save this transaction, the recurring date must start from tomorrow onwards"
+  String get recurringDateMustStartFromTomorrow => "To save this transaction, the recurring date must start from tomorrow onwards";
+  /// "To use this feature, you must accept the required permission"
+  String get acceptPermissionsToUseThisFeature => "To use this feature, you must accept the required permission";
+  /// "Child Transactions"
+  String get childTransactions => "Child Transactions";
+  /// "Since you are deleting a recurring transaction, if you want, I can delete all associated transactions. Otherwise they will be kept and only the parent transaction will be deleted"
+  String get deleteChildTransactionsConfirmation => "Since you are deleting a recurring transaction, if you want, I can delete all associated transactions. Otherwise they will be kept and only the parent transaction will be deleted";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -585,9 +593,9 @@ class _I18n_es_VE extends I18n {
   /// "Una transacción hija no puede ser modificada ni borrada"
   @override
   String get childTransactionCantBeDeleted => "Una transacción hija no puede ser modificada ni borrada";
-  /// "La transacción recurrente empezará el ${date} ${cycle}"
+  /// "La transacción recurrente empezará el ${date} y se ejecuta ${cycle}"
   @override
-  String recurringTransactionStartsOn(String date, String cycle) => "La transacción recurrente empezará el ${date} ${cycle}";
+  String recurringTransactionStartsOn(String date, String cycle) => "La transacción recurrente empezará el ${date} y se ejecuta ${cycle}";
   /// "No se encontraron transacciones recurrentes"
   @override
   String get noRecurringTransactionsWereFound => "No se encontraron transacciones recurrentes";
@@ -633,6 +641,18 @@ class _I18n_es_VE extends I18n {
   /// "La contraseña no concuerda"
   @override
   String get passwordDoesntMatch => "La contraseña no concuerda";
+  /// "Para guardar esta transacción, la fecha recurrente debe empezar desde mañana en adelante"
+  @override
+  String get recurringDateMustStartFromTomorrow => "Para guardar esta transacción, la fecha recurrente debe empezar desde mañana en adelante";
+  /// "Para usar esta característica, debes aceptar los permisos requeridos"
+  @override
+  String get acceptPermissionsToUseThisFeature => "Para usar esta característica, debes aceptar los permisos requeridos";
+  /// "Transacciones Hijas"
+  @override
+  String get childTransactions => "Transacciones Hijas";
+  /// "Ya que estas borrando una transacción recurrente, si lo deseas, tambien puedo borrar todas las transacciones asociadas a esta. De lo contrario seran conservadas y solo la transacción padre será borrada"
+  @override
+  String get deleteChildTransactionsConfirmation => "Ya que estas borrando una transacción recurrente, si lo deseas, tambien puedo borrar todas las transacciones asociadas a esta. De lo contrario seran conservadas y solo la transacción padre será borrada";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";

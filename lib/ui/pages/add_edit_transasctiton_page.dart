@@ -134,7 +134,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
           if (!state.isNewTransaction != null && !state.isChildTransaction)
             IconButton(
               icon: Icon(Icons.delete),
-              onPressed: () => _showDeleteConfirmationDialog(state.description),
+              onPressed: () => _showDeleteConfirmationDialog(state),
             ),
         ],
       );
@@ -353,26 +353,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
           children: <Widget>[
             _buildAmountInput(context, state),
             _buildDescriptionInput(state),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Icon(
-                  Icons.calendar_today,
-                  size: 30,
-                ),
-                Expanded(
-                  child: FlatButton(
-                    onPressed: !state.isChildTransaction
-                        ? () => _transactionDateClicked(state)
-                        : null,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(state.transactionDateString),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            _buildTransactionDateButton(context, state),
             _buildRepetitionCyclesDropDown(state),
             ..._buildPickImageButtons(context, state),
           ],
@@ -479,6 +460,50 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     );
   }
 
+  Widget _buildTransactionDateButton(
+    final BuildContext context,
+    final TransactionFormLoadedState state,
+  ) {
+    final i18n = I18n.of(context);
+    final theme = Theme.of(context);
+    return Column(
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Icon(
+              Icons.calendar_today,
+              size: 30,
+            ),
+            Expanded(
+              child: FlatButton(
+                onPressed: !state.isChildTransaction
+                    ? () => _transactionDateClicked(state)
+                    : null,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(state.transactionDateString),
+                ),
+              ),
+            ),
+          ],
+        ),
+        if (!state.isChildTransaction &&
+            !state.isTransactionDateValid &&
+            state.repetitionCycle != RepetitionCycleType.none)
+          Padding(
+            padding: const EdgeInsets.only(left: 8, right: 8),
+            child: Text(
+              i18n.recurringDateMustStartFromTomorrow,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.caption
+                  .copyWith(color: theme.primaryColorDark),
+            ),
+          ),
+      ],
+    );
+  }
+
   Widget _buildRepetitionCyclesDropDown(
     final TransactionFormLoadedState state,
   ) {
@@ -507,7 +532,6 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                     isExpanded: true,
                     hint: Text(
                       i18n.translateRepetitionCycleType(state.repetitionCycle),
-                      style: TextStyle(color: Colors.red),
                     ),
                     value: state.repetitionCycle,
                     iconSize: 24,
@@ -532,7 +556,8 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               ),
             ],
           ),
-          if (state.repetitionCycle != RepetitionCycleType.none)
+          if (!state.isChildTransaction &&
+              state.repetitionCycle != RepetitionCycleType.none)
             Padding(
               padding: const EdgeInsets.only(bottom: 5, left: 8, right: 8),
               child: Text(
@@ -592,15 +617,17 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         children: <Widget>[
           FlatButton.icon(
             textColor: theme.primaryColor,
-            onPressed:
-                !state.isChildTransaction ? () => _pickPicture(true) : null,
+            onPressed: !state.isChildTransaction
+                ? () => _pickPicture(true, i18n)
+                : null,
             icon: Icon(Icons.photo_library),
             label: Text(i18n.fromGallery),
           ),
           FlatButton.icon(
             textColor: theme.primaryColor,
-            onPressed:
-                !state.isChildTransaction ? () => _pickPicture(false) : null,
+            onPressed: !state.isChildTransaction
+                ? () => _pickPicture(false, i18n)
+                : null,
             icon: Icon(Icons.camera_enhance),
             label: Text(i18n.fromCamera),
           ),
@@ -631,23 +658,6 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
             ],
           ),
         ),
-
-      // if (state.imageExists)
-      //   Container(
-      //     margin: const EdgeInsets.only(
-      //       left: 10,
-      //       right: 10,
-      //       bottom: 30,
-      //     ),
-      //     child: GestureDetector(
-      //       onTap: _showDeleteImageDialog,
-      //       child: Image(
-      //         alignment: Alignment.topCenter,
-      //         fit: BoxFit.fill,
-      //         image: FileImage(File(state.imagePath)),
-      //       ),
-      //     ),
-      //   ),
     ];
   }
 
@@ -743,12 +753,14 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     context.bloc<TransactionFormBloc>().add(FormSubmitted());
   }
 
-  void _showDeleteConfirmationDialog(String transDescription) {
+  void _showDeleteConfirmationDialog(
+    TransactionFormLoadedState state,
+  ) {
     final i18n = I18n.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(i18n.deleteX(transDescription)),
+        title: Text(i18n.deleteX(state.description)),
         content: Text(i18n.confirmDeleteTransaction),
         actions: <Widget>[
           OutlineButton(
@@ -761,7 +773,47 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
           RaisedButton(
             color: Theme.of(ctx).primaryColor,
             onPressed: () {
-              context.bloc<TransactionFormBloc>().add(DeleteTransaction());
+              Navigator.of(ctx).pop();
+
+              if (state.isParentTransaction) {
+                _showDeleteChildsConfirmationDialog();
+              } else {
+                context
+                    .bloc<TransactionFormBloc>()
+                    .add(const DeleteTransaction());
+              }
+            },
+            child: Text(i18n.yes),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteChildsConfirmationDialog() {
+    final i18n = I18n.of(context);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(i18n.deleteX(i18n.childTransactions.toLowerCase())),
+        content: Text(i18n.deleteChildTransactionsConfirmation),
+        actions: <Widget>[
+          OutlineButton(
+            textColor: Theme.of(context).primaryColor,
+            onPressed: () {
+              context
+                  .bloc<TransactionFormBloc>()
+                  .add(const DeleteTransaction(keepChilds: true));
+              Navigator.of(ctx).pop();
+            },
+            child: Text(i18n.no),
+          ),
+          RaisedButton(
+            color: Theme.of(ctx).primaryColor,
+            onPressed: () {
+              context
+                  .bloc<TransactionFormBloc>()
+                  .add(const DeleteTransaction(keepChilds: false));
               Navigator.of(ctx).pop();
             },
             child: Text(i18n.yes),
@@ -801,15 +853,19 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     );
   }
 
-  Future<void> _pickPicture(bool fromGallery) async {
-    final image = await ImagePicker.pickImage(
-      source: fromGallery ? ImageSource.gallery : ImageSource.camera,
-      maxHeight: 600,
-      maxWidth: 600,
-    );
-    if (image == null) return;
-    context
-        .bloc<TransactionFormBloc>()
-        .add(ImageChanged(path: image.path, imageExists: true));
+  Future<void> _pickPicture(bool fromGallery, I18n i18n) async {
+    try {
+      final image = await ImagePicker.pickImage(
+        source: fromGallery ? ImageSource.gallery : ImageSource.camera,
+        maxHeight: 600,
+        maxWidth: 600,
+      );
+      if (image == null) return;
+      context
+          .bloc<TransactionFormBloc>()
+          .add(ImageChanged(path: image.path, imageExists: true));
+    } catch (e) {
+      showWarningToast(i18n.acceptPermissionsToUseThisFeature);
+    }
   }
 }

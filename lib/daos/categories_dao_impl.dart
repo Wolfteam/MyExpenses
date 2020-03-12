@@ -65,7 +65,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
 
     if (category.id <= 0) {
       id = await into(categories).insert(Category(
-        createdBy: 'someone',
+        createdBy: createdBy,
         icon: category.icon,
         iconColor: category.iconColor,
         isAnIncome: category.isAnIncome,
@@ -79,7 +79,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
         isAnIncome: Value(category.isAnIncome),
         name: Value(category.name),
         updatedAt: Value(DateTime.now()),
-        updatedBy: Value('somebody'),
+        updatedBy: const Value(createdBy),
       );
 
       await (update(categories)..where((t) => t.id.equals(id)))

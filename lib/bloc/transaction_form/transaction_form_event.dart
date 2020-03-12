@@ -74,7 +74,11 @@ class ImageChanged extends TransactionFormEvent {
   List<Object> get props => [path, imageExists];
 }
 
-class DeleteTransaction extends TransactionFormEvent {}
+class DeleteTransaction extends TransactionFormEvent {
+  final bool keepChilds;
+
+  const DeleteTransaction({this.keepChilds = false});
+}
 
 class FormSubmitted extends TransactionFormEvent {}
 

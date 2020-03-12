@@ -24,6 +24,8 @@ part 'database.g.dart';
 part 'transactions.dart';
 part 'users.dart';
 
+const createdBy = 'system';
+
 LazyDatabase _openConnection() {
   // the LazyDatabase util lets us find the right location for the file async.
   return LazyDatabase(() async {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:local_auth/auth_strings.dart';
 import 'package:local_auth/local_auth.dart';
@@ -64,22 +65,24 @@ class _SplashScreenState extends State<SplashScreen> {
 
     final i18n = I18n.of(context);
     final localAuth = LocalAuthentication();
-    final isAuthenticated = await localAuth.authenticateWithBiometrics(
-      localizedReason: '',
-      stickyAuth: true,
-      androidAuthStrings: AndroidAuthMessages(
-        fingerprintHint: i18n.authenticationFingerprintHint,
-        fingerprintNotRecognized: i18n.authenticationFingerprintNotRecognized,
-        fingerprintSuccess: i18n.authenticationFingerprintSuccess,
-        cancelButton: i18n.cancel,
-        signInTitle: i18n.authenticationSignInTitle,
-        fingerprintRequiredTitle: i18n.authenticationFingerprintRequired,
-        goToSettingsButton: i18n.authenticationGoToSettings,
-        goToSettingsDescription: i18n.authenticationGoToSettingDescription,
-      ),
-    );
-
-    _handleAuthenticationResult(context, isAuthenticated);
+    try {
+      final isAuthenticated = await localAuth.authenticateWithBiometrics(
+        localizedReason: '',
+        androidAuthStrings: AndroidAuthMessages(
+          fingerprintHint: i18n.authenticationFingerprintHint,
+          fingerprintNotRecognized: i18n.authenticationFingerprintNotRecognized,
+          fingerprintSuccess: i18n.authenticationFingerprintSuccess,
+          cancelButton: i18n.cancel,
+          signInTitle: i18n.authenticationSignInTitle,
+          fingerprintRequiredTitle: i18n.authenticationFingerprintRequired,
+          goToSettingsButton: i18n.authenticationGoToSettings,
+          goToSettingsDescription: i18n.authenticationGoToSettingDescription,
+        ),
+      );
+      _handleAuthenticationResult(context, isAuthenticated);
+    } catch (e) {
+      SystemNavigator.pop();
+    }
   }
 
   Future<void> _authenticateViaPassword(BuildContext context) async {

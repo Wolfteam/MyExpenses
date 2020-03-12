@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_colorpicker/block_picker.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 import '../../bloc/categories_list/categories_list_bloc.dart';
 import '../../bloc/category_form/category_form_bloc.dart';
@@ -345,9 +345,17 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
       child: AlertDialog(
         title: Text(i18n.pickColor),
         content: SingleChildScrollView(
-          child: BlockPicker(
+          child: ColorPicker(
             pickerColor: state.iconColor,
             onColorChanged: _iconColorChanged,
+            enableAlpha: false,
+            displayThumbColor: true,
+            showLabel: true,
+            paletteType: PaletteType.hsv,
+            pickerAreaBorderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(2.0),
+              topRight: Radius.circular(2.0),
+            ),
           ),
         ),
         actions: <Widget>[

@@ -29,7 +29,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
       final id = await into(transactions).insert(Transaction(
         amount: transaction.amount,
         categoryId: transaction.category.id,
-        createdBy: 'Someone',
+        createdBy: createdBy,
         description: transaction.description,
         repetitionCycle: transaction.repetitionCycle,
         transactionDate: transaction.transactionDate,
@@ -42,6 +42,10 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
       final query = select(transactions)..where((t) => t.id.equals(id));
       savedTransaction = (await query.get()).first;
     } else {
+      final currentTrans = await (select(transactions)
+            ..where((t) => t.id.equals(transaction.id)))
+          .getSingle();
+
       final updatedFields = TransactionsCompanion(
         amount: Value(transaction.amount),
         description: Value(transaction.description),
@@ -49,7 +53,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
         categoryId: Value(transaction.category.id),
         transactionDate: Value(transaction.transactionDate),
         updatedAt: Value(DateTime.now()),
-        updatedBy: Value('somebody'),
+        updatedBy: const Value(createdBy),
         parentTransactionId: Value(transaction.parentTransactionId),
         isParentTransaction: Value(transaction.isParentTransaction),
         imagePath: Value(transaction.imagePath),
@@ -57,6 +61,28 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
       );
       await (update(transactions)..where((t) => t.id.equals(transaction.id)))
           .write(updatedFields);
+
+      final isNoLongerAParent =
+          currentTrans.isParentTransaction && !transaction.isParentTransaction;
+
+      if (isNoLongerAParent) {
+        final childTransactions = await _getChildTransactions(transaction.id);
+        final updatedFields = TransactionsCompanion(
+          repetitionCycle: const Value(RepetitionCycleType.none),
+          parentTransactionId: const Value(null),
+          updatedAt: Value(DateTime.now()),
+          updatedBy: const Value(createdBy),
+        );
+        await batch((b) {
+          for (final child in childTransactions) {
+            b.update<Transactions, Transaction>(
+              transactions,
+              updatedFields,
+              where: (t) => t.id.equals(child.id),
+            );
+          }
+        });
+      }
 
       final query = select(transactions)
         ..where((t) => t.id.equals(transaction.id));
@@ -82,9 +108,11 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
   @override
   Future<List<TransactionItem>> getAllParentTransactions() {
     final query = (select(transactions)
-          ..where((t) =>
-              t.repetitionCycle.equals(RepetitionCycleType.none.index).not() &
-              isNull(t.parentTransactionId)))
+          ..where(
+            (t) =>
+                t.repetitionCycle.equals(RepetitionCycleType.none.index).not() &
+                t.isParentTransaction,
+          ))
         .join([
       innerJoin(
         categories,
@@ -101,8 +129,8 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
           ..where(
             (t) =>
                 t.repetitionCycle.equals(RepetitionCycleType.none.index).not() &
-                isNull(t.parentTransactionId) &
-                t.nextRecurringDate.isSmallerOrEqualValue(until),
+                t.nextRecurringDate.isSmallerOrEqualValue(until) &
+                t.isParentTransaction,
           ))
         .join([
       innerJoin(
@@ -135,14 +163,6 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
     ]).map(_mapToTransactionItem);
 
     return query.get();
-  }
-
-  @override
-  Future<bool> deleteAllChildTransactions(int parentId) async {
-    await (delete(transactions)
-          ..where((t) => t.parentTransactionId.equals(parentId)))
-        .go();
-    return true;
   }
 
   @override
@@ -186,6 +206,51 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
     return query.getSingle();
   }
 
+  @override
+  Future<bool> deleteParentTransaction(
+    int id, {
+    bool keepChildTransactions = false,
+  }) async {
+    if (keepChildTransactions) {
+      final childTransactions = await _getChildTransactions(id);
+
+      final updatedFields = TransactionsCompanion(
+        repetitionCycle: const Value(RepetitionCycleType.none),
+        parentTransactionId: const Value(null),
+        updatedAt: Value(DateTime.now()),
+        updatedBy: const Value(createdBy),
+      );
+
+      await batch((b) {
+        for (final child in childTransactions) {
+          b.update<Transactions, Transaction>(
+            transactions,
+            updatedFields,
+            where: (t) => t.id.equals(child.id),
+          );
+        }
+
+        b.deleteWhere<Transactions, Transaction>(
+          transactions,
+          (t) => t.id.equals(id),
+        );
+      });
+    } else {
+      await batch((b) {
+        b.deleteWhere<Transactions, Transaction>(
+          transactions,
+          (t) => t.parentTransactionId.equals(id),
+        );
+
+        b.deleteWhere<Transactions, Transaction>(
+          transactions,
+          (t) => t.id.equals(id),
+        );
+      });
+    }
+    return true;
+  }
+
   List<Transaction> _buildChildTransactions(
     TransactionItem parent,
     List<DateTime> periods,
@@ -200,7 +265,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
     return Transaction(
       amount: parent.amount,
       categoryId: parent.category.id,
-      createdBy: 'ebastidas',
+      createdBy: createdBy,
       repetitionCycle: parent.repetitionCycle,
       description: parent.description,
       parentTransactionId: parent.id,
@@ -231,5 +296,11 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
         isSeleted: true,
       ),
     );
+  }
+
+  Future<List<Transaction>> _getChildTransactions(int parentId) {
+    return (select(transactions)
+          ..where((t) => t.parentTransactionId.equals(parentId)))
+        .get();
   }
 }

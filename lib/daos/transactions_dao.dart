@@ -17,8 +17,6 @@ abstract class TransactionsDao {
     DateTime to,
   );
 
-  Future<bool> deleteAllChildTransactions(int parentId);
-
   Future<void> checkAndSaveRecurringTransactions(
     TransactionItem parent,
     DateTime nextRecurringDate,
@@ -26,4 +24,9 @@ abstract class TransactionsDao {
   );
 
   Future<TransactionItem> getTransaction(int id);
+
+  Future<bool> deleteParentTransaction(
+    int id, {
+    bool keepChildTransactions = false,
+  });
 }

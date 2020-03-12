@@ -16,6 +16,8 @@ AppSettings _$AppSettingsFromJson(Map<String, dynamic> json) {
         _$enumDecodeNullable(_$AppLanguageTypeEnumMap, json['appLanguage']),
     syncInterval:
         _$enumDecodeNullable(_$SyncIntervalTypeEnumMap, json['syncInterval']),
+    askForPassword: json['askForPassword'] as bool,
+    askForFingerPrint: json['askForFingerPrint'] as bool,
   );
 }
 
@@ -26,6 +28,8 @@ Map<String, dynamic> _$AppSettingsToJson(AppSettings instance) =>
       'accentColor': _$AppAccentColorTypeEnumMap[instance.accentColor],
       'appLanguage': _$AppLanguageTypeEnumMap[instance.appLanguage],
       'syncInterval': _$SyncIntervalTypeEnumMap[instance.syncInterval],
+      'askForPassword': instance.askForPassword,
+      'askForFingerPrint': instance.askForFingerPrint,
     };
 
 T _$enumDecode<T>(

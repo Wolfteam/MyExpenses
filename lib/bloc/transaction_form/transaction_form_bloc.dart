@@ -53,7 +53,10 @@ class TransactionFormBloc
         imageExists = await File(event.item.imagePath).exists();
       }
 
-      final firstDate = _getFirstDateToUse(event.item.repetitionCycle);
+      final firstDate = _getFirstDateToUse(
+        event.item.repetitionCycle,
+        event.item.transactionDate,
+      );
 
       yield TransactionFormLoadedState.initial(_settingsService.language)
           .copyWith(
@@ -99,21 +102,27 @@ class TransactionFormBloc
     if (event is TransactionDateChanged) {
       yield currentState.copyWith(
         transactionDate: event.transactionDate,
-        isTransactionDateValid: true,
+        isTransactionDateValid: _isTransactionDateValid(
+          event.transactionDate,
+          currentState.repetitionCycle,
+        ),
       );
     }
 
     if (event is RepetitionCycleChanged) {
       final transactionDate = _getInitialDateToUse(event.repetitionCycle);
-      final firstDate = _getFirstDateToUse(event.repetitionCycle);
+      final firstDate = _getFirstDateToUse(
+        event.repetitionCycle,
+        transactionDate,
+      );
 
       yield currentState.copyWith(
         transactionDate: transactionDate,
         firstDate: firstDate,
         repetitionCycle: event.repetitionCycle,
         isTransactionDateValid: _isTransactionDateValid(
-          currentState.transactionDate,
-          currentState.repetitionCycle,
+          transactionDate,
+          event.repetitionCycle,
         ),
       );
     }
@@ -133,7 +142,7 @@ class TransactionFormBloc
     }
 
     if (event is DeleteTransaction) {
-      yield* _deleteTransaction(currentState.id);
+      yield* _deleteTransaction(currentState.id, event.keepChilds);
     }
 
     if (event is FormSubmitted) {
@@ -154,7 +163,8 @@ class TransactionFormBloc
 
   bool _isTransactionDateValid(DateTime date, RepetitionCycleType cycle) {
     if (cycle == RepetitionCycleType.none) return true;
-    return date.difference(DateTime.now()).inDays >= 1;
+    final isAfter = date.isAfter(DateTime.now());
+    return isAfter;
   }
 
   Stream<TransactionFormState> _saveTransaction() async* {
@@ -197,15 +207,34 @@ class TransactionFormBloc
     }
   }
 
-  Stream<TransactionFormState> _deleteTransaction(int id) async* {
+  Stream<TransactionFormState> _deleteTransaction(
+    int id,
+    bool keepChilds,
+  ) async* {
     try {
       _logger.info(
         runtimeType,
-        '_deleteTransaction: Trying to delete transactionId = $id',
+        '_deleteTransaction: Getting transactionId = $id',
       );
-      final transToDelete = await _transactionsDao.getTransaction(id);
-      await _transactionsDao.deleteTransaction(id);
-      yield TransactionChangedState.deleted(transToDelete.transactionDate);
+      if (currentState.isParentTransaction) {
+        _logger.info(
+          runtimeType,
+          '_deleteTransaction: Trying to delete parent transactionId = $id and childs = $keepChilds',
+        );
+        await _transactionsDao.deleteParentTransaction(
+          id,
+          keepChildTransactions: keepChilds,
+        );
+        yield TransactionChangedState.deleted(DateTime.now());
+      } else {
+        _logger.info(
+          runtimeType,
+          '_deleteTransaction: Trying to delete transactionId = $id',
+        );
+        final transToDelete = await _transactionsDao.getTransaction(id);
+        await _transactionsDao.deleteTransaction(id);
+        yield TransactionChangedState.deleted(transToDelete.transactionDate);
+      }
     } on Exception catch (e, s) {
       _logger.error(
         runtimeType,
@@ -247,7 +276,10 @@ class TransactionFormBloc
     }
   }
 
-  DateTime _getFirstDateToUse(RepetitionCycleType cycle) {
+  DateTime _getFirstDateToUse(
+    RepetitionCycleType cycle,
+    DateTime transactionDate,
+  ) {
     final now = DateTime.now();
     final tomorrow = now.add(const Duration(days: 1));
     final inFifteenDate = DateUtils.getNextBiweeklyDate(now);
@@ -256,7 +288,13 @@ class TransactionFormBloc
         ? DateTime(now.year - 1)
         : cycle == RepetitionCycleType.biweekly ? inFifteenDate : tomorrow;
 
-    return DateTime(firstDate.year, firstDate.month, firstDate.day);
+    final tentativeDate = DateTime(
+      firstDate.year,
+      firstDate.month,
+      firstDate.day,
+    );
+    if (transactionDate.isBefore(tentativeDate)) return transactionDate;
+    return tentativeDate;
   }
 
   DateTime _getInitialDateToUse(RepetitionCycleType cycle) {
