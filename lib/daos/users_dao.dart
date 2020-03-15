@@ -1,5 +1,16 @@
-import '../models/entities/database.dart';
+import '../models/user_item.dart';
 
 abstract class UsersDao {
-  Future<List<User>> getAllUsers();
+  Future<List<UserItem>> getAllUsers();
+
+  Future<UserItem> getActiveUser();
+
+  Future<UserItem> getUser(String googleUserId);
+
+  Future<UserItem> saveUser(
+    String googleUserId,
+    String fullName,
+    String email,
+    String imgUrl,
+  );
 }

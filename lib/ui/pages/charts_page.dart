@@ -7,8 +7,8 @@ import '../../bloc/chart_details/chart_details_bloc.dart';
 import '../../bloc/charts/charts_bloc.dart';
 import '../../generated/i18n.dart';
 import '../../models/transactions_summary_per_date.dart';
-import '../../ui/widgets/transactions/no_transactions_found.dart';
 import '../widgets/charts/pie_chart_transactions_per_month.dart';
+import '../widgets/nothing_found.dart';
 import 'chart_details_page.dart';
 
 class ChartsPage extends StatefulWidget {
@@ -73,7 +73,7 @@ class _ChartsPageState extends State<ChartsPage>
         if (state.transactions.isNotEmpty)
           _buildIncomesAndExpensesCharts(context, state)
         else
-          NoTransactionsFound()
+          NothingFound(msg: i18n.noRecurringTransactionsWereFound)
       ];
     }
 
@@ -246,7 +246,7 @@ class _ChartsPageState extends State<ChartsPage>
         .toList();
 
     context.bloc<ChartDetailsBloc>().add(Initialize(transactions));
-    
+
     final route = MaterialPageRoute(
       fullscreenDialog: true,
       builder: (ctx) => ChartDetailsPage(

@@ -15,17 +15,23 @@ import 'bloc/drawer/drawer_bloc.dart';
 import 'bloc/password_dialog/password_dialog_bloc.dart';
 import 'bloc/reports/reports_bloc.dart';
 import 'bloc/settings/settings_bloc.dart';
+import 'bloc/sign_in_with_google/sign_in_with_google_bloc.dart';
 import 'bloc/transaction_form/transaction_form_bloc.dart';
 import 'bloc/transactions/transactions_bloc.dart';
 import 'bloc/transactions_last_7_days/transactions_last_7_days_bloc.dart';
+import 'bloc/users_accounts/user_accounts_bloc.dart';
 import 'common/utils/notification_utils.dart';
 import 'daos/categories_dao.dart';
 import 'daos/transactions_dao.dart';
+import 'daos/users_dao.dart';
 import 'generated/i18n.dart';
 import 'injection.dart';
 import 'logger.dart';
 import 'models/current_selected_category.dart';
+import 'services/google_service.dart';
 import 'services/logging_service.dart';
+import 'services/network_service.dart';
+import 'services/secure_storage_service.dart';
 import 'services/settings_service.dart';
 import 'telemetry.dart';
 import 'ui/pages/main_page.dart';
@@ -99,7 +105,11 @@ class _MyAppState extends State<MyApp> {
             final settingsService = getIt<SettingsService>();
             return app_bloc.AppBloc(logger, settingsService);
           }),
-          BlocProvider(create: (ctx) => DrawerBloc()),
+          BlocProvider(create: (ctx) {
+            final logger = getIt<LoggingService>();
+            final usersDao = getIt<UsersDao>();
+            return DrawerBloc(logger, usersDao);
+          }),
           BlocProvider(create: (ctx) {
             final logger = getIt<LoggingService>();
             final categoriesDao = getIt<CategoriesDao>();
@@ -123,6 +133,25 @@ class _MyAppState extends State<MyApp> {
             final settingsService = getIt<SettingsService>();
             return PasswordDialogBloc(logger, settingsService);
           }),
+          BlocProvider(create: (ctx) {
+            final logger = getIt<LoggingService>();
+            final usersDao = getIt<UsersDao>();
+            return UserAccountsBloc(logger, usersDao);
+          }),
+          BlocProvider(create: (ctx) {
+            final logger = getIt<LoggingService>();
+            final googleService = getIt<GoogleService>();
+            final usersDao = getIt<UsersDao>();
+            final networkService = getIt<NetworkService>();
+            final secureStorage = getIt<SecureStorageService>();
+            return SignInWithGoogleBloc(
+              logger,
+              usersDao,
+              googleService,
+              networkService,
+              secureStorage,
+            );
+          }),
         ],
         child: BlocConsumer<app_bloc.AppBloc, app_bloc.AppState>(
           listener: (ctx, state) async {
@@ -131,6 +160,8 @@ class _MyAppState extends State<MyApp> {
                 onIosReceiveLocalNotification: _onDidReceiveLocalNotification,
                 onSelectNotification: _onSelectNotification,
               );
+
+              ctx.bloc<DrawerBloc>().add(const InitializeDrawer());
             }
           },
           builder: (ctx, state) => _buildApp(ctx, state),

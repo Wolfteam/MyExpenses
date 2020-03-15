@@ -104,6 +104,13 @@
     "acceptPermissionsToUseThisFeature": "Para usar esta característica, debes aceptar los permisos requeridos",
     "childTransactions": "Transacciones Hijas",
     "deleteChildTransactionsConfirmation": "Ya que estas borrando una transacción recurrente, si lo deseas, tambien puedo borrar todas las transacciones asociadas a esta. De lo contrario seran conservadas y solo la transacción padre será borrada",
+    "accounts": "Cuentas de Usuario",
+    "noUserAccountsFound": "No se encontraron cuentas de usuario",
+    "add": "Agregar",
+    "confirmSignOut": "¿ Estás seguro que deseas loguearte ?",
+    "tapToSignIn": "Toca el ícono para iniciar sesión",
+    "networkIsNotAvailable": "Red no disponible",
+    "loading": "Cargando",
     "repetitionCycle": {
         "eachWeek": "Cada semana",
         "eachMonth": "Cada mes",

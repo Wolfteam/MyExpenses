@@ -5,13 +5,13 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../../common/enums/app_language_type.dart';
 import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/extensions/string_extensions.dart';
 import '../../common/utils/category_utils.dart';
 import '../../common/utils/date_utils.dart';
+import '../../common/utils/image_utils.dart';
 import '../../daos/transactions_dao.dart';
 import '../../models/category_item.dart';
 import '../../models/transaction_item.dart';
@@ -253,9 +253,8 @@ class TransactionFormBloc
         runtimeType,
         '_saveTransaction: Trying to save image',
       );
-      final dir = await getApplicationDocumentsDirectory();
-      final now = DateTime.now();
-      final finalPath = '${dir.path}/${now}_img.png';
+      final imgPath = await ImageUtils.imagePath;
+      final finalPath = '$imgPath/user_picked_img_${DateTime.now()}.png';
 
       await File(finalPath).writeAsBytes(await File(path).readAsBytes());
 

@@ -49,5 +49,12 @@
 	<string>Used to demonstrate image picker plugin</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Required for authentication</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+    	<true/>
+	</dict>
 </dict>
 </plist>

@@ -9,7 +9,7 @@ import '../pages/categories_page.dart';
 import '../pages/charts_page.dart';
 import '../pages/settings_page.dart';
 import '../pages/transactions_page.dart';
-import '../widgets/app_drawer.dart';
+import '../widgets/drawer/app_drawer.dart';
 
 class MainPage extends StatefulWidget {
   @override

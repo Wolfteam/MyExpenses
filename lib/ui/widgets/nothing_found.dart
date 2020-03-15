@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 
-import '../../../generated/i18n.dart';
+class NothingFound extends StatelessWidget {
+  final String msg;
+  final EdgeInsets padding;
 
-class NoTransactionsFound extends StatelessWidget {
-  final bool recurringTransactions;
-
-  const NoTransactionsFound({this.recurringTransactions = false});
+  const NothingFound({
+    @required this.msg,
+    this.padding = const EdgeInsets.only(bottom: 30, right: 20, left: 20),
+  });
 
   @override
   Widget build(BuildContext context) {
-    final i18n = I18n.of(context);
     final theme = Theme.of(context);
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 30, right: 20, left: 20),
+      padding: padding,
       child: Column(
         children: <Widget>[
           Icon(
@@ -22,9 +23,7 @@ class NoTransactionsFound extends StatelessWidget {
             size: 60,
           ),
           Text(
-            recurringTransactions
-                ? i18n.noRecurringTransactionsWereFound
-                : i18n.noTransactionsForThisPeriod,
+            msg,
             textAlign: TextAlign.center,
             style: theme.textTheme.title,
           ),

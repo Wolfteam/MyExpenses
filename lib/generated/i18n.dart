@@ -204,8 +204,8 @@ class I18n implements WidgetsLocalizations {
   String get childTransactionCantBeDeleted => "A child transaction can not be deleted nor edited";
   /// "Recurring transaction starts on ${date} and runs ${cycle}"
   String recurringTransactionStartsOn(String date, String cycle) => "Recurring transaction starts on ${date} and runs ${cycle}";
-  /// "No recurring transactions were founud"
-  String get noRecurringTransactionsWereFound => "No recurring transactions were founud";
+  /// "No recurring transactions were found"
+  String get noRecurringTransactionsWereFound => "No recurring transactions were found";
   /// "no"
   String get no => "no";
   /// "Remove image"
@@ -242,6 +242,20 @@ class I18n implements WidgetsLocalizations {
   String get childTransactions => "Child Transactions";
   /// "Since you are deleting a recurring transaction, if you want, I can delete all associated transactions. Otherwise they will be kept and only the parent transaction will be deleted"
   String get deleteChildTransactionsConfirmation => "Since you are deleting a recurring transaction, if you want, I can delete all associated transactions. Otherwise they will be kept and only the parent transaction will be deleted";
+  /// "User Accounts"
+  String get accounts => "User Accounts";
+  /// "No user accounts were found"
+  String get noUserAccountsFound => "No user accounts were found";
+  /// "Add"
+  String get add => "Add";
+  /// "Are you sure you wanna logout ?"
+  String get confirmSignOut => "Are you sure you wanna logout ?";
+  /// "Tap the icon to sign in"
+  String get tapToSignIn => "Tap the icon to sign in";
+  /// "Network is not available"
+  String get networkIsNotAvailable => "Network is not available";
+  /// "loading"
+  String get loading => "loading";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -653,6 +667,27 @@ class _I18n_es_VE extends I18n {
   /// "Ya que estas borrando una transacción recurrente, si lo deseas, tambien puedo borrar todas las transacciones asociadas a esta. De lo contrario seran conservadas y solo la transacción padre será borrada"
   @override
   String get deleteChildTransactionsConfirmation => "Ya que estas borrando una transacción recurrente, si lo deseas, tambien puedo borrar todas las transacciones asociadas a esta. De lo contrario seran conservadas y solo la transacción padre será borrada";
+  /// "Cuentas de Usuario"
+  @override
+  String get accounts => "Cuentas de Usuario";
+  /// "No se encontraron cuentas de usuario"
+  @override
+  String get noUserAccountsFound => "No se encontraron cuentas de usuario";
+  /// "Agregar"
+  @override
+  String get add => "Agregar";
+  /// "¿ Estás seguro que deseas loguearte ?"
+  @override
+  String get confirmSignOut => "¿ Estás seguro que deseas loguearte ?";
+  /// "Toca el ícono para iniciar sesión"
+  @override
+  String get tapToSignIn => "Toca el ícono para iniciar sesión";
+  /// "Red no disponible"
+  @override
+  String get networkIsNotAvailable => "Red no disponible";
+  /// "Cargando"
+  @override
+  String get loading => "Cargando";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";

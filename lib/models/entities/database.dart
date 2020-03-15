@@ -14,6 +14,7 @@ import '../../daos/transactions_dao.dart';
 import '../../daos/users_dao.dart';
 import '../../models/category_item.dart';
 import '../../models/transaction_item.dart';
+import '../../models/user_item.dart';
 import 'base_entity.dart';
 
 part '../../daos/categories_dao_impl.dart';
