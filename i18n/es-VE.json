@@ -111,6 +111,8 @@
     "tapToSignIn": "Toca el ícono para iniciar sesión",
     "networkIsNotAvailable": "Red no disponible",
     "loading": "Cargando",
+    "userWasSuccessfullyDeleted": "El usuario fue borrado exitosamente",
+    "confirmation":"Confirmación",
     "repetitionCycle": {
         "eachWeek": "Cada semana",
         "eachMonth": "Cada mes",

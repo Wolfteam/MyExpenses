@@ -136,7 +136,8 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(create: (ctx) {
             final logger = getIt<LoggingService>();
             final usersDao = getIt<UsersDao>();
-            return UserAccountsBloc(logger, usersDao);
+            final secureStorage = getIt<SecureStorageService>();
+            return UserAccountsBloc(logger, usersDao, secureStorage);
           }),
           BlocProvider(create: (ctx) {
             final logger = getIt<LoggingService>();

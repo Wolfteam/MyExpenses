@@ -34,7 +34,7 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase>
       id = existingUser.id;
       final updatedFields = UsersCompanion(
         email: Value(email),
-        isActive: const Value(true),
+        isActive: const Value(false),
         name: Value(fullName),
         pictureUrl: Value(imgUrl),
         updatedAt: Value(DateTime.now()),
@@ -45,7 +45,7 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase>
     } else {
       id = await into(users).insert(User(
         googleUserId: googleUserId,
-        isActive: true,
+        isActive: false,
         name: fullName,
         email: email,
         pictureUrl: imgUrl,
@@ -53,9 +53,7 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase>
       ));
     }
 
-    await (update(users)..where((u) => u.id.isNotIn([id])))
-        .write(const UsersCompanion(isActive: Value(false)));
-
+    await changeActiveUser(id);
     return (select(users)..where((u) => u.id.equals(id)))
         .map(_mapToUserItem)
         .getSingle();
@@ -66,6 +64,46 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase>
     return (select(users)..where((u) => u.isActive))
         .map(_mapToUserItem)
         .getSingle();
+  }
+
+  @override
+  Future<void> changeActiveUser(int newActiveUserId) async {
+    await batch((b) {
+      b.update(
+        users,
+        UsersCompanion(
+          updatedBy: const Value(createdBy),
+          updatedAt: Value(DateTime.now()),
+          isActive: const Value(false),
+        ),
+      );
+
+      if (newActiveUserId != null) {
+        b.update<Users, User>(
+          users,
+          UsersCompanion(
+            updatedBy: const Value(createdBy),
+            updatedAt: Value(DateTime.now()),
+            isActive: const Value(true),
+          ),
+          where: (u) => u.id.equals(newActiveUserId),
+        );
+      }
+    });
+  }
+
+  @override
+  Future<bool> deleteUser(int id) async {
+    await (delete(users)..where((u) => u.id.equals(id))).go();
+    final remainingUsers = await (select(users)
+          ..orderBy(
+            [(u) => OrderingTerm(expression: u.id, mode: OrderingMode.asc)],
+          ))
+        .get();
+    if (remainingUsers.isNotEmpty) {
+      await changeActiveUser(remainingUsers.first.id);
+    }
+    return true;
   }
 
   UserItem _mapToUserItem(User user) {

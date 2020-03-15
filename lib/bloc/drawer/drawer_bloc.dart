@@ -33,10 +33,6 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
       yield state.copyWith(selectedPage: event.selectedPage);
     }
 
-    if (event is UserSignedIn) {
-      yield* _userSignedIn();
-    }
-
     if (event is SignOut) {
       yield* _signOut();
     }
@@ -60,19 +56,10 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
     );
   }
 
-  Stream<DrawerState> _userSignedIn() async* {
-    final currentUser = await _usersDao.getActiveUser();
-    yield state.copyWith(
-      email: currentUser.email,
-      fullName: currentUser.name,
-      img: currentUser.pictureUrl,
-      isUserSignedIn: true,
-    );
-  }
-
   Stream<DrawerState> _signOut() async* {
+    //TODO: SHOULD I DELETE THE USER HERE?
     _logger.info(runtimeType, '_signIn: Signing out...');
-    // final user = await _googleService.signOut();
+    await _usersDao.changeActiveUser(null);
     yield state.copyWith(
       isUserSignedIn: false,
     );

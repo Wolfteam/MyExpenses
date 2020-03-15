@@ -110,7 +110,9 @@
     "confirmSignOut": "Are you sure you wanna logout ?",
     "tapToSignIn": "Tap the icon to sign in",
     "networkIsNotAvailable": "Network is not available",
-    "loading": "loading",
+    "loading": "Loading",
+    "userWasSuccessfullyDeleted": "User was successfully deleted",
+    "confirmation":"Confirmation",
     "repetitionCycle": {
         "eachWeek": "Each week",
         "eachMonth": "Each month",

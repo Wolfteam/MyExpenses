@@ -81,12 +81,40 @@ class SignInWithGoogleBloc
       return;
     }
 
-    _logger.info(runtimeType, '_signIn: Saving logged user into secure storage...');
-    await _secureStorageService.save(
-      SecureResourceType.currentUser,
-      _secureStorageService.defaultUsername,
-      user.email,
-    );
+    _logger.info(
+        runtimeType, '_signIn: Saving logged user into secure storage...');
+
+    await Future.wait([
+      _secureStorageService.save(
+        SecureResourceType.currentUser,
+        _secureStorageService.defaultUsername,
+        user.email,
+      ),
+      _secureStorageService.update(
+        SecureResourceType.accessTokenData,
+        _secureStorageService.defaultUsername,
+        true,
+        user.email,
+      ),
+      _secureStorageService.update(
+        SecureResourceType.accessTokenExpiricy,
+        _secureStorageService.defaultUsername,
+        true,
+        user.email,
+      ),
+      _secureStorageService.update(
+        SecureResourceType.accessTokenType,
+        _secureStorageService.defaultUsername,
+        true,
+        user.email,
+      ),
+      _secureStorageService.update(
+        SecureResourceType.refreshToken,
+        _secureStorageService.defaultUsername,
+        true,
+        user.email,
+      )
+    ]);
 
     if (!user.pictureUrl.isNullEmptyOrWhitespace) {
       _logger.info(runtimeType, '_signIn: Saving user img...');

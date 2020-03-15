@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_user_agent/flutter_user_agent.dart';
 
+import '../../../bloc/drawer/drawer_bloc.dart';
 import '../../../bloc/users_accounts/user_accounts_bloc.dart';
+import '../../../common/utils/toast_utils.dart';
 import '../../../generated/i18n.dart';
 import '../../../models/user_item.dart';
 import '../modal_sheet_separator.dart';
@@ -21,7 +23,18 @@ class UserAccountsBottomSheetDialog extends StatelessWidget {
           bottom: 10,
         ),
         padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
-        child: BlocBuilder<UserAccountsBloc, UserAccountsState>(
+        child: BlocConsumer<UserAccountsBloc, UserAccountsState>(
+          listener: (ctx, state) {
+            final i18n = I18n.of(context);
+            if (state.userWasDeleted) {
+              showSucceedToast(i18n.userWasSuccessfullyDeleted);
+              ctx.bloc<DrawerBloc>().add(const InitializeDrawer());
+            } else if (state.activeUserChanged) {
+              ctx.bloc<DrawerBloc>().add(const InitializeDrawer());
+            } else if (state.errorOcurred) {
+              showErrorToast(i18n.unknownErrorOcurred);
+            }
+          },
           builder: (ctx, state) => _buildPage(ctx, state),
         ),
       ),
@@ -44,17 +57,18 @@ class UserAccountsBottomSheetDialog extends StatelessWidget {
           i18n.accounts,
           style: Theme.of(context).textTheme.title,
         ),
-        if (state is UsersLoadedState)
+        if (state.users.isNotEmpty)
           ListView.builder(
             shrinkWrap: true,
             itemCount: state.users.length,
             physics: const NeverScrollableScrollPhysics(),
-            padding: EdgeInsets.all(0),
+            padding: const EdgeInsets.all(0),
             itemBuilder: (ctx, index) => _buildUserAccountItem(
               state.users[index],
+              state.users.length > 1,
             ),
           ),
-        if (state is! UsersLoadedState)
+        if (state.users.isEmpty)
           NothingFound(
             msg: i18n.noUserAccountsFound,
             padding: const EdgeInsets.only(right: 20, left: 20, top: 10),
@@ -82,12 +96,17 @@ class UserAccountsBottomSheetDialog extends StatelessWidget {
     );
   }
 
-  UserAccountItem _buildUserAccountItem(UserItem user) {
+  UserAccountItem _buildUserAccountItem(
+    UserItem user,
+    bool canBeDeleted,
+  ) {
     return UserAccountItem(
+      id: user.id,
       fullname: user.name,
       email: user.email,
       imgUrl: user.pictureUrl,
       isActive: user.isActive,
+      canBeDeleted: canBeDeleted,
     );
   }
 

@@ -268,16 +268,6 @@ class AppDrawer extends StatelessWidget {
     DrawerState state,
   ) async {
     Navigator.pop(context);
-
-    if (!state.isUserSignedIn) {
-      await FlutterUserAgent.init();
-      final route = MaterialPageRoute(
-        builder: (ctx) => const SignInWithGoogleWebView(),
-      );
-      Navigator.of(context).push(route);
-      return;
-    }
-
     context.bloc<UserAccountsBloc>().add(Initialize());
 
     showModalBottomSheet(

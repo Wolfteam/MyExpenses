@@ -20,13 +20,6 @@ class DrawerItemSelectionChanged extends DrawerEvent {
   List<Object> get props => [selectedPage];
 }
 
-class UserSignedIn extends DrawerEvent {
-  @override
-  List<Object> get props => [];
-
-  const UserSignedIn();
-}
-
 class SignOut extends DrawerEvent {
   @override
   List<Object> get props => [];

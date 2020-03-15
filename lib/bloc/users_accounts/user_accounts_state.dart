@@ -1,19 +1,45 @@
 part of 'user_accounts_bloc.dart';
 
-abstract class UserAccountsState extends Equatable {
-  const UserAccountsState();
-}
-
-class LoadingState extends UserAccountsState {
-  @override
-  List<Object> get props => [];
-}
-
-class UsersLoadedState extends UserAccountsState {
-  final List<UserItem>  users;
+@immutable
+class UserAccountsState extends Equatable {
+  final List<UserItem> users;
+  final bool userWasDeleted;
+  final bool errorOcurred;
+  final bool activeUserChanged;
 
   @override
-  List<Object> get props => [users];
+  List<Object> get props => [
+        users,
+        userWasDeleted,
+        errorOcurred,
+        activeUserChanged,
+      ];
 
-  const UsersLoadedState(this.users);
+  const UserAccountsState({
+    @required this.users,
+    this.userWasDeleted,
+    this.errorOcurred,
+    this.activeUserChanged,
+  });
+
+  factory UserAccountsState.initial() => const UserAccountsState(
+        users: [],
+        userWasDeleted: false,
+        errorOcurred: false,
+        activeUserChanged: false,
+      );
+
+  UserAccountsState copyWith({
+    List<UserItem> users,
+    bool userWasDeleted,
+    bool errorOcurred,
+    bool activeUserChanged,
+  }) {
+    return UserAccountsState(
+      users: users ?? this.users,
+      userWasDeleted: userWasDeleted ?? this.userWasDeleted,
+      errorOcurred: errorOcurred ?? this.errorOcurred,
+      activeUserChanged: activeUserChanged ?? this.activeUserChanged,
+    );
+  }
 }

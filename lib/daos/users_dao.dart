@@ -13,4 +13,8 @@ abstract class UsersDao {
     String email,
     String imgUrl,
   );
+
+  Future<bool> deleteUser(int id);
+
+  Future<void> changeActiveUser(int newActiveUserId);
 }

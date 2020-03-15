@@ -254,8 +254,12 @@ class I18n implements WidgetsLocalizations {
   String get tapToSignIn => "Tap the icon to sign in";
   /// "Network is not available"
   String get networkIsNotAvailable => "Network is not available";
-  /// "loading"
-  String get loading => "loading";
+  /// "Loading"
+  String get loading => "Loading";
+  /// "User was successfully deleted"
+  String get userWasSuccessfullyDeleted => "User was successfully deleted";
+  /// "Confirmation"
+  String get confirmation => "Confirmation";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -688,6 +692,12 @@ class _I18n_es_VE extends I18n {
   /// "Cargando"
   @override
   String get loading => "Cargando";
+  /// "El usuario fue borrado exitosamente"
+  @override
+  String get userWasSuccessfullyDeleted => "El usuario fue borrado exitosamente";
+  /// "Confirmación"
+  @override
+  String get confirmation => "Confirmación";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";
