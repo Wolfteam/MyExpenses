@@ -12,6 +12,7 @@ import 'services/logging_service.dart';
 import 'services/network_service.dart';
 import 'services/secure_storage_service.dart';
 import 'services/settings_service.dart';
+import 'services/sync_service.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -33,10 +34,20 @@ void initInjection() {
 
   getIt.registerSingleton<SecureStorageService>(SecureStorageServiceImpl());
 
-  getIt.registerSingleton<GoogleService>(
-      GoogleServiceImpl(getIt<SecureStorageService>()));
+  getIt.registerSingleton<GoogleService>(GoogleServiceImpl(
+    getIt<SecureStorageService>(),
+  ));
 
   getIt.registerSingleton<NetworkService>(NetworkServiceImpl());
+
+  getIt.registerSingleton<SyncService>(SyncServiceImpl(
+    getIt<LoggingService>(),
+    getIt<TransactionsDao>(),
+    getIt<CategoriesDao>(),
+    getIt<UsersDao>(),
+    getIt<GoogleService>(),
+    getIt<SecureStorageService>(),
+  ));
 
   $initGetIt(getIt);
 }

@@ -33,6 +33,7 @@ import 'services/logging_service.dart';
 import 'services/network_service.dart';
 import 'services/secure_storage_service.dart';
 import 'services/settings_service.dart';
+import 'services/sync_service.dart';
 import 'telemetry.dart';
 import 'ui/pages/main_page.dart';
 import 'ui/widgets/splash_screen.dart';
@@ -98,7 +99,8 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(create: (ctx) => TransactionsLast7DaysBloc()),
           BlocProvider(create: (ctx) {
             final settingsService = getIt<SettingsService>();
-            return SettingsBloc(settingsService);
+            final secureStorage = getIt<SecureStorageService>();
+            return SettingsBloc(settingsService, secureStorage);
           }),
           BlocProvider(create: (ctx) {
             final logger = getIt<LoggingService>();
@@ -130,8 +132,8 @@ class _MyAppState extends State<MyApp> {
           }),
           BlocProvider(create: (ctx) {
             final logger = getIt<LoggingService>();
-            final settingsService = getIt<SettingsService>();
-            return PasswordDialogBloc(logger, settingsService);
+            final secureStorage = getIt<SecureStorageService>();
+            return PasswordDialogBloc(logger, secureStorage);
           }),
           BlocProvider(create: (ctx) {
             final logger = getIt<LoggingService>();
@@ -145,12 +147,14 @@ class _MyAppState extends State<MyApp> {
             final usersDao = getIt<UsersDao>();
             final networkService = getIt<NetworkService>();
             final secureStorage = getIt<SecureStorageService>();
+            final syncService = getIt<SyncService>();
             return SignInWithGoogleBloc(
               logger,
               usersDao,
               googleService,
               networkService,
               secureStorage,
+              syncService,
             );
           }),
         ],

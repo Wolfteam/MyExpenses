@@ -1,3 +1,4 @@
+import '../models/drive/transaction.dart' as sync_trans;
 import '../models/transaction_item.dart';
 
 abstract class TransactionsDao {
@@ -29,4 +30,12 @@ abstract class TransactionsDao {
     int id, {
     bool keepChildTransactions = false,
   });
+
+  Future<List<sync_trans.Transaction>> getAllTransactionsToSync();
+
+  Future<void> deleteTransactions(List<sync_trans.Transaction> existingTrans);
+
+  Future<void> createTransactions(List<sync_trans.Transaction> existingTrans);
+
+  Future<void> updateTransactions(List<sync_trans.Transaction> existingTrans);
 }

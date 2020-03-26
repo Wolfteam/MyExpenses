@@ -54,6 +54,8 @@ class _SignInWithGoogleWebViewState extends State<SignInWithGoogleWebView> {
           } else if (!state.isNetworkAvailable) {
             Navigator.of(ctx).pop();
             showWarningToast(i18n.networkIsNotAvailable);
+          } else if (state.anErrorOccurred) {
+            showErrorToast(i18n.unknownErrorOcurred);
           }
         }
       },

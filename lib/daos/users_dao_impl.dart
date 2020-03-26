@@ -29,6 +29,7 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase>
     final existingUser = await (select(users)
           ..where((u) => u.googleUserId.equals(googleUserId)))
         .getSingle();
+    final now = DateTime.now();
     //user exists
     if (existingUser != null) {
       id = existingUser.id;
@@ -37,7 +38,7 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase>
         isActive: const Value(false),
         name: Value(fullName),
         pictureUrl: Value(imgUrl),
-        updatedAt: Value(DateTime.now()),
+        updatedAt: Value(now),
         updatedBy: const Value(createdBy),
       );
       await (update(users)..where((u) => u.id.equals(existingUser.id)))
@@ -50,6 +51,16 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase>
         email: email,
         pictureUrl: imgUrl,
         createdBy: createdBy,
+        createdAt: now,
+        createdHash: createdHash([
+          googleUserId,
+          false,
+          fullName,
+          email,
+          imgUrl,
+          createdBy,
+          now,
+        ]),
       ));
     }
 

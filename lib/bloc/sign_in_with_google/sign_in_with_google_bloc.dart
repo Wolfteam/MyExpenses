@@ -12,6 +12,7 @@ import '../../services/google_service.dart';
 import '../../services/logging_service.dart';
 import '../../services/network_service.dart';
 import '../../services/secure_storage_service.dart';
+import '../../services/sync_service.dart';
 
 part 'sign_in_with_google_event.dart';
 part 'sign_in_with_google_state.dart';
@@ -23,6 +24,7 @@ class SignInWithGoogleBloc
   final GoogleService _googleService;
   final NetworkService _networkService;
   final SecureStorageService _secureStorageService;
+  final SyncService _syncService;
 
   @override
   SignInWithGoogleState get initialState => UnninitializedState();
@@ -35,6 +37,7 @@ class SignInWithGoogleBloc
     this._googleService,
     this._networkService,
     this._secureStorageService,
+    this._syncService,
   );
 
   @override
@@ -63,77 +66,88 @@ class SignInWithGoogleBloc
 
     yield currentState.copyWith(codeGranted: true);
 
-    final isSignedIn =
-        await _googleService.exchangeAuthCodeAndSaveCredentials(authCode);
-    if (!isSignedIn) {
+    try {
+      final isSignedIn =
+          await _googleService.exchangeAuthCodeAndSaveCredentials(authCode);
+      if (!isSignedIn) {
+        _logger.info(
+          runtimeType,
+          '_signIn: Code exchange failed',
+        );
+        yield currentState.copyWith(flowCompleted: true, codeGranted: false);
+        return;
+      }
+
+      _logger.info(runtimeType, '_signIn: Getting user info...');
+      var user = await _googleService.getUserInfo();
+      if (user == null) {
+        yield currentState.copyWith(flowCompleted: true, codeGranted: false);
+        return;
+      }
+
       _logger.info(
-        runtimeType,
-        '_signIn: Code exchange failed',
+          runtimeType, '_signIn: Saving logged user into secure storage...');
+
+      //This needs to be saved here before making any authenticated request
+      await Future.wait([
+        _secureStorageService.save(
+          SecureResourceType.currentUser,
+          _secureStorageService.defaultUsername,
+          user.email,
+        ),
+        _secureStorageService.update(
+          SecureResourceType.accessTokenData,
+          _secureStorageService.defaultUsername,
+          true,
+          user.email,
+        ),
+        _secureStorageService.update(
+          SecureResourceType.accessTokenExpiricy,
+          _secureStorageService.defaultUsername,
+          true,
+          user.email,
+        ),
+        _secureStorageService.update(
+          SecureResourceType.accessTokenType,
+          _secureStorageService.defaultUsername,
+          true,
+          user.email,
+        ),
+        _secureStorageService.update(
+          SecureResourceType.refreshToken,
+          _secureStorageService.defaultUsername,
+          true,
+          user.email,
+        )
+      ]);
+
+      if (!user.pictureUrl.isNullEmptyOrWhitespace) {
+        _logger.info(runtimeType, '_signIn: Saving user img...');
+        final imgPath = await ImageUtils.saveNetworkImage(user.pictureUrl);
+        user = user.copyWith(pictureUrl: imgPath);
+      }
+
+      _logger.info(runtimeType, '_signIn: Saving user into db...');
+      await _usersDao.saveUser(
+        user.googleUserId,
+        user.name,
+        user.email,
+        user.pictureUrl,
       );
+      _logger.info(runtimeType, '_signIn: User was succesfully saved...');
+
+      await _syncService.initializeAppFolderAndFiles();
+      
       yield currentState.copyWith(flowCompleted: true, codeGranted: false);
-      return;
+    } on Exception catch (e, s) {
+      _logger.error(runtimeType, '_signIn: Unknown error occurred', e, s);
+      yield currentState.copyWith(
+        flowCompleted: true,
+        codeGranted: false,
+        anErrorOccurred: true,
+      );
     }
 
-    _logger.info(runtimeType, '_signIn: Getting user info...');
-    var user = await _googleService.getUserInfo();
-    if (user == null) {
-      yield currentState.copyWith(flowCompleted: true, codeGranted: false);
-      return;
-    }
-
-    _logger.info(
-        runtimeType, '_signIn: Saving logged user into secure storage...');
-
-    await Future.wait([
-      _secureStorageService.save(
-        SecureResourceType.currentUser,
-        _secureStorageService.defaultUsername,
-        user.email,
-      ),
-      _secureStorageService.update(
-        SecureResourceType.accessTokenData,
-        _secureStorageService.defaultUsername,
-        true,
-        user.email,
-      ),
-      _secureStorageService.update(
-        SecureResourceType.accessTokenExpiricy,
-        _secureStorageService.defaultUsername,
-        true,
-        user.email,
-      ),
-      _secureStorageService.update(
-        SecureResourceType.accessTokenType,
-        _secureStorageService.defaultUsername,
-        true,
-        user.email,
-      ),
-      _secureStorageService.update(
-        SecureResourceType.refreshToken,
-        _secureStorageService.defaultUsername,
-        true,
-        user.email,
-      )
-    ]);
-
-    if (!user.pictureUrl.isNullEmptyOrWhitespace) {
-      _logger.info(runtimeType, '_signIn: Saving user img...');
-      final imgPath = await ImageUtils.saveNetworkImage(user.pictureUrl);
-      user = user.copyWith(pictureUrl: imgPath);
-    }
-
-    _logger.info(runtimeType, '_signIn: Saving user into db...');
-
-    await _usersDao.saveUser(
-      user.googleUserId,
-      user.name,
-      user.email,
-      user.pictureUrl,
-    );
-
-    _logger.info(runtimeType, '_signIn: User was succesfully saved...');
-
-    yield currentState.copyWith(flowCompleted: true, codeGranted: false);
     yield UnninitializedState();
   }
 }

@@ -15,6 +15,7 @@ class InitializedState extends SignInWithGoogleState {
   final bool isNetworkAvailable;
   final bool codeGranted;
   final bool flowCompleted;
+  final bool anErrorOccurred;
 
   @override
   List<Object> get props => [
@@ -22,6 +23,7 @@ class InitializedState extends SignInWithGoogleState {
         isNetworkAvailable,
         codeGranted,
         flowCompleted,
+        anErrorOccurred,
       ];
 
   const InitializedState({
@@ -29,18 +31,21 @@ class InitializedState extends SignInWithGoogleState {
     @required this.isNetworkAvailable,
     this.codeGranted = false,
     this.flowCompleted = false,
+    this.anErrorOccurred = false,
   });
 
   InitializedState copyWith({
     bool isNetworkAvailable,
     bool codeGranted,
     bool flowCompleted,
+    bool anErrorOccurred,
   }) {
     return InitializedState(
       authUrl: authUrl,
       isNetworkAvailable: isNetworkAvailable ?? this.isNetworkAvailable,
       codeGranted: codeGranted ?? this.codeGranted,
       flowCompleted: flowCompleted ?? this.flowCompleted,
+      anErrorOccurred: anErrorOccurred ?? this.anErrorOccurred,
     );
   }
 }

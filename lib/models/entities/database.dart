@@ -1,6 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:convert/convert.dart';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:moor/moor.dart';
 import 'package:moor_ffi/moor_ffi.dart';
 import 'package:path/path.dart' as p;
@@ -13,6 +17,8 @@ import '../../daos/categories_dao.dart';
 import '../../daos/transactions_dao.dart';
 import '../../daos/users_dao.dart';
 import '../../models/category_item.dart';
+import '../../models/drive/category.dart' as sync_cat;
+import '../../models/drive/transaction.dart' as sync_trans;
 import '../../models/transaction_item.dart';
 import '../../models/user_item.dart';
 import 'base_entity.dart';
@@ -27,6 +33,19 @@ part 'users.dart';
 
 const createdBy = 'system';
 
+String createdHash(List<Object> columns) {
+  final output = AccumulatorSink<Digest>();
+  final input = sha256.startChunkedConversion(output);
+
+  for (final value in columns) {
+    final bytes = utf8.encode('$value');
+    input.add(bytes);
+  }
+  input.close();
+
+  return output.events.single.toString();
+}
+
 LazyDatabase _openConnection() {
   // the LazyDatabase util lets us find the right location for the file async.
   return LazyDatabase(() async {
@@ -34,7 +53,7 @@ LazyDatabase _openConnection() {
     // for your app.
     final dbFolder = await getApplicationDocumentsDirectory();
     final file = File(p.join(dbFolder.path, 'my_expenses.sqlite'));
-    //TODO: CHANGE THIS
+    // TODO: CHANGE THIS
     // if (await file.exists()) {
     //   debugPrint('Deleting database');
     //   debugPrint('Db path =  ${dbFolder.path}');
@@ -70,8 +89,9 @@ class AppDatabase extends _$AppDatabase {
         },
         beforeOpen: (details) async {
           if (details.wasCreated) {
+            final defaultCats = getDefaultCategories();
             await batch((b) {
-              b.insertAll(categories, getDefaultCategories());
+              b.insertAll(categories, defaultCats);
               // b.insertAll(transactions, getDefaultTransactions());
               // b.insertAll(transactions, getDefaultRecurringTransactions());
             });

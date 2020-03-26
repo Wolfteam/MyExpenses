@@ -6,6 +6,7 @@ import 'package:googleapis/people/v1.dart' as people;
 import 'package:googleapis/sheets/v4.dart' as sheets;
 import 'package:googleapis_auth/auth_io.dart' as g_auth;
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart';
 
 import '../common/enums/secure_resource_type.dart';
 import '../models/user_item.dart';
@@ -20,12 +21,26 @@ abstract class GoogleService {
   Future<bool> exchangeAuthCodeAndSaveCredentials(String code);
 
   Future<UserItem> getUserInfo();
+
+  Future<String> getAppFolder();
+
+  Future<String> createAppDriveFolder();
+
+  Future<String> uploadFile(String folderId, String filePath);
+
+  Future<File> downloadFile(String fileName, String filePath);
 }
 
+//TODO: WILL THE ACCESS TOKEN GET REFRESHED
 class GoogleServiceImpl implements GoogleService {
   final SecureStorageService _secureStorageService;
 
   static const _baseGoogleApisUrl = 'https://www.googleapis.com';
+  static const _folder = 'My Expenses';
+  static const _folderMimeType = 'application/vnd.google-apps.folder';
+  static const _spreadSheetName = 'Default SpreadSheet';
+  static const _spreadSheetMimeType = 'application/vnd.google-apps.spreadsheet';
+
   final _authUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
   final String _tokenUrl = '$_baseGoogleApisUrl/oauth2/v4/token';
   final _redirectUrl = 'http://localhost';
@@ -112,26 +127,130 @@ class GoogleServiceImpl implements GoogleService {
     }
   }
 
-  Future<void> uploadFile(String file, String name) async {
+  @override
+  Future<String> getAppFolder() async {
     final client = await _getAuthClient();
     final api = drive.DriveApi(client);
-    final localFile = File(file);
-    final media = drive.Media(localFile.openRead(), localFile.lengthSync());
-    final driveFile = drive.File();
-    driveFile.name = name;
-    driveFile.description = 'Uploaded by My Expenses';
-    return api.files.create(driveFile, uploadMedia: media).then((f) {
-      print('Uploaded $file. Id: ${f.id}');
-    });
+    final fileList = await api.files.list(
+      q: "name='$_folder' and mimeType='$_folderMimeType'",
+      includeItemsFromAllDrives: true,
+      supportsAllDrives: true,
+    );
+
+    if (fileList.files.isNotEmpty) {
+      final folder = fileList.files.first;
+      if (folder.trashed != null && folder.trashed) return null;
+      return folder.id;
+    }
+    return null;
   }
 
-  Future downloadFile(
-    drive.DriveApi api,
-    http.Client client,
-    String objectId,
+  @override
+  Future<String> createAppDriveFolder() async {
+    final client = await _getAuthClient();
+    final api = drive.DriveApi(client);
+    final driveFile = drive.File()
+      ..name = _folder
+      ..mimeType = _folderMimeType;
+
+    final folder = await api.files.create(driveFile);
+    return folder.id;
+  }
+
+  Future<String> createAppSheet(String folderId) async {
+    final client = await _getAuthClient();
+    final api = drive.DriveApi(client);
+    final driveFile = drive.File()
+      ..name = _spreadSheetName
+      ..mimeType = _spreadSheetMimeType
+      ..parents = [folderId];
+
+    final spreadSheet = await api.files.create(driveFile);
+    await initializeAppSheet(spreadSheet.id);
+    return spreadSheet.id;
+  }
+
+  @override
+  Future<File> downloadFile(
+    String fileName,
+    String filePath,
+  ) async {
+    final client = await _getAuthClient();
+    final api = drive.DriveApi(client);
+    final fileList = await api.files.list(q: "name='$fileName'");
+
+    final file = await api.files.get(
+      fileList.files.first.id,
+      downloadOptions: drive.DownloadOptions.FullMedia,
+    ) as drive.Media;
+    final fileToSave = File(filePath);
+    final fileExists = await fileToSave.exists();
+    if (fileExists) {
+      await fileToSave.delete();
+    }
+
+    await fileToSave.openWrite().addStream(file.stream);
+
+    return fileToSave;
+  }
+
+  Future<void> initializeAppSheet(String spreadSheetId) async {
+    final client = await _getAuthClient();
+    final api = sheets.SheetsApi(client);
+
+    final spreadSheet = await api.spreadsheets.get(spreadSheetId);
+    final defaultSheetId = spreadSheet.sheets.first.properties.sheetId;
+
+    final transSheetProps = sheets.SheetProperties()..title = 'Transactitons';
+    final categoriesSheetProps = sheets.SheetProperties()..title = 'Categories';
+
+    final transSheetRequest = sheets.Request()
+      ..addSheet = (sheets.AddSheetRequest()..properties = transSheetProps);
+    final catSheetRequest = sheets.Request()
+      ..addSheet =
+          (sheets.AddSheetRequest()..properties = categoriesSheetProps);
+    final deleteRequest = sheets.Request()
+      ..deleteSheet = (sheets.DeleteSheetRequest()..sheetId = defaultSheetId);
+
+    final updateRequest = sheets.BatchUpdateSpreadsheetRequest()
+      ..requests = [
+        transSheetRequest,
+        catSheetRequest,
+        deleteRequest,
+      ];
+
+    await api.spreadsheets.batchUpdate(updateRequest, spreadSheetId);
+  }
+
+  @override
+  Future<String> uploadFile(String folderId, String filePath) async {
+    try {
+      final client = await _getAuthClient();
+      final api = drive.DriveApi(client);
+      final localFile = File(filePath);
+      final name = basename(localFile.path);
+      final media = drive.Media(localFile.openRead(), localFile.lengthSync());
+
+      final driveFile = drive.File()
+        ..name = name
+        ..description = 'Uploaded by My Expenses'
+        ..parents = [folderId];
+
+      final response = await api.files.create(driveFile, uploadMedia: media);
+      return response.id;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // @override
+  Future<void> downloadFileById(
+    String fileId,
     String filename,
-  ) {
-    return api.files.get(objectId).then((file) {
+  ) async {
+    final client = await _getAuthClient();
+    final api = drive.DriveApi(client);
+    return api.files.get(fileId).then((file) {
       // The Drive API allows one to download files via `File.downloadUrl`.
       return client.readBytes(file.downloadUrl).then((bytes) {
         final stream = File(filename).openWrite()..add(bytes);

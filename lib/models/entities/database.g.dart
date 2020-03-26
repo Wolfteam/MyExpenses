@@ -11,6 +11,7 @@ class User extends DataClass implements Insertable<User> {
   final int id;
   final DateTime createdAt;
   final String createdBy;
+  final String createdHash;
   final DateTime updatedAt;
   final String updatedBy;
   final String googleUserId;
@@ -22,6 +23,7 @@ class User extends DataClass implements Insertable<User> {
       {@required this.id,
       @required this.createdAt,
       @required this.createdBy,
+      @required this.createdHash,
       this.updatedAt,
       this.updatedBy,
       @required this.googleUserId,
@@ -42,6 +44,8 @@ class User extends DataClass implements Insertable<User> {
           .mapFromDatabaseResponse(data['${effectivePrefix}created_at']),
       createdBy: stringType
           .mapFromDatabaseResponse(data['${effectivePrefix}created_by']),
+      createdHash: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}created_hash']),
       updatedAt: dateTimeType
           .mapFromDatabaseResponse(data['${effectivePrefix}updated_at']),
       updatedBy: stringType
@@ -64,6 +68,7 @@ class User extends DataClass implements Insertable<User> {
       id: serializer.fromJson<int>(json['id']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       createdBy: serializer.fromJson<String>(json['createdBy']),
+      createdHash: serializer.fromJson<String>(json['createdHash']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       updatedBy: serializer.fromJson<String>(json['updatedBy']),
       googleUserId: serializer.fromJson<String>(json['googleUserId']),
@@ -80,6 +85,7 @@ class User extends DataClass implements Insertable<User> {
       'id': serializer.toJson<int>(id),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'createdBy': serializer.toJson<String>(createdBy),
+      'createdHash': serializer.toJson<String>(createdHash),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'updatedBy': serializer.toJson<String>(updatedBy),
       'googleUserId': serializer.toJson<String>(googleUserId),
@@ -100,6 +106,9 @@ class User extends DataClass implements Insertable<User> {
       createdBy: createdBy == null && nullToAbsent
           ? const Value.absent()
           : Value(createdBy),
+      createdHash: createdHash == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdHash),
       updatedAt: updatedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(updatedAt),
@@ -125,6 +134,7 @@ class User extends DataClass implements Insertable<User> {
           {int id,
           DateTime createdAt,
           String createdBy,
+          String createdHash,
           DateTime updatedAt,
           String updatedBy,
           String googleUserId,
@@ -136,6 +146,7 @@ class User extends DataClass implements Insertable<User> {
         id: id ?? this.id,
         createdAt: createdAt ?? this.createdAt,
         createdBy: createdBy ?? this.createdBy,
+        createdHash: createdHash ?? this.createdHash,
         updatedAt: updatedAt ?? this.updatedAt,
         updatedBy: updatedBy ?? this.updatedBy,
         googleUserId: googleUserId ?? this.googleUserId,
@@ -150,6 +161,7 @@ class User extends DataClass implements Insertable<User> {
           ..write('id: $id, ')
           ..write('createdAt: $createdAt, ')
           ..write('createdBy: $createdBy, ')
+          ..write('createdHash: $createdHash, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('updatedBy: $updatedBy, ')
           ..write('googleUserId: $googleUserId, ')
@@ -169,17 +181,19 @@ class User extends DataClass implements Insertable<User> {
           $mrjc(
               createdBy.hashCode,
               $mrjc(
-                  updatedAt.hashCode,
+                  createdHash.hashCode,
                   $mrjc(
-                      updatedBy.hashCode,
+                      updatedAt.hashCode,
                       $mrjc(
-                          googleUserId.hashCode,
+                          updatedBy.hashCode,
                           $mrjc(
-                              name.hashCode,
+                              googleUserId.hashCode,
                               $mrjc(
-                                  email.hashCode,
-                                  $mrjc(pictureUrl.hashCode,
-                                      isActive.hashCode))))))))));
+                                  name.hashCode,
+                                  $mrjc(
+                                      email.hashCode,
+                                      $mrjc(pictureUrl.hashCode,
+                                          isActive.hashCode)))))))))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
@@ -187,6 +201,7 @@ class User extends DataClass implements Insertable<User> {
           other.id == this.id &&
           other.createdAt == this.createdAt &&
           other.createdBy == this.createdBy &&
+          other.createdHash == this.createdHash &&
           other.updatedAt == this.updatedAt &&
           other.updatedBy == this.updatedBy &&
           other.googleUserId == this.googleUserId &&
@@ -200,6 +215,7 @@ class UsersCompanion extends UpdateCompanion<User> {
   final Value<int> id;
   final Value<DateTime> createdAt;
   final Value<String> createdBy;
+  final Value<String> createdHash;
   final Value<DateTime> updatedAt;
   final Value<String> updatedBy;
   final Value<String> googleUserId;
@@ -211,6 +227,7 @@ class UsersCompanion extends UpdateCompanion<User> {
     this.id = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.createdBy = const Value.absent(),
+    this.createdHash = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.updatedBy = const Value.absent(),
     this.googleUserId = const Value.absent(),
@@ -221,8 +238,9 @@ class UsersCompanion extends UpdateCompanion<User> {
   });
   UsersCompanion.insert({
     this.id = const Value.absent(),
-    this.createdAt = const Value.absent(),
+    @required DateTime createdAt,
     @required String createdBy,
+    @required String createdHash,
     this.updatedAt = const Value.absent(),
     this.updatedBy = const Value.absent(),
     @required String googleUserId,
@@ -230,7 +248,9 @@ class UsersCompanion extends UpdateCompanion<User> {
     @required String email,
     this.pictureUrl = const Value.absent(),
     this.isActive = const Value.absent(),
-  })  : createdBy = Value(createdBy),
+  })  : createdAt = Value(createdAt),
+        createdBy = Value(createdBy),
+        createdHash = Value(createdHash),
         googleUserId = Value(googleUserId),
         name = Value(name),
         email = Value(email);
@@ -238,6 +258,7 @@ class UsersCompanion extends UpdateCompanion<User> {
       {Value<int> id,
       Value<DateTime> createdAt,
       Value<String> createdBy,
+      Value<String> createdHash,
       Value<DateTime> updatedAt,
       Value<String> updatedBy,
       Value<String> googleUserId,
@@ -249,6 +270,7 @@ class UsersCompanion extends UpdateCompanion<User> {
       id: id ?? this.id,
       createdAt: createdAt ?? this.createdAt,
       createdBy: createdBy ?? this.createdBy,
+      createdHash: createdHash ?? this.createdHash,
       updatedAt: updatedAt ?? this.updatedAt,
       updatedBy: updatedBy ?? this.updatedBy,
       googleUserId: googleUserId ?? this.googleUserId,
@@ -282,7 +304,7 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
       'created_at',
       $tableName,
       false,
-    )..clientDefault = () => DateTime.now();
+    );
   }
 
   final VerificationMeta _createdByMeta = const VerificationMeta('createdBy');
@@ -292,6 +314,20 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   GeneratedTextColumn _constructCreatedBy() {
     return GeneratedTextColumn('created_by', $tableName, false,
         minTextLength: 0, maxTextLength: 255);
+  }
+
+  final VerificationMeta _createdHashMeta =
+      const VerificationMeta('createdHash');
+  GeneratedTextColumn _createdHash;
+  @override
+  GeneratedTextColumn get createdHash =>
+      _createdHash ??= _constructCreatedHash();
+  GeneratedTextColumn _constructCreatedHash() {
+    return GeneratedTextColumn(
+      'created_hash',
+      $tableName,
+      false,
+    );
   }
 
   final VerificationMeta _updatedAtMeta = const VerificationMeta('updatedAt');
@@ -373,6 +409,7 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
         id,
         createdAt,
         createdBy,
+        createdHash,
         updatedAt,
         updatedBy,
         googleUserId,
@@ -397,12 +434,20 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     if (d.createdAt.present) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableValue(d.createdAt.value, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
     }
     if (d.createdBy.present) {
       context.handle(_createdByMeta,
           createdBy.isAcceptableValue(d.createdBy.value, _createdByMeta));
     } else if (isInserting) {
       context.missing(_createdByMeta);
+    }
+    if (d.createdHash.present) {
+      context.handle(_createdHashMeta,
+          createdHash.isAcceptableValue(d.createdHash.value, _createdHashMeta));
+    } else if (isInserting) {
+      context.missing(_createdHashMeta);
     }
     if (d.updatedAt.present) {
       context.handle(_updatedAtMeta,
@@ -463,6 +508,9 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     if (d.createdBy.present) {
       map['created_by'] = Variable<String, StringType>(d.createdBy.value);
     }
+    if (d.createdHash.present) {
+      map['created_hash'] = Variable<String, StringType>(d.createdHash.value);
+    }
     if (d.updatedAt.present) {
       map['updated_at'] = Variable<DateTime, DateTimeType>(d.updatedAt.value);
     }
@@ -498,6 +546,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   final int id;
   final DateTime createdAt;
   final String createdBy;
+  final String createdHash;
   final DateTime updatedAt;
   final String updatedBy;
   final double amount;
@@ -513,6 +562,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       {@required this.id,
       @required this.createdAt,
       @required this.createdBy,
+      @required this.createdHash,
       this.updatedAt,
       this.updatedBy,
       @required this.amount,
@@ -538,6 +588,8 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           .mapFromDatabaseResponse(data['${effectivePrefix}created_at']),
       createdBy: stringType
           .mapFromDatabaseResponse(data['${effectivePrefix}created_by']),
+      createdHash: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}created_hash']),
       updatedAt: dateTimeType
           .mapFromDatabaseResponse(data['${effectivePrefix}updated_at']),
       updatedBy: stringType
@@ -569,6 +621,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       id: serializer.fromJson<int>(json['id']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       createdBy: serializer.fromJson<String>(json['createdBy']),
+      createdHash: serializer.fromJson<String>(json['createdHash']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       updatedBy: serializer.fromJson<String>(json['updatedBy']),
       amount: serializer.fromJson<double>(json['amount']),
@@ -593,6 +646,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       'id': serializer.toJson<int>(id),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'createdBy': serializer.toJson<String>(createdBy),
+      'createdHash': serializer.toJson<String>(createdHash),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'updatedBy': serializer.toJson<String>(updatedBy),
       'amount': serializer.toJson<double>(amount),
@@ -618,6 +672,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       createdBy: createdBy == null && nullToAbsent
           ? const Value.absent()
           : Value(createdBy),
+      createdHash: createdHash == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdHash),
       updatedAt: updatedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(updatedAt),
@@ -657,6 +714,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           {int id,
           DateTime createdAt,
           String createdBy,
+          String createdHash,
           DateTime updatedAt,
           String updatedBy,
           double amount,
@@ -672,6 +730,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
         id: id ?? this.id,
         createdAt: createdAt ?? this.createdAt,
         createdBy: createdBy ?? this.createdBy,
+        createdHash: createdHash ?? this.createdHash,
         updatedAt: updatedAt ?? this.updatedAt,
         updatedBy: updatedBy ?? this.updatedBy,
         amount: amount ?? this.amount,
@@ -690,6 +749,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           ..write('id: $id, ')
           ..write('createdAt: $createdAt, ')
           ..write('createdBy: $createdBy, ')
+          ..write('createdHash: $createdHash, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('updatedBy: $updatedBy, ')
           ..write('amount: $amount, ')
@@ -713,27 +773,30 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           $mrjc(
               createdBy.hashCode,
               $mrjc(
-                  updatedAt.hashCode,
+                  createdHash.hashCode,
                   $mrjc(
-                      updatedBy.hashCode,
+                      updatedAt.hashCode,
                       $mrjc(
-                          amount.hashCode,
+                          updatedBy.hashCode,
                           $mrjc(
-                              description.hashCode,
+                              amount.hashCode,
                               $mrjc(
-                                  transactionDate.hashCode,
+                                  description.hashCode,
                                   $mrjc(
-                                      repetitionCycle.hashCode,
+                                      transactionDate.hashCode,
                                       $mrjc(
-                                          parentTransactionId.hashCode,
+                                          repetitionCycle.hashCode,
                                           $mrjc(
-                                              isParentTransaction.hashCode,
+                                              parentTransactionId.hashCode,
                                               $mrjc(
-                                                  nextRecurringDate.hashCode,
+                                                  isParentTransaction.hashCode,
                                                   $mrjc(
-                                                      imagePath.hashCode,
-                                                      categoryId
-                                                          .hashCode))))))))))))));
+                                                      nextRecurringDate
+                                                          .hashCode,
+                                                      $mrjc(
+                                                          imagePath.hashCode,
+                                                          categoryId
+                                                              .hashCode)))))))))))))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
@@ -741,6 +804,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           other.id == this.id &&
           other.createdAt == this.createdAt &&
           other.createdBy == this.createdBy &&
+          other.createdHash == this.createdHash &&
           other.updatedAt == this.updatedAt &&
           other.updatedBy == this.updatedBy &&
           other.amount == this.amount &&
@@ -758,6 +822,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   final Value<int> id;
   final Value<DateTime> createdAt;
   final Value<String> createdBy;
+  final Value<String> createdHash;
   final Value<DateTime> updatedAt;
   final Value<String> updatedBy;
   final Value<double> amount;
@@ -773,6 +838,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.id = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.createdBy = const Value.absent(),
+    this.createdHash = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.updatedBy = const Value.absent(),
     this.amount = const Value.absent(),
@@ -787,8 +853,9 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   });
   TransactionsCompanion.insert({
     this.id = const Value.absent(),
-    this.createdAt = const Value.absent(),
+    @required DateTime createdAt,
     @required String createdBy,
+    @required String createdHash,
     this.updatedAt = const Value.absent(),
     this.updatedBy = const Value.absent(),
     @required double amount,
@@ -800,7 +867,9 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.nextRecurringDate = const Value.absent(),
     this.imagePath = const Value.absent(),
     @required int categoryId,
-  })  : createdBy = Value(createdBy),
+  })  : createdAt = Value(createdAt),
+        createdBy = Value(createdBy),
+        createdHash = Value(createdHash),
         amount = Value(amount),
         description = Value(description),
         transactionDate = Value(transactionDate),
@@ -811,6 +880,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       {Value<int> id,
       Value<DateTime> createdAt,
       Value<String> createdBy,
+      Value<String> createdHash,
       Value<DateTime> updatedAt,
       Value<String> updatedBy,
       Value<double> amount,
@@ -826,6 +896,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       id: id ?? this.id,
       createdAt: createdAt ?? this.createdAt,
       createdBy: createdBy ?? this.createdBy,
+      createdHash: createdHash ?? this.createdHash,
       updatedAt: updatedAt ?? this.updatedAt,
       updatedBy: updatedBy ?? this.updatedBy,
       amount: amount ?? this.amount,
@@ -864,7 +935,7 @@ class $TransactionsTable extends Transactions
       'created_at',
       $tableName,
       false,
-    )..clientDefault = () => DateTime.now();
+    );
   }
 
   final VerificationMeta _createdByMeta = const VerificationMeta('createdBy');
@@ -874,6 +945,20 @@ class $TransactionsTable extends Transactions
   GeneratedTextColumn _constructCreatedBy() {
     return GeneratedTextColumn('created_by', $tableName, false,
         minTextLength: 0, maxTextLength: 255);
+  }
+
+  final VerificationMeta _createdHashMeta =
+      const VerificationMeta('createdHash');
+  GeneratedTextColumn _createdHash;
+  @override
+  GeneratedTextColumn get createdHash =>
+      _createdHash ??= _constructCreatedHash();
+  GeneratedTextColumn _constructCreatedHash() {
+    return GeneratedTextColumn(
+      'created_hash',
+      $tableName,
+      false,
+    );
   }
 
   final VerificationMeta _updatedAtMeta = const VerificationMeta('updatedAt');
@@ -1016,6 +1101,7 @@ class $TransactionsTable extends Transactions
         id,
         createdAt,
         createdBy,
+        createdHash,
         updatedAt,
         updatedBy,
         amount,
@@ -1044,12 +1130,20 @@ class $TransactionsTable extends Transactions
     if (d.createdAt.present) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableValue(d.createdAt.value, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
     }
     if (d.createdBy.present) {
       context.handle(_createdByMeta,
           createdBy.isAcceptableValue(d.createdBy.value, _createdByMeta));
     } else if (isInserting) {
       context.missing(_createdByMeta);
+    }
+    if (d.createdHash.present) {
+      context.handle(_createdHashMeta,
+          createdHash.isAcceptableValue(d.createdHash.value, _createdHashMeta));
+    } else if (isInserting) {
+      context.missing(_createdHashMeta);
     }
     if (d.updatedAt.present) {
       context.handle(_updatedAtMeta,
@@ -1133,6 +1227,9 @@ class $TransactionsTable extends Transactions
     if (d.createdBy.present) {
       map['created_by'] = Variable<String, StringType>(d.createdBy.value);
     }
+    if (d.createdHash.present) {
+      map['created_hash'] = Variable<String, StringType>(d.createdHash.value);
+    }
     if (d.updatedAt.present) {
       map['updated_at'] = Variable<DateTime, DateTimeType>(d.updatedAt.value);
     }
@@ -1188,22 +1285,26 @@ class Category extends DataClass implements Insertable<Category> {
   final int id;
   final DateTime createdAt;
   final String createdBy;
+  final String createdHash;
   final DateTime updatedAt;
   final String updatedBy;
   final String name;
   final bool isAnIncome;
   final IconData icon;
   final Color iconColor;
+  final int userId;
   Category(
       {@required this.id,
       @required this.createdAt,
       @required this.createdBy,
+      @required this.createdHash,
       this.updatedAt,
       this.updatedBy,
       @required this.name,
       @required this.isAnIncome,
       @required this.icon,
-      @required this.iconColor});
+      @required this.iconColor,
+      this.userId});
   factory Category.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
     final effectivePrefix = prefix ?? '';
@@ -1217,6 +1318,8 @@ class Category extends DataClass implements Insertable<Category> {
           .mapFromDatabaseResponse(data['${effectivePrefix}created_at']),
       createdBy: stringType
           .mapFromDatabaseResponse(data['${effectivePrefix}created_by']),
+      createdHash: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}created_hash']),
       updatedAt: dateTimeType
           .mapFromDatabaseResponse(data['${effectivePrefix}updated_at']),
       updatedBy: stringType
@@ -1228,6 +1331,8 @@ class Category extends DataClass implements Insertable<Category> {
           stringType.mapFromDatabaseResponse(data['${effectivePrefix}icon'])),
       iconColor: $CategoriesTable.$converter1.mapToDart(intType
           .mapFromDatabaseResponse(data['${effectivePrefix}icon_color'])),
+      userId:
+          intType.mapFromDatabaseResponse(data['${effectivePrefix}user_id']),
     );
   }
   factory Category.fromJson(Map<String, dynamic> json,
@@ -1237,12 +1342,14 @@ class Category extends DataClass implements Insertable<Category> {
       id: serializer.fromJson<int>(json['id']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       createdBy: serializer.fromJson<String>(json['createdBy']),
+      createdHash: serializer.fromJson<String>(json['createdHash']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       updatedBy: serializer.fromJson<String>(json['updatedBy']),
       name: serializer.fromJson<String>(json['name']),
       isAnIncome: serializer.fromJson<bool>(json['isAnIncome']),
       icon: serializer.fromJson<IconData>(json['icon']),
       iconColor: serializer.fromJson<Color>(json['iconColor']),
+      userId: serializer.fromJson<int>(json['userId']),
     );
   }
   @override
@@ -1252,12 +1359,14 @@ class Category extends DataClass implements Insertable<Category> {
       'id': serializer.toJson<int>(id),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'createdBy': serializer.toJson<String>(createdBy),
+      'createdHash': serializer.toJson<String>(createdHash),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'updatedBy': serializer.toJson<String>(updatedBy),
       'name': serializer.toJson<String>(name),
       'isAnIncome': serializer.toJson<bool>(isAnIncome),
       'icon': serializer.toJson<IconData>(icon),
       'iconColor': serializer.toJson<Color>(iconColor),
+      'userId': serializer.toJson<int>(userId),
     };
   }
 
@@ -1271,6 +1380,9 @@ class Category extends DataClass implements Insertable<Category> {
       createdBy: createdBy == null && nullToAbsent
           ? const Value.absent()
           : Value(createdBy),
+      createdHash: createdHash == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdHash),
       updatedAt: updatedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(updatedAt),
@@ -1285,6 +1397,8 @@ class Category extends DataClass implements Insertable<Category> {
       iconColor: iconColor == null && nullToAbsent
           ? const Value.absent()
           : Value(iconColor),
+      userId:
+          userId == null && nullToAbsent ? const Value.absent() : Value(userId),
     );
   }
 
@@ -1292,22 +1406,26 @@ class Category extends DataClass implements Insertable<Category> {
           {int id,
           DateTime createdAt,
           String createdBy,
+          String createdHash,
           DateTime updatedAt,
           String updatedBy,
           String name,
           bool isAnIncome,
           IconData icon,
-          Color iconColor}) =>
+          Color iconColor,
+          int userId}) =>
       Category(
         id: id ?? this.id,
         createdAt: createdAt ?? this.createdAt,
         createdBy: createdBy ?? this.createdBy,
+        createdHash: createdHash ?? this.createdHash,
         updatedAt: updatedAt ?? this.updatedAt,
         updatedBy: updatedBy ?? this.updatedBy,
         name: name ?? this.name,
         isAnIncome: isAnIncome ?? this.isAnIncome,
         icon: icon ?? this.icon,
         iconColor: iconColor ?? this.iconColor,
+        userId: userId ?? this.userId,
       );
   @override
   String toString() {
@@ -1315,12 +1433,14 @@ class Category extends DataClass implements Insertable<Category> {
           ..write('id: $id, ')
           ..write('createdAt: $createdAt, ')
           ..write('createdBy: $createdBy, ')
+          ..write('createdHash: $createdHash, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('updatedBy: $updatedBy, ')
           ..write('name: $name, ')
           ..write('isAnIncome: $isAnIncome, ')
           ..write('icon: $icon, ')
-          ..write('iconColor: $iconColor')
+          ..write('iconColor: $iconColor, ')
+          ..write('userId: $userId')
           ..write(')'))
         .toString();
   }
@@ -1333,13 +1453,19 @@ class Category extends DataClass implements Insertable<Category> {
           $mrjc(
               createdBy.hashCode,
               $mrjc(
-                  updatedAt.hashCode,
+                  createdHash.hashCode,
                   $mrjc(
-                      updatedBy.hashCode,
+                      updatedAt.hashCode,
                       $mrjc(
-                          name.hashCode,
-                          $mrjc(isAnIncome.hashCode,
-                              $mrjc(icon.hashCode, iconColor.hashCode)))))))));
+                          updatedBy.hashCode,
+                          $mrjc(
+                              name.hashCode,
+                              $mrjc(
+                                  isAnIncome.hashCode,
+                                  $mrjc(
+                                      icon.hashCode,
+                                      $mrjc(iconColor.hashCode,
+                                          userId.hashCode)))))))))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
@@ -1347,46 +1473,56 @@ class Category extends DataClass implements Insertable<Category> {
           other.id == this.id &&
           other.createdAt == this.createdAt &&
           other.createdBy == this.createdBy &&
+          other.createdHash == this.createdHash &&
           other.updatedAt == this.updatedAt &&
           other.updatedBy == this.updatedBy &&
           other.name == this.name &&
           other.isAnIncome == this.isAnIncome &&
           other.icon == this.icon &&
-          other.iconColor == this.iconColor);
+          other.iconColor == this.iconColor &&
+          other.userId == this.userId);
 }
 
 class CategoriesCompanion extends UpdateCompanion<Category> {
   final Value<int> id;
   final Value<DateTime> createdAt;
   final Value<String> createdBy;
+  final Value<String> createdHash;
   final Value<DateTime> updatedAt;
   final Value<String> updatedBy;
   final Value<String> name;
   final Value<bool> isAnIncome;
   final Value<IconData> icon;
   final Value<Color> iconColor;
+  final Value<int> userId;
   const CategoriesCompanion({
     this.id = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.createdBy = const Value.absent(),
+    this.createdHash = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.updatedBy = const Value.absent(),
     this.name = const Value.absent(),
     this.isAnIncome = const Value.absent(),
     this.icon = const Value.absent(),
     this.iconColor = const Value.absent(),
+    this.userId = const Value.absent(),
   });
   CategoriesCompanion.insert({
     this.id = const Value.absent(),
-    this.createdAt = const Value.absent(),
+    @required DateTime createdAt,
     @required String createdBy,
+    @required String createdHash,
     this.updatedAt = const Value.absent(),
     this.updatedBy = const Value.absent(),
     @required String name,
     @required bool isAnIncome,
     @required IconData icon,
     @required Color iconColor,
-  })  : createdBy = Value(createdBy),
+    this.userId = const Value.absent(),
+  })  : createdAt = Value(createdAt),
+        createdBy = Value(createdBy),
+        createdHash = Value(createdHash),
         name = Value(name),
         isAnIncome = Value(isAnIncome),
         icon = Value(icon),
@@ -1395,22 +1531,26 @@ class CategoriesCompanion extends UpdateCompanion<Category> {
       {Value<int> id,
       Value<DateTime> createdAt,
       Value<String> createdBy,
+      Value<String> createdHash,
       Value<DateTime> updatedAt,
       Value<String> updatedBy,
       Value<String> name,
       Value<bool> isAnIncome,
       Value<IconData> icon,
-      Value<Color> iconColor}) {
+      Value<Color> iconColor,
+      Value<int> userId}) {
     return CategoriesCompanion(
       id: id ?? this.id,
       createdAt: createdAt ?? this.createdAt,
       createdBy: createdBy ?? this.createdBy,
+      createdHash: createdHash ?? this.createdHash,
       updatedAt: updatedAt ?? this.updatedAt,
       updatedBy: updatedBy ?? this.updatedBy,
       name: name ?? this.name,
       isAnIncome: isAnIncome ?? this.isAnIncome,
       icon: icon ?? this.icon,
       iconColor: iconColor ?? this.iconColor,
+      userId: userId ?? this.userId,
     );
   }
 }
@@ -1438,7 +1578,7 @@ class $CategoriesTable extends Categories
       'created_at',
       $tableName,
       false,
-    )..clientDefault = () => DateTime.now();
+    );
   }
 
   final VerificationMeta _createdByMeta = const VerificationMeta('createdBy');
@@ -1448,6 +1588,20 @@ class $CategoriesTable extends Categories
   GeneratedTextColumn _constructCreatedBy() {
     return GeneratedTextColumn('created_by', $tableName, false,
         minTextLength: 0, maxTextLength: 255);
+  }
+
+  final VerificationMeta _createdHashMeta =
+      const VerificationMeta('createdHash');
+  GeneratedTextColumn _createdHash;
+  @override
+  GeneratedTextColumn get createdHash =>
+      _createdHash ??= _constructCreatedHash();
+  GeneratedTextColumn _constructCreatedHash() {
+    return GeneratedTextColumn(
+      'created_hash',
+      $tableName,
+      false,
+    );
   }
 
   final VerificationMeta _updatedAtMeta = const VerificationMeta('updatedAt');
@@ -1516,17 +1670,28 @@ class $CategoriesTable extends Categories
     );
   }
 
+  final VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  GeneratedIntColumn _userId;
+  @override
+  GeneratedIntColumn get userId => _userId ??= _constructUserId();
+  GeneratedIntColumn _constructUserId() {
+    return GeneratedIntColumn('user_id', $tableName, true,
+        $customConstraints: 'REFERENCES users(id)');
+  }
+
   @override
   List<GeneratedColumn> get $columns => [
         id,
         createdAt,
         createdBy,
+        createdHash,
         updatedAt,
         updatedBy,
         name,
         isAnIncome,
         icon,
-        iconColor
+        iconColor,
+        userId
       ];
   @override
   $CategoriesTable get asDslTable => this;
@@ -1544,12 +1709,20 @@ class $CategoriesTable extends Categories
     if (d.createdAt.present) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableValue(d.createdAt.value, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
     }
     if (d.createdBy.present) {
       context.handle(_createdByMeta,
           createdBy.isAcceptableValue(d.createdBy.value, _createdByMeta));
     } else if (isInserting) {
       context.missing(_createdByMeta);
+    }
+    if (d.createdHash.present) {
+      context.handle(_createdHashMeta,
+          createdHash.isAcceptableValue(d.createdHash.value, _createdHashMeta));
+    } else if (isInserting) {
+      context.missing(_createdHashMeta);
     }
     if (d.updatedAt.present) {
       context.handle(_updatedAtMeta,
@@ -1573,6 +1746,10 @@ class $CategoriesTable extends Categories
     }
     context.handle(_iconMeta, const VerificationResult.success());
     context.handle(_iconColorMeta, const VerificationResult.success());
+    if (d.userId.present) {
+      context.handle(
+          _userIdMeta, userId.isAcceptableValue(d.userId.value, _userIdMeta));
+    }
     return context;
   }
 
@@ -1596,6 +1773,9 @@ class $CategoriesTable extends Categories
     if (d.createdBy.present) {
       map['created_by'] = Variable<String, StringType>(d.createdBy.value);
     }
+    if (d.createdHash.present) {
+      map['created_hash'] = Variable<String, StringType>(d.createdHash.value);
+    }
     if (d.updatedAt.present) {
       map['updated_at'] = Variable<DateTime, DateTimeType>(d.updatedAt.value);
     }
@@ -1617,6 +1797,9 @@ class $CategoriesTable extends Categories
       final converter = $CategoriesTable.$converter1;
       map['icon_color'] =
           Variable<int, IntType>(converter.mapToSql(d.iconColor.value));
+    }
+    if (d.userId.present) {
+      map['user_id'] = Variable<int, IntType>(d.userId.value);
     }
     return map;
   }

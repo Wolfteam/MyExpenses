@@ -62,14 +62,23 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
   Future<CategoryItem> saveCategory(CategoryItem category) async {
     Category savedCategory;
     int id = 0;
-
+    final now = DateTime.now();
     if (category.id <= 0) {
       id = await into(categories).insert(Category(
-        createdBy: createdBy,
         icon: category.icon,
         iconColor: category.iconColor,
         isAnIncome: category.isAnIncome,
         name: category.name,
+        createdAt: now,
+        createdBy: createdBy,
+        createdHash: createdHash([
+          category.name,
+          now,
+          createdBy,
+          category.isAnIncome,
+          const ColorConverter().mapToSql(category.iconColor),
+          const IconDataConverter().mapToSql(category.icon),
+        ]),
       ));
     } else {
       id = category.id;
@@ -109,5 +118,132 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
     final query = select(transactions)..where((t) => t.categoryId.equals(id));
     final result = await query.get();
     return result.isNotEmpty;
+  }
+
+  @override
+  Future<void> updateUserId(int userId) {
+    return (update(categories)..where((c) => c.userId.equals(null)))
+        .write(CategoriesCompanion(userId: Value(userId)));
+  }
+
+  @override
+  Future<List<sync_cat.Category>> getAllCategoriesToSync() {
+    return select(categories)
+        .map((row) => sync_cat.Category(
+              createdAt: row.createdAt,
+              createdBy: row.createdBy,
+              createdHash: row.createdHash,
+              icon: const IconDataConverter().mapToSql(row.icon),
+              iconColor: const ColorConverter().mapToSql(row.iconColor),
+              isAnIncome: row.isAnIncome,
+              name: row.name,
+              updatedAt: row.updatedAt,
+              updatedBy: row.updatedBy,
+            ))
+        .get();
+  }
+
+  @override
+  Future<void> deleteCategories(
+    int userId,
+    List<sync_cat.Category> existingCats,
+  ) async {
+    final catsInDb =
+        await (select(categories)..where((c) => c.userId.equals(userId))).get();
+    final downloadedCatsHash = existingCats.map((c) => c.createdHash).toList();
+    final catsToDelete = catsInDb
+        .where((c) => !downloadedCatsHash.contains(c.createdHash))
+        .map((t) => t.id)
+        .toList();
+
+    if (catsToDelete.isEmpty) return;
+
+    await batch((b) {
+      b.deleteWhere<Categories, Category>(
+        categories,
+        (c) => c.id.isIn(catsToDelete),
+      );
+    });
+  }
+
+  @override
+  Future<void> createCategories(
+    int userId,
+    List<sync_cat.Category> existingCats,
+  ) async {
+    final catsInDb =
+        await (select(categories)..where((c) => c.userId.equals(userId))).get();
+    final catsToBeCreated = existingCats
+        .where((c) => !catsInDb.contains(c.createdHash))
+        .map((c) => Category(
+              createdAt: c.createdAt,
+              createdBy: c.createdBy,
+              createdHash: c.createdHash,
+              icon: const IconDataConverter().mapToDart(c.icon),
+              iconColor: const ColorConverter().mapToDart(c.iconColor),
+              isAnIncome: c.isAnIncome,
+              name: c.name,
+              updatedAt: c.updatedAt,
+              updatedBy: c.updatedBy,
+              userId: userId,
+            ))
+        .toList();
+
+    if (catsToBeCreated.isEmpty) return;
+
+    await batch((b) {
+      b.insertAll<Category>(categories, catsToBeCreated);
+    });
+  }
+
+  @override
+  Future<void> updateCategories(
+    int userId,
+    List<sync_cat.Category> existingCats,
+  ) async {
+    final existingCatsToUse =
+        existingCats.where((t) => t.updatedAt != null).toList();
+    final downloadedCatsHash =
+        existingCatsToUse.map((c) => c.createdHash).toList();
+    final catsInDb = await (select(categories)
+          ..where((c) =>
+              c.userId.equals(userId) & c.createdHash.isIn(downloadedCatsHash)))
+        .get();
+
+    final catsToUpdate = <Category>[];
+    for (final cat in catsToUpdate) {
+      final localCat =
+          catsInDb.singleWhere((t) => t.createdHash == cat.createdHash);
+
+      if (localCat.updatedAt == null ||
+          localCat.updatedAt.isBefore(cat.updatedAt)) {
+        catsToUpdate.add(localCat);
+      }
+    }
+
+    if (catsToUpdate.isEmpty) return;
+
+    await batch((b) {
+      for (final cat in catsToUpdate) {
+        final updatedCat = existingCatsToUse
+            .singleWhere((c) => c.createdHash == cat.createdHash);
+
+        b.update<Categories, Category>(
+          categories,
+          CategoriesCompanion(
+            icon: Value(const IconDataConverter().mapToDart(updatedCat.icon)),
+            iconColor: Value(
+              const ColorConverter().mapToDart(updatedCat.iconColor),
+            ),
+            isAnIncome: Value(updatedCat.isAnIncome),
+            name: Value(updatedCat.name),
+            updatedAt: Value(updatedCat.updatedAt),
+            updatedBy: Value(updatedCat.updatedBy),
+            userId: Value(userId),
+          ),
+          where: (c) => c.id.equals(cat.id),
+        );
+      }
+    });
   }
 }
