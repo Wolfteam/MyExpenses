@@ -4,5 +4,7 @@ enum SecureResourceType{
   accessTokenExpiricy,
   refreshToken,
   currentUser,
-//TODO: THE SAVED PASSWORD SHOULD BE HERE
+  currentUserDriveFolderId,
+  currentUserAppFileId,
+  loginPassword,
 }

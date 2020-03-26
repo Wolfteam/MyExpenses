@@ -25,9 +25,6 @@ abstract class SettingsService {
   bool get askForPassword;
   set askForPassword(bool ask);
 
-  String get password;
-  set password(String password);
-
   bool get askForFingerPrint;
   set askForFingerPrint(bool ask);
 
@@ -95,11 +92,6 @@ class SettingsServiceImpl implements SettingsService {
   bool get askForFingerPrint => _prefs.getBool(_askForFingerPrintKey);
   @override
   set askForFingerPrint(bool ask) => _prefs.setBool(_askForFingerPrintKey, ask);
-
-  @override
-  String get password => _prefs.getString(_passwordKey);
-  @override
-  set password(String pass) => _prefs.setString(_passwordKey, pass);
 
   SettingsServiceImpl(this._logger);
 

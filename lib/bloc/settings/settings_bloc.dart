@@ -9,8 +9,10 @@ import 'package:package_info/package_info.dart';
 import '../../common/enums/app_accent_color_type.dart';
 import '../../common/enums/app_language_type.dart';
 import '../../common/enums/app_theme_type.dart';
+import '../../common/enums/secure_resource_type.dart';
 import '../../common/enums/sync_intervals_type.dart';
 import '../../generated/i18n.dart';
+import '../../services/secure_storage_service.dart';
 import '../../services/settings_service.dart';
 
 part 'settings_event.dart';
@@ -18,8 +20,9 @@ part 'settings_state.dart';
 
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final SettingsService _settingsService;
+  final SecureStorageService _secureStorageService;
 
-  SettingsBloc(this._settingsService);
+  SettingsBloc(this._settingsService, this._secureStorageService);
 
   SettingsInitialState get currentState => state as SettingsInitialState;
 
@@ -60,7 +63,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     if (event is AskForPasswordChanged) {
       _settingsService.askForPassword = event.ask;
       if (!event.ask) {
-        _settingsService.password = null;
+        await _secureStorageService.delete(
+          SecureResourceType.loginPassword,
+          _secureStorageService.defaultUsername,
+        );
       }
 
       if (event.ask) {
@@ -77,7 +83,10 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       _settingsService.askForFingerPrint = event.ask;
 
       if (event.ask) {
-        _settingsService.password = null;
+        await _secureStorageService.delete(
+          SecureResourceType.loginPassword,
+          _secureStorageService.defaultUsername,
+        );
         yield currentState.copyWith(
           askForPassword: false,
           askForFingerPrint: event.ask,
