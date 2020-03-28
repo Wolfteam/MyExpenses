@@ -113,6 +113,11 @@
     "loading": "Cargando",
     "userWasSuccessfullyDeleted": "El usuario fue borrado exitosamente",
     "confirmation":"Confirmación",
+    "stopped": "Detenida",
+    "running": "Ejecutandose",
+    "recurringTransactionIsNowStopped": "La transacción recurrente ahora está detenida",
+    "recurringTransactionIsNowRunning": "La transacción recurrente ahora está en ejecución",
+    "nextDateOn":"Siguiente fecha: {on}",
     "repetitionCycle": {
         "eachWeek": "Cada semana",
         "eachMonth": "Cada mes",

@@ -260,6 +260,16 @@ class I18n implements WidgetsLocalizations {
   String get userWasSuccessfullyDeleted => "User was successfully deleted";
   /// "Confirmation"
   String get confirmation => "Confirmation";
+  /// "Stopped"
+  String get stopped => "Stopped";
+  /// "Running"
+  String get running => "Running";
+  /// "Recurring transaction is now stopped"
+  String get recurringTransactionIsNowStopped => "Recurring transaction is now stopped";
+  /// "Recurring transaction is now running"
+  String get recurringTransactionIsNowRunning => "Recurring transaction is now running";
+  /// "Next date: ${on}"
+  String nextDateOn(String on) => "Next date: ${on}";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -698,6 +708,21 @@ class _I18n_es_VE extends I18n {
   /// "Confirmación"
   @override
   String get confirmation => "Confirmación";
+  /// "Detenida"
+  @override
+  String get stopped => "Detenida";
+  /// "Ejecutandose"
+  @override
+  String get running => "Ejecutandose";
+  /// "La transacción recurrente ahora está detenida"
+  @override
+  String get recurringTransactionIsNowStopped => "La transacción recurrente ahora está detenida";
+  /// "La transacción recurrente ahora está en ejecución"
+  @override
+  String get recurringTransactionIsNowRunning => "La transacción recurrente ahora está en ejecución";
+  /// "Siguiente fecha: ${on}"
+  @override
+  String nextDateOn(String on) => "Siguiente fecha: ${on}";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";

@@ -31,6 +31,8 @@ abstract class TransactionsDao {
     bool keepChildTransactions = false,
   });
 
+  Future<void> updateNextRecurringDate(int id, DateTime nextRecurringDate);
+
   Future<List<sync_trans.Transaction>> getAllTransactionsToSync();
 
   Future<void> deleteTransactions(List<sync_trans.Transaction> existingTrans);

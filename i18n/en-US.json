@@ -112,7 +112,12 @@
     "networkIsNotAvailable": "Network is not available",
     "loading": "Loading",
     "userWasSuccessfullyDeleted": "User was successfully deleted",
-    "confirmation":"Confirmation",
+    "confirmation": "Confirmation",
+    "stopped": "Stopped",
+    "running": "Running",
+    "recurringTransactionIsNowStopped": "Recurring transaction is now stopped",
+    "recurringTransactionIsNowRunning": "Recurring transaction is now running",
+    "nextDateOn":"Next date: {on}",
     "repetitionCycle": {
         "eachWeek": "Each week",
         "eachMonth": "Each month",

@@ -12,6 +12,7 @@ import '../../common/extensions/string_extensions.dart';
 import '../../common/utils/category_utils.dart';
 import '../../common/utils/date_utils.dart';
 import '../../common/utils/image_utils.dart';
+import '../../common/utils/transaction_utils.dart';
 import '../../daos/transactions_dao.dart';
 import '../../models/category_item.dart';
 import '../../models/transaction_item.dart';
@@ -48,38 +49,42 @@ class TransactionFormBloc
     }
 
     if (event is EditTransaction) {
+      final transaction = await _transactionsDao.getTransaction(event.id);
+
       bool imageExists = false;
-      if (!event.item.imagePath.isNullEmptyOrWhitespace) {
-        imageExists = await File(event.item.imagePath).exists();
+      if (!transaction.imagePath.isNullEmptyOrWhitespace) {
+        imageExists = await File(transaction.imagePath).exists();
       }
 
       final firstDate = _getFirstDateToUse(
-        event.item.repetitionCycle,
-        event.item.transactionDate,
+        transaction.repetitionCycle,
+        transaction.transactionDate,
       );
 
       yield TransactionFormLoadedState.initial(_settingsService.language)
           .copyWith(
-        id: event.item.id,
-        amount: event.item.amount,
+        id: transaction.id,
+        amount: transaction.amount,
         isAmountValid: true,
         isAmountDirty: true,
-        category: event.item.category,
+        category: transaction.category,
         isCategoryValid: true,
-        description: event.item.description,
+        description: transaction.description,
         isDescriptionValid: true,
         isDescriptionDirty: true,
-        repetitionCycle: event.item.repetitionCycle,
-        transactionDate: event.item.transactionDate,
+        repetitionCycle: transaction.repetitionCycle,
+        transactionDate: transaction.transactionDate,
         isTransactionDateValid: _isTransactionDateValid(
-          event.item.transactionDate,
-          event.item.repetitionCycle,
+          transaction.transactionDate,
+          transaction.repetitionCycle,
         ),
-        isParentTransaction: event.item.isParentTransaction,
-        parentTransactionId: event.item.parentTransactionId,
+        isParentTransaction: transaction.isParentTransaction,
+        parentTransactionId: transaction.parentTransactionId,
         firstDate: firstDate,
-        imagePath: event.item.imagePath,
+        imagePath: transaction.imagePath,
         imageExists: imageExists,
+        isRecurringTransactionRunning: transaction.nextRecurringDate != null,
+        nextRecurringDate: transaction.nextRecurringDate,
       );
     }
 
@@ -139,6 +144,10 @@ class TransactionFormBloc
         imagePath: event.path,
         imageExists: event.imageExists,
       );
+    }
+
+    if (event is IsRunningChanged) {
+      yield* _isRunningChanged(event.isRunning);
     }
 
     if (event is DeleteTransaction) {
@@ -244,6 +253,54 @@ class TransactionFormBloc
       );
       yield currentState.copyWith(errorOccurred: true);
       yield currentState.copyWith(errorOccurred: false);
+    }
+  }
+
+  Stream<TransactionFormState> _isRunningChanged(bool isRunning) async* {
+    final now = DateTime.now();
+    DateTime recurringDateTouse;
+
+    try {
+      _logger.info(
+        runtimeType,
+        '_isRunningChanged: Updating nextRecurringDate of ' +
+            'transactionId = ${currentState.id}. IsNowRunning = $isRunning',
+      );
+      if (isRunning) {
+        bool allCompleted = false;
+        recurringDateTouse = currentState.transactionDate;
+        while (!allCompleted) {
+          if (recurringDateTouse.isAfter(now)) {
+            allCompleted = true;
+            break;
+          }
+          recurringDateTouse = TransactionUtils.getNextRecurringDate(
+            currentState.repetitionCycle,
+            recurringDateTouse,
+          );
+        }
+      }
+
+      _logger.info(
+        runtimeType,
+        '_isRunningChanged: The next recurringDate will be $recurringDateTouse',
+      );
+
+      await _transactionsDao.updateNextRecurringDate(
+        currentState.id,
+        recurringDateTouse,
+      );
+      yield currentState.copyWith(
+        isRecurringTransactionRunning: isRunning,
+        nextRecurringDate: recurringDateTouse,
+      );
+    } on Exception catch (e, s) {
+      _logger.error(
+        runtimeType,
+        '_isRunningChanged: Unknown error occurred',
+        e,
+        s,
+      );
     }
   }
 

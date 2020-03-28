@@ -144,6 +144,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
           ..where(
             (t) =>
                 t.repetitionCycle.equals(RepetitionCycleType.none.index).not() &
+                isNotNull(t.nextRecurringDate) &
                 t.nextRecurringDate.isSmallerOrEqualValue(until) &
                 t.isParentTransaction,
           ))
@@ -264,6 +265,13 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
       });
     }
     return true;
+  }
+
+  @override
+  Future<void> updateNextRecurringDate(int id, DateTime nextRecurringDate) {
+    return (update(transactions)..where((t) => t.id.equals(id))).write(
+      TransactionsCompanion(nextRecurringDate: Value(nextRecurringDate)),
+    );
   }
 
   @override

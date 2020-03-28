@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../bloc/transaction_form/transaction_form_bloc.dart';
+import '../../../common/utils/date_utils.dart';
+import '../../../generated/i18n.dart';
 import '../../../models/transaction_item.dart' as trans_item;
 import '../../pages/add_edit_transasctiton_page.dart';
 
@@ -15,6 +17,13 @@ class TransactionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final i18n = I18n.of(context);
+    final subtitle = item.isParentTransaction && item.nextRecurringDate != null
+        ? Text(i18n.nextDateOn(DateUtils.formatDateWithoutLocale(
+            item.nextRecurringDate,
+            DateUtils.monthDayAndYearFormat,
+          )))
+        : item.isParentTransaction ? Text(i18n.stopped) : null;
     final amountWidget = Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -51,11 +60,17 @@ class TransactionItem extends StatelessWidget {
       },
       child: ListTile(
         dense: true,
-        leading: Icon(
-          item.category.icon,
-          color: item.category.iconColor,
+        leading: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(
+              item.category.icon,
+              color: item.category.iconColor,
+            ),
+          ],
         ),
         title: Text(item.description),
+        subtitle: subtitle,
         trailing: amountWidget,
       ),
     );
