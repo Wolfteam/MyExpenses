@@ -2,15 +2,15 @@ import '../models/category_item.dart';
 import '../models/drive/category.dart' as sync_cat;
 
 abstract class CategoriesDao {
-  Future<List<CategoryItem>> getAll();
+  Future<List<CategoryItem>> getAll(int userId);
 
-  Future<List<CategoryItem>> getAllCategories(bool onlyIncomes);
+  Future<List<CategoryItem>> getAllCategories(bool onlyIncomes, int userId);
 
-  Future<List<CategoryItem>> getAllIncomes();
+  Future<List<CategoryItem>> getAllIncomes(int userId);
 
-  Future<List<CategoryItem>> getAllExpenses();
+  Future<List<CategoryItem>> getAllExpenses(int userId);
 
-  Future<CategoryItem> saveCategory(CategoryItem category);
+  Future<CategoryItem> saveCategory(int userId, CategoryItem category);
 
   Future<bool> deleteCategory(int id);
 
@@ -18,7 +18,7 @@ abstract class CategoriesDao {
 
   Future<void> updateUserId(int userId);
 
-  Future<List<sync_cat.Category>> getAllCategoriesToSync();
+  Future<List<sync_cat.Category>> getAllCategoriesToSync(int userId);
 
   Future<void> deleteCategories(
     int userId,

@@ -7,30 +7,16 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
   CategoriesDaoImpl(AppDatabase db) : super(db);
 
   @override
-  Future<List<CategoryItem>> getAll() {
-    return (select(categories)
-          ..orderBy([(t) => OrderingTerm(expression: t.name)]))
-        .map((row) => CategoryItem(
-              id: row.id,
-              isAnIncome: row.isAnIncome,
-              name: row.name,
-              icon: row.icon,
-              iconColor: row.iconColor,
-            ))
-        .get();
-  }
-
-  @override
-  Future<List<CategoryItem>> getAllCategories(bool onlyIncomes) {
-    if (onlyIncomes) return getAllIncomes();
-    return getAllExpenses();
-  }
-
-  @override
-  Future<List<CategoryItem>> getAllIncomes() {
+  Future<List<CategoryItem>> getAll(int userId) {
     final query = select(categories)
-      ..where((c) => c.isAnIncome.equals(true))
       ..orderBy([(t) => OrderingTerm(expression: t.name)]);
+
+    if (userId != null) {
+      query.where((c) => c.userId.equals(userId));
+    } else {
+      query.where((c) => isNull(c.userId));
+    }
+
     return query
         .map((row) => CategoryItem(
               id: row.id,
@@ -43,28 +29,49 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
   }
 
   @override
-  Future<List<CategoryItem>> getAllExpenses() {
-    final query = select(categories)
-      ..where((c) => c.isAnIncome.equals(false))
-      ..orderBy([(t) => OrderingTerm(expression: t.name)]);
-    return query
-        .map((row) => CategoryItem(
-              id: row.id,
-              isAnIncome: row.isAnIncome,
-              name: row.name,
-              icon: row.icon,
-              iconColor: row.iconColor,
-            ))
+  Future<List<CategoryItem>> getAllCategories(bool onlyIncomes, int userId) {
+    if (onlyIncomes) return getAllIncomes(userId);
+    return getAllExpenses(userId);
+  }
+
+  @override
+  Future<List<CategoryItem>> getAllIncomes(int userId) {
+    final query = select(categories);
+
+    if (userId != null) {
+      query.where((c) => c.isAnIncome.equals(true) & c.userId.equals(userId));
+    } else {
+      query.where((c) => c.isAnIncome.equals(true) & isNull(c.userId));
+    }
+
+    return (query..orderBy([(t) => OrderingTerm(expression: t.name)]))
+        .map(_mapToCategoryItem)
         .get();
   }
 
   @override
-  Future<CategoryItem> saveCategory(CategoryItem category) async {
+  Future<List<CategoryItem>> getAllExpenses(int userId) {
+    final query = select(categories)
+      ..orderBy([(t) => OrderingTerm(expression: t.name)]);
+
+    if (userId != null) {
+      query.where((c) => c.isAnIncome.equals(false) & c.userId.equals(userId));
+    } else {
+      query.where((c) => c.isAnIncome.equals(false) & isNull(c.userId));
+    }
+    return query
+        .map(_mapToCategoryItem)
+        .get();
+  }
+
+  @override
+  Future<CategoryItem> saveCategory(int userId, CategoryItem category) async {
     Category savedCategory;
     int id = 0;
     final now = DateTime.now();
     if (category.id <= 0) {
       id = await into(categories).insert(Category(
+        userId: userId,
         icon: category.icon,
         iconColor: category.iconColor,
         isAnIncome: category.isAnIncome,
@@ -89,6 +96,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
         name: Value(category.name),
         updatedAt: Value(DateTime.now()),
         updatedBy: const Value(createdBy),
+        userId: Value(userId),
       );
 
       await (update(categories)..where((t) => t.id.equals(id)))
@@ -122,12 +130,12 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
 
   @override
   Future<void> updateUserId(int userId) {
-    return (update(categories)..where((c) => c.userId.equals(null)))
+    return (update(categories)..where((c) => isNull(c.userId)))
         .write(CategoriesCompanion(userId: Value(userId)));
   }
 
   @override
-  Future<List<sync_cat.Category>> getAllCategoriesToSync() {
+  Future<List<sync_cat.Category>> getAllCategoriesToSync(int userId) {
     return select(categories)
         .map((row) => sync_cat.Category(
               createdAt: row.createdAt,
@@ -245,5 +253,15 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
         );
       }
     });
+  }
+
+  CategoryItem _mapToCategoryItem(Category cat) {
+    return CategoryItem(
+      id: cat.id,
+      isAnIncome: cat.isAnIncome,
+      name: cat.name,
+      icon: cat.icon,
+      iconColor: cat.iconColor,
+    );
   }
 }

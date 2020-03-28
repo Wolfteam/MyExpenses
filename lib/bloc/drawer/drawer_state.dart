@@ -6,7 +6,6 @@ class DrawerState extends Equatable {
   final String email;
   final String img;
   final bool isUserSignedIn;
-  final bool isInternetAvailable;
 
   @override
   List<Object> get props => [
@@ -15,7 +14,6 @@ class DrawerState extends Equatable {
         email,
         img,
         isUserSignedIn,
-        isInternetAvailable,
       ];
 
   const DrawerState({
@@ -24,7 +22,6 @@ class DrawerState extends Equatable {
     this.email,
     this.img,
     this.isUserSignedIn,
-    this.isInternetAvailable = true,
   });
 
   factory DrawerState.initial(AppDrawerItemType page) {
@@ -37,7 +34,6 @@ class DrawerState extends Equatable {
     String email,
     String img,
     bool isUserSignedIn,
-    bool isInternetAvailable,
   }) {
     return DrawerState(
       selectedPage: selectedPage ?? this.selectedPage,
@@ -45,7 +41,6 @@ class DrawerState extends Equatable {
       email: email ?? this.email,
       img: img ?? this.img,
       isUserSignedIn: isUserSignedIn ?? this.isUserSignedIn,
-      isInternetAvailable: isInternetAvailable ?? this.isInternetAvailable,
     );
   }
 }

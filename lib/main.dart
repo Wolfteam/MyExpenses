@@ -71,14 +71,16 @@ class _MyAppState extends State<MyApp> {
             create: (ctx) {
               final logger = getIt<LoggingService>();
               final categoriesDao = getIt<CategoriesDao>();
-              return IncomesCategoriesBloc(logger, categoriesDao);
+              final usersDao = getIt<UsersDao>();
+              return IncomesCategoriesBloc(logger, categoriesDao, usersDao);
             },
           ),
           BlocProvider(
             create: (ctx) {
               final logger = getIt<LoggingService>();
               final categoriesDao = getIt<CategoriesDao>();
-              return ExpensesCategoriesBloc(logger, categoriesDao);
+              final usersDao = getIt<UsersDao>();
+              return ExpensesCategoriesBloc(logger, categoriesDao, usersDao);
             },
           ),
           BlocProvider(
@@ -115,7 +117,8 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(create: (ctx) {
             final logger = getIt<LoggingService>();
             final categoriesDao = getIt<CategoriesDao>();
-            return CategoryFormBloc(logger, categoriesDao);
+            final usersDao = getIt<UsersDao>();
+            return CategoryFormBloc(logger, categoriesDao, usersDao);
           }),
           BlocProvider(create: (ctx) => CategoryIconBloc()),
           BlocProvider(create: (ctx) {

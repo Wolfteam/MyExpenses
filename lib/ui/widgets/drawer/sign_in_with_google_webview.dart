@@ -6,8 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_user_agent/flutter_user_agent.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
-import '../../../bloc/drawer/drawer_bloc.dart';
 import '../../../bloc/sign_in_with_google/sign_in_with_google_bloc.dart';
+import '../../../common/utils/bloc_utils.dart';
 import '../../../common/utils/toast_utils.dart';
 import '../../../generated/i18n.dart';
 
@@ -44,21 +44,7 @@ class _SignInWithGoogleWebViewState extends State<SignInWithGoogleWebView> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<SignInWithGoogleBloc, SignInWithGoogleState>(
-      listener: (ctx, state) {
-        final i18n = I18n.of(ctx);
-        if (state is InitializedState) {
-          if (state.flowCompleted) {
-            ctx.bloc<DrawerBloc>().add(const InitializeDrawer());
-            Navigator.of(ctx).pop();
-            _flutterWebviewPlugin.close();
-          } else if (!state.isNetworkAvailable) {
-            Navigator.of(ctx).pop();
-            showWarningToast(i18n.networkIsNotAvailable);
-          } else if (state.anErrorOccurred) {
-            showErrorToast(i18n.unknownErrorOcurred);
-          }
-        }
-      },
+      listener: _handleStateChanges,
       builder: (ctx, state) => _buildPage(ctx, state),
     );
   }
@@ -67,6 +53,23 @@ class _SignInWithGoogleWebViewState extends State<SignInWithGoogleWebView> {
   void dispose() {
     _onUrlChanged.cancel();
     super.dispose();
+  }
+
+  void _handleStateChanges(BuildContext ctx, SignInWithGoogleState state) {
+    if (state is InitializedState) {
+      final i18n = I18n.of(ctx);
+
+      if (state.flowCompleted) {
+        BlocUtils.userChanged(ctx);
+        Navigator.of(ctx).pop();
+        _flutterWebviewPlugin.close();
+      } else if (!state.isNetworkAvailable) {
+        Navigator.of(ctx).pop();
+        showWarningToast(i18n.networkIsNotAvailable);
+      } else if (state.anErrorOccurred) {
+        showErrorToast(i18n.unknownErrorOcurred);
+      }
+    }
   }
 
   Widget _buildPage(

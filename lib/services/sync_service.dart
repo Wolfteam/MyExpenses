@@ -29,10 +29,17 @@ class SyncServiceImpl implements SyncService {
   final SecureStorageService _secureStorageService;
 
   static const _appFile = 'app_file.json';
+  static const _readmeFile = 'README.md';
 
   Future<String> get appFilePath async {
     final dir = await getExternalStorageDirectory();
     final path = '${dir.path}/$_appFile';
+    return path;
+  }
+
+  Future<String> get readmeFilePath async {
+    final dir = await getExternalStorageDirectory();
+    final path = '${dir.path}/$_readmeFile';
     return path;
   }
 
@@ -59,7 +66,7 @@ class SyncServiceImpl implements SyncService {
       final folderId = await _googleService.getAppFolder();
 
       if (folderId == null) {
-        await _onFirstInstall(currentUser);
+        await _onFirstInstall();
       } else {
         await _onExistingInstall(folderId, currentUser);
       }
@@ -83,8 +90,13 @@ class SyncServiceImpl implements SyncService {
       );
       final transactions = await _transactionsDao.getAllTransactionsToSync();
       _logger.info(
-          runtimeType, 'createAppFile: Getting all categories to save..');
-      final categories = await _categoriesDao.getAllCategoriesToSync();
+        runtimeType,
+        'createAppFile: Getting all categories to save..',
+      );
+
+      final currentUser = await _usersDao.getActiveUser();
+      final categories =
+          await _categoriesDao.getAllCategoriesToSync(currentUser.id);
 
       final appFile = AppFile(
         transactions: transactions,
@@ -94,19 +106,31 @@ class SyncServiceImpl implements SyncService {
       final path = await appFilePath;
 
       final file = File(path);
-      // bool fileExists = await file.exists();
-      // if (fileExists) {
-      //   final readed = await file.readAsString();
-      //   final decoded = jsonDecode(readed) as Map<String, dynamic>;
-      //   final appFilex2 = AppFile.fromJson(decoded);
-      //   print("decoded");
-      // }
+
       _logger.info(runtimeType, 'createAppFile: Saving file..');
       await file.writeAsString(encoded);
     } on Exception catch (e, s) {
       _logger.error(
         runtimeType,
         'createAppFile: An error occurred while trying to create file',
+        e,
+        s,
+      );
+    }
+  }
+
+  Future<void> createReadmeFile() async {
+    try {
+      _logger.info(runtimeType, 'createReadmeFile: Creating $_readmeFile');
+      final path = await readmeFilePath;
+      final file = File(path);
+      const contents = 'DO NOT DELETE NOR MODIFY THIS FOLDER AND ITS CONTENTS.\n' +
+          'This folder is used by MyExpenses to keep your transactions synced';
+      await file.writeAsString(contents);
+    } on Exception catch (e, s) {
+      _logger.error(
+        runtimeType,
+        'createReadmeFile: An error occurred while trying to create file',
         e,
         s,
       );
@@ -155,20 +179,42 @@ class SyncServiceImpl implements SyncService {
     }
   }
 
-  Future<void> _onFirstInstall(String currentUser) async {
+  Future<void> _onFirstInstall() async {
     _logger.info(
       runtimeType,
-      '_onFirstInstall: Creating drive folder and uploading app file...',
+      '_onFirstInstall: Creating drive folder...',
     );
+
+    final currentUser = await _usersDao.getActiveUser();
     final folderId = await _googleService.createAppDriveFolder();
 
     await _secureStorageService.save(
       SecureResourceType.currentUserDriveFolderId,
-      currentUser,
+      currentUser.email,
       folderId,
     );
 
+    _logger.info(
+      runtimeType,
+      '_onFirstInstall: Updating categories...',
+    );
+
+    await _categoriesDao.updateUserId(currentUser.id);
+
+    _logger.info(
+      runtimeType,
+      '_onFirstInstall: Creating app and readme files...',
+    );
+
     await createLocalAppFile();
+    await createReadmeFile();
+
+    _logger.info(
+      runtimeType,
+      '_onFirstInstall: Uploading app and readme files...',
+    );
+    await uploadAppFile();
+    await _uploadReadmeFile();
   }
 
   Future<void> _onExistingInstall(
@@ -189,17 +235,47 @@ class SyncServiceImpl implements SyncService {
     final json = await file.readAsString();
     final appFile = AppFile.fromJson(jsonDecode(json) as Map<String, dynamic>);
     final user = await _usersDao.getActiveUser();
+
+    _logger.info(
+      runtimeType,
+      '_onExistingInstall: Creating categories and transactions...',
+    );
     //The order is important
     // Create Cat - Trasn
     await _categoriesDao.createCategories(user.id, appFile.categories);
     await _transactionsDao.createTransactions(appFile.transactions);
 
+    _logger.info(
+      runtimeType,
+      '_onExistingInstall: Deleting categories and transactions...',
+    );
+
     // Delete Trans - Cats
     await _categoriesDao.deleteCategories(user.id, appFile.categories);
     await _transactionsDao.deleteTransactions(appFile.transactions);
 
+    _logger.info(
+      runtimeType,
+      '_onExistingInstall: Updating categories and transactions...',
+    );
     //Update Cat - Trans
     await _categoriesDao.updateCategories(user.id, appFile.categories);
     await _transactionsDao.updateTransactions(appFile.transactions);
+
+    //TODO: SYNC IMG in the bg
+  }
+
+  Future<void> _uploadReadmeFile() async {
+    final currentUser = await _secureStorageService.get(
+      SecureResourceType.currentUser,
+      _secureStorageService.defaultUsername,
+    );
+    final appFolderId = await _secureStorageService.get(
+      SecureResourceType.currentUserDriveFolderId,
+      currentUser,
+    );
+
+    final readmePath = await readmeFilePath;
+    await _googleService.uploadFile(appFolderId, readmePath);
   }
 }

@@ -128,16 +128,18 @@ class SignInWithGoogleBloc
       }
 
       _logger.info(runtimeType, '_signIn: Saving user into db...');
-      await _usersDao.saveUser(
+      final savedUser = await _usersDao.saveUser(
         user.googleUserId,
         user.name,
         user.email,
         user.pictureUrl,
       );
+
+      await _usersDao.changeActiveUser(savedUser.id);
       _logger.info(runtimeType, '_signIn: User was succesfully saved...');
 
       await _syncService.initializeAppFolderAndFiles();
-      
+
       yield currentState.copyWith(flowCompleted: true, codeGranted: false);
     } on Exception catch (e, s) {
       _logger.error(runtimeType, '_signIn: Unknown error occurred', e, s);

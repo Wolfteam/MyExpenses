@@ -4,6 +4,7 @@ import 'package:flutter_user_agent/flutter_user_agent.dart';
 
 import '../../../bloc/drawer/drawer_bloc.dart';
 import '../../../bloc/users_accounts/user_accounts_bloc.dart';
+import '../../../common/utils/bloc_utils.dart';
 import '../../../common/utils/toast_utils.dart';
 import '../../../generated/i18n.dart';
 import '../../../models/user_item.dart';
@@ -30,7 +31,7 @@ class UserAccountsBottomSheetDialog extends StatelessWidget {
               showSucceedToast(i18n.userWasSuccessfullyDeleted);
               ctx.bloc<DrawerBloc>().add(const InitializeDrawer());
             } else if (state.activeUserChanged) {
-              ctx.bloc<DrawerBloc>().add(const InitializeDrawer());
+              BlocUtils.userChanged(ctx);
             } else if (state.errorOcurred) {
               showErrorToast(i18n.unknownErrorOcurred);
             }

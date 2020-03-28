@@ -3,29 +3,21 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_user_agent/flutter_user_agent.dart';
-import 'package:my_expenses/bloc/users_accounts/user_accounts_bloc.dart';
 
 import '../../../bloc/drawer/drawer_bloc.dart';
 import '../../../bloc/reports/reports_bloc.dart';
+import '../../../bloc/users_accounts/user_accounts_bloc.dart';
 import '../../../common/enums/app_drawer_item_type.dart';
 import '../../../common/presentation/custom_assets.dart';
-import '../../../common/utils/toast_utils.dart';
+import '../../../common/utils/bloc_utils.dart';
 import '../../../generated/i18n.dart';
 import '../reports/reports_bottom_sheet_dialog.dart';
-import 'sign_in_with_google_webview.dart';
 import 'user_accounts_bottom_sheet_dialog.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<DrawerBloc, DrawerState>(
-      listener: (ctx, state) {
-        final i18n = I18n.of(ctx);
-        if (!state.isInternetAvailable) {
-          showWarningToast(i18n.networkIsNotAvailable);
-        }
-      },
+    return BlocBuilder<DrawerBloc, DrawerState>(
       builder: (ctx, state) {
         return Drawer(
           child: ListView(
@@ -115,7 +107,7 @@ class AppDrawer extends StatelessWidget {
                         backgroundImage: FileImage(File(state.img)),
                       ),
                     )
-                  : Image.asset(  
+                  : Image.asset(
                       CustomAssets.appIcon,
                       width: 80,
                       height: 80,
@@ -261,6 +253,7 @@ class AppDrawer extends StatelessWidget {
   void _signOut(BuildContext context) {
     Navigator.pop(context);
     context.bloc<DrawerBloc>().add(const SignOut());
+    BlocUtils.userChanged(context);
   }
 
   Future<void> _signIn(

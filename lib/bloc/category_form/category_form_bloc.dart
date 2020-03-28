@@ -8,6 +8,7 @@ import '../../common/enums/transaction_type.dart';
 import '../../common/extensions/string_extensions.dart';
 import '../../common/utils/category_utils.dart';
 import '../../daos/categories_dao.dart';
+import '../../daos/users_dao.dart';
 import '../../models/category_item.dart';
 import '../../services/logging_service.dart';
 
@@ -17,8 +18,9 @@ part 'category_form_state.dart';
 class CategoryFormBloc extends Bloc<CategoryFormEvent, CategoryState> {
   final LoggingService _logger;
   final CategoriesDao _categoriesDao;
+  final UsersDao _usersDao;
 
-  CategoryFormBloc(this._logger, this._categoriesDao);
+  CategoryFormBloc(this._logger, this._categoriesDao, this._usersDao);
 
   @override
   CategoryState get initialState => CategoryFormState.initial();
@@ -94,7 +96,11 @@ class CategoryFormBloc extends Bloc<CategoryFormEvent, CategoryState> {
         runtimeType,
         '_saveCategory: Trying to save category = ${category.toJson()}',
       );
-      final savedCategory = await _categoriesDao.saveCategory(category);
+      final currentUser = await _usersDao.getActiveUser();
+      final savedCategory = await _categoriesDao.saveCategory(
+        currentUser?.id,
+        category,
+      );
       yield CategorySavedState(savedCategory);
     } on Exception catch (e, s) {
       _logger.error(

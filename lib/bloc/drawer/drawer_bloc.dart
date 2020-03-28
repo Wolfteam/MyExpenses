@@ -58,10 +58,9 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
 
   Stream<DrawerState> _signOut() async* {
     //TODO: SHOULD I DELETE THE USER HERE?
+    //TODO: STOP BG SYNC
     _logger.info(runtimeType, '_signIn: Signing out...');
     await _usersDao.changeActiveUser(null);
-    yield state.copyWith(
-      isUserSignedIn: false,
-    );
+    yield state.copyWith(isUserSignedIn: false);
   }
 }

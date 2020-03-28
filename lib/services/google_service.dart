@@ -50,15 +50,6 @@ class GoogleServiceImpl implements GoogleService {
     drive.DriveApi.DriveScope,
     drive.DriveApi.DriveReadonlyScope,
     drive.DriveApi.DriveFileScope,
-    sheets.SheetsApi.SpreadsheetsScope,
-    sheets.SheetsApi.SpreadsheetsReadonlyScope,
-    // 'email',
-    // 'profile',
-    // 'https://www.googleapis.com/auth/drive',
-    // 'https://www.googleapis.com/auth/drive.readonly',
-    // 'https://www.googleapis.com/auth/spreadsheets.readonly',
-    // 'https://www.googleapis.com/auth/spreadsheets',
-    // 'https://www.googleapis.com/auth/drive.file'
   ];
 
   @override
