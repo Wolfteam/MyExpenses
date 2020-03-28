@@ -4,9 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../bloc/transactions/transactions_bloc.dart';
 import '../../generated/i18n.dart';
+import '../widgets/nothing_found.dart';
 import '../widgets/transactions/home_last_7_days_summary.dart';
 import '../widgets/transactions/home_transactions_summary_per_month.dart';
-import '../widgets/nothing_found.dart';
 import '../widgets/transactions/transactions_card_container.dart';
 
 class TransactionsPage extends StatefulWidget {

@@ -219,7 +219,8 @@ class _ChartsPageState extends State<ChartsPage>
                     child: Text(
                       '${incomes ? state.totalIncomeAmount : state.totalExpenseAmount} \$',
                       style: textStyle.copyWith(
-                          color: incomes ? Colors.green : Colors.red),
+                        color: incomes ? Colors.green : Colors.red,
+                      ),
                     ),
                   ),
                 ],

@@ -7,7 +7,7 @@ import '../transactions/transaction_item.dart' as trans_item;
 
 class ChartTransactionCardContainer extends StatelessWidget {
   final TransactionItem item;
-  final int transactionsTotalAmount;
+  final double transactionsTotalAmount;
 
   const ChartTransactionCardContainer(
     this.item,

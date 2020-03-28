@@ -15,11 +15,14 @@ class LoadedState extends ChartsState {
   final List<TransactionsSummaryPerDate> transactionsPerDate;
   final List<TransactionItem> transactions;
 
-  double get totalIncomeAmount =>
-      incomeChartTransactions.map((t) => t.amount).fold(0, (t1, t2) => t1 + t2);
-  double get totalExpenseAmount => expenseChartTransactions
+  double get totalIncomeAmount => transactions
+      .where((t) => t.category.isAnIncome == true)
       .map((t) => t.amount)
-      .fold(0, (t1, t2) => t1 + t2);
+      .fold(0, (t1, t2) => TransactionUtils.roundDouble(t1 + t2));
+  double get totalExpenseAmount => transactions
+      .where((t) => t.category.isAnIncome == false)
+      .map((t) => t.amount)
+      .fold(0, (t1, t2) => TransactionUtils.roundDouble(t1 + t2));
 
   List<ChartTransactionItem> get incomeChartTransactions =>
       _buildChartTransactionItems(true);
