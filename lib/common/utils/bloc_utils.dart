@@ -7,19 +7,36 @@ import '../../bloc/drawer/drawer_bloc.dart';
 import '../../bloc/transactions/transactions_bloc.dart';
 
 class BlocUtils {
-  static void userChanged(BuildContext ctx) {
+  static void raiseCommonBlocEvents(
+    BuildContext ctx, {
+    bool reloadTransactions = true,
+    bool reloadCharts = true,
+    bool reloadCategories = true,
+    bool reloadDrawer = true,
+  }) {
     debugPrint(
-      'User changed, raising corresponding events for transactions, charts, incomes, expenses and drawer bloc',
+      'Raising corresponding events for transactions, charts, incomes, expenses and drawer bloc',
     );
     final now = DateTime.now();
-    ctx.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: now));
-    ctx.bloc<ChartsBloc>().add(LoadChart(now));
-    ctx
-        .bloc<IncomesCategoriesBloc>()
-        .add(const GetCategories(loadIncomes: true));
-    ctx
-        .bloc<ExpensesCategoriesBloc>()
-        .add(const GetCategories(loadIncomes: false));
-    ctx.bloc<DrawerBloc>().add(const InitializeDrawer());
+    if (reloadTransactions) {
+      ctx.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: now));
+    }
+
+    if (reloadCharts) {
+      ctx.bloc<ChartsBloc>().add(LoadChart(now));
+    }
+
+    if (reloadCategories) {
+      ctx
+          .bloc<IncomesCategoriesBloc>()
+          .add(const GetCategories(loadIncomes: true));
+      ctx
+          .bloc<ExpensesCategoriesBloc>()
+          .add(const GetCategories(loadIncomes: false));
+    }
+
+    if (reloadDrawer) {
+      ctx.bloc<DrawerBloc>().add(const InitializeDrawer());
+    }
   }
 }

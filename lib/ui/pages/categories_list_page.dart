@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../bloc/categories_list/categories_list_bloc.dart';
 import '../../bloc/category_form/category_form_bloc.dart';
+import '../../common/utils/bloc_utils.dart';
 import '../../models/category_item.dart';
 import '../widgets/categories/category_item.dart' as cat_item;
 import 'add_edit_category_page.dart';
@@ -93,5 +94,6 @@ class _CategoriesListPageState extends State<CategoriesListPage>
     context.bloc<CategoryFormBloc>().add(AddCategory());
     await Navigator.of(context).push(route);
     context.bloc<CategoryFormBloc>().add(FormClosed());
+    BlocUtils.raiseCommonBlocEvents(context, reloadDrawer: false);
   }
 }

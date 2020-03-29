@@ -9,6 +9,8 @@ class ChartTransactionCardContainer extends StatelessWidget {
   final TransactionItem item;
   final double transactionsTotalAmount;
 
+  double get percentage => item.amount.round() * 100 / transactionsTotalAmount;
+
   const ChartTransactionCardContainer(
     this.item,
     this.transactionsTotalAmount,
@@ -22,9 +24,7 @@ class ChartTransactionCardContainer extends StatelessWidget {
       DateUtils.monthDayAndYearFormat,
     );
     final dateString = '${i18n.date}: $formattedDate';
-    final percentageString =
-        (item.amount.round() * 100 / transactionsTotalAmount)
-            .toStringAsFixed(2);
+    final percentageString = percentage.toStringAsFixed(2);
 
     return Card(
       shape: RoundedRectangleBorder(

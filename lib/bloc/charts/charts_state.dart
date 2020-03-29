@@ -46,9 +46,9 @@ class LoadedState extends ChartsState {
     return transactions
         .where((t) => t.category.isAnIncome == onlyIncomes)
         .map((t) => ChartTransactionItem(
-              t.category.iconColor,
-              amount: t.amount.round(),
+              value: t.amount,
               order: transactions.indexOf(t),
+              categoryColor: t.category.iconColor,
             ))
         .toList();
   }

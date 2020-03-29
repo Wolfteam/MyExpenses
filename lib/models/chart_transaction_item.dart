@@ -1,25 +1,21 @@
 import 'package:flutter/material.dart';
 
-import 'base_transaction.dart';
+import '../common/mixins/transaction_mixin.dart';
 
-class ChartTransactionItem extends BaseTransaction {
-  Color _color;
+class ChartTransactionItem with TransactionMixin {
   final int order;
+  final double value;
   final bool dummyItem;
+  final Color categoryColor;
 
-  @override
-  Color get color {
-    return _color;
-  }
+  bool get isAnIncome => isTransactionAnIncome(value);
 
-  set color(Color c) {
-    _color = c;
-  }
+  Color get transactionColor => getTransactionColor(isAnIncome: isAnIncome);
 
-  ChartTransactionItem(
-    this._color, {
-    @required int amount,
+  ChartTransactionItem({
+    @required this.value,
     @required this.order,
-    this.dummyItem = false
-  }) : super(amount: amount);
+    this.categoryColor,
+    this.dummyItem = false,
+  });
 }

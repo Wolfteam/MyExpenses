@@ -60,7 +60,7 @@ class _SignInWithGoogleWebViewState extends State<SignInWithGoogleWebView> {
       final i18n = I18n.of(ctx);
 
       if (state.flowCompleted) {
-        BlocUtils.userChanged(ctx);
+        BlocUtils.raiseCommonBlocEvents(ctx);
         Navigator.of(ctx).pop();
         _flutterWebviewPlugin.close();
       } else if (!state.isNetworkAvailable) {

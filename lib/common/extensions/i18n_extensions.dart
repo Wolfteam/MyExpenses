@@ -119,6 +119,8 @@ extension I18nExtensions on I18n {
         return amount;
       case ChartDetailsFilterType.date:
         return date;
+      case ChartDetailsFilterType.category:
+        return category;
       default:
         throw Exception('Invalid chart details filter');
     }

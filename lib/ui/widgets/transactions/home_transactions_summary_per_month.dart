@@ -6,6 +6,7 @@ import 'package:month_picker_dialog/month_picker_dialog.dart';
 import '../../../bloc/transactions/transactions_bloc.dart';
 import '../../../generated/i18n.dart';
 import '../../../models/transactions_summary_per_month.dart';
+import '../custom_arc_renderer.dart';
 
 class HomeTransactionSummaryPerMonth extends StatelessWidget {
   final String month;
@@ -84,8 +85,9 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
       child: charts.PieChart(
         _createSampleData(),
         animate: true,
-        defaultRenderer: charts.ArcRendererConfig(
+        defaultRenderer: CustomArcRendererConfig(
           arcRatio: 1,
+          strokeWidthPx: 0,
           arcRendererDecorators: [
             charts.ArcLabelDecorator(
               labelPosition: charts.ArcLabelPosition.inside,

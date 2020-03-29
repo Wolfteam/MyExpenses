@@ -206,8 +206,8 @@ class I18n implements WidgetsLocalizations {
   String recurringTransactionStartsOn(String date, String cycle) => "Recurring transaction starts on ${date} and runs ${cycle}";
   /// "No recurring transactions were found"
   String get noRecurringTransactionsWereFound => "No recurring transactions were found";
-  /// "no"
-  String get no => "no";
+  /// "No"
+  String get no => "No";
   /// "Remove image"
   String get removeImg => "Remove image";
   /// "Are you sure ?"
@@ -270,6 +270,8 @@ class I18n implements WidgetsLocalizations {
   String get recurringTransactionIsNowRunning => "Recurring transaction is now running";
   /// "Next date: ${on}"
   String nextDateOn(String on) => "Next date: ${on}";
+  /// "Date: ${on}"
+  String dateOn(String on) => "Date: ${on}";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -627,9 +629,9 @@ class _I18n_es_VE extends I18n {
   /// "No se encontraron transacciones recurrentes"
   @override
   String get noRecurringTransactionsWereFound => "No se encontraron transacciones recurrentes";
-  /// "no"
+  /// "No"
   @override
-  String get no => "no";
+  String get no => "No";
   /// "Remover imagen"
   @override
   String get removeImg => "Remover imagen";
@@ -723,6 +725,9 @@ class _I18n_es_VE extends I18n {
   /// "Siguiente fecha: ${on}"
   @override
   String nextDateOn(String on) => "Siguiente fecha: ${on}";
+  /// "Fecha: ${on}"
+  @override
+  String dateOn(String on) => "Fecha: ${on}";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";

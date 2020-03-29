@@ -9,21 +9,28 @@ import '../../pages/add_edit_transasctiton_page.dart';
 
 class TransactionItem extends StatelessWidget {
   final trans_item.TransactionItem item;
+  final bool showDate;
 
   const TransactionItem({
     Key key,
     @required this.item,
+    this.showDate = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final i18n = I18n.of(context);
+    final dateString = DateUtils.formatDateWithoutLocale(
+      item.isParentTransaction && item.nextRecurringDate != null
+          ? item.transactionDate
+          : item.transactionDate,
+      DateUtils.monthDayAndYearFormat,
+    );
     final subtitle = item.isParentTransaction && item.nextRecurringDate != null
-        ? Text(i18n.nextDateOn(DateUtils.formatDateWithoutLocale(
-            item.nextRecurringDate,
-            DateUtils.monthDayAndYearFormat,
-          )))
-        : item.isParentTransaction ? Text(i18n.stopped) : null;
+        ? Text(i18n.nextDateOn(dateString))
+        : item.isParentTransaction
+            ? Text(i18n.stopped)
+            : showDate ? Text(i18n.dateOn(dateString)) : null;
     final amountWidget = Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+//TODO: REPLACE THIS CLASS WITH A MIXIN
 class BaseTransaction {
   int amount;
   String description;

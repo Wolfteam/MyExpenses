@@ -86,7 +86,7 @@
     "childTransactionCantBeDeleted": "A child transaction can not be deleted nor edited",
     "recurringTransactionStartsOn": "Recurring transaction starts on {date} and runs {cycle}",
     "noRecurringTransactionsWereFound": "No recurring transactions were found",
-    "no": "no",
+    "no": "No",
     "removeImg": "Remove image",
     "areYouSure": "Are you sure ?",
     "recurring": "Recurring",
@@ -117,7 +117,8 @@
     "running": "Running",
     "recurringTransactionIsNowStopped": "Recurring transaction is now stopped",
     "recurringTransactionIsNowRunning": "Recurring transaction is now running",
-    "nextDateOn":"Next date: {on}",
+    "nextDateOn": "Next date: {on}",
+    "dateOn": "Date: {on}",
     "repetitionCycle": {
         "eachWeek": "Each week",
         "eachMonth": "Each month",
