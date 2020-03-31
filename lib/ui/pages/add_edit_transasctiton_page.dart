@@ -12,6 +12,7 @@ import '../../bloc/transactions/transactions_bloc.dart';
 import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/extensions/i18n_extensions.dart';
 import '../../common/extensions/string_extensions.dart';
+import '../../common/utils/bloc_utils.dart';
 import '../../common/utils/date_utils.dart';
 import '../../common/utils/i18n_utils.dart';
 import '../../common/utils/toast_utils.dart';
@@ -85,6 +86,15 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         if (state is TransactionFormLoadedState) {
           if (state.errorOccurred) {
             showWarningToast(i18n.unknownErrorOcurred);
+          }
+
+          if (state.nextRecurringDateWasUpdated) {
+            BlocUtils.raiseCommonBlocEvents(
+              context,
+              reloadCategories: false,
+              reloadCharts: false,
+              reloadDrawer: false,
+            );
           }
         }
 

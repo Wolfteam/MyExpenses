@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:intl/intl.dart';
 
 import '../../common/utils/date_utils.dart';
 import '../../common/utils/transaction_utils.dart';
@@ -35,11 +36,11 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
   }
 
   Stream<ChartsState> _buildLoadedState(DateTime now) async* {
-    final dateString = DateUtils.formatAppDate(
+    final dateString = toBeginningOfSentenceCase(DateUtils.formatAppDate(
       now,
       _settingsService.language,
       DateUtils.fullMonthAndYearFormat,
-    );
+    ));
     final from = DateUtils.getFirstDayDateOfTheMonth(now);
     final to = DateUtils.getLastDayDateOfTheMonth(now);
     var transactions = <TransactionItem>[];

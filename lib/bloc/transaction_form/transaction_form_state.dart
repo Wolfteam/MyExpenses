@@ -46,6 +46,7 @@ class TransactionFormLoadedState extends TransactionFormState {
 
   final bool isRecurringTransactionRunning;
   final DateTime nextRecurringDate;
+  final bool nextRecurringDateWasUpdated;
 
   bool get isNewTransaction => id == null || id <= 0;
 
@@ -84,6 +85,7 @@ class TransactionFormLoadedState extends TransactionFormState {
         isSavingForm,
         isRecurringTransactionRunning,
         nextRecurringDate,
+        nextRecurringDateWasUpdated,
       ];
 
   const TransactionFormLoadedState({
@@ -111,6 +113,7 @@ class TransactionFormLoadedState extends TransactionFormState {
     this.isSavingForm = false,
     this.isRecurringTransactionRunning = true,
     this.nextRecurringDate,
+    this.nextRecurringDateWasUpdated = false,
   });
 
   factory TransactionFormLoadedState.initial(AppLanguageType language) {
@@ -173,6 +176,7 @@ class TransactionFormLoadedState extends TransactionFormState {
     bool isSavingForm,
     bool isRecurringTransactionRunning,
     DateTime nextRecurringDate,
+    bool nextRecurringDateWasUpdated,
   }) {
     final date = transactionDate ?? this.transactionDate;
     final transactionDateString = DateUtils.formatAppDate(
@@ -208,6 +212,8 @@ class TransactionFormLoadedState extends TransactionFormState {
       isRecurringTransactionRunning:
           isRecurringTransactionRunning ?? this.isRecurringTransactionRunning,
       nextRecurringDate: nextRecurringDate ?? this.nextRecurringDate,
+      nextRecurringDateWasUpdated:
+          nextRecurringDateWasUpdated ?? this.nextRecurringDateWasUpdated,
     );
   }
 

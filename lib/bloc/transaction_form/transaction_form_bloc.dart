@@ -293,6 +293,12 @@ class TransactionFormBloc
       yield currentState.copyWith(
         isRecurringTransactionRunning: isRunning,
         nextRecurringDate: recurringDateTouse,
+        nextRecurringDateWasUpdated: true,
+      );
+      yield currentState.copyWith(
+        isRecurringTransactionRunning: isRunning,
+        nextRecurringDate: recurringDateTouse,
+        nextRecurringDateWasUpdated: false,
       );
     } on Exception catch (e, s) {
       _logger.error(

@@ -53,11 +53,11 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
   Stream<TransactionsLoadedState> _buildInitialState(
     GetTransactions event,
   ) async* {
-    final month = DateUtils.formatAppDate(
+    final month = toBeginningOfSentenceCase(DateUtils.formatAppDate(
       event.inThisDate,
       _settingsService.language,
       DateUtils.fullMonthFormat,
-    );
+    ));
     final now = DateTime.now();
     final from = DateUtils.getFirstDayDateOfTheMonth(event.inThisDate);
     final to = DateUtils.getLastDayDateOfTheMonth(from);

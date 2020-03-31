@@ -22,10 +22,11 @@ class TransactionItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final currencyBloc = context.bloc<CurrencyBloc>();
     final i18n = I18n.of(context);
+    final dateToUse = item.isParentTransaction && item.nextRecurringDate != null
+        ? item.nextRecurringDate
+        : item.transactionDate;
     final dateString = DateUtils.formatDateWithoutLocale(
-      item.isParentTransaction && item.nextRecurringDate != null
-          ? item.transactionDate
-          : item.transactionDate,
+      dateToUse,
       DateUtils.monthDayAndYearFormat,
     );
     final subtitle = item.isParentTransaction && item.nextRecurringDate != null
@@ -68,7 +69,7 @@ class TransactionItem extends StatelessWidget {
         context.bloc<TransactionFormBloc>().add(FormClosed());
       },
       child: ListTile(
-        dense: true,        
+        dense: true,
         leading: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[

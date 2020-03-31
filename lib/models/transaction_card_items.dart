@@ -1,18 +1,27 @@
-import 'package:my_expenses/common/utils/transaction_utils.dart';
-import 'package:my_expenses/models/transaction_item.dart';
+import 'package:equatable/equatable.dart';
 
-class TransactionCardItems {
+import '../common/utils/transaction_utils.dart';
+import 'transaction_item.dart';
+
+class TransactionCardItems extends Equatable {
   final DateTime date;
   final String dateString;
   final List<TransactionItem> transactions;
 
-  double get dayExpenses =>
-      TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: false);
+  @override
+  List<Object> get props => [date, dateString, transactions];
 
-  double get dayIncomes =>
-      TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: true);
+  double get dayExpenses => TransactionUtils.getTotalTransactionAmounts(
+        transactions,
+        onlyIncomes: false,
+      );
 
-  TransactionCardItems({
+  double get dayIncomes => TransactionUtils.getTotalTransactionAmounts(
+        transactions,
+        onlyIncomes: true,
+      );
+
+  const TransactionCardItems({
     this.date,
     this.dateString,
     this.transactions,
