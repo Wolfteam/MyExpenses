@@ -221,18 +221,18 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
   ) {
     final balance = (expenses.abs() + incomes).abs();
     if (transactions.isNotEmpty) {
-      final expensesPercentage = (expenses * 100 / balance).abs().round();
-      final incomesPercentage = (incomes * 100 / balance).round();
+      final expensesPercentage = (expenses * 100 / balance).abs();
+      final incomesPercentage = incomes * 100 / balance;
 
       return [
         TransactionsSummaryPerMonth(
           order: 0,
-          percentage: expensesPercentage,
+          percentage: TransactionUtils.roundDouble(expensesPercentage),
           isAnIncome: false,
         ),
         TransactionsSummaryPerMonth(
           order: 1,
-          percentage: incomesPercentage,
+          percentage: TransactionUtils.roundDouble(incomesPercentage),
           isAnIncome: true,
         ),
       ];
@@ -295,11 +295,11 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
       final models = map.entries
           .map((kvp) => TransactionsSummaryPerDay(
                 date: kvp.key,
-                amount: kvp.value.round(),
+                totalDayAmount: kvp.value,
               ))
           .toList();
 
-      models.sort((t1, t2) => t1.createdAt.compareTo(t2.createdAt));
+      models.sort((t1, t2) => t1.date.compareTo(t2.date));
       return models;
     } on Exception catch (e, s) {
       _logger.error(

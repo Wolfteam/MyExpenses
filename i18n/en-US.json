@@ -119,6 +119,8 @@
     "recurringTransactionIsNowRunning": "Recurring transaction is now running",
     "nextDateOn": "Next date: {on}",
     "dateOn": "Date: {on}",
+    "currencySimbol": "Currency symbol",
+    "currencySymbolToRight": "Currency symbol to the right",
     "repetitionCycle": {
         "eachWeek": "Each week",
         "eachMonth": "Each month",

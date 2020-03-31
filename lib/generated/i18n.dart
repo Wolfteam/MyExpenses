@@ -272,6 +272,10 @@ class I18n implements WidgetsLocalizations {
   String nextDateOn(String on) => "Next date: ${on}";
   /// "Date: ${on}"
   String dateOn(String on) => "Date: ${on}";
+  /// "Currency symbol"
+  String get currencySimbol => "Currency symbol";
+  /// "Currency symbol to the right"
+  String get currencySymbolToRight => "Currency symbol to the right";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -728,6 +732,12 @@ class _I18n_es_VE extends I18n {
   /// "Fecha: ${on}"
   @override
   String dateOn(String on) => "Fecha: ${on}";
+  /// "Símbolo de moneda"
+  @override
+  String get currencySimbol => "Símbolo de moneda";
+  /// "Símbolo de moneda a la derecha"
+  @override
+  String get currencySymbolToRight => "Símbolo de moneda a la derecha";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";

@@ -88,7 +88,7 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
     for (var i = 0; i < days; i++) {
       final now = from.add(Duration(days: i));
       final first = DateTime(now.year, now.month, now.day, 0, 0, 0);
-      
+
       final next = _getNextDate(first);
       final last = DateTime(next.year, next.month, next.day, 23, 59, 59);
 
@@ -111,12 +111,7 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
 
       final dateRangeString = '$start - $end';
 
-      trans.add(TransactionsSummaryPerDate(
-        amount.round(),
-        first,
-        last,
-        dateRangeString,
-      ));
+      trans.add(TransactionsSummaryPerDate(amount, dateRangeString));
 
       i += last.difference(first).inDays;
     }

@@ -1,6 +1,8 @@
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../bloc/currency/currency_bloc.dart';
 import '../../../models/chart_transaction_item.dart';
 import '../custom_arc_renderer.dart';
 
@@ -33,6 +35,8 @@ class PieChartTransactionsPerMonths extends StatelessWidget {
       ),
     );
 
+    final currencyBloc = context.bloc<CurrencyBloc>();
+
     final dataToUse = chartData.isEmpty
         ? [
             ChartTransactionItem(
@@ -52,8 +56,9 @@ class PieChartTransactionsPerMonths extends StatelessWidget {
         measureFn: (item, _) => item.value.abs(),
         colorFn: (item, _) => charts.ColorUtil.fromDartColor(
             item.categoryColor ?? item.transactionColor),
-        labelAccessorFn: (item, _) =>
-            item.dummyItem ? '0 \$' : '${item.value} \$',
+        labelAccessorFn: (item, _) => item.dummyItem
+            ? currencyBloc.format(0)
+            : currencyBloc.format(item.value),
         insideLabelStyleAccessorFn: (item, _) => labelsStyle,
         outsideLabelStyleAccessorFn: (item, _) => labelsStyle,
       )

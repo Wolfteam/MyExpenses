@@ -2,6 +2,7 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../bloc/currency/currency_bloc.dart';
 import '../../../bloc/transactions_last_7_days/transactions_last_7_days_bloc.dart';
 import '../../../common/enums/transaction_type.dart';
 import '../../../common/utils/date_utils.dart';
@@ -24,9 +25,7 @@ class HomeLast7DaysSummary extends StatelessWidget {
       margin: const EdgeInsets.all(10),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
-          // bottomLeft: Radius.circular(20),
           bottomRight: Radius.circular(60),
-          // topRight: Radius.circular(30),
         ),
       ),
       child: Padding(
@@ -69,10 +68,14 @@ class HomeLast7DaysSummary extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final labelStyle = charts.TextStyleSpec(
+      fontSize: 10,
+      lineHeight: 1.0,
       color: charts.ColorUtil.fromDartColor(
         isDark ? Colors.white : Colors.black,
       ),
     );
+
+    final currencyBloc = context.bloc<CurrencyBloc>();
 
     return [
       charts.Series<TransactionsSummaryPerDay, String>(
@@ -80,13 +83,16 @@ class HomeLast7DaysSummary extends StatelessWidget {
         data: data,
         colorFn: (item, __) => charts.ColorUtil.fromDartColor(item.color),
         domainFn: (item, _) => DateUtils.formatDateWithoutLocale(
-          item.createdAt,
+          item.date,
           DateUtils.dayAndMonthFormat,
         ),
-        measureFn: (item, _) => item.amount,
+        measureFn: (item, _) => item.totalDayAmount,
         insideLabelStyleAccessorFn: (item, index) => labelStyle,
         outsideLabelStyleAccessorFn: (item, index) => labelStyle,
-        labelAccessorFn: (item, _) => '${item.amount}\$',
+        labelAccessorFn: (item, _) => currencyBloc.format(
+          item.totalDayAmount,
+          showSymbol: false,
+        ),
       ),
     ];
   }

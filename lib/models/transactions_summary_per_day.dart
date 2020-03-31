@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:my_expenses/models/base_transaction.dart';
 
-class TransactionsSummaryPerDay extends BaseTransaction {
+import '../common/mixins/transaction_mixin.dart';
+
+class TransactionsSummaryPerDay with TransactionMixin {
+  final DateTime date;
+  final double totalDayAmount;
+
+  Color get color => getTransactionColor(
+        isAnIncome: isTransactionAnIncome(totalDayAmount),
+      );
+
   TransactionsSummaryPerDay({
-    @required DateTime date,
-    @required int amount,
-  }) : super.withDate(amount: amount, createdAt: date);
+    @required this.date,
+    @required this.totalDayAmount,
+  });
 }

@@ -9,7 +9,7 @@ class ChartTransactionCardContainer extends StatelessWidget {
   final TransactionItem item;
   final double transactionsTotalAmount;
 
-  double get percentage => item.amount.round() * 100 / transactionsTotalAmount;
+  double get percentage => item.amount * 100 / transactionsTotalAmount;
 
   const ChartTransactionCardContainer(
     this.item,
@@ -35,7 +35,12 @@ class ChartTransactionCardContainer extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.only(top: 10, left: 16, right: 16),
+            padding: const EdgeInsets.only(
+              top: 8,
+              left: 16,
+              right: 16,
+              bottom: 5,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -59,6 +64,7 @@ class ChartTransactionCardContainer extends StatelessWidget {
           ),
           Divider(
             color: Colors.grey,
+            height: 1,
           ),
           trans_item.TransactionItem(item: item),
         ],

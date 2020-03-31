@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../common/enums/app_accent_color_type.dart';
 import '../common/enums/app_language_type.dart';
 import '../common/enums/app_theme_type.dart';
+import '../common/enums/currency_symbol_type.dart';
 import '../common/enums/sync_intervals_type.dart';
 import '../models/app_settings.dart';
 import 'logging_service.dart';
@@ -28,6 +29,12 @@ abstract class SettingsService {
   bool get askForFingerPrint;
   set askForFingerPrint(bool ask);
 
+  CurrencySymbolType get currencySymbol;
+  set currencySymbol(CurrencySymbolType type);
+
+  bool get currencyToTheRight;
+  set currencyToTheRight(bool toTheRight);
+
   Future init();
 }
 
@@ -38,7 +45,9 @@ class SettingsServiceImpl implements SettingsService {
   final _syncIntervalKey = 'SyncInterval';
   final _askForPasswordKey = 'AskForPassword';
   final _askForFingerPrintKey = 'AskForFingerPrint';
-  final _passwordKey = 'Password';
+  final _currencySymbolKey = 'CurrencySymbol';
+  final _currencyToTheRightKey = 'CurrencyToTheRight';
+
   final LoggingService _logger;
 
   bool _initialized = false;
@@ -54,6 +63,8 @@ class SettingsServiceImpl implements SettingsService {
         syncInterval: syncInterval,
         askForPassword: askForPassword,
         askForFingerPrint: askForFingerPrint,
+        currencySymbol: currencySymbol,
+        currencyToTheRight: currencyToTheRight,
       );
 
   @override
@@ -92,6 +103,21 @@ class SettingsServiceImpl implements SettingsService {
   bool get askForFingerPrint => _prefs.getBool(_askForFingerPrintKey);
   @override
   set askForFingerPrint(bool ask) => _prefs.setBool(_askForFingerPrintKey, ask);
+
+  @override
+  CurrencySymbolType get currencySymbol =>
+      CurrencySymbolType.values[_prefs.getInt(_currencySymbolKey)];
+
+  @override
+  set currencySymbol(CurrencySymbolType type) =>
+      _prefs.setInt(_currencySymbolKey, type.index);
+
+  @override
+  bool get currencyToTheRight => _prefs.getBool(_currencyToTheRightKey);
+
+  @override
+  set currencyToTheRight(bool toTheRight) =>
+      _prefs.setBool(_currencyToTheRightKey, toTheRight);
 
   SettingsServiceImpl(this._logger);
 
@@ -134,6 +160,19 @@ class SettingsServiceImpl implements SettingsService {
     if (_prefs.get(_askForFingerPrintKey) == null) {
       _logger.info(runtimeType, 'Setting ask for fingerprint to false...');
       _prefs.setBool(_askForFingerPrintKey, false);
+    }
+
+    if (_prefs.get(_currencySymbolKey) == null) {
+      _logger.info(
+        runtimeType,
+        'Setting current currency to ${CurrencySymbolType.dolar}...',
+      );
+      _prefs.setInt(_currencySymbolKey, CurrencySymbolType.dolar.index);
+    }
+
+    if (_prefs.get(_currencyToTheRightKey) == null) {
+      _logger.info(runtimeType, 'Setting currency to the right to true...');
+      _prefs.setBool(_currencyToTheRightKey, true);
     }
 
     _initialized = true;

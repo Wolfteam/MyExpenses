@@ -11,6 +11,7 @@ import 'bloc/category_form/category_form_bloc.dart';
 import 'bloc/category_icon/category_icon_bloc.dart';
 import 'bloc/chart_details/chart_details_bloc.dart';
 import 'bloc/charts/charts_bloc.dart';
+import 'bloc/currency/currency_bloc.dart';
 import 'bloc/drawer/drawer_bloc.dart';
 import 'bloc/password_dialog/password_dialog_bloc.dart';
 import 'bloc/reports/reports_bloc.dart';
@@ -67,6 +68,12 @@ class _MyAppState extends State<MyApp> {
       ],
       child: MultiBlocProvider(
         providers: [
+          BlocProvider(
+            create: (ctx) {
+              final settingsService = getIt<SettingsService>();
+              return CurrencyBloc(settingsService);
+            },
+          ),
           BlocProvider(
             create: (ctx) {
               final logger = getIt<LoggingService>();
@@ -128,11 +135,18 @@ class _MyAppState extends State<MyApp> {
             return ChartsBloc(logger, transactionsDao, settingsService);
           }),
           BlocProvider(create: (ctx) => ChartDetailsBloc()),
-          BlocProvider(create: (ctx) {
-            final logger = getIt<LoggingService>();
-            final transactionsDao = getIt<TransactionsDao>();
-            return ReportsBloc(logger, transactionsDao);
-          }),
+          BlocProvider(
+            create: (ctx) {
+              final logger = getIt<LoggingService>();
+              final transactionsDao = getIt<TransactionsDao>();
+              final currencyBloc = ctx.bloc<CurrencyBloc>();
+              return ReportsBloc(
+                logger,
+                transactionsDao,
+                currencyBloc,
+              );
+            },
+          ),
           BlocProvider(create: (ctx) {
             final logger = getIt<LoggingService>();
             final secureStorage = getIt<SecureStorageService>();

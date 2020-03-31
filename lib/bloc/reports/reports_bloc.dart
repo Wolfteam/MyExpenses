@@ -14,6 +14,7 @@ import '../../generated/i18n.dart';
 import '../../models/transaction_item.dart';
 import '../../services/logging_service.dart';
 import '../../ui/widgets/reports/pdf_report.dart';
+import '../currency/currency_bloc.dart';
 
 part 'reports_event.dart';
 part 'reports_state.dart';
@@ -21,8 +22,13 @@ part 'reports_state.dart';
 class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
   final LoggingService _logger;
   final TransactionsDao _transactionsDao;
+  final CurrencyBloc _currencyBloc;
 
-  ReportsBloc(this._logger, this._transactionsDao);
+  ReportsBloc(
+    this._logger,
+    this._transactionsDao,
+    this._currencyBloc,
+  );
 
   @override
   ReportState get initialState => ReportSheetState.initial();
@@ -124,8 +130,11 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
       ...transactions.map((t) => [
             t.id,
             t.description,
-            t.amount.toString(),
-            t.transactionDate.toString(),
+            _currencyBloc.format(t.amount, showSymbol: true),
+            DateUtils.formatDateWithoutLocale(
+              t.transactionDate,
+              DateUtils.monthDayAndYearFormat,
+            ),
             t.category.name,
             if (t.category.isAnIncome)
               event.i18n.income
@@ -151,6 +160,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
     String filename,
   ) async {
     final pdf = await buildPdf(
+      (amount) => _currencyBloc.format(amount, showSymbol: true),
       transactions,
       event.i18n,
       currentState.from,

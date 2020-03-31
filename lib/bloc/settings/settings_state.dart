@@ -20,6 +20,8 @@ class SettingsInitialState extends SettingsState {
   final bool askForPassword;
   final bool canUseFingerPrint;
   final bool askForFingerPrint;
+  final CurrencySymbolType currencySymbol;
+  final bool currencyToTheRight;
 
   final String appName;
   final String appVersion;
@@ -35,7 +37,9 @@ class SettingsInitialState extends SettingsState {
         canUseFingerPrint,
         askForFingerPrint,
         appName,
-        appVersion
+        appVersion,
+        currencySymbol,
+        currencyToTheRight,
       ];
 
   const SettingsInitialState({
@@ -49,6 +53,8 @@ class SettingsInitialState extends SettingsState {
     @required this.askForFingerPrint,
     @required this.appName,
     @required this.appVersion,
+    @required this.currencySymbol,
+    @required this.currencyToTheRight,
   });
 
   SettingsInitialState copyWith({
@@ -62,6 +68,8 @@ class SettingsInitialState extends SettingsState {
     bool askForFingerPrint,
     String appName,
     String appVersion,
+    CurrencySymbolType currencySymbol,
+    bool currencyToTheRight,
   }) {
     return SettingsInitialState(
       appTheme: appTheme ?? this.appTheme,
@@ -74,6 +82,8 @@ class SettingsInitialState extends SettingsState {
       askForFingerPrint: askForFingerPrint ?? this.askForFingerPrint,
       appName: appName ?? this.appName,
       appVersion: appVersion ?? this.appVersion,
+      currencySymbol: currencySymbol ?? this.currencySymbol,
+      currencyToTheRight: currencyToTheRight ?? this.currencyToTheRight,
     );
   }
 }

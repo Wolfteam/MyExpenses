@@ -5,6 +5,7 @@ import 'package:json_annotation/json_annotation.dart';
 import '../common/enums/app_accent_color_type.dart';
 import '../common/enums/app_language_type.dart';
 import '../common/enums/app_theme_type.dart';
+import '../common/enums/currency_symbol_type.dart';
 import '../common/enums/sync_intervals_type.dart';
 
 part 'app_settings.g.dart';
@@ -18,6 +19,8 @@ class AppSettings extends Equatable {
   final SyncIntervalType syncInterval;
   final bool askForPassword;
   final bool askForFingerPrint;
+  final CurrencySymbolType currencySymbol;
+  final bool currencyToTheRight;
 
   @override
   List<Object> get props => [
@@ -28,6 +31,8 @@ class AppSettings extends Equatable {
         syncInterval,
         askForPassword,
         askForFingerPrint,
+        currencySymbol,
+        currencyToTheRight,
       ];
 
   const AppSettings({
@@ -38,6 +43,8 @@ class AppSettings extends Equatable {
     @required this.syncInterval,
     @required this.askForPassword,
     @required this.askForFingerPrint,
+    @required this.currencySymbol,
+    @required this.currencyToTheRight,
   });
 
   factory AppSettings.fromJson(Map<String, dynamic> json) =>

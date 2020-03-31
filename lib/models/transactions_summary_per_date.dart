@@ -1,14 +1,19 @@
-import '../models/base_transaction.dart';
+import 'package:flutter/material.dart';
 
-class TransactionsSummaryPerDate extends BaseTransaction {
-  final DateTime from;
-  final DateTime to;
+import '../common/mixins/transaction_mixin.dart';
+
+class TransactionsSummaryPerDate with TransactionMixin {
+  final double totalAmount;
   final String dateRangeString;
 
+  Color get color => getTransactionColor(
+        isAnIncome: isTransactionAnIncome(totalAmount),
+      );
+
+  bool get isAnIncome => isTransactionAnIncome(totalAmount);
+
   TransactionsSummaryPerDate(
-    int amount,
-    this.from,
-    this.to,
+    this.totalAmount,
     this.dateRangeString,
-  ) : super(amount: amount);
+  );
 }

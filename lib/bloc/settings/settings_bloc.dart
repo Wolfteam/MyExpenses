@@ -9,6 +9,7 @@ import 'package:package_info/package_info.dart';
 import '../../common/enums/app_accent_color_type.dart';
 import '../../common/enums/app_language_type.dart';
 import '../../common/enums/app_theme_type.dart';
+import '../../common/enums/currency_symbol_type.dart';
 import '../../common/enums/secure_resource_type.dart';
 import '../../common/enums/sync_intervals_type.dart';
 import '../../generated/i18n.dart';
@@ -95,6 +96,16 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         yield currentState.copyWith(askForFingerPrint: event.ask);
       }
     }
+
+    if (event is CurrencyChanged) {
+      _settingsService.currencySymbol = event.selectedCurrency;
+      yield currentState.copyWith(currencySymbol: event.selectedCurrency);
+    }
+
+    if (event is CurrencyPlacementChanged) {
+      _settingsService.currencyToTheRight = event.placeToTheRight;
+      yield currentState.copyWith(currencyToTheRight: event.placeToTheRight);
+    }
   }
 
   Stream<SettingsState> _buildInitialState() async* {
@@ -115,6 +126,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       askForFingerPrint: appSettings.askForFingerPrint,
       appName: packageInfo.appName,
       appVersion: packageInfo.version,
+      currencySymbol: appSettings.currencySymbol,
+      currencyToTheRight: appSettings.currencyToTheRight,
     );
   }
 }

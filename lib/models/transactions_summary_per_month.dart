@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
-class TransactionsSummaryPerMonth {
+import '../common/mixins/transaction_mixin.dart';
+
+class TransactionsSummaryPerMonth with TransactionMixin {
   final int order;
-  final int percentage;
+  final double percentage;
   final bool isAnIncome;
 
-  Color get color {
-    return isAnIncome ? Colors.green : Colors.red;
-  }
+  Color get color => getTransactionColor(isAnIncome: isAnIncome);
 
   TransactionsSummaryPerMonth({
-    this.order,
-    this.percentage,
-    this.isAnIncome,
+    @required this.order,
+    @required this.percentage,
+    @required this.isAnIncome,
   });
 }

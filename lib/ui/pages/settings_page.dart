@@ -8,10 +8,13 @@ import '../../bloc/settings/settings_bloc.dart';
 import '../../common/enums/app_accent_color_type.dart';
 import '../../common/enums/app_language_type.dart';
 import '../../common/enums/app_theme_type.dart';
+import '../../common/enums/currency_symbol_type.dart';
 import '../../common/enums/sync_intervals_type.dart';
 import '../../common/extensions/app_theme_type_extensions.dart';
 import '../../common/extensions/i18n_extensions.dart';
 import '../../common/presentation/custom_assets.dart';
+import '../../common/utils/bloc_utils.dart';
+import '../../common/utils/currency_utils.dart';
 import '../../generated/i18n.dart';
 import '../widgets/settings/password_dialog.dart';
 
@@ -375,6 +378,45 @@ class _SettingsPageState extends State<SettingsPage>
     I18n i18n,
   ) {
     final theme = Theme.of(context);
+    final currencyDropDown = DropdownButton<CurrencySymbolType>(
+      isExpanded: true,
+      isDense: true,
+      selectedItemBuilder: (ctx) => CurrencySymbolType.values
+          .map((value) => Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(i18n.currencySimbol),
+                      Container(
+                        margin: const EdgeInsets.only(right: 15),
+                        child: Text(
+                          CurrencyUtils.getCurrencySymbol(value),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ))
+          .toList(),
+      value: state.currencySymbol,
+      iconSize: 24,
+      underline: Container(
+        height: 0,
+        color: Colors.transparent,
+      ),
+      onChanged: _currencyChanged,
+      items: CurrencySymbolType.values
+          .map<DropdownMenuItem<CurrencySymbolType>>(
+            (symbol) => DropdownMenuItem<CurrencySymbolType>(
+              value: symbol,
+              child: Text(CurrencyUtils.getCurrencySymbol(symbol)),
+            ),
+          )
+          .toList(),
+    );
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       margin: const EdgeInsets.all(10),
@@ -397,6 +439,20 @@ class _SettingsPageState extends State<SettingsPage>
                   ),
                 ),
               ],
+            ),
+            Container(
+              margin: const EdgeInsets.only(top: 10),
+              padding: const EdgeInsets.only(
+                left: 16,
+                right: 16,
+              ),
+              child: currencyDropDown,
+            ),
+            SwitchListTile(
+              activeColor: theme.accentColor,
+              value: state.currencyToTheRight,
+              title: Text(i18n.currencySymbolToRight),
+              onChanged: _currencyPlacementChanged,
             ),
             SwitchListTile(
               activeColor: theme.accentColor,
@@ -579,5 +635,25 @@ class _SettingsPageState extends State<SettingsPage>
     if (result == null) return;
 
     context.bloc<SettingsBloc>().add(AskForPasswordChanged(ask: result));
+  }
+
+  void _currencyChanged(CurrencySymbolType newValue) {
+    context.bloc<SettingsBloc>().add(CurrencyChanged(newValue));
+    BlocUtils.raiseCommonBlocEvents(
+      context,
+      reloadDrawer: false,
+      reloadCategories: false,
+    );
+  }
+
+  void _currencyPlacementChanged(bool newValue) {
+    context
+        .bloc<SettingsBloc>()
+        .add(CurrencyPlacementChanged(placeToTheRight: newValue));
+    BlocUtils.raiseCommonBlocEvents(
+      context,
+      reloadTransactions: true,
+      reloadCharts: true,
+    );
   }
 }

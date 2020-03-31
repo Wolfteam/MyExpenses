@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../bloc/currency/currency_bloc.dart';
 import '../../../bloc/transaction_form/transaction_form_bloc.dart';
 import '../../../common/utils/date_utils.dart';
 import '../../../generated/i18n.dart';
@@ -19,6 +20,7 @@ class TransactionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currencyBloc = context.bloc<CurrencyBloc>();
     final i18n = I18n.of(context);
     final dateString = DateUtils.formatDateWithoutLocale(
       item.isParentTransaction && item.nextRecurringDate != null
@@ -37,7 +39,7 @@ class TransactionItem extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
         Text(
-          '${item.amount} \$',
+          currencyBloc.format(item.amount),
           style: TextStyle(
             color: item.category.isAnIncome ? Colors.green : Colors.red,
           ),
@@ -66,7 +68,7 @@ class TransactionItem extends StatelessWidget {
         context.bloc<TransactionFormBloc>().add(FormClosed());
       },
       child: ListTile(
-        dense: true,
+        dense: true,        
         leading: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[

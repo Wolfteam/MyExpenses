@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../bloc/currency/currency_bloc.dart';
 import '../../../generated/i18n.dart';
 import '../../../models/chart_grouped_transactions_by_category.dart';
 import '../transactions/transaction_item.dart' as trans_item;
@@ -21,6 +23,8 @@ class ChartGroupedTransactionsCardContainer extends StatelessWidget {
     final i18n = I18n.of(context);
     final percentageString = percentage.toStringAsFixed(2);
 
+    final currencyBloc = context.bloc<CurrencyBloc>();
+
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
@@ -30,7 +34,12 @@ class ChartGroupedTransactionsCardContainer extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.only(top: 10, left: 16, right: 16),
+            padding: const EdgeInsets.only(
+              top: 8,
+              left: 16,
+              right: 16,
+              bottom: 5,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -54,6 +63,7 @@ class ChartGroupedTransactionsCardContainer extends StatelessWidget {
           ),
           Divider(
             color: Colors.grey,
+            height: 1,
           ),
           ListView.builder(
             physics: const NeverScrollableScrollPhysics(),
@@ -71,7 +81,7 @@ class ChartGroupedTransactionsCardContainer extends StatelessWidget {
               bottom: 10,
             ),
             child: Text(
-              '${i18n.total}: ${grouped.total} \$',
+              '${i18n.total}: ${currencyBloc.format(grouped.total)}',
               textAlign: TextAlign.end,
               style: TextStyle(color: Colors.grey),
             ),

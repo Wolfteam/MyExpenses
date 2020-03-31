@@ -5,6 +5,7 @@ import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 import '../../bloc/chart_details/chart_details_bloc.dart';
 import '../../bloc/charts/charts_bloc.dart';
+import '../../bloc/currency/currency_bloc.dart';
 import '../../generated/i18n.dart';
 import '../../models/transactions_summary_per_date.dart';
 import '../widgets/charts/pie_chart_transactions_per_month.dart';
@@ -144,20 +145,26 @@ class _ChartsPageState extends State<ChartsPage>
         isDark ? Colors.white : Colors.black,
       ),
     );
+
+    final currency = context.bloc<CurrencyBloc>();
+
     return [
       charts.Series<TransactionsSummaryPerDate, String>(
         id: 'BarChartMonthSummary',
         data: state.transactionsPerDate,
-        colorFn: (item, _) => item.amount == 0
+        colorFn: (item, _) => item.totalAmount == 0
             ? charts.MaterialPalette.white
             : item.isAnIncome
                 ? charts.MaterialPalette.green.shadeDefault
                 : charts.MaterialPalette.red.shadeDefault,
         domainFn: (item, _) => item.dateRangeString,
-        measureFn: (item, _) => item.amount,
+        measureFn: (item, _) => item.totalAmount,
         insideLabelStyleAccessorFn: (item, index) => labelStyle,
         outsideLabelStyleAccessorFn: (item, index) => labelStyle,
-        labelAccessorFn: (item, _) => '${item.amount}\$',
+        labelAccessorFn: (item, _) => currency.format(
+          item.totalAmount,
+          showSymbol: false,
+        ),
       ),
     ];
   }
@@ -193,6 +200,8 @@ class _ChartsPageState extends State<ChartsPage>
         ? state.incomeChartTransactions
         : state.expenseChartTransactions;
 
+    final currencyBloc = context.bloc<CurrencyBloc>();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -217,7 +226,12 @@ class _ChartsPageState extends State<ChartsPage>
                   Container(
                     margin: const EdgeInsets.only(left: 20),
                     child: Text(
-                      '${incomes ? state.totalIncomeAmount : state.totalExpenseAmount} \$',
+                      currencyBloc.format(
+                        incomes
+                            ? state.totalIncomeAmount
+                            : state.totalExpenseAmount,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                       style: textStyle.copyWith(
                         color: incomes ? Colors.green : Colors.red,
                       ),

@@ -19,7 +19,12 @@ class BlocUtils {
     );
     final now = DateTime.now();
     if (reloadTransactions) {
-      ctx.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: now));
+      final transBloc = ctx.bloc<TransactionsBloc>();
+      if (transBloc.currentState.showParentTransactions) {
+        ctx.bloc<TransactionsBloc>().add(const GetAllParentTransactions());
+      } else {
+        ctx.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: now));
+      }
     }
 
     if (reloadCharts) {
