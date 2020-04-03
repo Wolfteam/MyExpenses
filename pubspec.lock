@@ -154,14 +154,14 @@ packages:
       name: charts_common
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.8.1"
+    version: "0.9.0"
   charts_flutter:
     dependency: "direct main"
     description:
       name: charts_flutter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.8.1"
+    version: "0.9.0"
   checked_yaml:
     dependency: transitive
     description:
@@ -271,7 +271,7 @@ packages:
       name: flutter_appcenter_bundle
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.0+1"
+    version: "3.1.0+1"
   flutter_bloc:
     dependency: "direct main"
     description:
@@ -313,7 +313,7 @@ packages:
       name: flutter_local_notifications
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.2.1"
+    version: "1.4.0"
   flutter_local_notifications_platform_interface:
     dependency: transitive
     description:
@@ -442,7 +442,7 @@ packages:
       name: image_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.3+4"
+    version: "0.6.4"
   injectable:
     dependency: "direct main"
     description:
@@ -491,7 +491,7 @@ packages:
       name: json_serializable
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.2.5"
+    version: "3.3.0"
   lint:
     dependency: "direct dev"
     description:
@@ -561,7 +561,7 @@ packages:
       name: moor
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.4.1"
+    version: "2.4.2"
   moor_ffi:
     dependency: "direct main"
     description:
@@ -673,7 +673,7 @@ packages:
       name: pdf
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.5.0"
+    version: "1.6.0"
   pedantic:
     dependency: transitive
     description:
@@ -966,6 +966,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.0"
+  workmanager:
+    dependency: "direct main"
+    description:
+      name: workmanager
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.2"
   xml:
     dependency: transitive
     description:

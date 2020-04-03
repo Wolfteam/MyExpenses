@@ -121,6 +121,8 @@
     "dateOn": "Fecha: {on}",
     "currencySimbol": "Símbolo de moneda",
     "currencySymbolToRight": "Símbolo de moneda a la derecha",
+    "automaticSync": "Sincronización automática",
+    "syncWasSuccessfullyPerformed": "La sincronización fue ejecutada exitosamente",
     "repetitionCycle": {
         "eachWeek": "Cada semana",
         "eachMonth": "Cada mes",

@@ -121,6 +121,8 @@
     "dateOn": "Date: {on}",
     "currencySimbol": "Currency symbol",
     "currencySymbolToRight": "Currency symbol to the right",
+    "automaticSync": "Automatic sync",
+    "syncWasSuccessfullyPerformed": "Sync was successfully performed",
     "repetitionCycle": {
         "eachWeek": "Each week",
         "eachMonth": "Each month",
