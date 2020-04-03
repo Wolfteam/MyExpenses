@@ -21,6 +21,7 @@ import 'bloc/transaction_form/transaction_form_bloc.dart';
 import 'bloc/transactions/transactions_bloc.dart';
 import 'bloc/transactions_last_7_days/transactions_last_7_days_bloc.dart';
 import 'bloc/users_accounts/user_accounts_bloc.dart';
+import 'common/utils/background_utils.dart';
 import 'common/utils/notification_utils.dart';
 import 'daos/categories_dao.dart';
 import 'daos/transactions_dao.dart';
@@ -43,6 +44,7 @@ Future main() async {
   initInjection();
   await setupLogging();
   await initTelemetry();
+  await BackgroundUtils.initBg();
   runApp(MyApp());
 }
 
@@ -109,7 +111,8 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(create: (ctx) {
             final settingsService = getIt<SettingsService>();
             final secureStorage = getIt<SecureStorageService>();
-            return SettingsBloc(settingsService, secureStorage);
+            final usersDao = getIt<UsersDao>();
+            return SettingsBloc(settingsService, secureStorage, usersDao);
           }),
           BlocProvider(create: (ctx) {
             final logger = getIt<LoggingService>();

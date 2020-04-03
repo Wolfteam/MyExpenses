@@ -128,14 +128,13 @@ class SignInWithGoogleBloc
       }
 
       _logger.info(runtimeType, '_signIn: Saving user into db...');
-      final savedUser = await _usersDao.saveUser(
+      await _usersDao.saveUser(
         user.googleUserId,
         user.name,
         user.email,
         user.pictureUrl,
       );
 
-      await _usersDao.changeActiveUser(savedUser.id);
       _logger.info(runtimeType, '_signIn: User was succesfully saved...');
 
       await _syncService.initializeAppFolderAndFiles();

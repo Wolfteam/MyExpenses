@@ -11,6 +11,8 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 import '../../common/converters/db_converters.dart';
+import '../../common/converters/local_status_converter.dart';
+import '../../common/enums/local_status_type.dart';
 import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/utils/db_seed_util.dart';
 import '../../daos/categories_dao.dart';
@@ -55,8 +57,8 @@ LazyDatabase _openConnection() {
     final file = File(p.join(dbFolder.path, 'my_expenses.sqlite'));
     // TODO: CHANGE THIS
     // if (await file.exists()) {
-    //   debugPrint('Deleting database');
-    //   debugPrint('Db path =  ${dbFolder.path}');
+    //   debugPrint('********Deleting database');
+    //   debugPrint('********Db path =  ${dbFolder.path}');
     //   await file.delete();
     // }
     return VmDatabase(file);
@@ -92,8 +94,6 @@ class AppDatabase extends _$AppDatabase {
             final defaultCats = getDefaultCategories();
             await batch((b) {
               b.insertAll(categories, defaultCats);
-              // b.insertAll(transactions, getDefaultTransactions());
-              // b.insertAll(transactions, getDefaultRecurringTransactions());
             });
           }
         },

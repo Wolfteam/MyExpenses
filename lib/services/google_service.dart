@@ -28,7 +28,12 @@ abstract class GoogleService {
 
   Future<String> uploadFile(String folderId, String filePath);
 
-  Future<File> downloadFile(String fileName, String filePath);
+  Future<String> downloadFile(String fileName, String filePath);
+
+  Future<String> updateFile(
+    String fileId,
+    String filePath,
+  );
 }
 
 //TODO: WILL THE ACCESS TOKEN GET REFRESHED
@@ -98,24 +103,19 @@ class GoogleServiceImpl implements GoogleService {
 
   @override
   Future<UserItem> getUserInfo() async {
-    try {
-      final client = await _getAuthClient();
+    final client = await _getAuthClient();
 
-      final response =
-          await client.get('$_baseGoogleApisUrl/oauth2/v3/userinfo');
-      final json = jsonDecode(response.body);
+    final response = await client.get('$_baseGoogleApisUrl/oauth2/v3/userinfo');
+    final json = jsonDecode(response.body);
 
-      final user = UserItem(
-        email: json['email'] as String,
-        isActive: true,
-        googleUserId: json['sub'] as String,
-        name: json['name'] as String,
-        pictureUrl: json['picture'] as String,
-      );
-      return user;
-    } catch (error) {
-      return null;
-    }
+    final user = UserItem(
+      email: json['email'] as String,
+      isActive: true,
+      googleUserId: json['sub'] as String,
+      name: json['name'] as String,
+      pictureUrl: json['picture'] as String,
+    );
+    return user;
   }
 
   @override
@@ -162,7 +162,7 @@ class GoogleServiceImpl implements GoogleService {
   }
 
   @override
-  Future<File> downloadFile(
+  Future<String> downloadFile(
     String fileName,
     String filePath,
   ) async {
@@ -182,7 +182,7 @@ class GoogleServiceImpl implements GoogleService {
 
     await fileToSave.openWrite().addStream(file.stream);
 
-    return fileToSave;
+    return fileList.files.first.id;
   }
 
   Future<void> initializeAppSheet(String spreadSheetId) async {
@@ -215,23 +215,39 @@ class GoogleServiceImpl implements GoogleService {
 
   @override
   Future<String> uploadFile(String folderId, String filePath) async {
-    try {
-      final client = await _getAuthClient();
-      final api = drive.DriveApi(client);
-      final localFile = File(filePath);
-      final name = basename(localFile.path);
-      final media = drive.Media(localFile.openRead(), localFile.lengthSync());
+    final client = await _getAuthClient();
+    final api = drive.DriveApi(client);
+    final localFile = File(filePath);
+    final name = basename(localFile.path);
+    final media = drive.Media(localFile.openRead(), localFile.lengthSync());
 
-      final driveFile = drive.File()
-        ..name = name
-        ..description = 'Uploaded by My Expenses'
-        ..parents = [folderId];
+    final driveFile = drive.File()
+      ..name = name
+      ..description = 'Uploaded by My Expenses'
+      ..parents = [folderId];
 
-      final response = await api.files.create(driveFile, uploadMedia: media);
-      return response.id;
-    } catch (e) {
-      return null;
-    }
+    final response = await api.files.create(driveFile, uploadMedia: media);
+    return response.id;
+  }
+
+  @override
+  Future<String> updateFile(
+    String fileId,
+    String filePath,
+  ) async {
+    final client = await _getAuthClient();
+    final api = drive.DriveApi(client);
+    final localFile = File(filePath);
+    final media = drive.Media(localFile.openRead(), localFile.lengthSync());
+
+    final driveFile = drive.File();
+
+    final response = await api.files.update(
+      driveFile,
+      fileId,
+      uploadMedia: media,
+    );
+    return response.id;
   }
 
   // @override

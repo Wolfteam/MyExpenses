@@ -16,6 +16,7 @@ class SettingsInitialState extends SettingsState {
   final bool useDarkAmoled;
   final AppAccentColorType accentColor;
   final AppLanguageType appLanguage;
+  final bool isUserLoggedIn;
   final SyncIntervalType syncInterval;
   final bool askForPassword;
   final bool canUseFingerPrint;
@@ -32,6 +33,7 @@ class SettingsInitialState extends SettingsState {
         useDarkAmoled,
         accentColor,
         appLanguage,
+        isUserLoggedIn,
         syncInterval,
         askForPassword,
         canUseFingerPrint,
@@ -47,6 +49,7 @@ class SettingsInitialState extends SettingsState {
     @required this.useDarkAmoled,
     @required this.accentColor,
     @required this.appLanguage,
+    @required this.isUserLoggedIn,
     @required this.syncInterval,
     @required this.askForPassword,
     @required this.canUseFingerPrint,
@@ -62,6 +65,7 @@ class SettingsInitialState extends SettingsState {
     bool useDarkAmoled,
     AppAccentColorType accentColor,
     AppLanguageType appLanguage,
+    bool isUserLoggedIn,
     SyncIntervalType syncInterval,
     bool askForPassword,
     bool canUseFingerPrint,
@@ -75,6 +79,7 @@ class SettingsInitialState extends SettingsState {
       appTheme: appTheme ?? this.appTheme,
       accentColor: accentColor ?? this.accentColor,
       appLanguage: appLanguage ?? this.appLanguage,
+      isUserLoggedIn: isUserLoggedIn ?? this.isUserLoggedIn,
       syncInterval: syncInterval ?? this.syncInterval,
       useDarkAmoled: useDarkAmoled ?? this.useDarkAmoled,
       askForPassword: askForPassword ?? this.askForPassword,

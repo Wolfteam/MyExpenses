@@ -1,3 +1,4 @@
+import '../common/enums/local_status_type.dart';
 import '../models/drive/transaction.dart' as sync_trans;
 import '../models/transaction_item.dart';
 
@@ -33,6 +34,8 @@ abstract class TransactionsDao {
 
   Future<void> updateNextRecurringDate(int id, DateTime nextRecurringDate);
 
+  Future<void> deleteAll();
+
   Future<List<sync_trans.Transaction>> getAllTransactionsToSync();
 
   Future<void> deleteTransactions(List<sync_trans.Transaction> existingTrans);
@@ -40,4 +43,6 @@ abstract class TransactionsDao {
   Future<void> createTransactions(List<sync_trans.Transaction> existingTrans);
 
   Future<void> updateTransactions(List<sync_trans.Transaction> existingTrans);
+
+  Future<void> updateAllLocalStatus(LocalStatusType newValue);
 }

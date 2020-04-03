@@ -1,8 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
+
+const _channelId = 'my_expenses_channel';
+const _channelName = 'Notifications';
+const _channelDescription = 'Notifications from the app';
+const _largeIcon = 'cost';
+
+//TODO: A CRASH HAPPENS WHEN YOU OPEN THE NOTIFICATION
+final _androidPlatformChannelSpecifics = AndroidNotificationDetails(
+  _channelId,
+  _channelName,
+  _channelDescription,
+  importance: Importance.Max,
+  priority: Priority.High,
+  autoCancel: true,
+  enableLights: true,
+  enableVibration: true,
+  color: Colors.red,
+  largeIcon: const DrawableResourceAndroidBitmap(_largeIcon),
+);
+
+const _iOSPlatformChannelSpecifics = IOSNotificationDetails();
+
+final _platformChannelSpecifics = NotificationDetails(
+  _androidPlatformChannelSpecifics,
+  _iOSPlatformChannelSpecifics,
+);
 
 Future setupNotifications({
   DidReceiveLocalNotificationCallback onIosReceiveLocalNotification,
@@ -20,14 +46,14 @@ Future setupNotifications({
     initializationSettingsAndroid,
     initializationSettingsIOS,
   );
-  await flutterLocalNotificationsPlugin.initialize(
+  await _flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
     onSelectNotification: onSelectNotification,
   );
 }
 
 Future<bool> requestIOSPermissions() async {
-  final result = await flutterLocalNotificationsPlugin
+  final result = await _flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
           IOSFlutterLocalNotificationsPlugin>()
       ?.requestPermissions(
@@ -46,41 +72,36 @@ Future<void> showNotification(
   String body, {
   int id = 0,
   String payload,
-}) async {
-  const channel = 'my_expenses_channel';
-  final androidPlatformChannelSpecifics = AndroidNotificationDetails(
-    channel,
-    'Notifications',
-    'Notifications from the app',
-    importance: Importance.Max,
-    priority: Priority.High,
-    ticker: 'ticker',
-    autoCancel: true,
-    enableLights: true,
-    enableVibration: true,
-    color: Colors.red,
-    style: AndroidNotificationStyle.BigText,
-    largeIcon: 'cost',
-    largeIconBitmapSource: BitmapSource.Drawable,
-  );
-  final iOSPlatformChannelSpecifics = IOSNotificationDetails();
-  final platformChannelSpecifics = NotificationDetails(
-    androidPlatformChannelSpecifics,
-    iOSPlatformChannelSpecifics,
-  );
-  await flutterLocalNotificationsPlugin.show(
+}) {
+  return _flutterLocalNotificationsPlugin.show(
     id,
     title,
     body,
-    platformChannelSpecifics,
+    _platformChannelSpecifics,
     payload: payload,
   );
 }
 
-Future<void> cancelNotification(int id) async {
-  await flutterLocalNotificationsPlugin.cancel(id);
+Future<void> cancelNotification(int id) {
+  return _flutterLocalNotificationsPlugin.cancel(id);
 }
 
-Future<void> cancelAllNotifications() async {
-  await flutterLocalNotificationsPlugin.cancelAll();
+Future<void> cancelAllNotifications() {
+  return _flutterLocalNotificationsPlugin.cancelAll();
+}
+
+Future<void> scheduleNotification(
+  int id,
+  String title,
+  String body,
+  DateTime deliveredOn,
+) {
+  return _flutterLocalNotificationsPlugin.schedule(
+    id,
+    title,
+    body,
+    deliveredOn,
+    _platformChannelSpecifics,
+    androidAllowWhileIdle: true,
+  );
 }

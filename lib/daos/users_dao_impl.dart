@@ -45,6 +45,7 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase>
           .write(updatedFields);
     } else {
       id = await into(users).insert(User(
+        localStatus: LocalStatusType.nothing,
         googleUserId: googleUserId,
         isActive: false,
         name: fullName,
@@ -79,28 +80,23 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase>
 
   @override
   Future<void> changeActiveUser(int newActiveUserId) async {
-    await batch((b) {
-      b.update(
-        users,
+    await update(users).write(
+      UsersCompanion(
+        updatedBy: const Value(createdBy),
+        updatedAt: Value(DateTime.now()),
+        isActive: const Value(false),
+      ),
+    );
+
+    if (newActiveUserId != null) {
+      await (update(users)..where((u) => u.id.equals(newActiveUserId))).write(
         UsersCompanion(
           updatedBy: const Value(createdBy),
           updatedAt: Value(DateTime.now()),
-          isActive: const Value(false),
+          isActive: const Value(true),
         ),
       );
-
-      if (newActiveUserId != null) {
-        b.update<Users, User>(
-          users,
-          UsersCompanion(
-            updatedBy: const Value(createdBy),
-            updatedAt: Value(DateTime.now()),
-            isActive: const Value(true),
-          ),
-          where: (u) => u.id.equals(newActiveUserId),
-        );
-      }
-    });
+    }
   }
 
   @override

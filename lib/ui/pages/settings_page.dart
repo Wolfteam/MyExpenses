@@ -60,6 +60,7 @@ class _SettingsPageState extends State<SettingsPage>
         _buildThemeSettings(context, state, i18n),
         _buildAccentColorSettings(context, state, i18n),
         _buildLanguageSettings(context, state, i18n),
+        // if (state.isUserLoggedIn) 
         _buildSyncSettings(context, state, i18n),
         if (state.canUseFingerPrint) _buildOtherSettings(context, state, i18n),
         _buildAboutSettings(context, state, i18n),
@@ -641,8 +642,8 @@ class _SettingsPageState extends State<SettingsPage>
     context.bloc<SettingsBloc>().add(CurrencyChanged(newValue));
     BlocUtils.raiseCommonBlocEvents(
       context,
-      reloadDrawer: false,
-      reloadCategories: false,
+      reloadCharts: true,
+      reloadTransactions: true,
     );
   }
 

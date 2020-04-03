@@ -253,7 +253,7 @@ class AppDrawer extends StatelessWidget {
   void _signOut(BuildContext context) {
     Navigator.pop(context);
     context.bloc<DrawerBloc>().add(const SignOut());
-    BlocUtils.raiseCommonBlocEvents(context);
+    BlocUtils.raiseAllCommonBlocEvents(context);
   }
 
   Future<void> _signIn(

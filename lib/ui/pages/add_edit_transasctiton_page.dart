@@ -91,9 +91,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
           if (state.nextRecurringDateWasUpdated) {
             BlocUtils.raiseCommonBlocEvents(
               context,
-              reloadCategories: false,
-              reloadCharts: false,
-              reloadDrawer: false,
+              reloadTransactions: true,
             );
           }
         }

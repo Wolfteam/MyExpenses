@@ -5,6 +5,7 @@ import '../../common/utils/category_utils.dart';
 import '../../models/entities/database.dart';
 import '../converters/color_converter.dart';
 import '../converters/icon_data_converter.dart';
+import '../enums/local_status_type.dart';
 
 const createdBy = 'ebastidas';
 
@@ -241,6 +242,7 @@ Category _buildCategory(
 ]) {
   final now = DateTime.now();
   return Category(
+    localStatus: LocalStatusType.nothing,
     name: name,
     isAnIncome: isAnIncome,
     icon: icon,
@@ -254,6 +256,7 @@ Category _buildCategory(
       const ColorConverter().mapToSql(color),
       createdBy,
       now,
+      LocalStatusType.nothing
     ]),
   );
 }
@@ -269,6 +272,7 @@ Transaction _buildTransaction(
 }) {
   final now = DateTime.now();
   return Transaction(
+    localStatus: LocalStatusType.nothing,
     amount: amount,
     categoryId: categoryId,
     description: description,
@@ -288,6 +292,7 @@ Transaction _buildTransaction(
       cycle != RepetitionCycleType.none,
       nextRecurringDate,
       now,
+      LocalStatusType.nothing,
     ]),
   );
 }

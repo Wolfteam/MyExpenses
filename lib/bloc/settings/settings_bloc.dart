@@ -12,6 +12,8 @@ import '../../common/enums/app_theme_type.dart';
 import '../../common/enums/currency_symbol_type.dart';
 import '../../common/enums/secure_resource_type.dart';
 import '../../common/enums/sync_intervals_type.dart';
+import '../../common/utils/background_utils.dart';
+import '../../daos/users_dao.dart';
 import '../../generated/i18n.dart';
 import '../../services/secure_storage_service.dart';
 import '../../services/settings_service.dart';
@@ -22,8 +24,13 @@ part 'settings_state.dart';
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final SettingsService _settingsService;
   final SecureStorageService _secureStorageService;
+  final UsersDao _usersDao;
 
-  SettingsBloc(this._settingsService, this._secureStorageService);
+  SettingsBloc(
+    this._settingsService,
+    this._secureStorageService,
+    this._usersDao,
+  );
 
   SettingsInitialState get currentState => state as SettingsInitialState;
 
@@ -58,6 +65,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
     if (event is SyncIntervalChanged) {
       _settingsService.syncInterval = event.selectedSyncInterval;
+      await BackgroundUtils.registerSyncTask(event.selectedSyncInterval);
       yield currentState.copyWith(syncInterval: event.selectedSyncInterval);
     }
 
@@ -113,12 +121,14 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     final packageInfo = await PackageInfo.fromPlatform();
     final localAuth = LocalAuthentication();
     final availableBiometrics = await localAuth.getAvailableBiometrics();
+    final currentUser = await _usersDao.getActiveUser();
 
     yield SettingsInitialState(
       appTheme: appSettings.appTheme,
       useDarkAmoled: false,
       accentColor: appSettings.accentColor,
       appLanguage: appSettings.appLanguage,
+      isUserLoggedIn: currentUser != null,
       syncInterval: appSettings.syncInterval,
       askForPassword: appSettings.askForPassword,
       canUseFingerPrint:

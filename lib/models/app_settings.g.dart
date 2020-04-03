@@ -18,6 +18,9 @@ AppSettings _$AppSettingsFromJson(Map<String, dynamic> json) {
         _$enumDecodeNullable(_$SyncIntervalTypeEnumMap, json['syncInterval']),
     askForPassword: json['askForPassword'] as bool,
     askForFingerPrint: json['askForFingerPrint'] as bool,
+    currencySymbol: _$enumDecodeNullable(
+        _$CurrencySymbolTypeEnumMap, json['currencySymbol']),
+    currencyToTheRight: json['currencyToTheRight'] as bool,
   );
 }
 
@@ -30,6 +33,8 @@ Map<String, dynamic> _$AppSettingsToJson(AppSettings instance) =>
       'syncInterval': _$SyncIntervalTypeEnumMap[instance.syncInterval],
       'askForPassword': instance.askForPassword,
       'askForFingerPrint': instance.askForFingerPrint,
+      'currencySymbol': _$CurrencySymbolTypeEnumMap[instance.currencySymbol],
+      'currencyToTheRight': instance.currencyToTheRight,
     };
 
 T _$enumDecode<T>(
@@ -99,4 +104,12 @@ const _$SyncIntervalTypeEnumMap = {
   SyncIntervalType.each6Hours: 'each6Hours',
   SyncIntervalType.each12Hours: 'each12Hours',
   SyncIntervalType.eachDay: 'eachDay',
+};
+
+const _$CurrencySymbolTypeEnumMap = {
+  CurrencySymbolType.dolar: 'dolar',
+  CurrencySymbolType.brazilianReal: 'brazilianReal',
+  CurrencySymbolType.yen: 'yen',
+  CurrencySymbolType.euro: 'euro',
+  CurrencySymbolType.pounds: 'pounds',
 };

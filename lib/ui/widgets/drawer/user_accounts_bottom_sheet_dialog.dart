@@ -31,7 +31,7 @@ class UserAccountsBottomSheetDialog extends StatelessWidget {
               showSucceedToast(i18n.userWasSuccessfullyDeleted);
               ctx.bloc<DrawerBloc>().add(const InitializeDrawer());
             } else if (state.activeUserChanged) {
-              BlocUtils.raiseCommonBlocEvents(ctx);
+              BlocUtils.raiseAllCommonBlocEvents(ctx);
             } else if (state.errorOcurred) {
               showErrorToast(i18n.unknownErrorOcurred);
             }

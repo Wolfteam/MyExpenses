@@ -276,6 +276,10 @@ class I18n implements WidgetsLocalizations {
   String get currencySimbol => "Currency symbol";
   /// "Currency symbol to the right"
   String get currencySymbolToRight => "Currency symbol to the right";
+  /// "Automatic sync"
+  String get automaticSync => "Automatic sync";
+  /// "Sync was successfully performed"
+  String get syncWasSuccessfullyPerformed => "Sync was successfully performed";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -738,6 +742,12 @@ class _I18n_es_VE extends I18n {
   /// "Símbolo de moneda a la derecha"
   @override
   String get currencySymbolToRight => "Símbolo de moneda a la derecha";
+  /// "Sincronización automática"
+  @override
+  String get automaticSync => "Sincronización automática";
+  /// "La sincronización fue ejecutada exitosamente"
+  @override
+  String get syncWasSuccessfullyPerformed => "La sincronización fue ejecutada exitosamente";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";

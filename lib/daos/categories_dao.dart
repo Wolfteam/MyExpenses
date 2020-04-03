@@ -1,3 +1,4 @@
+import '../common/enums/local_status_type.dart';
 import '../models/category_item.dart';
 import '../models/drive/category.dart' as sync_cat;
 
@@ -18,6 +19,8 @@ abstract class CategoriesDao {
 
   Future<void> updateUserId(int userId);
 
+  Future<void> deleteAll();
+
   Future<List<sync_cat.Category>> getAllCategoriesToSync(int userId);
 
   Future<void> deleteCategories(
@@ -34,4 +37,6 @@ abstract class CategoriesDao {
     int userId,
     List<sync_cat.Category> existingCats,
   );
+
+  Future<void> updateAllLocalStatus(LocalStatusType newValue);
 }
