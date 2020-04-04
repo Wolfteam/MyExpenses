@@ -65,6 +65,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
     if (event is SyncIntervalChanged) {
       _settingsService.syncInterval = event.selectedSyncInterval;
+      await BackgroundUtils.cancelSyncTask();
       await BackgroundUtils.registerSyncTask(event.selectedSyncInterval);
       yield currentState.copyWith(syncInterval: event.selectedSyncInterval);
     }
@@ -114,6 +115,16 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       _settingsService.currencyToTheRight = event.placeToTheRight;
       yield currentState.copyWith(currencyToTheRight: event.placeToTheRight);
     }
+
+    if (event is ShowNotifAfterFullSyncChanged) {
+      _settingsService.showNotifAfterFullSync = event.show;
+      yield currentState.copyWith(showNotifAfterFullSync: event.show);
+    }
+
+    if (event is ShowNotifForRecurringTransChanged) {
+      _settingsService.showNotifForRecurringTrans = event.show;
+      yield currentState.copyWith(showNotifForRecurringTrans: event.show);
+    }
   }
 
   Stream<SettingsState> _buildInitialState() async* {
@@ -130,6 +141,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       appLanguage: appSettings.appLanguage,
       isUserLoggedIn: currentUser != null,
       syncInterval: appSettings.syncInterval,
+      showNotifAfterFullSync: appSettings.showNotifAfterFullSync,
       askForPassword: appSettings.askForPassword,
       canUseFingerPrint:
           availableBiometrics.contains(BiometricType.fingerprint),
@@ -138,6 +150,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       appVersion: packageInfo.version,
       currencySymbol: appSettings.currencySymbol,
       currencyToTheRight: appSettings.currencyToTheRight,
+      showNotifForRecurringTrans: appSettings.showNotifForRecurringTrans,
     );
   }
 }

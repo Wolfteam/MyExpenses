@@ -18,11 +18,13 @@ class SettingsInitialState extends SettingsState {
   final AppLanguageType appLanguage;
   final bool isUserLoggedIn;
   final SyncIntervalType syncInterval;
+  final bool showNotifAfterFullSync;
   final bool askForPassword;
   final bool canUseFingerPrint;
   final bool askForFingerPrint;
   final CurrencySymbolType currencySymbol;
   final bool currencyToTheRight;
+  final bool showNotifForRecurringTrans;
 
   final String appName;
   final String appVersion;
@@ -35,6 +37,7 @@ class SettingsInitialState extends SettingsState {
         appLanguage,
         isUserLoggedIn,
         syncInterval,
+        showNotifAfterFullSync,
         askForPassword,
         canUseFingerPrint,
         askForFingerPrint,
@@ -42,6 +45,7 @@ class SettingsInitialState extends SettingsState {
         appVersion,
         currencySymbol,
         currencyToTheRight,
+        showNotifForRecurringTrans,
       ];
 
   const SettingsInitialState({
@@ -51,6 +55,7 @@ class SettingsInitialState extends SettingsState {
     @required this.appLanguage,
     @required this.isUserLoggedIn,
     @required this.syncInterval,
+    @required this.showNotifAfterFullSync,
     @required this.askForPassword,
     @required this.canUseFingerPrint,
     @required this.askForFingerPrint,
@@ -58,6 +63,7 @@ class SettingsInitialState extends SettingsState {
     @required this.appVersion,
     @required this.currencySymbol,
     @required this.currencyToTheRight,
+    @required this.showNotifForRecurringTrans,
   });
 
   SettingsInitialState copyWith({
@@ -67,6 +73,7 @@ class SettingsInitialState extends SettingsState {
     AppLanguageType appLanguage,
     bool isUserLoggedIn,
     SyncIntervalType syncInterval,
+    bool showNotifAfterFullSync,
     bool askForPassword,
     bool canUseFingerPrint,
     bool askForFingerPrint,
@@ -74,6 +81,7 @@ class SettingsInitialState extends SettingsState {
     String appVersion,
     CurrencySymbolType currencySymbol,
     bool currencyToTheRight,
+    bool showNotifForRecurringTrans,
   }) {
     return SettingsInitialState(
       appTheme: appTheme ?? this.appTheme,
@@ -81,6 +89,8 @@ class SettingsInitialState extends SettingsState {
       appLanguage: appLanguage ?? this.appLanguage,
       isUserLoggedIn: isUserLoggedIn ?? this.isUserLoggedIn,
       syncInterval: syncInterval ?? this.syncInterval,
+      showNotifAfterFullSync:
+          showNotifAfterFullSync ?? this.showNotifAfterFullSync,
       useDarkAmoled: useDarkAmoled ?? this.useDarkAmoled,
       askForPassword: askForPassword ?? this.askForPassword,
       canUseFingerPrint: canUseFingerPrint ?? this.canUseFingerPrint,
@@ -89,6 +99,8 @@ class SettingsInitialState extends SettingsState {
       appVersion: appVersion ?? this.appVersion,
       currencySymbol: currencySymbol ?? this.currencySymbol,
       currencyToTheRight: currencyToTheRight ?? this.currencyToTheRight,
+      showNotifForRecurringTrans:
+          showNotifForRecurringTrans ?? this.showNotifForRecurringTrans,
     );
   }
 }

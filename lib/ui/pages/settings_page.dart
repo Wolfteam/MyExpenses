@@ -60,9 +60,8 @@ class _SettingsPageState extends State<SettingsPage>
         _buildThemeSettings(context, state, i18n),
         _buildAccentColorSettings(context, state, i18n),
         _buildLanguageSettings(context, state, i18n),
-        // if (state.isUserLoggedIn) 
-        _buildSyncSettings(context, state, i18n),
-        if (state.canUseFingerPrint) _buildOtherSettings(context, state, i18n),
+        if (state.isUserLoggedIn) _buildSyncSettings(context, state, i18n),
+        _buildOtherSettings(context, state, i18n),
         _buildAboutSettings(context, state, i18n),
       ];
     }
@@ -304,6 +303,7 @@ class _SettingsPageState extends State<SettingsPage>
     SettingsInitialState state,
     I18n i18n,
   ) {
+    final theme = Theme.of(context);
     final dropdown = DropdownButton<SyncIntervalType>(
       isExpanded: true,
       hint: Text(i18n.settingsSelectSyncInterval),
@@ -366,6 +366,12 @@ class _SettingsPageState extends State<SettingsPage>
                 right: 16,
               ),
               child: dropdown,
+            ),
+            SwitchListTile(
+              activeColor: theme.accentColor,
+              value: state.showNotifAfterFullSync,
+              title: Text(i18n.showNotificationAfterFullSync),
+              onChanged: _showNotifAfterFullSyncChanged,
             ),
           ],
         ),
@@ -441,6 +447,17 @@ class _SettingsPageState extends State<SettingsPage>
                 ),
               ],
             ),
+            Padding(
+              padding: const EdgeInsets.only(
+                top: 5,
+              ),
+              child: Text(
+                i18n.settingsOthersSubTitle,
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+              ),
+            ),
             Container(
               margin: const EdgeInsets.only(top: 10),
               padding: const EdgeInsets.only(
@@ -461,11 +478,18 @@ class _SettingsPageState extends State<SettingsPage>
               title: Text(i18n.askForPassword),
               onChanged: _askForPasswordChanged,
             ),
+            if (state.canUseFingerPrint)
+              SwitchListTile(
+                activeColor: theme.accentColor,
+                value: state.askForFingerPrint,
+                title: Text(i18n.askForFingerPrint),
+                onChanged: _askForFingerPrintChanged,
+              ),
             SwitchListTile(
               activeColor: theme.accentColor,
-              value: state.askForFingerPrint,
-              title: Text(i18n.askForFingerPrint),
-              onChanged: _askForFingerPrintChanged,
+              value: state.showNotifForRecurringTrans,
+              title: Text(i18n.showNotificationForRecurringTrans),
+              onChanged: _showNotifForRecurringTransChanged,
             ),
           ],
         ),
@@ -502,8 +526,19 @@ class _SettingsPageState extends State<SettingsPage>
                 ),
               ],
             ),
+            Padding(
+              padding: const EdgeInsets.only(
+                top: 5,
+              ),
+              child: Text(
+                i18n.settingsAboutSubTitle,
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+              ),
+            ),
             Container(
-              margin: const EdgeInsets.only(top: 5, left: 16, right: 16),
+              margin: const EdgeInsets.only(left: 16, right: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
@@ -657,4 +692,12 @@ class _SettingsPageState extends State<SettingsPage>
       reloadCharts: true,
     );
   }
+
+  void _showNotifAfterFullSyncChanged(bool newValue) => context
+      .bloc<SettingsBloc>()
+      .add(ShowNotifAfterFullSyncChanged(show: newValue));
+
+  void _showNotifForRecurringTransChanged(bool newValue) => context
+      .bloc<SettingsBloc>()
+      .add(ShowNotifForRecurringTransChanged(show: newValue));
 }

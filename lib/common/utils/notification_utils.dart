@@ -9,7 +9,6 @@ const _channelName = 'Notifications';
 const _channelDescription = 'Notifications from the app';
 const _largeIcon = 'cost';
 
-//TODO: A CRASH HAPPENS WHEN YOU OPEN THE NOTIFICATION
 final _androidPlatformChannelSpecifics = AndroidNotificationDetails(
   _channelId,
   _channelName,
@@ -69,9 +68,9 @@ Future<bool> requestIOSPermissions() async {
 
 Future<void> showNotification(
   String title,
-  String body, {
+  String body,
+  String payload, {
   int id = 0,
-  String payload,
 }) {
   return _flutterLocalNotificationsPlugin.show(
     id,

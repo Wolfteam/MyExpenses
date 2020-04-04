@@ -1,7 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:my_expenses/ui/pages/add_edit_transasctiton_page.dart';
 import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
 
@@ -21,6 +25,8 @@ import 'bloc/transaction_form/transaction_form_bloc.dart';
 import 'bloc/transactions/transactions_bloc.dart';
 import 'bloc/transactions_last_7_days/transactions_last_7_days_bloc.dart';
 import 'bloc/users_accounts/user_accounts_bloc.dart';
+import 'common/enums/notification_type.dart';
+import 'common/extensions/string_extensions.dart';
 import 'common/utils/background_utils.dart';
 import 'common/utils/notification_utils.dart';
 import 'daos/categories_dao.dart';
@@ -29,6 +35,7 @@ import 'daos/users_dao.dart';
 import 'generated/i18n.dart';
 import 'injection.dart';
 import 'logger.dart';
+import 'models/app_notification.dart';
 import 'models/current_selected_category.dart';
 import 'services/google_service.dart';
 import 'services/logging_service.dart';
@@ -195,9 +202,7 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-//TODO: SHOW THE RECURRING DATE IN THE RECURRING TRANSACTIONS
 //TODO: USE SUPER ENUM
-//TODO: USE BLOC TO BLOC COMMUNICATION
   Widget _buildApp(BuildContext ctx, app_bloc.AppState state) {
     final delegates = <LocalizationsDelegate>[
       // A class which loads the translations from JSON files
@@ -270,8 +275,36 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Future<bool> _onSelectNotification(String payload) async {
-    OpenFile.open(payload);
+  Future<bool> _onSelectNotification(String json) async {
+    if (json.isNullEmptyOrWhitespace) {
+      return true;
+    }
+
+    final notification = AppNotification.fromJson(
+      jsonDecode(json) as Map<String, dynamic>,
+    );
+
+    switch (notification.type) {
+      case NotificationType.openPdf:
+        final file = File(notification.payload);
+        if (await file.exists()) {
+          OpenFile.open(notification.payload);
+        }
+        break;
+      case NotificationType.openTransactionDetails:
+        final transDao = getIt<TransactionsDao>();
+        final transaction = await transDao.getTransaction(
+          int.parse(notification.payload),
+        );
+        final route = MaterialPageRoute(
+          builder: (ctx) => AddEditTransactionPage(item: transaction),
+        );
+        Navigator.push(context, route);
+        break;
+      case NotificationType.msg:
+        break;
+    }
+
     return true;
   }
 }

@@ -64,7 +64,11 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
 
     try {
       if (from.isBefore(now) || from.isAtSameMomentAs(now)) {
-        await _checkRecurringTransactions(now);
+        await TransactionUtils.checkRecurringTransactions(
+          now,
+          _logger,
+          _transactionsDao,
+        );
       }
 
       _logger.info(
@@ -142,67 +146,6 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
       );
     } on Exception catch (e, s) {
       _logger.error(runtimeType, '_buildRecurringState: Unknown error', e, s);
-    }
-  }
-
-  Future _checkRecurringTransactions(DateTime now) async {
-    _logger.info(
-      runtimeType,
-      '_checkRecurringTransactions: Getting all parent transactions...',
-    );
-    final until = DateTime(now.year, now.month, now.day, 23, 59, 59);
-    final parents = await _transactionsDao.getAllParentTransactionsUntil(until);
-
-    if (parents.isEmpty) {
-      _logger.info(
-        runtimeType,
-        '_checkRecurringTransactions: There are no parent transactions...',
-      );
-      return;
-    }
-
-    for (final parent in parents) {
-      if (parent.repetitionCycle == RepetitionCycleType.none) {
-        _logger.warning(
-          runtimeType,
-          '_checkRecurringTransactions: Transaction = ${parent.description} is marked as parent , ' +
-              'but the repetition cycle is none...',
-        );
-        continue;
-      }
-
-      _logger.info(
-        runtimeType,
-        '_checkRecurringTransactions: Transaction initial date is = ${parent.transactionDate}\n' +
-            'and next recurring date is = ${parent.nextRecurringDate}',
-      );
-
-      bool allCompleted = false;
-      var currentRecurringDate = parent.nextRecurringDate;
-      final periods = <DateTime>[];
-      while (!allCompleted) {
-        if (currentRecurringDate.isAfter(now)) {
-          allCompleted = true;
-          break;
-        }
-        periods.add(currentRecurringDate);
-
-        currentRecurringDate = TransactionUtils.getNextRecurringDate(
-          parent.repetitionCycle,
-          currentRecurringDate,
-        );
-      }
-
-      _logger.info(
-        runtimeType,
-        '_checkRecurringTransactions: Saving ${periods.length} periods for parent transaction id = ${parent.id}',
-      );
-
-      await _transactionsDao.checkAndSaveRecurringTransactions(
-        parent,
-        currentRecurringDate,
-        periods,
-      );
     }
   }
 

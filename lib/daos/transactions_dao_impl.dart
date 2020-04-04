@@ -193,7 +193,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
   }
 
   @override
-  Future<void> checkAndSaveRecurringTransactions(
+  Future<List<TransactionItem>> checkAndSaveRecurringTransactions(
     TransactionItem parent,
     DateTime nextRecurringDate,
     List<DateTime> periods,
@@ -204,7 +204,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
     );
 
     if (transToSave.isEmpty) {
-      return;
+      return [];
     }
 
     final currentParent = await (select(transactions)
@@ -232,6 +232,22 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
         mode: InsertMode.insertOrRollback,
       );
     });
+
+    return (select(transactions)
+          ..where(
+            (t) =>
+                isNotNull(t.parentTransactionId) &
+                t.parentTransactionId.equals(parent.id) &
+                t.transactionDate.isIn(periods),
+          ))
+        .join([
+          innerJoin(
+            categories,
+            categories.id.equalsExp(transactions.categoryId),
+          )
+        ])
+        .map(_mapToTransactionItem)
+        .get();
   }
 
   @override

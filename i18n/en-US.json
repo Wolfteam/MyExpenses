@@ -123,6 +123,8 @@
     "currencySymbolToRight": "Currency symbol to the right",
     "automaticSync": "Automatic sync",
     "syncWasSuccessfullyPerformed": "Sync was successfully performed",
+    "showNotificationAfterFullSync": "Show a notification after a full sync",
+    "showNotificationForRecurringTrans": "Show a notification when a recurring transactions is executed",
     "repetitionCycle": {
         "eachWeek": "Each week",
         "eachMonth": "Each month",
@@ -163,6 +165,8 @@
         "aboutSummary": "An app that helps you to keep track of your expenses.",
         "donations": "Donations",
         "support": "Support",
+        "othersSubTitle": "Currency, security, others",
+        "aboutSubTitle": "App information",
         "donationsMsg": "I hope you are enjoying using this app, if you would like to buy me a coffee/beer, just send me an email.",
         "donationSupport": "I made this app in my free time and it is also open source. If you would like to help me, report an issue, have an idea, want a feature to be implemented, etc please open an issue here:"
     },

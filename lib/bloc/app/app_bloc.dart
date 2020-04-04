@@ -8,6 +8,7 @@ import '../../common/enums/app_accent_color_type.dart';
 import '../../common/enums/app_language_type.dart';
 import '../../common/enums/app_theme_type.dart';
 import '../../common/extensions/app_theme_type_extensions.dart';
+import '../../common/utils/background_utils.dart';
 import '../../generated/i18n.dart';
 import '../../services/logging_service.dart';
 import '../../services/settings_service.dart';
@@ -36,6 +37,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
 
     if (event is InitializeApp) {
+      if (!_settingsService.isRecurringTransTaskRegistered) {
+        _logger.info(
+          runtimeType,
+          'Recurring trans task is not registered, registering it...',
+        );
+        await BackgroundUtils.registerRecurringTransactionsTask();
+      }
       _logger.info(
         runtimeType,
         'Current settings are: ${_settingsService.appSettings.toJson()}',

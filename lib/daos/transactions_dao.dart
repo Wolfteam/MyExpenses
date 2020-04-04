@@ -19,7 +19,7 @@ abstract class TransactionsDao {
     DateTime to,
   );
 
-  Future<void> checkAndSaveRecurringTransactions(
+  Future<List<TransactionItem>> checkAndSaveRecurringTransactions(
     TransactionItem parent,
     DateTime nextRecurringDate,
     List<DateTime> periods,

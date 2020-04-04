@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 import '../../common/enums/app_drawer_item_type.dart';
+import '../../common/utils/background_utils.dart';
 import '../../daos/users_dao.dart';
 import '../../services/logging_service.dart';
 
@@ -58,9 +59,9 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
 
   Stream<DrawerState> _signOut() async* {
     //TODO: SHOULD I DELETE THE USER HERE?
-    //TODO: STOP BG SYNC
     _logger.info(runtimeType, '_signIn: Signing out...');
     await _usersDao.changeActiveUser(null);
+    await BackgroundUtils.cancelSyncTask();
     yield state.copyWith(isUserSignedIn: false);
   }
 }

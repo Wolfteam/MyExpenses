@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:workmanager/workmanager.dart';
@@ -5,13 +6,16 @@ import 'package:workmanager/workmanager.dart';
 import '../../common/enums/sync_intervals_type.dart';
 import '../../common/utils/i18n_utils.dart';
 import '../../common/utils/notification_utils.dart';
+import '../../daos/transactions_dao.dart';
 import '../../injection.dart';
 import '../../logger.dart';
+import '../../models/app_notification.dart';
 import '../../services/logging_service.dart';
 import '../../services/network_service.dart';
 import '../../services/settings_service.dart';
 import '../../services/sync_service.dart';
 import '../../telemetry.dart';
+import 'transaction_utils.dart';
 
 void callbackDispatcher() {
   Workmanager.executeTask((task, inputData) async {
@@ -21,12 +25,16 @@ void callbackDispatcher() {
 }
 
 class BackgroundUtils {
-  static const _syncTaskId = '1';
+  static const _syncTaskId = 'my_expenses_sync_task';
   static const _syncTaskName = 'Sync task';
 
+  static const _recurringTransId = 'my_expenses_recurring_trans_task';
+  static const _recurringTransName = 'Recurring Transactions Task';
+
   static Future<void> initBg() {
+    //TODO: CHANGE THE ISINDEBUG
     if (Platform.isAndroid) {
-      return Workmanager.initialize(callbackDispatcher, isInDebugMode: true);
+      return Workmanager.initialize(callbackDispatcher, isInDebugMode: false);
     }
 
     return Future.value();
@@ -37,11 +45,6 @@ class BackgroundUtils {
     if (!Platform.isAndroid) {
       return Future.value();
     }
-
-    return Workmanager.registerOneOffTask(
-      _syncTaskId,
-      _syncTaskName,
-    );
 
     switch (interval) {
       case SyncIntervalType.eachHour:
@@ -59,8 +62,6 @@ class BackgroundUtils {
       case SyncIntervalType.eachDay:
         duration = const Duration(hours: 24);
         break;
-      case SyncIntervalType.none:
-        return Workmanager.cancelByUniqueName(_syncTaskId);
       default:
         throw Exception(
           'Cant register sync task with the provided value = $interval',
@@ -78,18 +79,37 @@ class BackgroundUtils {
     );
   }
 
+  static Future<void> registerRecurringTransactionsTask() {
+    const duration = Duration(hours: 8);
+    if (!Platform.isAndroid) {
+      return Future.value();
+    }
+
+    return Workmanager.registerPeriodicTask(
+      _recurringTransId,
+      _recurringTransName,
+      frequency: duration,
+      constraints: Constraints(
+        networkType: NetworkType.not_required,
+        requiresBatteryNotLow: true,
+      ),
+    );
+  }
+
+  static Future<void> cancelSyncTask() {
+    return Workmanager.cancelByUniqueName(_syncTaskId);
+  }
+
   static Future<void> bgSync(String task) async {
     initInjection();
     await setupLogging();
     await initTelemetry();
     final logger = getIt<LoggingService>();
-    final networkService = getIt<NetworkService>();
-    final syncService = getIt<SyncService>();
     final settingsService = getIt<SettingsService>();
     await settingsService.init();
     final i18n = await getI18n(settingsService.language);
     const runtimeType = BackgroundUtils;
-    final isNetworkAvailable = await networkService.isInternetAvailable();
+    // await setupNotifications();
 
     try {
       switch (task) {
@@ -98,6 +118,9 @@ class BackgroundUtils {
             runtimeType,
             'bgSync: Checking if internet is available...',
           );
+          final networkService = getIt<NetworkService>();
+          final syncService = getIt<SyncService>();
+          final isNetworkAvailable = await networkService.isInternetAvailable();
           if (!isNetworkAvailable) {
             logger.info(
               runtimeType,
@@ -116,10 +139,45 @@ class BackgroundUtils {
             runtimeType,
             'bgSync: Sync was successfully performed',
           );
-          showNotification(
-            i18n.automaticSync,
-            i18n.syncWasSuccessfullyPerformed,
+          if (settingsService.showNotifAfterFullSync) {
+            await showNotification(
+              i18n.automaticSync,
+              i18n.syncWasSuccessfullyPerformed,
+              jsonEncode(AppNotification.nothing()),
+            );
+          }
+          break;
+        case _recurringTransName:
+          final transactionsDao = getIt<TransactionsDao>();
+          final now = DateTime.now();
+          logger.info(
+            runtimeType,
+            'bgSync: Checking recurring transactions for date = $now',
           );
+          final childs = await TransactionUtils.checkRecurringTransactions(
+            now,
+            logger,
+            transactionsDao,
+          );
+
+          if (childs.isEmpty) return;
+
+          if (settingsService.showNotifForRecurringTrans) {
+            logger.info(
+              runtimeType,
+              'bgSync: Show ${childs.length} child notifications...',
+            );
+
+            final futures = childs
+                .map((t) => showNotification(
+                      i18n.recurringTransactions,
+                      t.description,
+                      jsonEncode(AppNotification.openTransaction(t.id)),
+                    ))
+                .toList();
+
+            await Future.wait(futures);
+          }
           break;
         default:
           logger.warning(runtimeType, 'bgSync: Task = $task is not valid');
@@ -127,10 +185,17 @@ class BackgroundUtils {
       }
     } on Exception catch (e, s) {
       logger.error(runtimeType, 'bgSync: Unknown error occurred', e, s);
-      showNotification(
-        i18n.automaticSync,
-        i18n.unknownErrorOcurred,
-      );
+      if (settingsService.showNotifAfterFullSync) {
+        await showNotification(
+          i18n.automaticSync,
+          i18n.unknownErrorOcurred,
+          jsonEncode(AppNotification.nothing()),
+        );
+      }
     }
+    logger.info(
+      runtimeType,
+      'bgSync: Process completed',
+    );
   }
 }

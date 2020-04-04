@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -7,6 +9,7 @@ import '../../../common/extensions/i18n_extensions.dart';
 import '../../../common/utils/notification_utils.dart';
 import '../../../common/utils/toast_utils.dart';
 import '../../../generated/i18n.dart';
+import '../../../models/app_notification.dart';
 import '../modal_sheet_separator.dart';
 
 class ReportsBottomSheetDialog extends StatelessWidget {
@@ -35,7 +38,7 @@ class ReportsBottomSheetDialog extends StatelessWidget {
               showNotification(
                 i18n.transactionsReport,
                 '${i18n.reportWasSuccessfullyGenerated(state.fileName)}.\n${i18n.tapToOpen}',
-                payload: state.filePath,
+                jsonEncode(AppNotification.openPdf(state.filePath)),
               );
               Navigator.pop(context);
             }

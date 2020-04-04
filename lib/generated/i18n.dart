@@ -280,6 +280,10 @@ class I18n implements WidgetsLocalizations {
   String get automaticSync => "Automatic sync";
   /// "Sync was successfully performed"
   String get syncWasSuccessfullyPerformed => "Sync was successfully performed";
+  /// "Show a notification after a full sync"
+  String get showNotificationAfterFullSync => "Show a notification after a full sync";
+  /// "Show a notification when a recurring transactions is executed"
+  String get showNotificationForRecurringTrans => "Show a notification when a recurring transactions is executed";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -346,6 +350,10 @@ class I18n implements WidgetsLocalizations {
   String get settingsDonations => "Donations";
   /// "Support"
   String get settingsSupport => "Support";
+  /// "Currency, security, others"
+  String get settingsOthersSubTitle => "Currency, security, others";
+  /// "App information"
+  String get settingsAboutSubTitle => "App information";
   /// "I hope you are enjoying using this app, if you would like to buy me a coffee/beer, just send me an email."
   String get settingsDonationsMsg => "I hope you are enjoying using this app, if you would like to buy me a coffee/beer, just send me an email.";
   /// "I made this app in my free time and it is also open source. If you would like to help me, report an issue, have an idea, want a feature to be implemented, etc please open an issue here:"
@@ -748,6 +756,12 @@ class _I18n_es_VE extends I18n {
   /// "La sincronización fue ejecutada exitosamente"
   @override
   String get syncWasSuccessfullyPerformed => "La sincronización fue ejecutada exitosamente";
+  /// "Mostrar una notificación después de una sincronización"
+  @override
+  String get showNotificationAfterFullSync => "Mostrar una notificación después de una sincronización";
+  /// "Mostrar una notification cuando se ejecute una transacción recurrente"
+  @override
+  String get showNotificationForRecurringTrans => "Mostrar una notification cuando se ejecute una transacción recurrente";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";
@@ -847,6 +861,12 @@ class _I18n_es_VE extends I18n {
   /// "Soporte"
   @override
   String get settingsSupport => "Soporte";
+  /// "Moneda, seguridad, otros"
+  @override
+  String get settingsOthersSubTitle => "Moneda, seguridad, otros";
+  /// "Información de la aplicación"
+  @override
+  String get settingsAboutSubTitle => "Información de la aplicación";
   /// "Espero que disfrutes al usar esta aplicación, si te gustaría comprarme un cafe o una cerveza, envíame un email."
   @override
   String get settingsDonationsMsg => "Espero que disfrutes al usar esta aplicación, si te gustaría comprarme un cafe o una cerveza, envíame un email.";

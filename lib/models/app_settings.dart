@@ -17,10 +17,13 @@ class AppSettings extends Equatable {
   final AppAccentColorType accentColor;
   final AppLanguageType appLanguage;
   final SyncIntervalType syncInterval;
+  final bool showNotifAfterFullSync;
   final bool askForPassword;
   final bool askForFingerPrint;
   final CurrencySymbolType currencySymbol;
   final bool currencyToTheRight;
+  final bool showNotifForRecurringTrans;
+  final bool isRecurringTransTaskRegistered;
 
   @override
   List<Object> get props => [
@@ -29,10 +32,13 @@ class AppSettings extends Equatable {
         accentColor,
         appLanguage,
         syncInterval,
+        showNotifAfterFullSync,
         askForPassword,
         askForFingerPrint,
         currencySymbol,
         currencyToTheRight,
+        showNotifForRecurringTrans,
+        isRecurringTransTaskRegistered,
       ];
 
   const AppSettings({
@@ -41,10 +47,13 @@ class AppSettings extends Equatable {
     @required this.accentColor,
     @required this.appLanguage,
     @required this.syncInterval,
+    @required this.showNotifAfterFullSync,
     @required this.askForPassword,
     @required this.askForFingerPrint,
     @required this.currencySymbol,
     @required this.currencyToTheRight,
+    @required this.showNotifForRecurringTrans,
+    @required this.isRecurringTransTaskRegistered,
   });
 
   factory AppSettings.fromJson(Map<String, dynamic> json) =>

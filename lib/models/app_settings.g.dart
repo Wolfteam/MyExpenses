@@ -16,11 +16,15 @@ AppSettings _$AppSettingsFromJson(Map<String, dynamic> json) {
         _$enumDecodeNullable(_$AppLanguageTypeEnumMap, json['appLanguage']),
     syncInterval:
         _$enumDecodeNullable(_$SyncIntervalTypeEnumMap, json['syncInterval']),
+    showNotifAfterFullSync: json['showNotifAfterFullSync'] as bool,
     askForPassword: json['askForPassword'] as bool,
     askForFingerPrint: json['askForFingerPrint'] as bool,
     currencySymbol: _$enumDecodeNullable(
         _$CurrencySymbolTypeEnumMap, json['currencySymbol']),
     currencyToTheRight: json['currencyToTheRight'] as bool,
+    showNotifForRecurringTrans: json['showNotifForRecurringTrans'] as bool,
+    isRecurringTransTaskRegistered:
+        json['isRecurringTransTaskRegistered'] as bool,
   );
 }
 
@@ -31,10 +35,13 @@ Map<String, dynamic> _$AppSettingsToJson(AppSettings instance) =>
       'accentColor': _$AppAccentColorTypeEnumMap[instance.accentColor],
       'appLanguage': _$AppLanguageTypeEnumMap[instance.appLanguage],
       'syncInterval': _$SyncIntervalTypeEnumMap[instance.syncInterval],
+      'showNotifAfterFullSync': instance.showNotifAfterFullSync,
       'askForPassword': instance.askForPassword,
       'askForFingerPrint': instance.askForFingerPrint,
       'currencySymbol': _$CurrencySymbolTypeEnumMap[instance.currencySymbol],
       'currencyToTheRight': instance.currencyToTheRight,
+      'showNotifForRecurringTrans': instance.showNotifForRecurringTrans,
+      'isRecurringTransTaskRegistered': instance.isRecurringTransTaskRegistered,
     };
 
 T _$enumDecode<T>(

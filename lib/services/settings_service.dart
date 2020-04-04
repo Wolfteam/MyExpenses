@@ -23,6 +23,9 @@ abstract class SettingsService {
   SyncIntervalType get syncInterval;
   set syncInterval(SyncIntervalType interval);
 
+  bool get showNotifAfterFullSync;
+  set showNotifAfterFullSync(bool show);
+
   bool get askForPassword;
   set askForPassword(bool ask);
 
@@ -35,6 +38,12 @@ abstract class SettingsService {
   bool get currencyToTheRight;
   set currencyToTheRight(bool toTheRight);
 
+  bool get showNotifForRecurringTrans;
+  set showNotifForRecurringTrans(bool show);
+
+  bool get isRecurringTransTaskRegistered;
+  set isRecurringTransTaskRegistered(bool itIs);
+
   Future init();
 }
 
@@ -43,10 +52,14 @@ class SettingsServiceImpl implements SettingsService {
   final _accentColorKey = 'AccentColor';
   final _appLanguageKey = 'AppLanguage';
   final _syncIntervalKey = 'SyncInterval';
+  final _showNotifAfterFullSyncKey = 'ShowNotificationAfterFullSync';
   final _askForPasswordKey = 'AskForPassword';
   final _askForFingerPrintKey = 'AskForFingerPrint';
   final _currencySymbolKey = 'CurrencySymbol';
   final _currencyToTheRightKey = 'CurrencyToTheRight';
+  final _showNotifForRecurringTransKey =
+      'ShowNotificationForRecurringTransactions';
+  final _recurringTransTaskIsRegisteredKey = 'RecurringTransIsRegistered';
 
   final LoggingService _logger;
 
@@ -61,10 +74,13 @@ class SettingsServiceImpl implements SettingsService {
         accentColor: accentColor,
         appLanguage: language,
         syncInterval: syncInterval,
+        showNotifAfterFullSync: showNotifAfterFullSync,
         askForPassword: askForPassword,
         askForFingerPrint: askForFingerPrint,
         currencySymbol: currencySymbol,
         currencyToTheRight: currencyToTheRight,
+        showNotifForRecurringTrans: showNotifForRecurringTrans,
+        isRecurringTransTaskRegistered: isRecurringTransTaskRegistered,
       );
 
   @override
@@ -95,6 +111,14 @@ class SettingsServiceImpl implements SettingsService {
       _prefs.setInt(_syncIntervalKey, interval.index);
 
   @override
+  bool get showNotifAfterFullSync => _prefs.getBool(_showNotifAfterFullSyncKey);
+  @override
+  set showNotifAfterFullSync(bool show) => _prefs.setBool(
+        _showNotifAfterFullSyncKey,
+        show,
+      );
+
+  @override
   bool get askForPassword => _prefs.getBool(_askForPasswordKey);
   @override
   set askForPassword(bool ask) => _prefs.setBool(_askForPasswordKey, ask);
@@ -107,17 +131,33 @@ class SettingsServiceImpl implements SettingsService {
   @override
   CurrencySymbolType get currencySymbol =>
       CurrencySymbolType.values[_prefs.getInt(_currencySymbolKey)];
-
   @override
   set currencySymbol(CurrencySymbolType type) =>
       _prefs.setInt(_currencySymbolKey, type.index);
 
   @override
   bool get currencyToTheRight => _prefs.getBool(_currencyToTheRightKey);
-
   @override
   set currencyToTheRight(bool toTheRight) =>
       _prefs.setBool(_currencyToTheRightKey, toTheRight);
+
+  @override
+  bool get showNotifForRecurringTrans =>
+      _prefs.getBool(_showNotifForRecurringTransKey);
+  @override
+  set showNotifForRecurringTrans(bool show) => _prefs.setBool(
+        _showNotifForRecurringTransKey,
+        show,
+      );
+
+  @override
+  bool get isRecurringTransTaskRegistered =>
+      _prefs.getBool(_recurringTransTaskIsRegisteredKey);
+  @override
+  set isRecurringTransTaskRegistered(bool itIs) => _prefs.setBool(
+        _recurringTransTaskIsRegisteredKey,
+        itIs,
+      );
 
   SettingsServiceImpl(this._logger);
 
@@ -152,6 +192,14 @@ class SettingsServiceImpl implements SettingsService {
       _prefs.setInt(_syncIntervalKey, SyncIntervalType.none.index);
     }
 
+    if (_prefs.get(_showNotifAfterFullSyncKey) == null) {
+      _logger.info(
+        runtimeType,
+        'Setting show notif after full sync to false...',
+      );
+      _prefs.setBool(_showNotifAfterFullSyncKey, false);
+    }
+
     if (_prefs.get(_askForPasswordKey) == null) {
       _logger.info(runtimeType, 'Setting ask for password to false...');
       _prefs.setBool(_askForPasswordKey, false);
@@ -173,6 +221,22 @@ class SettingsServiceImpl implements SettingsService {
     if (_prefs.get(_currencyToTheRightKey) == null) {
       _logger.info(runtimeType, 'Setting currency to the right to true...');
       _prefs.setBool(_currencyToTheRightKey, true);
+    }
+
+    if (_prefs.get(_showNotifForRecurringTransKey) == null) {
+      _logger.info(
+        runtimeType,
+        'Setting show notif for recurring trans to false...',
+      );
+      _prefs.setBool(_showNotifForRecurringTransKey, false);
+    }
+
+    if (_prefs.get(_recurringTransTaskIsRegisteredKey) == null) {
+      _logger.info(
+        runtimeType,
+        'Setting recurring trans task is registered to false...',
+      );
+      _prefs.setBool(_recurringTransTaskIsRegisteredKey, false);
     }
 
     _initialized = true;

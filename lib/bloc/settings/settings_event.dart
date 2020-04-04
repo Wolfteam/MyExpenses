@@ -82,3 +82,21 @@ class CurrencyPlacementChanged extends SettingsEvent {
 
   const CurrencyPlacementChanged({@required this.placeToTheRight});
 }
+
+class ShowNotifAfterFullSyncChanged extends SettingsEvent {
+  final bool show;
+
+  @override
+  List<Object> get props => [show];
+
+  const ShowNotifAfterFullSyncChanged({@required this.show});
+}
+
+class ShowNotifForRecurringTransChanged extends SettingsEvent {
+  final bool show;
+
+  @override
+  List<Object> get props => [show];
+
+  const ShowNotifForRecurringTransChanged({@required this.show});
+}
