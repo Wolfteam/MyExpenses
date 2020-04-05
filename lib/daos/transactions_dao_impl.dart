@@ -11,6 +11,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
     final query = (select(transactions)
           ..where(
             (t) =>
+                t.localStatus.equals(LocalStatusType.deleted.index).not() &
                 t.transactionDate.isBetweenValues(from, to) &
                 t.isParentTransaction.not(),
           ))
@@ -127,7 +128,20 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
 
   @override
   Future<bool> deleteTransaction(int id) async {
-    await (delete(transactions)..where((t) => t.id.equals(id))).go();
+    final trans =
+        await (select(transactions)..where((t) => t.id.equals(id))).getSingle();
+
+    if (trans.localStatus == LocalStatusType.created) {
+      await (delete(transactions)..where((t) => t.id.equals(id))).go();
+    }
+
+    await (update(transactions)..where((t) => t.id.equals(id))).write(
+      TransactionsCompanion(
+        updatedAt: Value(DateTime.now()),
+        updatedBy: const Value(createdBy),
+        localStatus: const Value(LocalStatusType.deleted),
+      ),
+    );
     return true;
   }
 
@@ -136,6 +150,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
     final query = (select(transactions)
           ..where(
             (t) =>
+                t.localStatus.equals(LocalStatusType.deleted.index).not() &
                 t.repetitionCycle.equals(RepetitionCycleType.none.index).not() &
                 t.isParentTransaction,
           ))
@@ -154,6 +169,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
     final query = (select(transactions)
           ..where(
             (t) =>
+                t.localStatus.equals(LocalStatusType.deleted.index).not() &
                 t.repetitionCycle.equals(RepetitionCycleType.none.index).not() &
                 isNotNull(t.nextRecurringDate) &
                 t.nextRecurringDate.isSmallerOrEqualValue(until) &
@@ -178,6 +194,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
     final query = (select(transactions)
           ..where(
             (t) =>
+                t.localStatus.equals(LocalStatusType.deleted.index).not() &
                 t.repetitionCycle.equals(RepetitionCycleType.none.index).not() &
                 t.parentTransactionId.equals(parentId) &
                 t.transactionDate.isBetweenValues(from, to),
@@ -304,10 +321,22 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
 
   @override
   Future<List<sync_trans.Transaction>> getAllTransactionsToSync() async {
-    final parents =
-        await (select(transactions)..where((t) => t.isParentTransaction)).get();
+    final parents = await (select(transactions)
+          ..where(
+            (t) =>
+                t.isParentTransaction &
+                t.localStatus.equals(LocalStatusType.deleted.index).not(),
+          ))
+        .get();
 
-    return select(transactions).join([
+    return (select(transactions)
+          ..where(
+            (t) => t.localStatus.equals(LocalStatusType.deleted.index).not(),
+          )
+          ..orderBy(
+            [(t) => OrderingTerm(expression: t.id)],
+          ))
+        .join([
       innerJoin(categories, categories.id.equalsExp(transactions.categoryId))
     ]).map((row) {
       final cat = row.readTable(categories);
@@ -337,7 +366,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
   }
 
   @override
-  Future<void> deleteTransactions(
+  Future<void> syncDownDelete(
     List<sync_trans.Transaction> existingTrans,
   ) async {
     final transInDb = await (select(transactions)
@@ -390,7 +419,27 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
   }
 
   @override
-  Future<void> createTransactions(
+  Future<void> syncUpDelete() async {
+    //first we delete the childs...
+    await (delete(transactions)
+          ..where(
+            (t) =>
+                t.localStatus.equals(LocalStatusType.deleted.index) &
+                isNotNull(t.parentTransactionId),
+          ))
+        .go();
+    //and then the parents
+    await (delete(transactions)
+          ..where(
+            (t) =>
+                t.localStatus.equals(LocalStatusType.deleted.index) &
+                isNull(t.parentTransactionId),
+          ))
+        .go();
+  }
+
+  @override
+  Future<void> syncDownCreate(
     List<sync_trans.Transaction> existingTrans,
   ) async {
     final transInDb = await (select(transactions)).get();
@@ -440,7 +489,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
   }
 
   @override
-  Future<void> updateTransactions(
+  Future<void> syncDownUpdate(
     List<sync_trans.Transaction> existingTrans,
   ) async {
     final existingTransToUse =
@@ -653,10 +702,22 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
         );
       }
 
-      b.deleteWhere<Transactions, Transaction>(
-        transactions,
-        (t) => t.id.equals(parentTrans.id),
-      );
+      if (parentTrans.localStatus == LocalStatusType.created) {
+        b.deleteWhere<Transactions, Transaction>(
+          transactions,
+          (t) => t.id.equals(parentTrans.id),
+        );
+      } else {
+        b.update<Transactions, Transaction>(
+          transactions,
+          TransactionsCompanion(
+            updatedAt: Value(DateTime.now()),
+            updatedBy: const Value(createdBy),
+            localStatus: const Value(LocalStatusType.deleted),
+          ),
+          where: (t) => t.id.equals(parentTrans.id),
+        );
+      }
     });
   }
 
@@ -664,17 +725,42 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
     Transaction parentTrans,
     List<Transaction> childs,
   ) {
-    final childIds = childs.map((t) => t.id).toList();
     return batch((b) {
-      b.deleteWhere<Transactions, Transaction>(
-        transactions,
-        (t) => t.id.isIn(childIds),
-      );
+      for (final child in childs) {
+        if (child.localStatus == LocalStatusType.created) {
+          b.deleteWhere<Transactions, Transaction>(
+            transactions,
+            (t) => t.id.equals(child.id),
+          );
+        } else {
+          b.update<Transactions, Transaction>(
+            transactions,
+            TransactionsCompanion(
+              updatedAt: Value(DateTime.now()),
+              updatedBy: const Value(createdBy),
+              localStatus: const Value(LocalStatusType.deleted),
+            ),
+            where: (t) => t.id.equals(child.id),
+          );
+        }
+      }
 
-      b.deleteWhere<Transactions, Transaction>(
-        transactions,
-        (t) => t.id.equals(parentTrans.id),
-      );
+      if (parentTrans.localStatus == LocalStatusType.created) {
+        b.deleteWhere<Transactions, Transaction>(
+          transactions,
+          (t) => t.id.equals(parentTrans.id),
+        );
+      } else {
+        b.update<Transactions, Transaction>(
+          transactions,
+          TransactionsCompanion(
+            updatedAt: Value(DateTime.now()),
+            updatedBy: const Value(createdBy),
+            localStatus: const Value(LocalStatusType.deleted),
+          ),
+          where: (t) => t.id.equals(parentTrans.id),
+        );
+      }
     });
   }
 }

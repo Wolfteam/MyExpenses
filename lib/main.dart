@@ -275,9 +275,9 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Future<bool> _onSelectNotification(String json) async {
+  Future<void> _onSelectNotification(String json) async {
     if (json.isNullEmptyOrWhitespace) {
-      return true;
+      return;
     }
 
     final notification = AppNotification.fromJson(
@@ -288,7 +288,7 @@ class _MyAppState extends State<MyApp> {
       case NotificationType.openPdf:
         final file = File(notification.payload);
         if (await file.exists()) {
-          OpenFile.open(notification.payload);
+          await OpenFile.open(notification.payload);
         }
         break;
       case NotificationType.openTransactionDetails:
@@ -304,7 +304,5 @@ class _MyAppState extends State<MyApp> {
       case NotificationType.msg:
         break;
     }
-
-    return true;
   }
 }

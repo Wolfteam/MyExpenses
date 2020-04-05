@@ -9,9 +9,9 @@ import 'package:meta/meta.dart';
 import '../../common/enums/app_language_type.dart';
 import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/extensions/string_extensions.dart';
+import '../../common/utils/app_path_utils.dart';
 import '../../common/utils/category_utils.dart';
 import '../../common/utils/date_utils.dart';
-import '../../common/utils/image_utils.dart';
 import '../../common/utils/transaction_utils.dart';
 import '../../daos/transactions_dao.dart';
 import '../../models/category_item.dart';
@@ -316,7 +316,7 @@ class TransactionFormBloc
         runtimeType,
         '_saveTransaction: Trying to save image',
       );
-      final imgPath = await ImageUtils.imagePath;
+      final imgPath = await AppPathUtils.imagesPath;
       final finalPath = '$imgPath/user_picked_img_${DateTime.now()}.png';
 
       await File(finalPath).writeAsBytes(await File(path).readAsBytes());

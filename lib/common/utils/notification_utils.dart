@@ -72,6 +72,34 @@ Future<void> showNotification(
   String payload, {
   int id = 0,
 }) {
+  if (body.length > 40) {
+    final androidPlatformChannelSpecificsBigStyle = AndroidNotificationDetails(
+      _channelId,
+      _channelName,
+      _channelDescription,
+      importance: Importance.Max,
+      priority: Priority.High,
+      autoCancel: true,
+      enableLights: true,
+      enableVibration: true,
+      color: Colors.red,
+      styleInformation: BigTextStyleInformation(body),
+      largeIcon: const DrawableResourceAndroidBitmap(_largeIcon),
+    );
+
+    final _platformChannelSpecifics = NotificationDetails(
+      androidPlatformChannelSpecificsBigStyle,
+      _iOSPlatformChannelSpecifics,
+    );
+
+    return _flutterLocalNotificationsPlugin.show(
+      id,
+      title,
+      body,
+      _platformChannelSpecifics,
+      payload: payload,
+    );
+  }
   return _flutterLocalNotificationsPlugin.show(
     id,
     title,

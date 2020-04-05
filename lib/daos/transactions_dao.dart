@@ -38,11 +38,13 @@ abstract class TransactionsDao {
 
   Future<List<sync_trans.Transaction>> getAllTransactionsToSync();
 
-  Future<void> deleteTransactions(List<sync_trans.Transaction> existingTrans);
+  Future<void> syncDownDelete(List<sync_trans.Transaction> existingTrans);
 
-  Future<void> createTransactions(List<sync_trans.Transaction> existingTrans);
+  Future<void> syncUpDelete();
 
-  Future<void> updateTransactions(List<sync_trans.Transaction> existingTrans);
+  Future<void> syncDownCreate(List<sync_trans.Transaction> existingTrans);
+
+  Future<void> syncDownUpdate(List<sync_trans.Transaction> existingTrans);
 
   Future<void> updateAllLocalStatus(LocalStatusType newValue);
 }

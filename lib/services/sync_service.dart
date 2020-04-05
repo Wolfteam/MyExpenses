@@ -76,6 +76,7 @@ class SyncServiceImpl implements SyncService {
         e,
         s,
       );
+      rethrow;
     }
   }
 
@@ -90,7 +91,9 @@ class SyncServiceImpl implements SyncService {
       final fileId = await _googleService.downloadFile(_appFile, filePath);
       final appFile = await _getLocalAppFile(filePath);
       final user = await _usersDao.getActiveUser();
-      await _performSync(user.id, appFile);
+      await _performSyncDown(user.id, appFile);
+
+      await _performSyncUp(user.id);
 
       _logger.info(
         runtimeType,
@@ -111,6 +114,7 @@ class SyncServiceImpl implements SyncService {
         e,
         s,
       );
+      rethrow;
     }
   }
 
@@ -284,7 +288,7 @@ class SyncServiceImpl implements SyncService {
     await _categoriesDao.deleteAll();
     await _transactionsDao.deleteAll();
 
-    await _performSync(user.id, appFile);
+    await _performSyncDown(user.id, appFile);
   }
 
   Future<void> _uploadReadmeFile() async {
@@ -308,30 +312,42 @@ class SyncServiceImpl implements SyncService {
     return appFile;
   }
 
-  Future<void> _performSync(int userId, AppFile appFile) async {
+  Future<void> _performSyncDown(int userId, AppFile appFile) async {
     //The order is important
     _logger.info(
       runtimeType,
-      '_performSync: Creating categories and transactions...',
+      '_performSyncDown: Creating categories and transactions...',
     );
-    await _categoriesDao.createCategories(userId, appFile.categories);
-    await _transactionsDao.createTransactions(appFile.transactions);
+    await _categoriesDao.syncDownCreate(userId, appFile.categories);
+    await _transactionsDao.syncDownCreate(appFile.transactions);
 
     _logger.info(
       runtimeType,
-      '_performSync: Deleting categories and transactions...',
+      '_performSyncDown: Deleting categories and transactions...',
     );
-    await _categoriesDao.deleteCategories(userId, appFile.categories);
-    await _transactionsDao.deleteTransactions(appFile.transactions);
+    await _transactionsDao.syncDownDelete(appFile.transactions);
+    await _categoriesDao.syncDownDelete(userId, appFile.categories);
 
     _logger.info(
       runtimeType,
-      '_performSync: Updating categories and transactions...',
+      '_performSyncDown: Updating categories and transactions...',
     );
-    await _categoriesDao.updateCategories(userId, appFile.categories);
-    await _transactionsDao.updateTransactions(appFile.transactions);
+    await _categoriesDao.syncDownUpdate(userId, appFile.categories);
+    await _transactionsDao.syncDownUpdate(appFile.transactions);
 
     //TODO: SYNC IMG in the bg
+    //TODO: IF THE USER SWITCHES ACCOUNTS,
+    //YOU SHOULD ONLY SYNC THE USER TRANSACTIONS
+  }
+
+  Future<void> _performSyncUp(int userId) async {
+    //The order is important
+    _logger.info(
+      runtimeType,
+      '_performSyncUp: Deleting categories and transactions...',
+    );
+    await _transactionsDao.syncUpDelete();
+    await _categoriesDao.syncUpDelete(userId);
   }
 
   Future<void> _updateLocalStatus(LocalStatusType newValue) {

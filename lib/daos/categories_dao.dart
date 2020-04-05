@@ -23,17 +23,19 @@ abstract class CategoriesDao {
 
   Future<List<sync_cat.Category>> getAllCategoriesToSync(int userId);
 
-  Future<void> deleteCategories(
+  Future<void> syncDownDelete(
     int userId,
     List<sync_cat.Category> existingCats,
   );
 
-  Future<void> createCategories(
+  Future<void> syncUpDelete(int userId);
+
+  Future<void> syncDownCreate(
     int userId,
     List<sync_cat.Category> existingCats,
   );
 
-  Future<void> updateCategories(
+  Future<void> syncDownUpdate(
     int userId,
     List<sync_cat.Category> existingCats,
   );

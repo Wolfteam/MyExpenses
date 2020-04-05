@@ -233,6 +233,31 @@ List<Widget> _buildPdfBody(
   final transactionsMap = _buildTransactionsPerMonth(transactions);
   final tables = transactionsMap.entries
       .map((kvp) => _buildTable(kvp.key, kvp.value, i18n, formatter));
+  if (tables.isEmpty) {
+    return [
+      Align(
+        alignment: Alignment.centerLeft,
+        child: summary,
+      ),
+      Padding(
+        padding: const EdgeInsets.only(top: 30, right: 20, left: 20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Text(
+              i18n.noTransactionsForThisPeriod,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ];
+  }
 
   return [
     Align(

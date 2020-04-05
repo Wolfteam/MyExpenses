@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:log_4_dart_2/log_4_dart_2.dart';
-import 'package:path_provider/path_provider.dart';
+
+import 'common/utils/app_path_utils.dart';
 
 Future setupLogging() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final dir = await getApplicationSupportDirectory();
+  final dirPath = await AppPathUtils.logsPath;
   final config = {
     'appenders': [
       {
@@ -20,11 +21,10 @@ Future setupLogging() async {
         'level': 'ALL',
         'filePattern': 'my_expenses_log',
         'fileExtension': 'txt',
-        'path': '${dir.path}/',
+        'path': '$dirPath/',
         'rotationCycle': 'DAY'
       },
     ]
   };
   Logger().init(config);
 }
-

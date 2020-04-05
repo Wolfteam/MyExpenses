@@ -1,18 +1,12 @@
 import 'dart:io';
 import 'dart:isolate';
 
-import 'package:image/image.dart';
 import 'package:http/http.dart' as http;
-import 'package:path_provider/path_provider.dart';
+import 'package:image/image.dart';
+
+import 'app_path_utils.dart';
 
 class ImageUtils {
-  static Future<String> get imagePath async {
-    final dir = await getApplicationDocumentsDirectory();
-    final dirPath = '${dir.path}/images';
-    await Directory(dirPath).create(recursive: true);
-    return dirPath;
-  }
-
   static Future<void> resizeImage(
     File input,
     File output,
@@ -39,7 +33,7 @@ class ImageUtils {
     int width = 120,
     int height = 120,
   }) async {
-    final dirPath = await imagePath;
+    final dirPath = await AppPathUtils.imagesPath;
     final receivePort = ReceivePort();
 
     await Isolate.spawn(
@@ -63,8 +57,7 @@ class ImageUtils {
         copyResize(image, width: params.width, height: params.height);
     final png = encodePng(thumbnail);
 
-    final filePath =
-        '${params.dirPath}/user_profile_img_${DateTime.now()}.png';
+    final filePath = '${params.dirPath}/user_profile_img_${DateTime.now()}.png';
 
     File(filePath).writeAsBytesSync(png);
     params.sendPort.send(filePath);

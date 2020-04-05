@@ -5,9 +5,9 @@ import 'package:bloc/bloc.dart';
 import 'package:csv/csv.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../../common/enums/report_file_type.dart';
+import '../../common/utils/app_path_utils.dart';
 import '../../common/utils/date_utils.dart';
 import '../../daos/transactions_dao.dart';
 import '../../generated/i18n.dart';
@@ -81,12 +81,10 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
       );
       transactions
           .sort((t1, t2) => t1.transactionDate.compareTo(t2.transactionDate));
-      final dir = await getExternalStorageDirectory();
 
       if (currentState.selectedFileType == ReportFileType.csv) {
         final filename = '$now.csv';
         final path = await _buildCsvReport(
-          dir,
           transactions,
           event,
           filename,
@@ -95,7 +93,6 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
       } else {
         final filename = '$now.pdf';
         final path = await _buildPdfReport(
-          dir,
           transactions,
           event,
           filename,
@@ -113,7 +110,6 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
   }
 
   Future<String> _buildCsvReport(
-    Directory dir,
     List<TransactionItem> transactions,
     GenerateReport event,
     String filename,
@@ -145,7 +141,8 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
 
     final csv = const ListToCsvConverter().convert(csvData);
 
-    final path = '${dir.path}/$filename';
+    final dirPath = await AppPathUtils.reportsPath;
+    final path = '$dirPath/$filename';
 
     final file = File(path);
     await file.writeAsString(csv);
@@ -154,7 +151,6 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
   }
 
   Future<String> _buildPdfReport(
-    Directory dir,
     List<TransactionItem> transactions,
     GenerateReport event,
     String filename,
@@ -166,7 +162,8 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
       currentState.from,
       currentState.to,
     );
-    final path = '${dir.path}/$filename';
+    final dirPath = await AppPathUtils.reportsPath;
+    final path = '$dirPath/$filename';
     final file = File(path);
     await file.writeAsBytes(pdf.save());
 
