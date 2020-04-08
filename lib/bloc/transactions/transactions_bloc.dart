@@ -116,7 +116,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         expenseTransactionsPerWeek: expenseTransPerWeek,
         transactionsPerMonth: transPerMonth,
       );
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
           runtimeType, '_buildInitialState: An unknown error occurred', e, s);
       yield TransactionsLoadedState(
@@ -144,7 +144,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         showParentTransactions: true,
         transactionsPerMonth: transPerMonth,
       );
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(runtimeType, '_buildRecurringState: Unknown error', e, s);
     }
   }
@@ -244,7 +244,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
 
       models.sort((t1, t2) => t1.date.compareTo(t2.date));
       return models;
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         '_buildTransactionSummaryPerDay: Unknown error ocurred',

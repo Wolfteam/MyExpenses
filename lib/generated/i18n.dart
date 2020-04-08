@@ -284,6 +284,8 @@ class I18n implements WidgetsLocalizations {
   String get showNotificationAfterFullSync => "Show a notification after a full sync";
   /// "Show a notification when a recurring transactions is executed"
   String get showNotificationForRecurringTrans => "Show a notification when a recurring transactions is executed";
+  /// "You must grant permissions to open the file"
+  String get openFilePermissionRequestFailedMsg => "You must grant permissions to open the file";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -762,6 +764,9 @@ class _I18n_es_VE extends I18n {
   /// "Mostrar una notification cuando se ejecute una transacción recurrente"
   @override
   String get showNotificationForRecurringTrans => "Mostrar una notification cuando se ejecute una transacción recurrente";
+  /// "Debe otorgar permisos para abrir el archivo"
+  @override
+  String get openFilePermissionRequestFailedMsg => "Debe otorgar permisos para abrir el archivo";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";

@@ -62,7 +62,7 @@ abstract class _CategoriesListBloc
         _setSelectedItem(event.selectedCategory.id, categories);
       }
       yield buildCategoriesLoadedState(categories);
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         '_loadCategories: Unknown error occurred',

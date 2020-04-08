@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -19,11 +20,23 @@ part 'app_state.dart';
 class AppBloc extends Bloc<AppEvent, AppState> {
   final LoggingService _logger;
   final SettingsService _settingsService;
+  StreamSubscription _portSubscription;
 
   @override
   AppState get initialState => AppUninitializedState();
 
-  AppBloc(this._logger, this._settingsService);
+  AppBloc(this._logger, this._settingsService) {
+    IsolateNameServer.registerPortWithName(
+      BackgroundUtils.port.sendPort,
+      BackgroundUtils.portName,
+    );
+    _portSubscription = BackgroundUtils.port.listen((data) {
+      final isRunning = data[0] as bool;
+      add(BgTaskIsRunning(isRunning: isRunning));
+
+      //TODO: TRIGGER A DRAWER BLOC EVENT TO THE TRANSACTIONS PAGE IS THE INITIAL PAGE
+    });
+  }
 
   @override
   Stream<AppState> mapEventToState(
@@ -37,6 +50,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
 
     if (event is InitializeApp) {
+      await BackgroundUtils.initBg();
       if (!_settingsService.isRecurringTransTaskRegistered) {
         _logger.info(
           runtimeType,
@@ -82,16 +96,38 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         _settingsService.language,
       );
     }
+
+    if (event is BgTaskIsRunning) {
+      yield* _loadThemeData(
+        _settingsService.appTheme,
+        _settingsService.accentColor,
+        _settingsService.language,
+        bgTaskIsRunning: event.isRunning,
+      );
+    }
+  }
+
+  @override
+  Future<void> close() async {
+    IsolateNameServer.removePortNameMapping(BackgroundUtils.portName);
+    await _portSubscription.cancel();
+    await super.close();
   }
 
   Stream<AppState> _loadThemeData(
     AppThemeType theme,
     AppAccentColorType accentColor,
-    AppLanguageType language,
-  ) async* {
+    AppLanguageType language, {
+    bool isInitialized = true,
+    bool bgTaskIsRunning = false,
+  }) async* {
     final themeData = accentColor.getThemeData(theme);
     _setLocale(language);
-    yield AppInitializedState(themeData);
+    yield AppInitializedState(
+      themeData,
+      isInitialized: isInitialized,
+      bgTaskIsRunning: bgTaskIsRunning,
+    );
   }
 
   void _setLocale(AppLanguageType language) {

@@ -140,7 +140,7 @@ class SignInWithGoogleBloc
       await _syncService.initializeAppFolderAndFiles();
 
       yield currentState.copyWith(flowCompleted: true, codeGranted: false);
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(runtimeType, '_signIn: Unknown error occurred', e, s);
       yield currentState.copyWith(
         flowCompleted: true,

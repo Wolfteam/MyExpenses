@@ -94,11 +94,5 @@ class _CategoriesListPageState extends State<CategoriesListPage>
     context.bloc<CategoryFormBloc>().add(AddCategory());
     await Navigator.of(context).push(route);
     context.bloc<CategoryFormBloc>().add(FormClosed());
-    BlocUtils.raiseCommonBlocEvents(
-      context,
-      reloadCategories: true,
-      reloadCharts: true,
-      reloadTransactions: true,
-    );
   }
 }

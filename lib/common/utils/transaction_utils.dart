@@ -130,7 +130,7 @@ class TransactionUtils {
 
         createdChilds.addAll(childs);
       }
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       logger.error(
         TransactionUtils,
         'checkRecurringTransactions: Unknown error occurred',

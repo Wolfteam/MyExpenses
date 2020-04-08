@@ -10,6 +10,7 @@ import '../../../bloc/sign_in_with_google/sign_in_with_google_bloc.dart';
 import '../../../common/utils/bloc_utils.dart';
 import '../../../common/utils/toast_utils.dart';
 import '../../../generated/i18n.dart';
+import '../loading.dart';
 
 class SignInWithGoogleWebView extends StatefulWidget {
   const SignInWithGoogleWebView();
@@ -78,10 +79,6 @@ class _SignInWithGoogleWebViewState extends State<SignInWithGoogleWebView> {
   ) {
     final i18n = I18n.of(context);
 
-    const indicator = Center(
-      child: CircularProgressIndicator(),
-    );
-
     if (state is InitializedState &&
         !state.codeGranted &&
         !state.flowCompleted) {
@@ -100,26 +97,12 @@ class _SignInWithGoogleWebViewState extends State<SignInWithGoogleWebView> {
         ),
         withJavascript: true,
         withLocalStorage: true,
-        initialChild: indicator,
+        initialChild: const Center(
+          child: CircularProgressIndicator(),
+        ),
       );
     }
 
-    return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          indicator,
-          Container(
-            margin: const EdgeInsets.only(top: 5),
-            child: Text(
-              '${i18n.loading}...',
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
-      ),
-    );
+    return Loading();
   }
 }

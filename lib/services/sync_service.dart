@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../common/enums/local_status_type.dart';
 import '../common/enums/secure_resource_type.dart';
+import '../common/utils/app_path_utils.dart';
 import '../daos/categories_dao.dart';
 import '../daos/transactions_dao.dart';
 import '../daos/users_dao.dart';
@@ -69,7 +71,7 @@ class SyncServiceImpl implements SyncService {
       } else {
         await _onExistingInstall(folderId, currentUser);
       }
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         'createAppFolderAndFiles: An unknown error occurred',
@@ -107,7 +109,9 @@ class SyncServiceImpl implements SyncService {
       _logger.info(runtimeType, 'downloadAndUpdateFile: File was updated');
 
       await _updateLocalStatus(LocalStatusType.nothing);
-    } on Exception catch (e, s) {
+
+      await _updateImgFiles(user.email);
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         'updateFile: An error occurred while trying to update file',
@@ -118,31 +122,26 @@ class SyncServiceImpl implements SyncService {
     }
   }
 
-  Future<void> _uploadAppFile() async {
+  Future<void> _uploadAppFile(
+    String folderId,
+    String currentUser,
+  ) async {
     try {
       _logger.info(
         runtimeType,
         '_uploadAppFile: Trying to upload app file to drive',
-      );
-      final currentUser = await _secureStorageService.get(
-        SecureResourceType.currentUser,
-        _secureStorageService.defaultUsername,
-      );
-      final appFolderId = await _secureStorageService.get(
-        SecureResourceType.currentUserDriveFolderId,
-        currentUser,
       );
       final filePath = await appFilePath;
       final fileExists = await File(filePath).exists();
       if (!fileExists) {
         _logger.warning(
           runtimeType,
-          '_uploadAppFile: File doesnt exists',
+          '_uploadAppFile: File to upload doesnt exists',
         );
         return;
       }
 
-      final appFileId = await _googleService.uploadFile(appFolderId, filePath);
+      final appFileId = await _googleService.uploadFile(folderId, filePath);
       _logger.info(
         runtimeType,
         '_uploadAppFile: File was successfully uploaded',
@@ -153,7 +152,7 @@ class SyncServiceImpl implements SyncService {
         currentUser,
         appFileId,
       );
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         '_uploadAppFile: An error occurred while trying to upload file',
@@ -191,7 +190,7 @@ class SyncServiceImpl implements SyncService {
 
       _logger.info(runtimeType, 'createAppFile: Saving file..');
       await file.writeAsString(encoded);
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         'createAppFile: An error occurred while trying to create file',
@@ -209,7 +208,7 @@ class SyncServiceImpl implements SyncService {
       const contents = 'DO NOT DELETE NOR MODIFY THIS FOLDER AND ITS CONTENTS.\n' +
           'This folder is used by MyExpenses to keep your transactions and categories synced';
       await file.writeAsString(contents);
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         '_createReadmeFile: An error occurred while trying to create file',
@@ -253,8 +252,9 @@ class SyncServiceImpl implements SyncService {
       runtimeType,
       '_onFirstInstall: Uploading app and readme files...',
     );
-    await _uploadAppFile();
-    await _uploadReadmeFile();
+    await _uploadAppFile(folderId, currentUser.email);
+    await _uploadReadmeFile(folderId);
+    await _uploadAllLocalImgs(folderId);
   }
 
   Future<void> _onExistingInstall(
@@ -278,6 +278,12 @@ class SyncServiceImpl implements SyncService {
       fileId,
     );
 
+    _logger.info(
+      runtimeType,
+      '_onExistingInstall: Getting remote imgs...',
+    );
+    await _downloadAllRemoteImgs(folderId);
+
     final appFile = await _getLocalAppFile(filePath);
     final user = await _usersDao.getActiveUser();
 
@@ -291,18 +297,9 @@ class SyncServiceImpl implements SyncService {
     await _performSyncDown(user.id, appFile);
   }
 
-  Future<void> _uploadReadmeFile() async {
-    final currentUser = await _secureStorageService.get(
-      SecureResourceType.currentUser,
-      _secureStorageService.defaultUsername,
-    );
-    final appFolderId = await _secureStorageService.get(
-      SecureResourceType.currentUserDriveFolderId,
-      currentUser,
-    );
-
+  Future<void> _uploadReadmeFile(String folderId) async {
     final readmePath = await readmeFilePath;
-    await _googleService.uploadFile(appFolderId, readmePath);
+    await _googleService.uploadFile(folderId, readmePath);
   }
 
   Future<AppFile> _getLocalAppFile(String filePath) async {
@@ -359,5 +356,136 @@ class SyncServiceImpl implements SyncService {
       _categoriesDao.updateAllLocalStatus(newValue),
       _transactionsDao.updateAllLocalStatus(newValue),
     ]);
+  }
+
+  //TODO: TEST THIS 3 METHODS
+  Future<void> _uploadAllLocalImgs(String folderId) async {
+    _logger.info(
+      runtimeType,
+      '_uploadAllLocalImgs: Trying to upload all local imgs...',
+    );
+
+    try {
+      final imgPath = await AppPathUtils.imagesPath;
+      final imgs =
+          await Directory(imgPath).list().asyncMap((f) => f.path).toList();
+
+      _logger.info(
+        runtimeType,
+        '_uploadAllLocalImgs: ${imgs.length} will be uploaded...',
+      );
+
+      for (final path in imgs) {
+        await _googleService.uploadFile(folderId, path);
+      }
+      _logger.info(
+        runtimeType,
+        '_uploadAllLocalImgs: Completed uploading all the imgs',
+      );
+    } catch (e, s) {
+      _logger.error(
+        runtimeType,
+        '_uploadAllLocalImgs: Unknown error occurred',
+        e,
+        s,
+      );
+    }
+  }
+
+  Future<void> _downloadAllRemoteImgs(String folderId) async {
+    try {
+      _logger.info(
+        runtimeType,
+        '_downloadAllRemoteImgs: Trying to download all remote imgs...',
+      );
+      final currentImgsMap = await _googleService.getAllImgs(
+        folderId,
+        AppPathUtils.transactionImgPrefix,
+      );
+
+      _logger.info(
+        runtimeType,
+        '_downloadAllRemoteImgs: ${currentImgsMap.length} images will be downloaded...',
+      );
+
+      final imgPath = await AppPathUtils.imagesPath;
+
+      for (final kvp in currentImgsMap.entries) {
+        final filePath = join(imgPath, kvp.value);
+        await _googleService.downloadFile(kvp.value, filePath);
+      }
+
+      _logger.info(
+        runtimeType,
+        '_downloadAllRemoteImgs: Downloads completed',
+      );
+    } catch (e, s) {
+      _logger.error(
+        runtimeType,
+        '_downloadAllRemoteImgs: Unknown error occurred',
+        e,
+        s,
+      );
+    }
+  }
+
+  Future<void> _updateImgFiles(String currentUser) async {
+    try {
+      final folderId = await _secureStorageService.get(
+        SecureResourceType.currentUserDriveFolderId,
+        currentUser,
+      );
+
+      _logger.info(runtimeType, '_updateImgFiles: Getting all remote imgs...');
+      final currentImgsMap = await _googleService.getAllImgs(
+        folderId,
+        AppPathUtils.transactionImgPrefix,
+      );
+
+      _logger.info(runtimeType, '_updateImgFiles: Getting all local imgs...');
+      final imgs = await Directory(await AppPathUtils.imagesPath)
+          .list()
+          .asyncMap((f) => f.path)
+          .toList();
+
+      final imgsToDownload = currentImgsMap.entries.where(
+        (kvp) => !imgs.contains(kvp.value),
+      );
+
+      final imgsToUpload = imgs.where((path) {
+        final filename = basename(path);
+        return !currentImgsMap.values.contains(filename);
+      });
+
+      _logger.info(
+        runtimeType,
+        '_updateImgFiles: We will download ${imgsToDownload.length} imgs...',
+      );
+      //TODO: CREATE MULTIPLE FUTURES
+      final imgPath = await AppPathUtils.imagesPath;
+      for (final kvp in imgsToDownload) {
+        final filePath = join(imgPath, kvp.value);
+        await _googleService.downloadFile(kvp.value, filePath);
+      }
+
+      _logger.info(
+        runtimeType,
+        '_updateImgFiles: We will upload ${imgsToUpload.length} imgs...',
+      );
+      for (final path in imgsToUpload) {
+        await _googleService.uploadFile(folderId, path);
+      }
+      _logger.info(
+        runtimeType,
+        '_updateImgFiles: Process completed...',
+      );
+    } catch (e, s) {
+      _logger.error(
+        runtimeType,
+        '_updateImgFiles: Unknown error occurred',
+        e,
+        s,
+      );
+    }
   }
 }

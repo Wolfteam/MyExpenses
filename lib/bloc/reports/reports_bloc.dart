@@ -5,6 +5,7 @@ import 'package:bloc/bloc.dart';
 import 'package:csv/csv.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 
 import '../../common/enums/report_file_type.dart';
 import '../../common/utils/app_path_utils.dart';
@@ -74,32 +75,23 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
     try {
       yield currentState.copyWith(generatingReport: true);
 
-      final now = DateTime.now();
       final transactions = await _transactionsDao.getAllTransactions(
         currentState.from,
         currentState.to,
       );
-      transactions
-          .sort((t1, t2) => t1.transactionDate.compareTo(t2.transactionDate));
+      transactions.sort(
+        (t1, t2) => t1.transactionDate.compareTo(t2.transactionDate),
+      );
 
+      String path;
       if (currentState.selectedFileType == ReportFileType.csv) {
-        final filename = '$now.csv';
-        final path = await _buildCsvReport(
-          transactions,
-          event,
-          filename,
-        );
-        yield ReportGeneratedState(filename, path);
+        path = await _buildCsvReport(transactions, event);
       } else {
-        final filename = '$now.pdf';
-        final path = await _buildPdfReport(
-          transactions,
-          event,
-          filename,
-        );
-        yield ReportGeneratedState(filename, path);
+        path = await _buildPdfReport(transactions, event);
       }
-    } on Exception catch (e, s) {
+      final filename = basename(path);
+      yield ReportGeneratedState(filename, path);
+    } catch (e, s) {
       _logger.error(runtimeType, '_buildReport: Unknown error occurred', e, s);
       yield currentState.copyWith(errorOccurred: true, generatingReport: false);
       yield currentState.copyWith(
@@ -112,7 +104,6 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
   Future<String> _buildCsvReport(
     List<TransactionItem> transactions,
     GenerateReport event,
-    String filename,
   ) async {
     final csvData = [
       <String>[
@@ -141,9 +132,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
 
     final csv = const ListToCsvConverter().convert(csvData);
 
-    final dirPath = await AppPathUtils.reportsPath;
-    final path = '$dirPath/$filename';
-
+    final path = await AppPathUtils.generateReportFilePath(isPdf: false);
     final file = File(path);
     await file.writeAsString(csv);
 
@@ -153,7 +142,6 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
   Future<String> _buildPdfReport(
     List<TransactionItem> transactions,
     GenerateReport event,
-    String filename,
   ) async {
     final pdf = await buildPdf(
       (amount) => _currencyBloc.format(amount, showSymbol: true),
@@ -162,8 +150,8 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
       currentState.from,
       currentState.to,
     );
-    final dirPath = await AppPathUtils.reportsPath;
-    final path = '$dirPath/$filename';
+
+    final path = await AppPathUtils.generateReportFilePath(isPdf: true);
     final file = File(path);
     await file.writeAsBytes(pdf.save());
 

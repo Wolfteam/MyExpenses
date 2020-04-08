@@ -60,7 +60,7 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
         '_buildLoadedState: Mapping the transaction to the corresponding state',
       );
       trans = _buildTransactionSummaryPerDate(from, to, transactions);
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         '_buildLoadedState: An unknown error occurred',

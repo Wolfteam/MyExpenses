@@ -1,11 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
+import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../../common/enums/sync_intervals_type.dart';
 import '../../common/utils/i18n_utils.dart';
 import '../../common/utils/notification_utils.dart';
+import '../../daos/running_tasks_dao.dart';
 import '../../daos/transactions_dao.dart';
 import '../../injection.dart';
 import '../../logger.dart';
@@ -19,8 +23,9 @@ import 'transaction_utils.dart';
 
 void callbackDispatcher() {
   Workmanager.executeTask((task, inputData) async {
+    WidgetsFlutterBinding.ensureInitialized();
     await BackgroundUtils.bgSync(task);
-    return Future.value(true);
+    return true;
   });
 }
 
@@ -30,6 +35,9 @@ class BackgroundUtils {
 
   static const _recurringTransId = 'my_expenses_recurring_trans_task';
   static const _recurringTransName = 'Recurring Transactions Task';
+
+  static const portName = 'background_port';
+  static ReceivePort port = ReceivePort();
 
   static Future<void> initBg() {
     //TODO: CHANGE THE ISINDEBUG
@@ -109,81 +117,41 @@ class BackgroundUtils {
     await settingsService.init();
     final i18n = await getI18n(settingsService.language);
     const runtimeType = BackgroundUtils;
-    // await setupNotifications();
+    final runningTasksDao = getIt<RunningTasksDao>();
+
+    final taskId = await runningTasksDao.saveRunningTask(task);
 
     try {
       switch (task) {
         case _syncTaskName:
+          final SendPort sendPort = IsolateNameServer.lookupPortByName(
+            portName,
+          );
+          sendPort?.send([true]);
           logger.info(
             runtimeType,
             'bgSync: Checking if internet is available...',
           );
-          final networkService = getIt<NetworkService>();
-          final syncService = getIt<SyncService>();
-          final isNetworkAvailable = await networkService.isInternetAvailable();
-          if (!isNetworkAvailable) {
-            logger.info(
-              runtimeType,
-              'bgSync: Internet is not available :C',
-            );
-            return;
-          }
-
-          logger.info(
-            runtimeType,
-            'bgSync: Downloading and updating files...',
+          await runSyncTask(
+            logger,
+            getIt<NetworkService>(),
+            getIt<SyncService>(),
+            settingsService,
           );
-          await syncService.downloadAndUpdateFile();
-
-          logger.info(
-            runtimeType,
-            'bgSync: Sync was successfully performed',
-          );
-          if (settingsService.showNotifAfterFullSync) {
-            await showNotification(
-              i18n.automaticSync,
-              i18n.syncWasSuccessfullyPerformed,
-              jsonEncode(AppNotification.nothing()),
-            );
-          }
+          sendPort?.send([false]);
           break;
         case _recurringTransName:
-          final transactionsDao = getIt<TransactionsDao>();
-          final now = DateTime.now();
-          logger.info(
-            runtimeType,
-            'bgSync: Checking recurring transactions for date = $now',
-          );
-          final childs = await TransactionUtils.checkRecurringTransactions(
-            now,
+          await runRecurringTransTask(
             logger,
-            transactionsDao,
+            getIt<TransactionsDao>(),
+            settingsService,
           );
-
-          if (childs.isEmpty) return;
-
-          if (settingsService.showNotifForRecurringTrans) {
-            logger.info(
-              runtimeType,
-              'bgSync: Show ${childs.length} child notifications...',
-            );
-
-            final futures = childs
-                .map((t) => showNotification(
-                      i18n.recurringTransactions,
-                      t.description,
-                      jsonEncode(AppNotification.openTransaction(t.id)),
-                    ))
-                .toList();
-
-            await Future.wait(futures);
-          }
           break;
         default:
           logger.warning(runtimeType, 'bgSync: Task = $task is not valid');
           throw Exception('Bg task = $task is invalid');
       }
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       logger.error(runtimeType, 'bgSync: Unknown error occurred', e, s);
       if (settingsService.showNotifAfterFullSync) {
         await showNotification(
@@ -193,9 +161,111 @@ class BackgroundUtils {
         );
       }
     }
+
+    await runningTasksDao.updateRunningTask(taskId);
     logger.info(
       runtimeType,
       'bgSync: Process completed',
     );
+  }
+
+  static Future<void> runSyncTask(
+    LoggingService logger,
+    NetworkService networkService,
+    SyncService syncService,
+    SettingsService settingsService,
+  ) async {
+    const runtimeType = BackgroundUtils;
+    try {
+      logger.info(
+        runtimeType,
+        'runBgSyncTask: Sync task is starting. Sync interval = ${settingsService.syncInterval}',
+      );
+      final i18n = await getI18n(settingsService.language);
+      logger.info(
+        runtimeType,
+        'runBgSyncTask: Checking if internet is available...',
+      );
+      final isNetworkAvailable = await networkService.isInternetAvailable();
+      if (!isNetworkAvailable) {
+        logger.info(
+          runtimeType,
+          'runBgSyncTask: Internet is not available :C',
+        );
+        return;
+      }
+
+      logger.info(
+        runtimeType,
+        'runBgSyncTask: Downloading and updating files...',
+      );
+      await syncService.downloadAndUpdateFile();
+
+      logger.info(
+        runtimeType,
+        'runBgSyncTask: Sync was successfully performed',
+      );
+      if (settingsService.showNotifAfterFullSync) {
+        await showNotification(
+          i18n.automaticSync,
+          i18n.syncWasSuccessfullyPerformed,
+          jsonEncode(AppNotification.nothing()),
+        );
+      }
+    } catch (e, s) {
+      logger.error(
+        runtimeType,
+        'runBgSyncTask: Unknown error occurred',
+        e,
+        s,
+      );
+      rethrow;
+    }
+  }
+
+  static Future<void> runRecurringTransTask(
+    LoggingService logger,
+    TransactionsDao transactionsDao,
+    SettingsService settingsService,
+  ) async {
+    const runtimeType = BackgroundUtils;
+    try {
+      final i18n = await getI18n(settingsService.language);
+      final now = DateTime.now();
+      logger.info(
+        runtimeType,
+        'runBgRecurringTransTask: Checking recurring transactions for date = $now',
+      );
+      final childs = await TransactionUtils.checkRecurringTransactions(
+        now,
+        logger,
+        transactionsDao,
+      );
+
+      if (childs.isEmpty || !settingsService.showNotifForRecurringTrans) return;
+
+      logger.info(
+        runtimeType,
+        'runBgRecurringTransTask: Show ${childs.length} child notifications...',
+      );
+
+      final futures = childs
+          .map((t) => showNotification(
+                i18n.recurringTransactions,
+                t.description,
+                jsonEncode(AppNotification.openTransaction(t.id)),
+              ))
+          .toList();
+
+      await Future.wait(futures);
+    } catch (e, s) {
+      logger.error(
+        runtimeType,
+        'runBgRecurringTransTask: Unknown error occurred',
+        e,
+        s,
+      );
+      rethrow;
+    }
   }
 }

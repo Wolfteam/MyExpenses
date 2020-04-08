@@ -1949,6 +1949,467 @@ class $CategoriesTable extends Categories
   static TypeConverter<Color, int> $converter2 = const ColorConverter();
 }
 
+class RunningTask extends DataClass implements Insertable<RunningTask> {
+  final int id;
+  final LocalStatusType localStatus;
+  final DateTime createdAt;
+  final String createdBy;
+  final String createdHash;
+  final DateTime updatedAt;
+  final String updatedBy;
+  final String name;
+  final bool isRunning;
+  RunningTask(
+      {@required this.id,
+      @required this.localStatus,
+      @required this.createdAt,
+      @required this.createdBy,
+      @required this.createdHash,
+      this.updatedAt,
+      this.updatedBy,
+      @required this.name,
+      @required this.isRunning});
+  factory RunningTask.fromData(Map<String, dynamic> data, GeneratedDatabase db,
+      {String prefix}) {
+    final effectivePrefix = prefix ?? '';
+    final intType = db.typeSystem.forDartType<int>();
+    final dateTimeType = db.typeSystem.forDartType<DateTime>();
+    final stringType = db.typeSystem.forDartType<String>();
+    final boolType = db.typeSystem.forDartType<bool>();
+    return RunningTask(
+      id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id']),
+      localStatus: $RunningTasksTable.$converter0.mapToDart(intType
+          .mapFromDatabaseResponse(data['${effectivePrefix}local_status'])),
+      createdAt: dateTimeType
+          .mapFromDatabaseResponse(data['${effectivePrefix}created_at']),
+      createdBy: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}created_by']),
+      createdHash: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}created_hash']),
+      updatedAt: dateTimeType
+          .mapFromDatabaseResponse(data['${effectivePrefix}updated_at']),
+      updatedBy: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}updated_by']),
+      name: stringType.mapFromDatabaseResponse(data['${effectivePrefix}name']),
+      isRunning: boolType
+          .mapFromDatabaseResponse(data['${effectivePrefix}is_running']),
+    );
+  }
+  factory RunningTask.fromJson(Map<String, dynamic> json,
+      {ValueSerializer serializer}) {
+    serializer ??= moorRuntimeOptions.defaultSerializer;
+    return RunningTask(
+      id: serializer.fromJson<int>(json['id']),
+      localStatus: serializer.fromJson<LocalStatusType>(json['localStatus']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      createdBy: serializer.fromJson<String>(json['createdBy']),
+      createdHash: serializer.fromJson<String>(json['createdHash']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      updatedBy: serializer.fromJson<String>(json['updatedBy']),
+      name: serializer.fromJson<String>(json['name']),
+      isRunning: serializer.fromJson<bool>(json['isRunning']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer serializer}) {
+    serializer ??= moorRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'localStatus': serializer.toJson<LocalStatusType>(localStatus),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'createdBy': serializer.toJson<String>(createdBy),
+      'createdHash': serializer.toJson<String>(createdHash),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'updatedBy': serializer.toJson<String>(updatedBy),
+      'name': serializer.toJson<String>(name),
+      'isRunning': serializer.toJson<bool>(isRunning),
+    };
+  }
+
+  @override
+  RunningTasksCompanion createCompanion(bool nullToAbsent) {
+    return RunningTasksCompanion(
+      id: id == null && nullToAbsent ? const Value.absent() : Value(id),
+      localStatus: localStatus == null && nullToAbsent
+          ? const Value.absent()
+          : Value(localStatus),
+      createdAt: createdAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdAt),
+      createdBy: createdBy == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdBy),
+      createdHash: createdHash == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdHash),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
+      updatedBy: updatedBy == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedBy),
+      name: name == null && nullToAbsent ? const Value.absent() : Value(name),
+      isRunning: isRunning == null && nullToAbsent
+          ? const Value.absent()
+          : Value(isRunning),
+    );
+  }
+
+  RunningTask copyWith(
+          {int id,
+          LocalStatusType localStatus,
+          DateTime createdAt,
+          String createdBy,
+          String createdHash,
+          DateTime updatedAt,
+          String updatedBy,
+          String name,
+          bool isRunning}) =>
+      RunningTask(
+        id: id ?? this.id,
+        localStatus: localStatus ?? this.localStatus,
+        createdAt: createdAt ?? this.createdAt,
+        createdBy: createdBy ?? this.createdBy,
+        createdHash: createdHash ?? this.createdHash,
+        updatedAt: updatedAt ?? this.updatedAt,
+        updatedBy: updatedBy ?? this.updatedBy,
+        name: name ?? this.name,
+        isRunning: isRunning ?? this.isRunning,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('RunningTask(')
+          ..write('id: $id, ')
+          ..write('localStatus: $localStatus, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('createdBy: $createdBy, ')
+          ..write('createdHash: $createdHash, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('updatedBy: $updatedBy, ')
+          ..write('name: $name, ')
+          ..write('isRunning: $isRunning')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => $mrjf($mrjc(
+      id.hashCode,
+      $mrjc(
+          localStatus.hashCode,
+          $mrjc(
+              createdAt.hashCode,
+              $mrjc(
+                  createdBy.hashCode,
+                  $mrjc(
+                      createdHash.hashCode,
+                      $mrjc(
+                          updatedAt.hashCode,
+                          $mrjc(updatedBy.hashCode,
+                              $mrjc(name.hashCode, isRunning.hashCode)))))))));
+  @override
+  bool operator ==(dynamic other) =>
+      identical(this, other) ||
+      (other is RunningTask &&
+          other.id == this.id &&
+          other.localStatus == this.localStatus &&
+          other.createdAt == this.createdAt &&
+          other.createdBy == this.createdBy &&
+          other.createdHash == this.createdHash &&
+          other.updatedAt == this.updatedAt &&
+          other.updatedBy == this.updatedBy &&
+          other.name == this.name &&
+          other.isRunning == this.isRunning);
+}
+
+class RunningTasksCompanion extends UpdateCompanion<RunningTask> {
+  final Value<int> id;
+  final Value<LocalStatusType> localStatus;
+  final Value<DateTime> createdAt;
+  final Value<String> createdBy;
+  final Value<String> createdHash;
+  final Value<DateTime> updatedAt;
+  final Value<String> updatedBy;
+  final Value<String> name;
+  final Value<bool> isRunning;
+  const RunningTasksCompanion({
+    this.id = const Value.absent(),
+    this.localStatus = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.createdBy = const Value.absent(),
+    this.createdHash = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.updatedBy = const Value.absent(),
+    this.name = const Value.absent(),
+    this.isRunning = const Value.absent(),
+  });
+  RunningTasksCompanion.insert({
+    this.id = const Value.absent(),
+    @required LocalStatusType localStatus,
+    @required DateTime createdAt,
+    @required String createdBy,
+    @required String createdHash,
+    this.updatedAt = const Value.absent(),
+    this.updatedBy = const Value.absent(),
+    @required String name,
+    @required bool isRunning,
+  })  : localStatus = Value(localStatus),
+        createdAt = Value(createdAt),
+        createdBy = Value(createdBy),
+        createdHash = Value(createdHash),
+        name = Value(name),
+        isRunning = Value(isRunning);
+  RunningTasksCompanion copyWith(
+      {Value<int> id,
+      Value<LocalStatusType> localStatus,
+      Value<DateTime> createdAt,
+      Value<String> createdBy,
+      Value<String> createdHash,
+      Value<DateTime> updatedAt,
+      Value<String> updatedBy,
+      Value<String> name,
+      Value<bool> isRunning}) {
+    return RunningTasksCompanion(
+      id: id ?? this.id,
+      localStatus: localStatus ?? this.localStatus,
+      createdAt: createdAt ?? this.createdAt,
+      createdBy: createdBy ?? this.createdBy,
+      createdHash: createdHash ?? this.createdHash,
+      updatedAt: updatedAt ?? this.updatedAt,
+      updatedBy: updatedBy ?? this.updatedBy,
+      name: name ?? this.name,
+      isRunning: isRunning ?? this.isRunning,
+    );
+  }
+}
+
+class $RunningTasksTable extends RunningTasks
+    with TableInfo<$RunningTasksTable, RunningTask> {
+  final GeneratedDatabase _db;
+  final String _alias;
+  $RunningTasksTable(this._db, [this._alias]);
+  final VerificationMeta _idMeta = const VerificationMeta('id');
+  GeneratedIntColumn _id;
+  @override
+  GeneratedIntColumn get id => _id ??= _constructId();
+  GeneratedIntColumn _constructId() {
+    return GeneratedIntColumn('id', $tableName, false,
+        hasAutoIncrement: true, declaredAsPrimaryKey: true);
+  }
+
+  final VerificationMeta _localStatusMeta =
+      const VerificationMeta('localStatus');
+  GeneratedIntColumn _localStatus;
+  @override
+  GeneratedIntColumn get localStatus =>
+      _localStatus ??= _constructLocalStatus();
+  GeneratedIntColumn _constructLocalStatus() {
+    return GeneratedIntColumn(
+      'local_status',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _createdAtMeta = const VerificationMeta('createdAt');
+  GeneratedDateTimeColumn _createdAt;
+  @override
+  GeneratedDateTimeColumn get createdAt => _createdAt ??= _constructCreatedAt();
+  GeneratedDateTimeColumn _constructCreatedAt() {
+    return GeneratedDateTimeColumn(
+      'created_at',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _createdByMeta = const VerificationMeta('createdBy');
+  GeneratedTextColumn _createdBy;
+  @override
+  GeneratedTextColumn get createdBy => _createdBy ??= _constructCreatedBy();
+  GeneratedTextColumn _constructCreatedBy() {
+    return GeneratedTextColumn('created_by', $tableName, false,
+        minTextLength: 0, maxTextLength: 255);
+  }
+
+  final VerificationMeta _createdHashMeta =
+      const VerificationMeta('createdHash');
+  GeneratedTextColumn _createdHash;
+  @override
+  GeneratedTextColumn get createdHash =>
+      _createdHash ??= _constructCreatedHash();
+  GeneratedTextColumn _constructCreatedHash() {
+    return GeneratedTextColumn(
+      'created_hash',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _updatedAtMeta = const VerificationMeta('updatedAt');
+  GeneratedDateTimeColumn _updatedAt;
+  @override
+  GeneratedDateTimeColumn get updatedAt => _updatedAt ??= _constructUpdatedAt();
+  GeneratedDateTimeColumn _constructUpdatedAt() {
+    return GeneratedDateTimeColumn(
+      'updated_at',
+      $tableName,
+      true,
+    );
+  }
+
+  final VerificationMeta _updatedByMeta = const VerificationMeta('updatedBy');
+  GeneratedTextColumn _updatedBy;
+  @override
+  GeneratedTextColumn get updatedBy => _updatedBy ??= _constructUpdatedBy();
+  GeneratedTextColumn _constructUpdatedBy() {
+    return GeneratedTextColumn('updated_by', $tableName, true,
+        minTextLength: 0, maxTextLength: 255);
+  }
+
+  final VerificationMeta _nameMeta = const VerificationMeta('name');
+  GeneratedTextColumn _name;
+  @override
+  GeneratedTextColumn get name => _name ??= _constructName();
+  GeneratedTextColumn _constructName() {
+    return GeneratedTextColumn(
+      'name',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _isRunningMeta = const VerificationMeta('isRunning');
+  GeneratedBoolColumn _isRunning;
+  @override
+  GeneratedBoolColumn get isRunning => _isRunning ??= _constructIsRunning();
+  GeneratedBoolColumn _constructIsRunning() {
+    return GeneratedBoolColumn(
+      'is_running',
+      $tableName,
+      false,
+    );
+  }
+
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        localStatus,
+        createdAt,
+        createdBy,
+        createdHash,
+        updatedAt,
+        updatedBy,
+        name,
+        isRunning
+      ];
+  @override
+  $RunningTasksTable get asDslTable => this;
+  @override
+  String get $tableName => _alias ?? 'running_tasks';
+  @override
+  final String actualTableName = 'running_tasks';
+  @override
+  VerificationContext validateIntegrity(RunningTasksCompanion d,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    if (d.id.present) {
+      context.handle(_idMeta, id.isAcceptableValue(d.id.value, _idMeta));
+    }
+    context.handle(_localStatusMeta, const VerificationResult.success());
+    if (d.createdAt.present) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableValue(d.createdAt.value, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (d.createdBy.present) {
+      context.handle(_createdByMeta,
+          createdBy.isAcceptableValue(d.createdBy.value, _createdByMeta));
+    } else if (isInserting) {
+      context.missing(_createdByMeta);
+    }
+    if (d.createdHash.present) {
+      context.handle(_createdHashMeta,
+          createdHash.isAcceptableValue(d.createdHash.value, _createdHashMeta));
+    } else if (isInserting) {
+      context.missing(_createdHashMeta);
+    }
+    if (d.updatedAt.present) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableValue(d.updatedAt.value, _updatedAtMeta));
+    }
+    if (d.updatedBy.present) {
+      context.handle(_updatedByMeta,
+          updatedBy.isAcceptableValue(d.updatedBy.value, _updatedByMeta));
+    }
+    if (d.name.present) {
+      context.handle(
+          _nameMeta, name.isAcceptableValue(d.name.value, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (d.isRunning.present) {
+      context.handle(_isRunningMeta,
+          isRunning.isAcceptableValue(d.isRunning.value, _isRunningMeta));
+    } else if (isInserting) {
+      context.missing(_isRunningMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  RunningTask map(Map<String, dynamic> data, {String tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
+    return RunningTask.fromData(data, _db, prefix: effectivePrefix);
+  }
+
+  @override
+  Map<String, Variable> entityToSql(RunningTasksCompanion d) {
+    final map = <String, Variable>{};
+    if (d.id.present) {
+      map['id'] = Variable<int, IntType>(d.id.value);
+    }
+    if (d.localStatus.present) {
+      final converter = $RunningTasksTable.$converter0;
+      map['local_status'] =
+          Variable<int, IntType>(converter.mapToSql(d.localStatus.value));
+    }
+    if (d.createdAt.present) {
+      map['created_at'] = Variable<DateTime, DateTimeType>(d.createdAt.value);
+    }
+    if (d.createdBy.present) {
+      map['created_by'] = Variable<String, StringType>(d.createdBy.value);
+    }
+    if (d.createdHash.present) {
+      map['created_hash'] = Variable<String, StringType>(d.createdHash.value);
+    }
+    if (d.updatedAt.present) {
+      map['updated_at'] = Variable<DateTime, DateTimeType>(d.updatedAt.value);
+    }
+    if (d.updatedBy.present) {
+      map['updated_by'] = Variable<String, StringType>(d.updatedBy.value);
+    }
+    if (d.name.present) {
+      map['name'] = Variable<String, StringType>(d.name.value);
+    }
+    if (d.isRunning.present) {
+      map['is_running'] = Variable<bool, BoolType>(d.isRunning.value);
+    }
+    return map;
+  }
+
+  @override
+  $RunningTasksTable createAlias(String alias) {
+    return $RunningTasksTable(_db, alias);
+  }
+
+  static TypeConverter<LocalStatusType, int> $converter0 =
+      const LocalStatusConverter();
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
   $UsersTable _users;
@@ -1958,6 +2419,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       _transactions ??= $TransactionsTable(this);
   $CategoriesTable _categories;
   $CategoriesTable get categories => _categories ??= $CategoriesTable(this);
+  $RunningTasksTable _runningTasks;
+  $RunningTasksTable get runningTasks =>
+      _runningTasks ??= $RunningTasksTable(this);
   UsersDaoImpl _usersDaoImpl;
   UsersDaoImpl get usersDaoImpl =>
       _usersDaoImpl ??= UsersDaoImpl(this as AppDatabase);
@@ -1967,11 +2431,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   CategoriesDaoImpl _categoriesDaoImpl;
   CategoriesDaoImpl get categoriesDaoImpl =>
       _categoriesDaoImpl ??= CategoriesDaoImpl(this as AppDatabase);
+  RunningTasksDaoImpl _runningTasksDaoImpl;
+  RunningTasksDaoImpl get runningTasksDaoImpl =>
+      _runningTasksDaoImpl ??= RunningTasksDaoImpl(this as AppDatabase);
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [users, transactions, categories];
+      [users, transactions, categories, runningTasks];
 }
 
 // **************************************************************************
@@ -1981,6 +2448,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 mixin _$CategoriesDaoImplMixin on DatabaseAccessor<AppDatabase> {
   $CategoriesTable get categories => db.categories;
   $TransactionsTable get transactions => db.transactions;
+}
+mixin _$RunningTasksDaoImplMixin on DatabaseAccessor<AppDatabase> {
+  $RunningTasksTable get runningTasks => db.runningTasks;
 }
 mixin _$TransactionsDaoImplMixin on DatabaseAccessor<AppDatabase> {
   $TransactionsTable get transactions => db.transactions;

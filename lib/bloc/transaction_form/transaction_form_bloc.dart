@@ -204,7 +204,7 @@ class TransactionFormBloc
       } else {
         yield TransactionChangedState.updated(createdTrans.transactionDate);
       }
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         '_saveTransaction: Unknown error occurred:',
@@ -244,7 +244,7 @@ class TransactionFormBloc
         await _transactionsDao.deleteTransaction(id);
         yield TransactionChangedState.deleted(transToDelete.transactionDate);
       }
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         '_deleteTransaction: Unknown error occurred:',
@@ -300,7 +300,7 @@ class TransactionFormBloc
         nextRecurringDate: recurringDateTouse,
         nextRecurringDateWasUpdated: false,
       );
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         '_isRunningChanged: Unknown error occurred',
@@ -316,8 +316,7 @@ class TransactionFormBloc
         runtimeType,
         '_saveTransaction: Trying to save image',
       );
-      final imgPath = await AppPathUtils.imagesPath;
-      final finalPath = '$imgPath/user_picked_img_${DateTime.now()}.png';
+      final finalPath = await AppPathUtils.generateTransactionImgPath();
 
       await File(finalPath).writeAsBytes(await File(path).readAsBytes());
 
@@ -327,7 +326,7 @@ class TransactionFormBloc
       );
 
       return finalPath;
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         '_saveImage: Unknown error occurred:',

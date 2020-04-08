@@ -125,6 +125,7 @@
     "syncWasSuccessfullyPerformed": "Sync was successfully performed",
     "showNotificationAfterFullSync": "Show a notification after a full sync",
     "showNotificationForRecurringTrans": "Show a notification when a recurring transactions is executed",
+    "openFilePermissionRequestFailedMsg": "You must grant permissions to open the file",
     "repetitionCycle": {
         "eachWeek": "Each week",
         "eachMonth": "Each month",

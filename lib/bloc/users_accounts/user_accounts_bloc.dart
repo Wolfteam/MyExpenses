@@ -74,7 +74,7 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
       final s = state.copyWith(users: users, userWasDeleted: true);
       yield s;
       yield s.copyWith(userWasDeleted: false);
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         '_deleteUser: An error occurred while trying to delete userId = $id',
@@ -101,7 +101,7 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
       final s = state.copyWith(users: users, activeUserChanged: true);
       yield s;
       yield s.copyWith(activeUserChanged: false);
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         '_changeActiveUser: An error occurred while trying to change active user to userId = $id',

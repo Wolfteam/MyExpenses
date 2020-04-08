@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -11,6 +12,7 @@ import 'package:path/path.dart';
 import '../common/enums/secure_resource_type.dart';
 import '../models/user_item.dart';
 import '../secrets.dart';
+import '../services/logging_service.dart';
 import 'secure_storage_service.dart';
 
 abstract class GoogleService {
@@ -34,10 +36,15 @@ abstract class GoogleService {
     String fileId,
     String filePath,
   );
+
+  Future<Map<String, String>> getAllImgs(
+    String folderId,
+    String imgPrefix,
+  );
 }
 
-//TODO: WILL THE ACCESS TOKEN GET REFRESHED
 class GoogleServiceImpl implements GoogleService {
+  final LoggingService _logger;
   final SecureStorageService _secureStorageService;
 
   static const _baseGoogleApisUrl = 'https://www.googleapis.com';
@@ -60,7 +67,7 @@ class GoogleServiceImpl implements GoogleService {
   @override
   String get redirectUrl => _redirectUrl;
 
-  GoogleServiceImpl(this._secureStorageService);
+  GoogleServiceImpl(this._logger, this._secureStorageService);
 
   @override
   String getAuthUrl() {
@@ -73,6 +80,10 @@ class GoogleServiceImpl implements GoogleService {
   @override
   Future<bool> exchangeAuthCodeAndSaveCredentials(String code) async {
     try {
+      _logger.info(
+        runtimeType,
+        'exchangeAuthCodeAndSaveCredentials: Changing code for an auth token...',
+      );
       final response = await http.post(_tokenUrl, body: {
         'client_id': Secrets.googleClientId,
         'redirect_uri': '$_redirectUrl',
@@ -92,73 +103,132 @@ class GoogleServiceImpl implements GoogleService {
         DateTime.now().toUtc().add(Duration(seconds: expiresIn)),
       );
 
-      final credentials =
-          g_auth.AccessCredentials(accessToken, refreshToken, _scopes);
-
+      final credentials = g_auth.AccessCredentials(
+        accessToken,
+        refreshToken,
+        _scopes,
+      );
       return await _saveAccessCredentials(credentials);
-    } catch (e) {
+    } catch (e, s) {
+      _logger.error(
+        runtimeType,
+        'exchangeAuthCodeAndSaveCredentials: Unknown error occurred',
+        e,
+        s,
+      );
       return false;
     }
   }
 
   @override
   Future<UserItem> getUserInfo() async {
-    final client = await _getAuthClient();
+    try {
+      _logger.info(
+        runtimeType,
+        'getUserInfo: Trying to get user info...',
+      );
+      final client = await _getAuthClient();
 
-    final response = await client.get('$_baseGoogleApisUrl/oauth2/v3/userinfo');
-    final json = jsonDecode(response.body);
+      final response =
+          await client.get('$_baseGoogleApisUrl/oauth2/v3/userinfo');
+      final json = jsonDecode(response.body);
 
-    final user = UserItem(
-      email: json['email'] as String,
-      isActive: true,
-      googleUserId: json['sub'] as String,
-      name: json['name'] as String,
-      pictureUrl: json['picture'] as String,
-    );
-    return user;
+      final user = UserItem(
+        email: json['email'] as String,
+        isActive: true,
+        googleUserId: json['sub'] as String,
+        name: json['name'] as String,
+        pictureUrl: json['picture'] as String,
+      );
+      return user;
+    } catch (e, s) {
+      _logger.error(
+        runtimeType,
+        'getUserInfo: Unknown error occurred...',
+        e,
+        s,
+      );
+      rethrow;
+    }
   }
 
   @override
   Future<String> getAppFolder() async {
-    final client = await _getAuthClient();
-    final api = drive.DriveApi(client);
-    final fileList = await api.files.list(
-      q: "name='$_folder' and mimeType='$_folderMimeType'",
-      includeItemsFromAllDrives: true,
-      supportsAllDrives: true,
-    );
+    try {
+      _logger.info(
+        runtimeType,
+        'getAppFolder: Trying to get drive app folder id...',
+      );
 
-    if (fileList.files.isNotEmpty) {
-      final folder = fileList.files.first;
-      if (folder.trashed != null && folder.trashed) return null;
-      return folder.id;
+      final client = await _getAuthClient();
+      final api = drive.DriveApi(client);
+      final fileList = await api.files.list(
+        q: "name='$_folder' and mimeType='$_folderMimeType'",
+        includeItemsFromAllDrives: true,
+        supportsAllDrives: true,
+      );
+
+      if (fileList.files.isNotEmpty) {
+        final folder = fileList.files.first;
+        if (folder.trashed != null && folder.trashed) {
+          _logger.info(
+            runtimeType,
+            'getAppFolder: App folder is deleted',
+          );
+          return null;
+        }
+
+        _logger.info(
+          runtimeType,
+          'getAppFolder: Got app folder id',
+        );
+        return folder.id;
+      }
+      _logger.info(
+        runtimeType,
+        'getAppFolder: App folder doesnt exists',
+      );
+      return null;
+    } catch (e, s) {
+      _logger.error(
+        runtimeType,
+        'getAppFolder: Unknown error occurred...',
+        e,
+        s,
+      );
+      rethrow;
     }
-    return null;
   }
 
   @override
   Future<String> createAppDriveFolder() async {
-    final client = await _getAuthClient();
-    final api = drive.DriveApi(client);
-    final driveFile = drive.File()
-      ..name = _folder
-      ..mimeType = _folderMimeType;
+    try {
+      _logger.info(
+        runtimeType,
+        'createAppDriveFolder: Creating app drive folder...',
+      );
+      final client = await _getAuthClient();
+      final api = drive.DriveApi(client);
+      final driveFile = drive.File()
+        ..name = _folder
+        ..mimeType = _folderMimeType;
 
-    final folder = await api.files.create(driveFile);
-    return folder.id;
-  }
+      final folder = await api.files.create(driveFile);
 
-  Future<String> createAppSheet(String folderId) async {
-    final client = await _getAuthClient();
-    final api = drive.DriveApi(client);
-    final driveFile = drive.File()
-      ..name = _spreadSheetName
-      ..mimeType = _spreadSheetMimeType
-      ..parents = [folderId];
-
-    final spreadSheet = await api.files.create(driveFile);
-    await initializeAppSheet(spreadSheet.id);
-    return spreadSheet.id;
+      _logger.info(
+        runtimeType,
+        'createAppDriveFolder: App folder was created',
+      );
+      return folder.id;
+    } catch (e, s) {
+      _logger.error(
+        runtimeType,
+        'createAppDriveFolder: Unknown error occurred...',
+        e,
+        s,
+      );
+      rethrow;
+    }
   }
 
   @override
@@ -166,68 +236,95 @@ class GoogleServiceImpl implements GoogleService {
     String fileName,
     String filePath,
   ) async {
-    final client = await _getAuthClient();
-    final api = drive.DriveApi(client);
-    final fileList = await api.files.list(q: "name='$fileName'");
+    try {
+      final fileToSave = File(filePath);
+      final fileExists = await fileToSave.exists();
+      if (fileExists) {
+        _logger.info(
+          runtimeType,
+          'downloadFile: A file with the same name exists on disk, deleting it...',
+        );
+        await fileToSave.delete();
+      }
 
-    final file = await api.files.get(
-      fileList.files.first.id,
-      downloadOptions: drive.DownloadOptions.FullMedia,
-    ) as drive.Media;
-    final fileToSave = File(filePath);
-    final fileExists = await fileToSave.exists();
-    if (fileExists) {
-      await fileToSave.delete();
+      _logger.info(
+        runtimeType,
+        'downloadFile: Getting an auth client',
+      );
+      final client = await _getAuthClient();
+
+      _logger.info(
+        runtimeType,
+        'downloadFile: Downloading file = $fileName from drive...',
+      );
+      final api = drive.DriveApi(client);
+      final fileList = await api.files.list(q: "name='$fileName'");
+
+      _logger.info(
+        runtimeType,
+        'downloadFile: Trying to donwload fileId = ${fileList?.files?.first?.id}',
+      );
+      final file = await api.files.get(
+        fileList.files.first.id,
+        downloadOptions: drive.DownloadOptions.FullMedia,
+      ) as drive.Media;
+
+      _logger.info(
+        runtimeType,
+        'downloadFile: Saving downloaded file  to disk...',
+      );
+      await fileToSave.openWrite().addStream(file.stream);
+      _logger.info(
+        runtimeType,
+        'downloadFile: File was successfully saved',
+      );
+      return fileList.files.first.id;
+    } catch (e, s) {
+      _logger.error(
+        runtimeType,
+        'downloadFile: Unknown error occurred...',
+        e,
+        s,
+      );
+      rethrow;
     }
-
-    await fileToSave.openWrite().addStream(file.stream);
-
-    return fileList.files.first.id;
-  }
-
-  Future<void> initializeAppSheet(String spreadSheetId) async {
-    final client = await _getAuthClient();
-    final api = sheets.SheetsApi(client);
-
-    final spreadSheet = await api.spreadsheets.get(spreadSheetId);
-    final defaultSheetId = spreadSheet.sheets.first.properties.sheetId;
-
-    final transSheetProps = sheets.SheetProperties()..title = 'Transactitons';
-    final categoriesSheetProps = sheets.SheetProperties()..title = 'Categories';
-
-    final transSheetRequest = sheets.Request()
-      ..addSheet = (sheets.AddSheetRequest()..properties = transSheetProps);
-    final catSheetRequest = sheets.Request()
-      ..addSheet =
-          (sheets.AddSheetRequest()..properties = categoriesSheetProps);
-    final deleteRequest = sheets.Request()
-      ..deleteSheet = (sheets.DeleteSheetRequest()..sheetId = defaultSheetId);
-
-    final updateRequest = sheets.BatchUpdateSpreadsheetRequest()
-      ..requests = [
-        transSheetRequest,
-        catSheetRequest,
-        deleteRequest,
-      ];
-
-    await api.spreadsheets.batchUpdate(updateRequest, spreadSheetId);
   }
 
   @override
   Future<String> uploadFile(String folderId, String filePath) async {
-    final client = await _getAuthClient();
-    final api = drive.DriveApi(client);
-    final localFile = File(filePath);
-    final name = basename(localFile.path);
-    final media = drive.Media(localFile.openRead(), localFile.lengthSync());
+    try {
+      final localFile = File(filePath);
+      final name = basename(localFile.path);
+      _logger.info(
+        runtimeType,
+        'uploadFile: Trying to upload file = $name...',
+      );
 
-    final driveFile = drive.File()
-      ..name = name
-      ..description = 'Uploaded by My Expenses'
-      ..parents = [folderId];
+      final client = await _getAuthClient();
+      final api = drive.DriveApi(client);
+      final media = drive.Media(localFile.openRead(), localFile.lengthSync());
+      final driveFile = drive.File()
+        ..name = name
+        ..description = 'Uploaded by My Expenses'
+        ..parents = [folderId];
 
-    final response = await api.files.create(driveFile, uploadMedia: media);
-    return response.id;
+      final response = await api.files.create(driveFile, uploadMedia: media);
+
+      _logger.info(
+        runtimeType,
+        'uploadFile: File was successfully uploaded',
+      );
+
+      return response.id;
+    } catch (e, s) {
+      _logger.error(
+        runtimeType,
+        'uploadFile: Unknown error occurred...',
+        e,
+        s,
+      );
+      rethrow;
+    }
   }
 
   @override
@@ -235,35 +332,69 @@ class GoogleServiceImpl implements GoogleService {
     String fileId,
     String filePath,
   ) async {
-    final client = await _getAuthClient();
-    final api = drive.DriveApi(client);
-    final localFile = File(filePath);
-    final media = drive.Media(localFile.openRead(), localFile.lengthSync());
+    try {
+      final localFile = File(filePath);
+      _logger.info(
+        runtimeType,
+        'uploadFile: Trying to update file = ${basename(localFile.path)}',
+      );
 
-    final driveFile = drive.File();
+      final client = await _getAuthClient();
+      final api = drive.DriveApi(client);
+      final media = drive.Media(localFile.openRead(), localFile.lengthSync());
+      final driveFile = drive.File();
 
-    final response = await api.files.update(
-      driveFile,
-      fileId,
-      uploadMedia: media,
-    );
-    return response.id;
+      final response = await api.files.update(
+        driveFile,
+        fileId,
+        uploadMedia: media,
+      );
+
+      _logger.info(
+        runtimeType,
+        'uploadFile: File was succesfully updated',
+      );
+      return response.id;
+    } catch (e, s) {
+      _logger.error(
+        runtimeType,
+        'updateFile: Unknown error occurred...',
+        e,
+        s,
+      );
+      rethrow;
+    }
   }
 
-  // @override
-  Future<void> downloadFileById(
-    String fileId,
-    String filename,
+  @override
+  Future<Map<String, String>> getAllImgs(
+    String folderId,
+    String imgPrefix,
   ) async {
-    final client = await _getAuthClient();
-    final api = drive.DriveApi(client);
-    return api.files.get(fileId).then((file) {
-      // The Drive API allows one to download files via `File.downloadUrl`.
-      return client.readBytes(file.downloadUrl).then((bytes) {
-        final stream = File(filename).openWrite()..add(bytes);
-        return stream.close();
-      });
-    });
+    try {
+      final files = <drive.File>[];
+      String pageToken;
+      do {
+        final client = await _getAuthClient();
+        final api = drive.DriveApi(client);
+        final result = await api.files.list(
+          q: "'$folderId' in parents and name contains '$imgPrefix' and mimeType='image/jpeg'",
+          pageSize: 1000,
+        );
+        files.addAll(result.files);
+        pageToken = result.nextPageToken;
+      } while (pageToken != null);
+
+      return {for (var v in files) v.id: v.name};
+    } catch (e, s) {
+      _logger.error(
+        runtimeType,
+        'getAllImgs: Unknown error occurred...',
+        e,
+        s,
+      );
+      rethrow;
+    }
   }
 
   Future<g_auth.AccessCredentials> _getAccessCredentials() async {
@@ -298,18 +429,31 @@ class GoogleServiceImpl implements GoogleService {
       return null;
     }
 
-    final accessToken =
-        g_auth.AccessToken(type, data, DateTime.parse(expiricy));
-    return g_auth.AccessCredentials(accessToken, refreshToken, _scopes);
+    final accessToken = g_auth.AccessToken(
+      type,
+      data,
+      DateTime.parse(expiricy),
+    );
+
+    final credentials = g_auth.AccessCredentials(
+      accessToken,
+      refreshToken,
+      _scopes,
+    );
+
+    return credentials;
   }
 
   Future<bool> _saveAccessCredentials(
     g_auth.AccessCredentials credentials,
   ) async {
     try {
+      _logger.info(
+        runtimeType,
+        '_saveAccessCredentials: Trying to save access credentials...',
+      );
       final accessToken = credentials.accessToken;
       final refreshToken = credentials.refreshToken;
-
       await Future.wait([
         _secureStorageService.save(
           SecureResourceType.accessTokenData,
@@ -338,18 +482,98 @@ class GoogleServiceImpl implements GoogleService {
         ),
       ]);
 
+      _logger.info(
+        runtimeType,
+        '_saveAccessCredentials: Access credentials were successfully saved',
+      );
+
       return true;
-    } catch (e) {
+    } catch (e, s) {
+      _logger.error(
+        runtimeType,
+        '_saveAccessCredentials: Unknown error occurred...',
+        e,
+        s,
+      );
       return false;
     }
   }
 
   Future<http.Client> _getAuthClient() async {
-    final credentials = await _getAccessCredentials();
+    _logger.info(runtimeType, '_getAuthClient: Getting auth client...');
+    var credentials = await _getAccessCredentials();
     if (credentials == null) {
-      throw Exception('Credentials does not exists');
+      _logger.warning(runtimeType, '_getAuthClient: Credentials doesnt exist');
+      throw Exception('Credentials does not exist');
     }
 
-    return g_auth.authenticatedClient(http.Client(), credentials);
+    if (credentials.accessToken.hasExpired) {
+      _logger.info(
+        runtimeType,
+        '_getAuthClient: Token expired, updating it...',
+      );
+      credentials = await g_auth.refreshCredentials(
+        g_auth.ClientId(Secrets.googleClientId, ''),
+        credentials,
+        http.Client(),
+      );
+
+      _logger.info(
+        runtimeType,
+        '_getAuthClient: Token was updated, saving it...',
+      );
+      await _saveAccessCredentials(credentials);
+    }
+
+    final client = g_auth.authenticatedClient(
+      http.Client(),
+      credentials,
+    );
+
+    _logger.info(runtimeType, '_getAuthClient: Returning auth client...');
+    return client;
+  }
+
+//NOT USED
+  Future<String> _createAppSheet(String folderId) async {
+    final client = await _getAuthClient();
+    final api = drive.DriveApi(client);
+    final driveFile = drive.File()
+      ..name = _spreadSheetName
+      ..mimeType = _spreadSheetMimeType
+      ..parents = [folderId];
+
+    final spreadSheet = await api.files.create(driveFile);
+    await _initializeAppSheet(spreadSheet.id);
+    return spreadSheet.id;
+  }
+
+//NOT USED
+  Future<void> _initializeAppSheet(String spreadSheetId) async {
+    final client = await _getAuthClient();
+    final api = sheets.SheetsApi(client);
+
+    final spreadSheet = await api.spreadsheets.get(spreadSheetId);
+    final defaultSheetId = spreadSheet.sheets.first.properties.sheetId;
+
+    final transSheetProps = sheets.SheetProperties()..title = 'Transactitons';
+    final categoriesSheetProps = sheets.SheetProperties()..title = 'Categories';
+
+    final transSheetRequest = sheets.Request()
+      ..addSheet = (sheets.AddSheetRequest()..properties = transSheetProps);
+    final catSheetRequest = sheets.Request()
+      ..addSheet =
+          (sheets.AddSheetRequest()..properties = categoriesSheetProps);
+    final deleteRequest = sheets.Request()
+      ..deleteSheet = (sheets.DeleteSheetRequest()..sheetId = defaultSheetId);
+
+    final updateRequest = sheets.BatchUpdateSpreadsheetRequest()
+      ..requests = [
+        transSheetRequest,
+        catSheetRequest,
+        deleteRequest,
+      ];
+
+    await api.spreadsheets.batchUpdate(updateRequest, spreadSheetId);
   }
 }

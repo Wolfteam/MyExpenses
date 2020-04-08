@@ -102,7 +102,7 @@ class CategoryFormBloc extends Bloc<CategoryFormEvent, CategoryState> {
         category,
       );
       yield CategorySavedState(savedCategory);
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         '_saveCategory: An unknown error occurred',
@@ -131,7 +131,7 @@ class CategoryFormBloc extends Bloc<CategoryFormEvent, CategoryState> {
         yield currentState.copyWith(categoryCantBeDeleted: true);
         yield currentState.copyWith(categoryCantBeDeleted: false);
       }
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         '_deleteCategory: An unknown error occurred',
