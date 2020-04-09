@@ -11,6 +11,7 @@ import '../../common/enums/report_file_type.dart';
 import '../../common/utils/app_path_utils.dart';
 import '../../common/utils/date_utils.dart';
 import '../../daos/transactions_dao.dart';
+import '../../daos/users_dao.dart';
 import '../../generated/i18n.dart';
 import '../../models/transaction_item.dart';
 import '../../services/logging_service.dart';
@@ -23,11 +24,13 @@ part 'reports_state.dart';
 class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
   final LoggingService _logger;
   final TransactionsDao _transactionsDao;
+  final UsersDao _usersDao;
   final CurrencyBloc _currencyBloc;
 
   ReportsBloc(
     this._logger,
     this._transactionsDao,
+    this._usersDao,
     this._currencyBloc,
   );
 
@@ -75,7 +78,9 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
     try {
       yield currentState.copyWith(generatingReport: true);
 
+      final currentUser = await _usersDao.getActiveUser();
       final transactions = await _transactionsDao.getAllTransactions(
+        currentUser?.id,
         currentState.from,
         currentState.to,
       );

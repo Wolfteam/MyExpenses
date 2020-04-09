@@ -11,6 +11,7 @@ import '../../common/utils/i18n_utils.dart';
 import '../../common/utils/notification_utils.dart';
 import '../../daos/running_tasks_dao.dart';
 import '../../daos/transactions_dao.dart';
+import '../../daos/users_dao.dart';
 import '../../injection.dart';
 import '../../logger.dart';
 import '../../models/app_notification.dart';
@@ -111,14 +112,12 @@ class BackgroundUtils {
   static Future<void> bgSync(String task) async {
     initInjection();
     await setupLogging();
-    await initTelemetry();
     final logger = getIt<LoggingService>();
     final settingsService = getIt<SettingsService>();
     await settingsService.init();
     final i18n = await getI18n(settingsService.language);
     const runtimeType = BackgroundUtils;
     final runningTasksDao = getIt<RunningTasksDao>();
-
     final taskId = await runningTasksDao.saveRunningTask(task);
 
     try {
@@ -144,6 +143,7 @@ class BackgroundUtils {
           await runRecurringTransTask(
             logger,
             getIt<TransactionsDao>(),
+            getIt<UsersDao>(),
             settingsService,
           );
           break;
@@ -226,6 +226,7 @@ class BackgroundUtils {
   static Future<void> runRecurringTransTask(
     LoggingService logger,
     TransactionsDao transactionsDao,
+    UsersDao usersDao,
     SettingsService settingsService,
   ) async {
     const runtimeType = BackgroundUtils;
@@ -240,6 +241,7 @@ class BackgroundUtils {
         now,
         logger,
         transactionsDao,
+        usersDao,
       );
 
       if (childs.isEmpty || !settingsService.showNotifForRecurringTrans) return;

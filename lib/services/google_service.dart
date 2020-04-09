@@ -24,11 +24,9 @@ abstract class GoogleService {
 
   Future<UserItem> getUserInfo();
 
-  Future<String> getAppFolder();
+  Future<bool> appFolderExist();
 
-  Future<String> createAppDriveFolder();
-
-  Future<String> uploadFile(String folderId, String filePath);
+  Future<String> uploadFile(String filePath);
 
   Future<String> downloadFile(String fileName, String filePath);
 
@@ -38,7 +36,6 @@ abstract class GoogleService {
   );
 
   Future<Map<String, String>> getAllImgs(
-    String folderId,
     String imgPrefix,
   );
 }
@@ -48,10 +45,10 @@ class GoogleServiceImpl implements GoogleService {
   final SecureStorageService _secureStorageService;
 
   static const _baseGoogleApisUrl = 'https://www.googleapis.com';
-  static const _folder = 'My Expenses';
   static const _folderMimeType = 'application/vnd.google-apps.folder';
   static const _spreadSheetName = 'Default SpreadSheet';
   static const _spreadSheetMimeType = 'application/vnd.google-apps.spreadsheet';
+  static const _appDataFolder = 'appDataFolder';
 
   final _authUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
   final String _tokenUrl = '$_baseGoogleApisUrl/oauth2/v4/token';
@@ -59,9 +56,7 @@ class GoogleServiceImpl implements GoogleService {
   final _scopes = <String>[
     people.PeopleApi.UserinfoEmailScope,
     people.PeopleApi.UserinfoProfileScope,
-    drive.DriveApi.DriveScope,
-    drive.DriveApi.DriveReadonlyScope,
-    drive.DriveApi.DriveFileScope,
+    drive.DriveApi.DriveAppdataScope,
   ];
 
   @override
@@ -153,77 +148,24 @@ class GoogleServiceImpl implements GoogleService {
   }
 
   @override
-  Future<String> getAppFolder() async {
+  Future<bool> appFolderExist() async {
     try {
       _logger.info(
         runtimeType,
-        'getAppFolder: Trying to get drive app folder id...',
+        'appFolderExist: Trying to check if app folder exists',
       );
 
       final client = await _getAuthClient();
       final api = drive.DriveApi(client);
       final fileList = await api.files.list(
-        q: "name='$_folder' and mimeType='$_folderMimeType'",
-        includeItemsFromAllDrives: true,
-        supportsAllDrives: true,
+        spaces: _appDataFolder,
       );
 
-      if (fileList.files.isNotEmpty) {
-        final folder = fileList.files.first;
-        if (folder.trashed != null && folder.trashed) {
-          _logger.info(
-            runtimeType,
-            'getAppFolder: App folder is deleted',
-          );
-          return null;
-        }
-
-        _logger.info(
-          runtimeType,
-          'getAppFolder: Got app folder id',
-        );
-        return folder.id;
-      }
-      _logger.info(
-        runtimeType,
-        'getAppFolder: App folder doesnt exists',
-      );
-      return null;
+      return fileList.files.isNotEmpty;
     } catch (e, s) {
       _logger.error(
         runtimeType,
-        'getAppFolder: Unknown error occurred...',
-        e,
-        s,
-      );
-      rethrow;
-    }
-  }
-
-  @override
-  Future<String> createAppDriveFolder() async {
-    try {
-      _logger.info(
-        runtimeType,
-        'createAppDriveFolder: Creating app drive folder...',
-      );
-      final client = await _getAuthClient();
-      final api = drive.DriveApi(client);
-      final driveFile = drive.File()
-        ..name = _folder
-        ..mimeType = _folderMimeType;
-
-      final folder = await api.files.create(driveFile);
-
-      _logger.info(
-        runtimeType,
-        'createAppDriveFolder: App folder was created',
-      );
-      return folder.id;
-    } catch (e, s) {
-      _logger.error(
-        runtimeType,
-        'createAppDriveFolder: Unknown error occurred...',
+        'appFolderExist: Unknown error occurred...',
         e,
         s,
       );
@@ -258,7 +200,10 @@ class GoogleServiceImpl implements GoogleService {
         'downloadFile: Downloading file = $fileName from drive...',
       );
       final api = drive.DriveApi(client);
-      final fileList = await api.files.list(q: "name='$fileName'");
+      final fileList = await api.files.list(
+        q: "name='$fileName'",
+        spaces: _appDataFolder,
+      );
 
       _logger.info(
         runtimeType,
@@ -291,7 +236,7 @@ class GoogleServiceImpl implements GoogleService {
   }
 
   @override
-  Future<String> uploadFile(String folderId, String filePath) async {
+  Future<String> uploadFile(String filePath) async {
     try {
       final localFile = File(filePath);
       final name = basename(localFile.path);
@@ -306,7 +251,7 @@ class GoogleServiceImpl implements GoogleService {
       final driveFile = drive.File()
         ..name = name
         ..description = 'Uploaded by My Expenses'
-        ..parents = [folderId];
+        ..parents = [_appDataFolder];
 
       final response = await api.files.create(driveFile, uploadMedia: media);
 
@@ -368,7 +313,6 @@ class GoogleServiceImpl implements GoogleService {
 
   @override
   Future<Map<String, String>> getAllImgs(
-    String folderId,
     String imgPrefix,
   ) async {
     try {
@@ -378,7 +322,8 @@ class GoogleServiceImpl implements GoogleService {
         final client = await _getAuthClient();
         final api = drive.DriveApi(client);
         final result = await api.files.list(
-          q: "'$folderId' in parents and name contains '$imgPrefix' and mimeType='image/jpeg'",
+          q: "name contains '$imgPrefix' and mimeType contains 'image/'",
+          spaces: _appDataFolder,
           pageSize: 1000,
         );
         files.addAll(result.files);

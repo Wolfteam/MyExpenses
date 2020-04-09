@@ -16,5 +16,7 @@ abstract class UsersDao {
 
   Future<bool> deleteUser(int id);
 
+  Future<void> deleteAll();
+
   Future<void> changeActiveUser(int newActiveUserId);
 }

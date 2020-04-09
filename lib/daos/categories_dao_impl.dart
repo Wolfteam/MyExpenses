@@ -182,6 +182,12 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
   }
 
   @override
+  Future<void> onUserSignedOut() {
+    return update(categories)
+        .write(const CategoriesCompanion(userId: Value(null)));
+  }
+
+  @override
   Future<void> deleteAll() {
     return delete(categories).go();
   }
@@ -191,7 +197,8 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
     return (select(categories)
           ..where(
             (c) => c.localStatus.equals(LocalStatusType.deleted.index).not(),
-          )..orderBy(
+          )
+          ..orderBy(
             [(c) => OrderingTerm(expression: c.id)],
           ))
         .map((row) => sync_cat.Category(

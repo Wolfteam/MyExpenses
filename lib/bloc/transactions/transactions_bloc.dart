@@ -6,11 +6,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 
-import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/utils/date_utils.dart';
 import '../../common/utils/i18n_utils.dart';
 import '../../common/utils/transaction_utils.dart';
 import '../../daos/transactions_dao.dart';
+import '../../daos/users_dao.dart';
 import '../../models/transaction_card_items.dart';
 import '../../models/transaction_item.dart';
 import '../../models/transactions_summary_per_day.dart';
@@ -24,11 +24,13 @@ part 'transactions_state.dart';
 class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
   final LoggingService _logger;
   final TransactionsDao _transactionsDao;
+  final UsersDao _usersDao;
   final SettingsService _settingsService;
 
   TransactionsBloc(
     this._logger,
     this._transactionsDao,
+    this._usersDao,
     this._settingsService,
   );
 
@@ -68,6 +70,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
           now,
           _logger,
           _transactionsDao,
+          _usersDao,
         );
       }
 
@@ -75,7 +78,12 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         runtimeType,
         '_buildInitialState: Getting all the transactions from = $from to = $to',
       );
-      final transactions = await _transactionsDao.getAllTransactions(from, to);
+      final currentUser = await _usersDao.getActiveUser();
+      final transactions = await _transactionsDao.getAllTransactions(
+        currentUser?.id,
+        from,
+        to,
+      );
 
       final incomes = _getTotalIncomes(transactions);
       final expenses = _getTotalExpenses(transactions);
@@ -136,9 +144,14 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
 
   Stream<TransactionsLoadedState> _buildRecurringState() async* {
     try {
-      _logger.info(runtimeType,
-          '_buildRecurringState: Getting all parent transactions...');
-      final transactions = await _transactionsDao.getAllParentTransactions();
+      _logger.info(
+        runtimeType,
+        '_buildRecurringState: Getting all parent transactions...',
+      );
+      final currentUser = await _usersDao.getActiveUser();
+      final transactions = await _transactionsDao.getAllParentTransactions(
+        currentUser?.id,
+      );
       final transPerMonth = _buildTransactionsPerMonth(transactions);
       yield currentState.copyWith(
         showParentTransactions: true,
@@ -209,9 +222,11 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     );
 
     try {
-      final transactions = (await _transactionsDao.getAllTransactions(from, to))
-          .where((t) => t.category.isAnIncome == onlyIncomes)
-          .toList();
+      final currentUser = await _usersDao.getActiveUser();
+      final transactions =
+          (await _transactionsDao.getAllTransactions(currentUser?.id, from, to))
+              .where((t) => t.category.isAnIncome == onlyIncomes)
+              .toList();
 
       final map = <DateTime, double>{};
       for (final transaction in transactions) {

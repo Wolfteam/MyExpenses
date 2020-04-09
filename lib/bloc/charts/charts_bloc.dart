@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import '../../common/utils/date_utils.dart';
 import '../../common/utils/transaction_utils.dart';
 import '../../daos/transactions_dao.dart';
+import '../../daos/users_dao.dart';
 import '../../models/chart_transaction_item.dart';
 import '../../models/transaction_item.dart';
 import '../../models/transactions_summary_per_date.dart';
@@ -19,12 +20,18 @@ part 'charts_state.dart';
 class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
   final LoggingService _logger;
   final TransactionsDao _transactionsDao;
+  final UsersDao _usersDao;
   final SettingsService _settingsService;
 
   @override
   ChartsState get initialState => LoadingState();
 
-  ChartsBloc(this._logger, this._transactionsDao, this._settingsService);
+  ChartsBloc(
+    this._logger,
+    this._transactionsDao,
+    this._usersDao,
+    this._settingsService,
+  );
 
   @override
   Stream<ChartsState> mapEventToState(
@@ -51,7 +58,12 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
         runtimeType,
         '_buildLoadedState: Trying to get all the transactions from = $from to = $to',
       );
-      transactions = await _transactionsDao.getAllTransactions(from, to);
+      final currentUser = await _usersDao.getActiveUser();
+      transactions = await _transactionsDao.getAllTransactions(
+        currentUser?.id,
+        from,
+        to,
+      );
       transactions
           .sort((t1, t2) => t1.transactionDate.compareTo(t2.transactionDate));
 

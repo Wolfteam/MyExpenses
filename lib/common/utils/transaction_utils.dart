@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import '../../daos/transactions_dao.dart';
+import '../../daos/users_dao.dart';
 import '../../models/transaction_item.dart';
 import '../../services/logging_service.dart';
 import '../enums/repetition_cycle_type.dart';
@@ -66,6 +67,7 @@ class TransactionUtils {
     DateTime now,
     LoggingService logger,
     TransactionsDao _transactionsDao,
+    UsersDao usersDao,
   ) async {
     final createdChilds = <TransactionItem>[];
     try {
@@ -74,8 +76,11 @@ class TransactionUtils {
         'checkRecurringTransactions: Getting all parent transactions...',
       );
       final until = DateTime(now.year, now.month, now.day, 23, 59, 59);
-      final parents =
-          await _transactionsDao.getAllParentTransactionsUntil(until);
+      final currentUser = await usersDao.getActiveUser();
+      final parents = await _transactionsDao.getAllParentTransactionsUntil(
+        currentUser?.id,
+        until,
+      );
 
       if (parents.isEmpty) {
         logger.info(

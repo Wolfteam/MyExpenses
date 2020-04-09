@@ -7,7 +7,11 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
   TransactionsDaoImpl(AppDatabase db) : super(db);
 
   @override
-  Future<List<TransactionItem>> getAllTransactions(DateTime from, DateTime to) {
+  Future<List<TransactionItem>> getAllTransactions(
+    int userId,
+    DateTime from,
+    DateTime to,
+  ) {
     final query = (select(transactions)
           ..where(
             (t) =>
@@ -17,9 +21,15 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
           ))
         .join([
       innerJoin(categories, categories.id.equalsExp(transactions.categoryId)),
-    ]).map(_mapToTransactionItem);
-
-    return query.get();
+    ]);
+    if (userId == null) {
+      return (query..where((isNull(categories.userId))))
+          .map(_mapToTransactionItem)
+          .get();
+    }
+    return (query..where(categories.userId.equals(userId)))
+        .map(_mapToTransactionItem)
+        .get();
   }
 
   @override
@@ -146,7 +156,9 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
   }
 
   @override
-  Future<List<TransactionItem>> getAllParentTransactions() {
+  Future<List<TransactionItem>> getAllParentTransactions(
+    int userId,
+  ) {
     final query = (select(transactions)
           ..where(
             (t) =>
@@ -159,13 +171,24 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
         categories,
         categories.id.equalsExp(transactions.categoryId),
       ),
-    ]).map(_mapToTransactionItem);
+    ]);
 
-    return query.get();
+    if (userId == null) {
+      return (query..where((isNull(categories.userId))))
+          .map(_mapToTransactionItem)
+          .get();
+    }
+
+    return (query..where(categories.userId.equals(userId)))
+        .map(_mapToTransactionItem)
+        .get();
   }
 
   @override
-  Future<List<TransactionItem>> getAllParentTransactionsUntil(DateTime until) {
+  Future<List<TransactionItem>> getAllParentTransactionsUntil(
+    int userId,
+    DateTime until,
+  ) {
     final query = (select(transactions)
           ..where(
             (t) =>
@@ -180,9 +203,17 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
         categories,
         categories.id.equalsExp(transactions.categoryId),
       ),
-    ]).map(_mapToTransactionItem);
+    ]);
 
-    return query.get();
+    if (userId == null) {
+      return (query..where((isNull(categories.userId))))
+          .map(_mapToTransactionItem)
+          .get();
+    }
+
+    return (query..where(categories.userId.equals(userId)))
+        .map(_mapToTransactionItem)
+        .get();
   }
 
   @override
@@ -320,7 +351,9 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
   }
 
   @override
-  Future<List<sync_trans.Transaction>> getAllTransactionsToSync() async {
+  Future<List<sync_trans.Transaction>> getAllTransactionsToSync(
+    int userId,
+  ) async {
     final parents = await (select(transactions)
           ..where(
             (t) =>
@@ -329,7 +362,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
           ))
         .get();
 
-    return (select(transactions)
+    final joinStatement = (select(transactions)
           ..where(
             (t) => t.localStatus.equals(LocalStatusType.deleted.index).not(),
           )
@@ -338,41 +371,41 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
           ))
         .join([
       innerJoin(categories, categories.id.equalsExp(transactions.categoryId))
-    ]).map((row) {
-      final cat = row.readTable(categories);
-      final trans = row.readTable(transactions);
-      final parentCreatedHash = trans.parentTransactionId != null
-          ? parents
-              .singleWhere((t) => t.id == trans.parentTransactionId)
-              .createdHash
-          : null;
-      return sync_trans.Transaction(
-        amount: trans.amount,
-        categoryCreatedHash: cat.createdHash,
-        createdAt: trans.createdAt,
-        createdBy: trans.createdBy,
-        createdHash: trans.createdHash,
-        description: trans.description,
-        imagePath: trans.imagePath,
-        isParentTransaction: trans.isParentTransaction,
-        nextRecurringDate: trans.nextRecurringDate,
-        parentTransactionCreatedHash: parentCreatedHash,
-        repetitionCycle: trans.repetitionCycle,
-        transactionDate: trans.transactionDate,
-        updatedAt: trans.updatedAt,
-        updatedBy: trans.updatedBy,
-      );
-    }).get();
+    ]);
+    if (userId == null) {
+      joinStatement.where(isNull(categories.userId));
+    } else {
+      joinStatement.where(categories.userId.equals(userId));
+    }
+
+    return joinStatement
+        .map((row) => _mapToTransactionToSync(parents, row))
+        .get();
   }
 
   @override
   Future<void> syncDownDelete(
+    int userId,
     List<sync_trans.Transaction> existingTrans,
   ) async {
-    final transInDb = await (select(transactions)
+    final joinStatement = (select(transactions)
           ..where(
-              (t) => t.localStatus.equals(LocalStatusType.created.index).not()))
-        .get();
+            (t) => t.localStatus.equals(LocalStatusType.created.index).not(),
+          ))
+        .join([
+      innerJoin(categories, categories.id.equalsExp(transactions.categoryId))
+    ]);
+    if (userId == null) {
+      joinStatement.where(isNull(categories.userId));
+    } else {
+      joinStatement.where(categories.userId.equals(userId));
+    }
+
+    final transInDb = await joinStatement.map((row) {
+      final trans = row.readTable(transactions);
+      return trans;
+    }).get();
+
     final downloadedTransHash =
         existingTrans.map((t) => t.createdHash).toList();
     final transToDelete = transInDb
@@ -419,31 +452,71 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
   }
 
   @override
-  Future<void> syncUpDelete() async {
-    //first we delete the childs...
-    await (delete(transactions)
+  Future<void> syncUpDelete(int userId) async {
+    final childsQuery = (select(transactions)
           ..where(
             (t) =>
                 t.localStatus.equals(LocalStatusType.deleted.index) &
                 isNotNull(t.parentTransactionId),
           ))
-        .go();
-    //and then the parents
-    await (delete(transactions)
+        .join([
+      innerJoin(categories, categories.id.equalsExp(transactions.categoryId))
+    ]);
+
+    final parentsQuery = (select(transactions)
           ..where(
             (t) =>
                 t.localStatus.equals(LocalStatusType.deleted.index) &
                 isNull(t.parentTransactionId),
           ))
-        .go();
+        .join([
+      innerJoin(categories, categories.id.equalsExp(transactions.categoryId))
+    ]);
+
+    if (userId == null) {
+      childsQuery.where(isNull(categories.userId));
+      parentsQuery.where(isNull(categories.userId));
+    } else {
+      childsQuery.where(categories.userId.equals(userId));
+      parentsQuery.where(categories.userId.equals(userId));
+    }
+
+    final childIds = await childsQuery.map((row) {
+      final trans = row.readTable(transactions);
+      return trans.id;
+    }).get();
+
+    final parentsIds = await parentsQuery.map((row) {
+      final trans = row.readTable(transactions);
+      return trans.id;
+    }).get();
+
+    //first we delete the childs...
+    await (delete(transactions)..where((t) => t.id.isIn(childIds))).go();
+
+    //and then the parents
+    await (delete(transactions)..where((t) => t.id.isIn(parentsIds))).go();
   }
 
   @override
   Future<void> syncDownCreate(
+    int userId,
     List<sync_trans.Transaction> existingTrans,
   ) async {
-    final transInDb = await (select(transactions)).get();
-    final localTransHash = transInDb.map((t) => t.createdHash).toList();
+    final joinStatement = select(transactions).join([
+      innerJoin(categories, categories.id.equalsExp(transactions.categoryId))
+    ]);
+    if (userId == null) {
+      joinStatement.where(isNull(categories.userId));
+    } else {
+      joinStatement.where(categories.userId.equals(userId));
+    }
+
+    final localTransHash = await joinStatement.map((row) {
+      final trans = row.readTable(transactions);
+      return trans.createdHash;
+    }).get();
+
     final transToBeCreated = existingTrans
         .where((t) => !localTransHash.contains(t.createdHash))
         .toList();
@@ -490,14 +563,28 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
 
   @override
   Future<void> syncDownUpdate(
+    int userId,
     List<sync_trans.Transaction> existingTrans,
   ) async {
     final existingTransToUse =
         existingTrans.where((t) => t.updatedAt != null).toList();
     final transHash = existingTransToUse.map((t) => t.createdHash).toList();
-    final transInDb = await (select(transactions)
-          ..where((t) => t.createdHash.isIn(transHash)))
-        .get();
+    final joinStatement = (select(transactions)
+          ..where(
+            (t) => t.createdHash.isIn(transHash),
+          ))
+        .join([
+      innerJoin(categories, categories.id.equalsExp(transactions.categoryId))
+    ]);
+
+    if (userId == null) {
+      joinStatement.where(isNull(categories.userId));
+    } else {
+      joinStatement.where(categories.userId.equals(userId));
+    }
+
+    final transInDb =
+        await joinStatement.map((row) => row.readTable(transactions)).get();
 
     final transToUpdate = <Transaction>[];
     final updatedCatsHash = <String>[];
@@ -677,6 +764,35 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
       createdHash: transaction.createdHash,
       updatedAt: transaction.updatedAt,
       updatedBy: transaction.updatedBy,
+    );
+  }
+
+  sync_trans.Transaction _mapToTransactionToSync(
+    List<Transaction> parents,
+    TypedResult row,
+  ) {
+    final cat = row.readTable(categories);
+    final trans = row.readTable(transactions);
+    final parentCreatedHash = trans.parentTransactionId != null
+        ? parents
+            .singleWhere((t) => t.id == trans.parentTransactionId)
+            .createdHash
+        : null;
+    return sync_trans.Transaction(
+      amount: trans.amount,
+      categoryCreatedHash: cat.createdHash,
+      createdAt: trans.createdAt,
+      createdBy: trans.createdBy,
+      createdHash: trans.createdHash,
+      description: trans.description,
+      imagePath: trans.imagePath,
+      isParentTransaction: trans.isParentTransaction,
+      nextRecurringDate: trans.nextRecurringDate,
+      parentTransactionCreatedHash: parentCreatedHash,
+      repetitionCycle: trans.repetitionCycle,
+      transactionDate: trans.transactionDate,
+      updatedAt: trans.updatedAt,
+      updatedBy: trans.updatedBy,
     );
   }
 

@@ -113,6 +113,11 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase>
     return true;
   }
 
+  @override
+  Future<void> deleteAll() {
+    return delete(users).go();
+  }
+
   UserItem _mapToUserItem(User user) {
     return UserItem(
       id: user.id,

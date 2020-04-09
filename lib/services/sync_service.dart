@@ -64,12 +64,12 @@ class SyncServiceImpl implements SyncService {
         SecureResourceType.currentUser,
         _secureStorageService.defaultUsername,
       );
-      final folderId = await _googleService.getAppFolder();
+      final folderExists = await _googleService.appFolderExist();
 
-      if (folderId == null) {
+      if (!folderExists) {
         await _onFirstInstall();
       } else {
-        await _onExistingInstall(folderId, currentUser);
+        await _onExistingInstall(currentUser);
       }
     } catch (e, s) {
       _logger.error(
@@ -123,7 +123,6 @@ class SyncServiceImpl implements SyncService {
   }
 
   Future<void> _uploadAppFile(
-    String folderId,
     String currentUser,
   ) async {
     try {
@@ -141,7 +140,7 @@ class SyncServiceImpl implements SyncService {
         return;
       }
 
-      final appFileId = await _googleService.uploadFile(folderId, filePath);
+      final appFileId = await _googleService.uploadFile(filePath);
       _logger.info(
         runtimeType,
         '_uploadAppFile: File was successfully uploaded',
@@ -169,15 +168,19 @@ class SyncServiceImpl implements SyncService {
         runtimeType,
         'createAppFile: Getting all transactions to save..',
       );
-      final transactions = await _transactionsDao.getAllTransactionsToSync();
+      final currentUser = await _usersDao.getActiveUser();
+
+      final transactions = await _transactionsDao.getAllTransactionsToSync(
+        currentUser.id,
+      );
+
       _logger.info(
         runtimeType,
         'createAppFile: Getting all categories to save..',
       );
-
-      final currentUser = await _usersDao.getActiveUser();
-      final categories =
-          await _categoriesDao.getAllCategoriesToSync(currentUser.id);
+      final categories = await _categoriesDao.getAllCategoriesToSync(
+        currentUser.id,
+      );
 
       final appFile = AppFile(
         transactions: transactions,
@@ -225,14 +228,6 @@ class SyncServiceImpl implements SyncService {
     );
 
     final currentUser = await _usersDao.getActiveUser();
-    final folderId = await _googleService.createAppDriveFolder();
-
-    await _secureStorageService.save(
-      SecureResourceType.currentUserDriveFolderId,
-      currentUser.email,
-      folderId,
-    );
-
     _logger.info(
       runtimeType,
       '_onFirstInstall: Updating categories...',
@@ -246,29 +241,23 @@ class SyncServiceImpl implements SyncService {
     );
 
     await _createLocalAppFile();
-    await _createReadmeFile();
+    // await _createReadmeFile();
 
     _logger.info(
       runtimeType,
       '_onFirstInstall: Uploading app and readme files...',
     );
-    await _uploadAppFile(folderId, currentUser.email);
-    await _uploadReadmeFile(folderId);
-    await _uploadAllLocalImgs(folderId);
+    await _uploadAppFile(currentUser.email);
+    // await _uploadReadmeFile(folderId);
+    await _uploadAllLocalImgs();
   }
 
   Future<void> _onExistingInstall(
-    String folderId,
     String currentUser,
   ) async {
     _logger.info(
       runtimeType,
       '_onExistingInstall: Getting appfile...',
-    );
-    await _secureStorageService.save(
-      SecureResourceType.currentUserDriveFolderId,
-      currentUser,
-      folderId,
     );
     final filePath = await appFilePath;
     final fileId = await _googleService.downloadFile(_appFile, filePath);
@@ -282,7 +271,7 @@ class SyncServiceImpl implements SyncService {
       runtimeType,
       '_onExistingInstall: Getting remote imgs...',
     );
-    await _downloadAllRemoteImgs(folderId);
+    await _downloadAllRemoteImgs();
 
     final appFile = await _getLocalAppFile(filePath);
     final user = await _usersDao.getActiveUser();
@@ -299,7 +288,7 @@ class SyncServiceImpl implements SyncService {
 
   Future<void> _uploadReadmeFile(String folderId) async {
     final readmePath = await readmeFilePath;
-    await _googleService.uploadFile(folderId, readmePath);
+    await _googleService.uploadFile(readmePath);
   }
 
   Future<AppFile> _getLocalAppFile(String filePath) async {
@@ -316,13 +305,13 @@ class SyncServiceImpl implements SyncService {
       '_performSyncDown: Creating categories and transactions...',
     );
     await _categoriesDao.syncDownCreate(userId, appFile.categories);
-    await _transactionsDao.syncDownCreate(appFile.transactions);
+    await _transactionsDao.syncDownCreate(userId, appFile.transactions);
 
     _logger.info(
       runtimeType,
       '_performSyncDown: Deleting categories and transactions...',
     );
-    await _transactionsDao.syncDownDelete(appFile.transactions);
+    await _transactionsDao.syncDownDelete(userId, appFile.transactions);
     await _categoriesDao.syncDownDelete(userId, appFile.categories);
 
     _logger.info(
@@ -330,11 +319,11 @@ class SyncServiceImpl implements SyncService {
       '_performSyncDown: Updating categories and transactions...',
     );
     await _categoriesDao.syncDownUpdate(userId, appFile.categories);
-    await _transactionsDao.syncDownUpdate(appFile.transactions);
+    await _transactionsDao.syncDownUpdate(userId, appFile.transactions);
 
     //TODO: SYNC IMG in the bg
-    //TODO: IF THE USER SWITCHES ACCOUNTS,
-    //YOU SHOULD ONLY SYNC THE USER TRANSACTIONS
+    //TODO: IF THE USER SWITCHES ACCOUNTS, YOU SHOULD ONLY SYNC THE USER TRANSACTIONS SO, WHEN YOU GET THE
+    //TRANSACTIONS YOU MUST DO AN INNER JOIN WITH CATEGORIES AND SEARCH FOR THE ID
   }
 
   Future<void> _performSyncUp(int userId) async {
@@ -343,7 +332,7 @@ class SyncServiceImpl implements SyncService {
       runtimeType,
       '_performSyncUp: Deleting categories and transactions...',
     );
-    await _transactionsDao.syncUpDelete();
+    await _transactionsDao.syncUpDelete(userId);
     await _categoriesDao.syncUpDelete(userId);
   }
 
@@ -359,7 +348,7 @@ class SyncServiceImpl implements SyncService {
   }
 
   //TODO: TEST THIS 3 METHODS
-  Future<void> _uploadAllLocalImgs(String folderId) async {
+  Future<void> _uploadAllLocalImgs() async {
     _logger.info(
       runtimeType,
       '_uploadAllLocalImgs: Trying to upload all local imgs...',
@@ -367,8 +356,11 @@ class SyncServiceImpl implements SyncService {
 
     try {
       final imgPath = await AppPathUtils.imagesPath;
-      final imgs =
-          await Directory(imgPath).list().asyncMap((f) => f.path).toList();
+      final imgs = await Directory(imgPath)
+          .list()
+          .asyncMap((f) => f.path)
+          .where((path) => path.startsWith(AppPathUtils.transactionImgPrefix))
+          .toList();
 
       _logger.info(
         runtimeType,
@@ -376,7 +368,7 @@ class SyncServiceImpl implements SyncService {
       );
 
       for (final path in imgs) {
-        await _googleService.uploadFile(folderId, path);
+        await _googleService.uploadFile(path);
       }
       _logger.info(
         runtimeType,
@@ -392,14 +384,13 @@ class SyncServiceImpl implements SyncService {
     }
   }
 
-  Future<void> _downloadAllRemoteImgs(String folderId) async {
+  Future<void> _downloadAllRemoteImgs() async {
     try {
       _logger.info(
         runtimeType,
         '_downloadAllRemoteImgs: Trying to download all remote imgs...',
       );
       final currentImgsMap = await _googleService.getAllImgs(
-        folderId,
         AppPathUtils.transactionImgPrefix,
       );
 
@@ -431,38 +422,33 @@ class SyncServiceImpl implements SyncService {
 
   Future<void> _updateImgFiles(String currentUser) async {
     try {
-      final folderId = await _secureStorageService.get(
-        SecureResourceType.currentUserDriveFolderId,
-        currentUser,
-      );
-
       _logger.info(runtimeType, '_updateImgFiles: Getting all remote imgs...');
       final currentImgsMap = await _googleService.getAllImgs(
-        folderId,
         AppPathUtils.transactionImgPrefix,
       );
 
       _logger.info(runtimeType, '_updateImgFiles: Getting all local imgs...');
-      final imgs = await Directory(await AppPathUtils.imagesPath)
+      final imgPath = await AppPathUtils.imagesPath;
+      final imgs = await Directory(imgPath)
           .list()
           .asyncMap((f) => f.path)
+          .where((path) => path.startsWith(AppPathUtils.transactionImgPrefix))
           .toList();
 
-      final imgsToDownload = currentImgsMap.entries.where(
-        (kvp) => !imgs.contains(kvp.value),
-      );
+      final imgsToDownload = currentImgsMap.entries
+          .where((kvp) => !imgs.contains(kvp.value))
+          .toList();
 
       final imgsToUpload = imgs.where((path) {
         final filename = basename(path);
         return !currentImgsMap.values.contains(filename);
-      });
+      }).toList();
 
       _logger.info(
         runtimeType,
         '_updateImgFiles: We will download ${imgsToDownload.length} imgs...',
       );
       //TODO: CREATE MULTIPLE FUTURES
-      final imgPath = await AppPathUtils.imagesPath;
       for (final kvp in imgsToDownload) {
         final filePath = join(imgPath, kvp.value);
         await _googleService.downloadFile(kvp.value, filePath);
@@ -473,7 +459,7 @@ class SyncServiceImpl implements SyncService {
         '_updateImgFiles: We will upload ${imgsToUpload.length} imgs...',
       );
       for (final path in imgsToUpload) {
-        await _googleService.uploadFile(folderId, path);
+        await _googleService.uploadFile(path);
       }
       _logger.info(
         runtimeType,

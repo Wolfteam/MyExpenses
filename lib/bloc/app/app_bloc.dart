@@ -6,6 +6,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 import '../../common/enums/app_accent_color_type.dart';
+import '../../common/enums/app_drawer_item_type.dart';
 import '../../common/enums/app_language_type.dart';
 import '../../common/enums/app_theme_type.dart';
 import '../../common/extensions/app_theme_type_extensions.dart';
@@ -13,6 +14,7 @@ import '../../common/utils/background_utils.dart';
 import '../../generated/i18n.dart';
 import '../../services/logging_service.dart';
 import '../../services/settings_service.dart';
+import '../drawer/drawer_bloc.dart';
 
 part 'app_event.dart';
 part 'app_state.dart';
@@ -20,12 +22,17 @@ part 'app_state.dart';
 class AppBloc extends Bloc<AppEvent, AppState> {
   final LoggingService _logger;
   final SettingsService _settingsService;
+  final DrawerBloc _drawerBloc;
   StreamSubscription _portSubscription;
 
   @override
   AppState get initialState => AppUninitializedState();
 
-  AppBloc(this._logger, this._settingsService) {
+  AppBloc(
+    this._logger,
+    this._settingsService,
+    this._drawerBloc,
+  ) {
     IsolateNameServer.registerPortWithName(
       BackgroundUtils.port.sendPort,
       BackgroundUtils.portName,
@@ -33,8 +40,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     _portSubscription = BackgroundUtils.port.listen((data) {
       final isRunning = data[0] as bool;
       add(BgTaskIsRunning(isRunning: isRunning));
-
-      //TODO: TRIGGER A DRAWER BLOC EVENT TO THE TRANSACTIONS PAGE IS THE INITIAL PAGE
+      if (!isRunning) {
+        _drawerBloc.add(
+          const DrawerItemSelectionChanged(AppDrawerItemType.transactions),
+        );
+      }
     });
   }
 

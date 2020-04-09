@@ -17,7 +17,12 @@ import 'user_accounts_bottom_sheet_dialog.dart';
 class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DrawerBloc, DrawerState>(
+    return BlocConsumer<DrawerBloc, DrawerState>(
+      listener: (ctx, state) {
+        if (state.userSignedOut) {
+          BlocUtils.raiseAllCommonBlocEvents(ctx);
+        }
+      },
       builder: (ctx, state) {
         return Drawer(
           child: ListView(
@@ -253,7 +258,6 @@ class AppDrawer extends StatelessWidget {
   void _signOut(BuildContext context) {
     Navigator.pop(context);
     context.bloc<DrawerBloc>().add(const SignOut());
-    BlocUtils.raiseAllCommonBlocEvents(context);
   }
 
   Future<void> _signIn(

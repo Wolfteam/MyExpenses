@@ -106,8 +106,14 @@ class _MyAppState extends State<MyApp> {
             create: (ctx) {
               final logger = getIt<LoggingService>();
               final transactionsDao = getIt<TransactionsDao>();
+              final usersDao = getIt<UsersDao>();
               final settingsService = getIt<SettingsService>();
-              return TransactionsBloc(logger, transactionsDao, settingsService);
+              return TransactionsBloc(
+                logger,
+                transactionsDao,
+                usersDao,
+                settingsService,
+              );
             },
           ),
           BlocProvider(create: (ctx) {
@@ -126,13 +132,15 @@ class _MyAppState extends State<MyApp> {
           }),
           BlocProvider(create: (ctx) {
             final logger = getIt<LoggingService>();
-            final settingsService = getIt<SettingsService>();
-            return app_bloc.AppBloc(logger, settingsService);
+            final usersDao = getIt<UsersDao>();
+            final categoriesDao = getIt<CategoriesDao>();
+            return DrawerBloc(logger, usersDao, categoriesDao);
           }),
           BlocProvider(create: (ctx) {
             final logger = getIt<LoggingService>();
-            final usersDao = getIt<UsersDao>();
-            return DrawerBloc(logger, usersDao);
+            final settingsService = getIt<SettingsService>();
+            final drawerBloc = ctx.bloc<DrawerBloc>();
+            return app_bloc.AppBloc(logger, settingsService, drawerBloc);
           }),
           BlocProvider(create: (ctx) {
             final logger = getIt<LoggingService>();
@@ -144,18 +152,26 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(create: (ctx) {
             final logger = getIt<LoggingService>();
             final transactionsDao = getIt<TransactionsDao>();
+            final usersDao = getIt<UsersDao>();
             final settingsService = getIt<SettingsService>();
-            return ChartsBloc(logger, transactionsDao, settingsService);
+            return ChartsBloc(
+              logger,
+              transactionsDao,
+              usersDao,
+              settingsService,
+            );
           }),
           BlocProvider(create: (ctx) => ChartDetailsBloc()),
           BlocProvider(
             create: (ctx) {
               final logger = getIt<LoggingService>();
               final transactionsDao = getIt<TransactionsDao>();
+              final usersDao = getIt<UsersDao>();
               final currencyBloc = ctx.bloc<CurrencyBloc>();
               return ReportsBloc(
                 logger,
                 transactionsDao,
+                usersDao,
                 currencyBloc,
               );
             },
@@ -206,6 +222,7 @@ class _MyAppState extends State<MyApp> {
   }
 
 //TODO: USE SUPER ENUM
+//TODO: REMOVE THE RECURRINGTASK DAO
   Widget _buildApp(BuildContext ctx, app_bloc.AppState state) {
     final delegates = <LocalizationsDelegate>[
       // A class which loads the translations from JSON files

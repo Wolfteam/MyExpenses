@@ -57,7 +57,9 @@ class SignInWithGoogleBloc
     if (event is UrlChanged && event.url.contains(_googleService.redirectUrl)) {
       final uri = Uri.parse(event.url);
       final code = uri.queryParameters['code'];
-      yield* _signIn(code);
+      if (!code.isNullEmptyOrWhitespace) {
+        yield* _signIn(code);
+      }
     }
   }
 

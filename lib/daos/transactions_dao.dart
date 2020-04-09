@@ -3,15 +3,24 @@ import '../models/drive/transaction.dart' as sync_trans;
 import '../models/transaction_item.dart';
 
 abstract class TransactionsDao {
-  Future<List<TransactionItem>> getAllTransactions(DateTime from, DateTime to);
+  Future<List<TransactionItem>> getAllTransactions(
+    int userId,
+    DateTime from,
+    DateTime to,
+  );
 
   Future<TransactionItem> saveTransaction(TransactionItem transaction);
 
   Future<bool> deleteTransaction(int id);
 
-  Future<List<TransactionItem>> getAllParentTransactions();
+  Future<List<TransactionItem>> getAllParentTransactions(
+    int userId,
+  );
 
-  Future<List<TransactionItem>> getAllParentTransactionsUntil(DateTime until);
+  Future<List<TransactionItem>> getAllParentTransactionsUntil(
+    int userId,
+    DateTime until,
+  );
 
   Future<List<TransactionItem>> getAllChildTransactions(
     int parentId,
@@ -36,15 +45,26 @@ abstract class TransactionsDao {
 
   Future<void> deleteAll();
 
-  Future<List<sync_trans.Transaction>> getAllTransactionsToSync();
+  Future<List<sync_trans.Transaction>> getAllTransactionsToSync(
+    int userId,
+  );
 
-  Future<void> syncDownDelete(List<sync_trans.Transaction> existingTrans);
+  Future<void> syncDownDelete(
+    int userId,
+    List<sync_trans.Transaction> existingTrans,
+  );
 
-  Future<void> syncUpDelete();
+  Future<void> syncUpDelete(int userId);
 
-  Future<void> syncDownCreate(List<sync_trans.Transaction> existingTrans);
+  Future<void> syncDownCreate(
+    int userId,
+    List<sync_trans.Transaction> existingTrans,
+  );
 
-  Future<void> syncDownUpdate(List<sync_trans.Transaction> existingTrans);
+  Future<void> syncDownUpdate(
+    int userId,
+    List<sync_trans.Transaction> existingTrans,
+  );
 
   Future<void> updateAllLocalStatus(LocalStatusType newValue);
 }

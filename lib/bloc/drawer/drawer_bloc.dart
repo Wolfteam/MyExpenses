@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../../common/enums/app_drawer_item_type.dart';
 import '../../common/utils/background_utils.dart';
 import '../../daos/users_dao.dart';
+import '../../daos/categories_dao.dart';
 import '../../services/logging_service.dart';
 
 part 'drawer_event.dart';
@@ -15,12 +16,13 @@ part 'drawer_state.dart';
 class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
   final LoggingService _logger;
   final UsersDao _usersDao;
+  final CategoriesDao _categoriesDao;
 
   @override
   DrawerState get initialState =>
       DrawerState.initial(AppDrawerItemType.transactions);
 
-  DrawerBloc(this._logger, this._usersDao);
+  DrawerBloc(this._logger, this._usersDao, this._categoriesDao);
 
   @override
   Stream<DrawerState> mapEventToState(
@@ -31,7 +33,10 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
     }
 
     if (event is DrawerItemSelectionChanged) {
-      yield state.copyWith(selectedPage: event.selectedPage);
+      yield state.copyWith(
+        selectedPage: event.selectedPage,
+        userSignedOut: false,
+      );
     }
 
     if (event is SignOut) {
@@ -54,14 +59,18 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
       fullName: user.name,
       img: user.pictureUrl,
       isUserSignedIn: true,
+      userSignedOut: false,
     );
   }
 
   Stream<DrawerState> _signOut() async* {
-    //TODO: SHOULD I DELETE THE USER HERE?
     _logger.info(runtimeType, '_signIn: Signing out...');
-    await _usersDao.changeActiveUser(null);
+    await _categoriesDao.onUserSignedOut();
+    await _usersDao.deleteAll();
     await BackgroundUtils.cancelSyncTask();
-    yield state.copyWith(isUserSignedIn: false);
+    yield state.copyWith(
+      isUserSignedIn: false,
+      userSignedOut: true,
+    );
   }
 }

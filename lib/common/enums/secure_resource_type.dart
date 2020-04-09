@@ -4,7 +4,6 @@ enum SecureResourceType{
   accessTokenExpiricy,
   refreshToken,
   currentUser,
-  currentUserDriveFolderId,
   currentUserAppFileId,
   loginPassword,
 }
