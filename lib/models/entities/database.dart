@@ -18,7 +18,6 @@ import '../../common/utils/db_seed_util.dart';
 import '../../daos/categories_dao.dart';
 import '../../daos/transactions_dao.dart';
 import '../../daos/users_dao.dart';
-import '../../daos/running_tasks_dao.dart';
 import '../../models/category_item.dart';
 import '../../models/drive/category.dart' as sync_cat;
 import '../../models/drive/transaction.dart' as sync_trans;
@@ -28,7 +27,6 @@ import 'base_entity.dart';
 
 
 part '../../daos/categories_dao_impl.dart';
-part '../../daos/running_tasks_dao_impl.dart';
 part '../../daos/transactions_dao_impl.dart';
 part '../../daos/users_dao_impl.dart';
 part 'categories.dart';
@@ -69,7 +67,6 @@ LazyDatabase _openConnection() {
   });
 }
 
-//TODO: THE USERNAME SHOULD BE SAVED
 @UseMoor(
   tables: [
     Users,
@@ -81,7 +78,6 @@ LazyDatabase _openConnection() {
     UsersDaoImpl,
     TransactionsDaoImpl,
     CategoriesDaoImpl,
-    RunningTasksDaoImpl,
   ],
 )
 class AppDatabase extends _$AppDatabase {

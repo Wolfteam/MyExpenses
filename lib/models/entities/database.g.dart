@@ -2431,9 +2431,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   CategoriesDaoImpl _categoriesDaoImpl;
   CategoriesDaoImpl get categoriesDaoImpl =>
       _categoriesDaoImpl ??= CategoriesDaoImpl(this as AppDatabase);
-  RunningTasksDaoImpl _runningTasksDaoImpl;
-  RunningTasksDaoImpl get runningTasksDaoImpl =>
-      _runningTasksDaoImpl ??= RunningTasksDaoImpl(this as AppDatabase);
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override
@@ -2448,9 +2445,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 mixin _$CategoriesDaoImplMixin on DatabaseAccessor<AppDatabase> {
   $CategoriesTable get categories => db.categories;
   $TransactionsTable get transactions => db.transactions;
-}
-mixin _$RunningTasksDaoImplMixin on DatabaseAccessor<AppDatabase> {
-  $RunningTasksTable get runningTasks => db.runningTasks;
 }
 mixin _$TransactionsDaoImplMixin on DatabaseAccessor<AppDatabase> {
   $TransactionsTable get transactions => db.transactions;

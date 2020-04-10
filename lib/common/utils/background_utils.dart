@@ -9,7 +9,6 @@ import 'package:workmanager/workmanager.dart';
 import '../../common/enums/sync_intervals_type.dart';
 import '../../common/utils/i18n_utils.dart';
 import '../../common/utils/notification_utils.dart';
-import '../../daos/running_tasks_dao.dart';
 import '../../daos/transactions_dao.dart';
 import '../../daos/users_dao.dart';
 import '../../injection.dart';
@@ -19,7 +18,6 @@ import '../../services/logging_service.dart';
 import '../../services/network_service.dart';
 import '../../services/settings_service.dart';
 import '../../services/sync_service.dart';
-import '../../telemetry.dart';
 import 'transaction_utils.dart';
 
 void callbackDispatcher() {
@@ -52,7 +50,7 @@ class BackgroundUtils {
   static Future<void> registerSyncTask(SyncIntervalType interval) {
     Duration duration;
     if (!Platform.isAndroid) {
-      return Future.value();
+      throw Exception('Platform not supported');
     }
 
     switch (interval) {
@@ -81,6 +79,7 @@ class BackgroundUtils {
       _syncTaskId,
       _syncTaskName,
       frequency: duration,
+      existingWorkPolicy: ExistingWorkPolicy.replace,
       constraints: Constraints(
         networkType: NetworkType.connected,
         requiresBatteryNotLow: true,
@@ -117,8 +116,6 @@ class BackgroundUtils {
     await settingsService.init();
     final i18n = await getI18n(settingsService.language);
     const runtimeType = BackgroundUtils;
-    final runningTasksDao = getIt<RunningTasksDao>();
-    final taskId = await runningTasksDao.saveRunningTask(task);
 
     try {
       switch (task) {
@@ -162,7 +159,6 @@ class BackgroundUtils {
       }
     }
 
-    await runningTasksDao.updateRunningTask(taskId);
     logger.info(
       runtimeType,
       'bgSync: Process completed',

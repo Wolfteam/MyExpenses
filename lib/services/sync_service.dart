@@ -429,10 +429,11 @@ class SyncServiceImpl implements SyncService {
 
       _logger.info(runtimeType, '_updateImgFiles: Getting all local imgs...');
       final imgPath = await AppPathUtils.imagesPath;
+
       final imgs = await Directory(imgPath)
           .list()
           .asyncMap((f) => f.path)
-          .where((path) => path.startsWith(AppPathUtils.transactionImgPrefix))
+          .where((path) => path.contains(AppPathUtils.transactionImgPrefix))
           .toList();
 
       final imgsToDownload = currentImgsMap.entries

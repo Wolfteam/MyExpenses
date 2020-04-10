@@ -3,7 +3,6 @@ import 'package:injectable/injectable.dart';
 import 'package:log_4_dart_2/log_4_dart_2.dart';
 
 import 'daos/categories_dao.dart';
-import 'daos/running_tasks_dao.dart';
 import 'daos/transactions_dao.dart';
 import 'daos/users_dao.dart';
 import 'injection.iconfig.dart';
@@ -32,9 +31,6 @@ void initInjection() {
     TransactionsDaoImpl(getIt<AppDatabase>()),
   );
   getIt.registerSingleton<UsersDao>(UsersDaoImpl(getIt<AppDatabase>()));
-  getIt.registerSingleton<RunningTasksDao>(
-    RunningTasksDaoImpl(getIt<AppDatabase>()),
-  );
 
   getIt.registerSingleton<SecureStorageService>(SecureStorageServiceImpl());
 
