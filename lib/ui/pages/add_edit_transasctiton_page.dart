@@ -810,6 +810,9 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
       final amount = (double.tryParse(_amountController.text) ?? 0).abs();
       final amountText = selectedCat.isAnIncome ? '$amount' : '${amount * -1}';
       _amountController.text = amountText;
+      if (_descriptionController.text.isNullEmptyOrWhitespace) {
+        _descriptionController.text = selectedCat.name;
+      }
       context.bloc<TransactionFormBloc>().add(CategoryWasUpdated(selectedCat));
     }
   }

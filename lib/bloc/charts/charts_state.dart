@@ -14,6 +14,7 @@ class LoadedState extends ChartsState {
   final String currentDateString;
   final List<TransactionsSummaryPerDate> transactionsPerDate;
   final List<TransactionItem> transactions;
+  final AppLanguageType language;
 
   double get totalIncomeAmount => transactions
       .where((t) => t.category.isAnIncome == true)
@@ -35,10 +36,16 @@ class LoadedState extends ChartsState {
         currentDateString,
         transactionsPerDate,
         transactions,
+        language
       ];
 
-  const LoadedState(this.currentDate, this.currentDateString,
-      this.transactionsPerDate, this.transactions);
+  const LoadedState(
+    this.currentDate,
+    this.currentDateString,
+    this.transactionsPerDate,
+    this.transactions,
+    this.language,
+  );
 
   List<ChartTransactionItem> _buildChartTransactionItems(
     bool onlyIncomes,

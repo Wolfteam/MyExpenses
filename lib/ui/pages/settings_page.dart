@@ -17,6 +17,7 @@ import '../../common/utils/bloc_utils.dart';
 import '../../common/utils/currency_utils.dart';
 import '../../generated/i18n.dart';
 import '../widgets/settings/password_dialog.dart';
+import '../../common/utils/toast_utils.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -629,6 +630,8 @@ class _SettingsPageState extends State<SettingsPage>
   }
 
   void _appThemeChanged(AppThemeType newValue) {
+    final i18n = I18n.of(context);
+    showInfoToast(i18n.restartTheAppToApplyChanges);
     context.bloc<SettingsBloc>().add(AppThemeChanged(newValue));
     context.bloc<app_bloc.AppBloc>().add(app_bloc.AppThemeChanged(newValue));
   }
@@ -643,8 +646,11 @@ class _SettingsPageState extends State<SettingsPage>
   void _syncIntervalChanged(SyncIntervalType newValue) =>
       context.bloc<SettingsBloc>().add(SyncIntervalChanged(newValue));
 
-  void _languageChanged(AppLanguageType newValue) =>
-      context.bloc<SettingsBloc>().add(AppLanguageChanged(newValue));
+  void _languageChanged(AppLanguageType newValue) {
+    final i18n = I18n.of(context);
+    showInfoToast(i18n.restartTheAppToApplyChanges);
+    context.bloc<SettingsBloc>().add(AppLanguageChanged(newValue));
+  }
 
   void _askForFingerPrintChanged(bool ask) =>
       context.bloc<SettingsBloc>().add(AskForFingerPrintChanged(ask: ask));

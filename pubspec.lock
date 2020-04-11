@@ -551,9 +551,11 @@ packages:
   month_picker_dialog:
     dependency: "direct main"
     description:
-      name: month_picker_dialog
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "."
+      ref: "feature/support_custom_locale"
+      resolved-ref: "65596391b12cbe580300734afa97f379b13a9baa"
+      url: "git://github.com/Wolfteam/month_picker_dialog.git"
+    source: git
     version: "0.3.1"
   moor:
     dependency: "direct main"

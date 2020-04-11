@@ -286,6 +286,8 @@ class I18n implements WidgetsLocalizations {
   String get showNotificationForRecurringTrans => "Show a notification when a recurring transactions is executed";
   /// "You must grant permissions to open the file"
   String get openFilePermissionRequestFailedMsg => "You must grant permissions to open the file";
+  /// "You may need to restart the app for the changes to take effect"
+  String get restartTheAppToApplyChanges => "You may need to restart the app for the changes to take effect";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -767,6 +769,9 @@ class _I18n_es_VE extends I18n {
   /// "Debe otorgar permisos para abrir el archivo"
   @override
   String get openFilePermissionRequestFailedMsg => "Debe otorgar permisos para abrir el archivo";
+  /// "Puede que tengas que reinicar la aplicación, para que los cambios sean aplicados"
+  @override
+  String get restartTheAppToApplyChanges => "Puede que tengas que reinicar la aplicación, para que los cambios sean aplicados";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";

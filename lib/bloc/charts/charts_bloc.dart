@@ -13,6 +13,7 @@ import '../../models/transaction_item.dart';
 import '../../models/transactions_summary_per_date.dart';
 import '../../services/logging_service.dart';
 import '../../services/settings_service.dart';
+import '../../common/enums/app_language_type.dart';
 
 part 'charts_event.dart';
 part 'charts_state.dart';
@@ -86,6 +87,7 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
       dateString,
       trans,
       transactions,
+      _settingsService.language,
     );
   }
 

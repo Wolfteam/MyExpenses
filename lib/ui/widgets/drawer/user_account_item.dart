@@ -25,8 +25,6 @@ class UserAccountItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final i18n = I18n.of(context);
     return ListTile(
       contentPadding: const EdgeInsets.all(0),
       title: Text(fullname),

@@ -16,6 +16,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
   final double total;
   final List<TransactionsSummaryPerMonth> data;
   final DateTime currentDate;
+  final Locale locale;
 
   const HomeTransactionSummaryPerMonth({
     @required this.month,
@@ -24,6 +25,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
     @required this.total,
     @required this.data,
     @required this.currentDate,
+    @required this.locale,
   });
 
   @override
@@ -186,6 +188,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
       context: context,
       initialDate: currentDate,
       lastDate: DateTime(now.year + 1),
+      locale: locale,
     );
 
     if (selectedDate == null) return;

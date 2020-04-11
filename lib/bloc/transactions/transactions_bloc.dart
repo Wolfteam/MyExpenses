@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 
+import '../../common/enums/app_language_type.dart';
 import '../../common/utils/date_utils.dart';
 import '../../common/utils/i18n_utils.dart';
 import '../../common/utils/transaction_utils.dart';
@@ -123,6 +124,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         incomeTransactionsPerWeek: incomeTransPerWeek,
         expenseTransactionsPerWeek: expenseTransPerWeek,
         transactionsPerMonth: transPerMonth,
+        language: _settingsService.language,
       );
     } catch (e, s) {
       _logger.error(
@@ -138,6 +140,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         incomeTransactionsPerWeek: [],
         expenseTransactionsPerWeek: [],
         transactionsPerMonth: _buildTransactionsPerMonth([]),
+        language: _settingsService.language,
       );
     }
   }

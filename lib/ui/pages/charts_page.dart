@@ -6,6 +6,7 @@ import 'package:month_picker_dialog/month_picker_dialog.dart';
 import '../../bloc/chart_details/chart_details_bloc.dart';
 import '../../bloc/charts/charts_bloc.dart';
 import '../../bloc/currency/currency_bloc.dart';
+import '../../common/utils/i18n_utils.dart';
 import '../../generated/i18n.dart';
 import '../../models/transactions_summary_per_date.dart';
 import '../widgets/charts/pie_chart_transactions_per_month.dart';
@@ -275,7 +276,6 @@ class _ChartsPageState extends State<ChartsPage>
     Navigator.of(context).push(route);
   }
 
-  //TODO: CHANGE THE LOCALE HERE
   Future _changeCurrentDate(LoadedState state) async {
     final now = DateTime.now();
     final selectedDate = await showMonthPicker(
@@ -283,6 +283,7 @@ class _ChartsPageState extends State<ChartsPage>
       initialDate: state.currentDate,
       // firstDate: state.currentDate,
       lastDate: DateTime(now.year + 1),
+      locale: currentLocale(state.language)
     );
 
     if (selectedDate == null) return;

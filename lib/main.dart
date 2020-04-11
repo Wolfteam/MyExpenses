@@ -222,7 +222,6 @@ class _MyAppState extends State<MyApp> {
   }
 
 //TODO: USE SUPER ENUM
-//TODO: REMOVE THE RECURRINGTASK DAO
   Widget _buildApp(BuildContext ctx, app_bloc.AppState state) {
     final delegates = <LocalizationsDelegate>[
       // A class which loads the translations from JSON files

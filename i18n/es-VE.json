@@ -126,6 +126,7 @@
     "showNotificationAfterFullSync": "Mostrar una notificación después de una sincronización",
     "showNotificationForRecurringTrans": "Mostrar una notification cuando se ejecute una transacción recurrente",
     "openFilePermissionRequestFailedMsg": "Debe otorgar permisos para abrir el archivo",
+    "restartTheAppToApplyChanges": "Puede que tengas que reinicar la aplicación, para que los cambios sean aplicados",
     "repetitionCycle": {
         "eachWeek": "Cada semana",
         "eachMonth": "Cada mes",

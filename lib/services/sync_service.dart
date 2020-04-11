@@ -110,7 +110,7 @@ class SyncServiceImpl implements SyncService {
 
       await _updateLocalStatus(LocalStatusType.nothing);
 
-      await _updateImgFiles(user.email);
+      await _updateImgFiles();
     } catch (e, s) {
       _logger.error(
         runtimeType,
@@ -347,7 +347,6 @@ class SyncServiceImpl implements SyncService {
     ]);
   }
 
-  //TODO: TEST THIS 3 METHODS
   Future<void> _uploadAllLocalImgs() async {
     _logger.info(
       runtimeType,
@@ -420,7 +419,7 @@ class SyncServiceImpl implements SyncService {
     }
   }
 
-  Future<void> _updateImgFiles(String currentUser) async {
+  Future<void> _updateImgFiles() async {
     try {
       _logger.info(runtimeType, '_updateImgFiles: Getting all remote imgs...');
       final currentImgsMap = await _googleService.getAllImgs(
@@ -432,7 +431,7 @@ class SyncServiceImpl implements SyncService {
 
       final imgs = await Directory(imgPath)
           .list()
-          .asyncMap((f) => f.path)
+          .asyncMap((f) => basename(f.path))
           .where((path) => path.contains(AppPathUtils.transactionImgPrefix))
           .toList();
 
@@ -440,10 +439,9 @@ class SyncServiceImpl implements SyncService {
           .where((kvp) => !imgs.contains(kvp.value))
           .toList();
 
-      final imgsToUpload = imgs.where((path) {
-        final filename = basename(path);
-        return !currentImgsMap.values.contains(filename);
-      }).toList();
+      final imgsToUpload = imgs
+          .where((filename) => !currentImgsMap.values.contains(filename))
+          .toList();
 
       _logger.info(
         runtimeType,
@@ -459,8 +457,9 @@ class SyncServiceImpl implements SyncService {
         runtimeType,
         '_updateImgFiles: We will upload ${imgsToUpload.length} imgs...',
       );
-      for (final path in imgsToUpload) {
-        await _googleService.uploadFile(path);
+      for (final filename in imgsToUpload) {
+        final filePath = join(imgPath, filename);
+        await _googleService.uploadFile(filePath);
       }
       _logger.info(
         runtimeType,

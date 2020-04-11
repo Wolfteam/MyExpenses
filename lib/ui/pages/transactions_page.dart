@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../bloc/transactions/transactions_bloc.dart';
+import '../../common/utils/i18n_utils.dart';
 import '../../generated/i18n.dart';
 import '../widgets/nothing_found.dart';
 import '../widgets/transactions/home_last_7_days_summary.dart';
@@ -136,6 +137,7 @@ class _TransactionsPageState extends State<TransactionsPage>
           month: state.month,
           data: state.monthBalance,
           currentDate: state.currentDate,
+          locale: currentLocale(state.language),
         ),
         if (state.showLast7Days)
           HomeLast7DaysSummary(
