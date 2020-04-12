@@ -79,12 +79,12 @@ extension AppThemeTypeExtensions on AppAccentColorType {
     /// divisor of 5 would mean [50] is a lightness of 1.0 or
     /// a color of #ffffff. A value of six would be near white
     /// but not quite.
-    final lowDivisor = 6;
+    const lowDivisor = 6;
 
     /// if [500] is the default color, there are at LEAST four
     /// steps above [500]. A divisor of 4 would mean [900] is
     /// a lightness of 0.0 or color of #000000
-    final highDivisor = 5;
+    const highDivisor = 5;
 
     final lowStep = (1.0 - lightness) / lowDivisor;
     final highStep = lightness / highDivisor;

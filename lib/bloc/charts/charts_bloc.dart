@@ -2,10 +2,13 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:intl/intl.dart';
 
+import '../../common/enums/app_language_type.dart';
 import '../../common/utils/date_utils.dart';
 import '../../common/utils/transaction_utils.dart';
 import '../../daos/transactions_dao.dart';
+import '../../daos/users_dao.dart';
 import '../../models/chart_transaction_item.dart';
 import '../../models/transaction_item.dart';
 import '../../models/transactions_summary_per_date.dart';
@@ -18,12 +21,18 @@ part 'charts_state.dart';
 class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
   final LoggingService _logger;
   final TransactionsDao _transactionsDao;
+  final UsersDao _usersDao;
   final SettingsService _settingsService;
 
   @override
   ChartsState get initialState => LoadingState();
 
-  ChartsBloc(this._logger, this._transactionsDao, this._settingsService);
+  ChartsBloc(
+    this._logger,
+    this._transactionsDao,
+    this._usersDao,
+    this._settingsService,
+  );
 
   @override
   Stream<ChartsState> mapEventToState(
@@ -35,11 +44,11 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
   }
 
   Stream<ChartsState> _buildLoadedState(DateTime now) async* {
-    final dateString = DateUtils.formatAppDate(
+    final dateString = toBeginningOfSentenceCase(DateUtils.formatAppDate(
       now,
       _settingsService.language,
       DateUtils.fullMonthAndYearFormat,
-    );
+    ));
     final from = DateUtils.getFirstDayDateOfTheMonth(now);
     final to = DateUtils.getLastDayDateOfTheMonth(now);
     var transactions = <TransactionItem>[];
@@ -50,7 +59,12 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
         runtimeType,
         '_buildLoadedState: Trying to get all the transactions from = $from to = $to',
       );
-      transactions = await _transactionsDao.getAllTransactions(from, to);
+      final currentUser = await _usersDao.getActiveUser();
+      transactions = await _transactionsDao.getAllTransactions(
+        currentUser?.id,
+        from,
+        to,
+      );
       transactions
           .sort((t1, t2) => t1.transactionDate.compareTo(t2.transactionDate));
 
@@ -59,7 +73,7 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
         '_buildLoadedState: Mapping the transaction to the corresponding state',
       );
       trans = _buildTransactionSummaryPerDate(from, to, transactions);
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         '_buildLoadedState: An unknown error occurred',
@@ -73,6 +87,7 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
       dateString,
       trans,
       transactions,
+      _settingsService.language,
     );
   }
 
@@ -88,7 +103,7 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
     for (var i = 0; i < days; i++) {
       final now = from.add(Duration(days: i));
       final first = DateTime(now.year, now.month, now.day, 0, 0, 0);
-      
+
       final next = _getNextDate(first);
       final last = DateTime(next.year, next.month, next.day, 23, 59, 59);
 
@@ -111,12 +126,7 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
 
       final dateRangeString = '$start - $end';
 
-      trans.add(TransactionsSummaryPerDate(
-        amount.round(),
-        first,
-        last,
-        dateRangeString,
-      ));
+      trans.add(TransactionsSummaryPerDate(amount, dateRangeString));
 
       i += last.difference(first).inDays;
     }

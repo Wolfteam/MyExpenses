@@ -1,25 +1,34 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../bloc/drawer/drawer_bloc.dart';
-import '../../bloc/reports/reports_bloc.dart';
-import '../../common/enums/app_drawer_item_type.dart';
-import '../../common/presentation/custom_assets.dart';
-import '../../generated/i18n.dart';
-import 'reports/reports_bottom_sheet_dialog.dart';
+import '../../../bloc/drawer/drawer_bloc.dart';
+import '../../../bloc/reports/reports_bloc.dart';
+import '../../../bloc/users_accounts/user_accounts_bloc.dart';
+import '../../../common/enums/app_drawer_item_type.dart';
+import '../../../common/presentation/custom_assets.dart';
+import '../../../common/utils/bloc_utils.dart';
+import '../../../generated/i18n.dart';
+import '../reports/reports_bottom_sheet_dialog.dart';
+import 'user_accounts_bottom_sheet_dialog.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DrawerBloc, DrawerState>(
+    return BlocConsumer<DrawerBloc, DrawerState>(
+      listener: (ctx, state) {
+        if (state.userSignedOut) {
+          BlocUtils.raiseAllCommonBlocEvents(ctx);
+        }
+      },
       builder: (ctx, state) {
         return Drawer(
           child: ListView(
             padding: EdgeInsets.zero,
             children: <Widget>[
-              _buildHeader(),
+              _buildHeader(ctx, state),
               _buildItem(
                 AppDrawerItemType.transactions,
                 context,
@@ -63,12 +72,13 @@ class AppDrawer extends StatelessWidget {
                   ctx,
                 ),
               ),
-              // _buildItem(
-              //   AppDrawerItemType.logout,
-              //   context,
-              //   state,
-              //   (item, ctx) => _logout(ctx),
-              // ),
+              if (state.isUserSignedIn)
+                _buildItem(
+                  AppDrawerItemType.logout,
+                  context,
+                  state,
+                  (item, ctx) => _showSignOutDialog(ctx),
+                ),
             ],
           ),
         );
@@ -76,32 +86,60 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(
+    BuildContext context,
+    DrawerState state,
+  ) {
+    final theme = Theme.of(context);
+    final i18n = I18n.of(context);
+
     return DrawerHeader(
       margin: const EdgeInsets.all(0),
-      decoration: BoxDecoration(color: Colors.transparent),
+      // decoration: BoxDecoration(color: Colors.transparent),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 5),
-        // color: Colors.red,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Image.asset(
-              CustomAssets.appIcon,
-              width: 80,
-              height: 80,
+            GestureDetector(
+              onTap: () => _signIn(context, state),
+              child: state.isUserSignedIn
+                  ? Container(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: CircleAvatar(
+                        radius: 40,
+                        backgroundImage: FileImage(File(state.img)),
+                      ),
+                    )
+                  : Image.asset(
+                      CustomAssets.appIcon,
+                      width: 80,
+                      height: 80,
+                    ),
             ),
-            // Flexible(
-            //   child: Text(
-            //     'Efrain Bastidas',
-            //   ),
-            // ),
-            // Flexible(
-            //   child: Text(
-            //     'ebastidas@smartersolutions.com.ve',
-            //   ),
-            // )
+            if (!state.isUserSignedIn)
+              Container(
+                margin: const EdgeInsets.only(top: 10),
+                child: Text(
+                  i18n.tapToSignIn,
+                  style: theme.textTheme.subhead,
+                ),
+              ),
+            if (state.isUserSignedIn)
+              Flexible(
+                child: Text(
+                  state.fullName,
+                  style: theme.textTheme.subtitle,
+                ),
+              ),
+            if (state.isUserSignedIn)
+              Flexible(
+                child: Text(
+                  state.email,
+                  style: theme.textTheme.caption,
+                ),
+              )
           ],
         ),
       ),
@@ -187,7 +225,59 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  void _logout(BuildContext context) {
+  void _showSignOutDialog(BuildContext context) {
+    final theme = Theme.of(context);
+    final i18n = I18n.of(context);
+
     Navigator.pop(context);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(i18n.logout),
+        content: Text(i18n.confirmSignOut),
+        actions: <Widget>[
+          OutlineButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+            },
+            child: Text(
+              i18n.cancel,
+              style: TextStyle(color: theme.primaryColor),
+            ),
+          ),
+          RaisedButton(
+            color: theme.primaryColor,
+            onPressed: () => _signOut(ctx),
+            child: Text(i18n.yes),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _signOut(BuildContext context) {
+    Navigator.pop(context);
+    context.bloc<DrawerBloc>().add(const SignOut());
+  }
+
+  Future<void> _signIn(
+    BuildContext context,
+    DrawerState state,
+  ) async {
+    Navigator.pop(context);
+    context.bloc<UserAccountsBloc>().add(Initialize());
+
+    showModalBottomSheet(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(35),
+          topLeft: Radius.circular(35),
+        ),
+      ),
+      isDismissible: true,
+      isScrollControlled: true,
+      context: context,
+      builder: (ctx) => UserAccountsBottomSheetDialog(),
+    );
   }
 }

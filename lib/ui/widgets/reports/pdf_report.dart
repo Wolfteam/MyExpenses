@@ -13,6 +13,7 @@ import '../../../generated/i18n.dart';
 import '../../../models/transaction_item.dart';
 
 Future<Document> buildPdf(
+  String Function(double) formater,
   List<TransactionItem> transactions,
   I18n i18n,
   DateTime from,
@@ -38,6 +39,7 @@ Future<Document> buildPdf(
           Font.ttf(await rootBundle.load(CustomAssets.fontOpenSansBoldItalic)),
     ),
   );
+
   final imgBytes = await rootBundle.load(CustomAssets.appIcon);
   final img = image_lib.decodeImage(imgBytes.buffer.asUint8List());
   final resizedImg = image_lib.copyResize(img, width: 120, height: 120);
@@ -62,6 +64,7 @@ Future<Document> buildPdf(
         i18n,
         from,
         to,
+        formater,
       ),
     ),
   );
@@ -121,6 +124,7 @@ List<Widget> _buildPdfBody(
   I18n i18n,
   DateTime from,
   DateTime to,
+  String Function(double) formatter,
 ) {
   final generatedOn = DateUtils.formatDateWithoutLocale(
     DateTime.now(),
@@ -197,21 +201,21 @@ List<Widget> _buildPdfBody(
               ),
             ),
             Text(
-              '${i18n.incomes}: \$ $incomeAmount',
+              '${i18n.incomes}: ${formatter(incomeAmount)}',
               style: TextStyle(
                 color: PdfColors.green,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
-              '${i18n.expenses}: \$ $expenseAmount',
+              '${i18n.expenses}: ${formatter(expenseAmount)}',
               style: TextStyle(
                 color: PdfColors.red,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
-              '${i18n.total}: \$ $balance',
+              '${i18n.total}: ${formatter(balance)}',
               style: TextStyle(
                 color: balance >= 0 ? PdfColors.green : PdfColors.red,
                 fontWeight: FontWeight.bold,
@@ -228,7 +232,32 @@ List<Widget> _buildPdfBody(
 
   final transactionsMap = _buildTransactionsPerMonth(transactions);
   final tables = transactionsMap.entries
-      .map((kvp) => _buildTable(kvp.key, kvp.value, i18n));
+      .map((kvp) => _buildTable(kvp.key, kvp.value, i18n, formatter));
+  if (tables.isEmpty) {
+    return [
+      Align(
+        alignment: Alignment.centerLeft,
+        child: summary,
+      ),
+      Padding(
+        padding: const EdgeInsets.only(top: 30, right: 20, left: 20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Text(
+              i18n.noTransactionsForThisPeriod,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ];
+  }
 
   return [
     Align(
@@ -319,6 +348,7 @@ TableRow _buildRowItem(
   int index,
   TransactionItem t,
   I18n i18n,
+  String Function(double) formatter,
 ) {
   const cellPadding = EdgeInsets.symmetric(horizontal: 5);
   return TableRow(
@@ -343,7 +373,7 @@ TableRow _buildRowItem(
         padding: cellPadding,
         alignment: Alignment.center,
         child: Text(
-          '${t.amount} \$',
+          formatter(t.amount),
           textAlign: TextAlign.center,
         ),
       ),
@@ -393,6 +423,7 @@ Widget _buildTable(
   DateTime date,
   List<TransactionItem> transactions,
   I18n i18n,
+  String Function(double) formatter,
 ) {
   final firstDate = DateUtils.getFirstDayDateOfTheMonth(date);
   final lastDate = DateUtils.getLastDayDateOfTheMonth(date);
@@ -421,7 +452,14 @@ Widget _buildTable(
     //rows
     ...transactions
         .asMap()
-        .map((index, t) => MapEntry(index, _buildRowItem(index + 1, t, i18n)))
+        .map((index, t) => MapEntry(
+            index,
+            _buildRowItem(
+              index + 1,
+              t,
+              i18n,
+              formatter,
+            )))
         .values
   ];
   return Container(
@@ -465,21 +503,21 @@ Widget _buildTable(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '${i18n.incomes}: \$ $incomeAmount',
+                '${i18n.incomes}: ${formatter(incomeAmount)}',
                 style: TextStyle(
                   color: PdfColors.green,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
-                '${i18n.expenses}: \$ $expenseAmount',
+                '${i18n.expenses}: ${formatter(expenseAmount)}',
                 style: TextStyle(
                   color: PdfColors.red,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Text(
-                '${i18n.total}: \$ $balance',
+                '${i18n.total}: ${formatter(balance)}',
                 style: TextStyle(
                   color: balance >= 0 ? PdfColors.green : PdfColors.red,
                   fontWeight: FontWeight.bold,

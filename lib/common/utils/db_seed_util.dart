@@ -3,182 +3,141 @@ import 'package:flutter/material.dart';
 import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/utils/category_utils.dart';
 import '../../models/entities/database.dart';
+import '../converters/color_converter.dart';
+import '../converters/icon_data_converter.dart';
+import '../enums/local_status_type.dart';
 
 const createdBy = 'ebastidas';
 
 List<Category> getDefaultCategories() {
   final categories = [
     //Income
-    Category(
-      name: 'Money',
-      isAnIncome: true,
-      icon: CategoryUtils.getByName(CategoryUtils.money2).icon.icon,
-      iconColor: Colors.green,
-      createdBy: createdBy,
+    _buildCategory(
+      'Money',
+      CategoryUtils.getByName(CategoryUtils.money2).icon.icon,
+      Colors.green,
+      true,
     ),
-    Category(
-      name: 'Bank',
-      isAnIncome: true,
-      icon: CategoryUtils.getByName(CategoryUtils.bank).icon.icon,
-      iconColor: Colors.black,
-      createdBy: createdBy,
+    _buildCategory(
+      'Bank',
+      CategoryUtils.getByName(CategoryUtils.bank).icon.icon,
+      Colors.black,
+      true,
     ),
 
     //Food
-    Category(
-      name: 'Fast Food',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.fastFood).icon.icon,
-      iconColor: Colors.red,
-      createdBy: createdBy,
+    _buildCategory(
+      'Fast Food',
+      CategoryUtils.getByName(CategoryUtils.fastFood).icon.icon,
+      Colors.red,
     ),
-    Category(
-      name: 'Restaurant',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.restaurant).icon.icon,
-      iconColor: Colors.brown,
-      createdBy: createdBy,
+    _buildCategory(
+      'Restaurant',
+      CategoryUtils.getByName(CategoryUtils.restaurant).icon.icon,
+      Colors.brown,
     ),
-    Category(
-      name: 'Cafe',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.cafe).icon.icon,
-      iconColor: Colors.orange,
-      createdBy: createdBy,
+    _buildCategory(
+      'Cafe',
+      CategoryUtils.getByName(CategoryUtils.cafe).icon.icon,
+      Colors.orange,
     ),
 
     //Home
-    Category(
-      name: 'Gas',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.gas).icon.icon,
-      iconColor: Colors.blueAccent,
-      createdBy: createdBy,
+    _buildCategory(
+      'Gas',
+      CategoryUtils.getByName(CategoryUtils.gas).icon.icon,
+      Colors.blueAccent,
     ),
-    Category(
-      name: 'Water',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.waterDrop).icon.icon,
-      iconColor: Colors.blue,
-      createdBy: createdBy,
+    _buildCategory(
+      'Water',
+      CategoryUtils.getByName(CategoryUtils.waterDrop).icon.icon,
+      Colors.blue,
     ),
-    Category(
-      name: 'Light',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.battery).icon.icon,
-      iconColor: Colors.yellow,
-      createdBy: createdBy,
+    _buildCategory(
+      'Light',
+      CategoryUtils.getByName(CategoryUtils.battery).icon.icon,
+      Colors.yellow,
     ),
-    Category(
-      name: 'Phone',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.smartphone).icon.icon,
-      iconColor: Colors.green,
-      createdBy: createdBy,
+    _buildCategory(
+      'Phone',
+      CategoryUtils.getByName(CategoryUtils.smartphone).icon.icon,
+      Colors.green,
     ),
-    Category(
-      name: 'TV',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.tv).icon.icon,
-      iconColor: Colors.brown,
-      createdBy: createdBy,
+    _buildCategory(
+      'TV',
+      CategoryUtils.getByName(CategoryUtils.tv).icon.icon,
+      Colors.brown,
     ),
-    Category(
-      name: 'Internet',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.web).icon.icon,
-      iconColor: Colors.blueAccent,
-      createdBy: createdBy,
+    _buildCategory(
+      'Internet',
+      CategoryUtils.getByName(CategoryUtils.web).icon.icon,
+      Colors.blueAccent,
     ),
 
     //life
-    Category(
-      name: 'Games',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.gamepad).icon.icon,
-      iconColor: Colors.indigo,
-      createdBy: createdBy,
+    _buildCategory(
+      'Games',
+      CategoryUtils.getByName(CategoryUtils.gamepad).icon.icon,
+      Colors.indigo,
     ),
-    Category(
-      name: 'Movies',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.movies).icon.icon,
-      iconColor: Colors.grey,
-      createdBy: createdBy,
+    _buildCategory(
+      'Movies',
+      CategoryUtils.getByName(CategoryUtils.movies).icon.icon,
+      Colors.grey,
     ),
-    Category(
-      name: 'Sports',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.soccerBall).icon.icon,
-      iconColor: Colors.black,
-      createdBy: createdBy,
+    _buildCategory(
+      'Sports',
+      CategoryUtils.getByName(CategoryUtils.soccerBall).icon.icon,
+      Colors.black,
     ),
-    Category(
-      name: 'Health',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.healing).icon.icon,
-      iconColor: Colors.red,
-      createdBy: createdBy,
+    _buildCategory(
+      'Health',
+      CategoryUtils.getByName(CategoryUtils.healing).icon.icon,
+      Colors.red,
     ),
-    Category(
-      name: 'Pharmacy',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.pharmacy).icon.icon,
-      iconColor: Colors.red,
-      createdBy: createdBy,
+    _buildCategory(
+      'Pharmacy',
+      CategoryUtils.getByName(CategoryUtils.pharmacy).icon.icon,
+      Colors.red,
     ),
-    Category(
-      name: 'Education',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.school).icon.icon,
-      iconColor: Colors.grey,
-      createdBy: createdBy,
+    _buildCategory(
+      'Education',
+      CategoryUtils.getByName(CategoryUtils.school).icon.icon,
+      Colors.grey,
     ),
 
     //Shopping
-    Category(
-      name: 'Shopping',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.shop).icon.icon,
-      iconColor: Colors.cyan,
-      createdBy: createdBy,
+    _buildCategory(
+      'Shopping',
+      CategoryUtils.getByName(CategoryUtils.shop).icon.icon,
+      Colors.cyan,
     ),
-    Category(
-      name: 'Offer',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.offer).icon.icon,
-      iconColor: Colors.green,
-      createdBy: createdBy,
+    _buildCategory(
+      'Offer',
+      CategoryUtils.getByName(CategoryUtils.offer).icon.icon,
+      Colors.green,
     ),
 
     //Transport
-    Category(
-      name: 'Taxi',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.taxi).icon.icon,
-      iconColor: Colors.yellow,
-      createdBy: createdBy,
+    _buildCategory(
+      'Taxi',
+      CategoryUtils.getByName(CategoryUtils.taxi).icon.icon,
+      Colors.yellow,
     ),
-    Category(
-      name: 'Bus',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.bus).icon.icon,
-      iconColor: Colors.black,
-      createdBy: createdBy,
+    _buildCategory(
+      'Bus',
+      CategoryUtils.getByName(CategoryUtils.bus).icon.icon,
+      Colors.black,
     ),
-    Category(
-      name: 'Car',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.car).icon.icon,
-      iconColor: Colors.red,
-      createdBy: createdBy,
+    _buildCategory(
+      'Car',
+      CategoryUtils.getByName(CategoryUtils.car).icon.icon,
+      Colors.red,
     ),
-    Category(
-      name: 'Subway',
-      isAnIncome: false,
-      icon: CategoryUtils.getByName(CategoryUtils.subway).icon.icon,
-      iconColor: Colors.grey,
-      createdBy: createdBy,
+    _buildCategory(
+      'Subway',
+      CategoryUtils.getByName(CategoryUtils.subway).icon.icon,
+      Colors.grey,
     ),
   ];
 
@@ -275,6 +234,33 @@ List<Transaction> getDefaultRecurringTransactions() {
   ];
 }
 
+Category _buildCategory(
+  String name,
+  IconData icon,
+  Color color, [
+  bool isAnIncome = false,
+]) {
+  final now = DateTime.now();
+  return Category(
+    localStatus: LocalStatusType.nothing,
+    name: name,
+    isAnIncome: isAnIncome,
+    icon: icon,
+    iconColor: color,
+    createdBy: createdBy,
+    createdAt: now,
+    createdHash: createdHash([
+      name,
+      isAnIncome,
+      const IconDataConverter().mapToSql(icon),
+      const ColorConverter().mapToSql(color),
+      createdBy,
+      now,
+      LocalStatusType.nothing
+    ]),
+  );
+}
+
 Transaction _buildTransaction(
   int categoryId,
   String description,
@@ -284,7 +270,9 @@ Transaction _buildTransaction(
   RepetitionCycleType cycle = RepetitionCycleType.none,
   DateTime nextRecurringDate,
 }) {
+  final now = DateTime.now();
   return Transaction(
+    localStatus: LocalStatusType.nothing,
     amount: amount,
     categoryId: categoryId,
     description: description,
@@ -293,5 +281,18 @@ Transaction _buildTransaction(
     createdBy: createdBy,
     isParentTransaction: cycle != RepetitionCycleType.none,
     nextRecurringDate: nextRecurringDate,
+    createdAt: now,
+    createdHash: createdHash([
+      amount,
+      categoryId,
+      description,
+      date,
+      cycle,
+      createdBy,
+      cycle != RepetitionCycleType.none,
+      nextRecurringDate,
+      now,
+      LocalStatusType.nothing,
+    ]),
   );
 }

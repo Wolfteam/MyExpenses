@@ -6,11 +6,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 
-import '../../common/enums/repetition_cycle_type.dart';
+import '../../common/enums/app_language_type.dart';
 import '../../common/utils/date_utils.dart';
 import '../../common/utils/i18n_utils.dart';
 import '../../common/utils/transaction_utils.dart';
 import '../../daos/transactions_dao.dart';
+import '../../daos/users_dao.dart';
 import '../../models/transaction_card_items.dart';
 import '../../models/transaction_item.dart';
 import '../../models/transactions_summary_per_day.dart';
@@ -24,11 +25,13 @@ part 'transactions_state.dart';
 class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
   final LoggingService _logger;
   final TransactionsDao _transactionsDao;
+  final UsersDao _usersDao;
   final SettingsService _settingsService;
 
   TransactionsBloc(
     this._logger,
     this._transactionsDao,
+    this._usersDao,
     this._settingsService,
   );
 
@@ -53,25 +56,35 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
   Stream<TransactionsLoadedState> _buildInitialState(
     GetTransactions event,
   ) async* {
-    final month = DateUtils.formatAppDate(
+    final month = toBeginningOfSentenceCase(DateUtils.formatAppDate(
       event.inThisDate,
       _settingsService.language,
       DateUtils.fullMonthFormat,
-    );
+    ));
     final now = DateTime.now();
     final from = DateUtils.getFirstDayDateOfTheMonth(event.inThisDate);
     final to = DateUtils.getLastDayDateOfTheMonth(from);
 
     try {
       if (from.isBefore(now) || from.isAtSameMomentAs(now)) {
-        await _checkRecurringTransactions(now);
+        await TransactionUtils.checkRecurringTransactions(
+          now,
+          _logger,
+          _transactionsDao,
+          _usersDao,
+        );
       }
 
       _logger.info(
         runtimeType,
         '_buildInitialState: Getting all the transactions from = $from to = $to',
       );
-      final transactions = await _transactionsDao.getAllTransactions(from, to);
+      final currentUser = await _usersDao.getActiveUser();
+      final transactions = await _transactionsDao.getAllTransactions(
+        currentUser?.id,
+        from,
+        to,
+      );
 
       final incomes = _getTotalIncomes(transactions);
       final expenses = _getTotalExpenses(transactions);
@@ -111,8 +124,9 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         incomeTransactionsPerWeek: incomeTransPerWeek,
         expenseTransactionsPerWeek: expenseTransPerWeek,
         transactionsPerMonth: transPerMonth,
+        language: _settingsService.language,
       );
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
           runtimeType, '_buildInitialState: An unknown error occurred', e, s);
       yield TransactionsLoadedState(
@@ -123,86 +137,31 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         currentDate: event.inThisDate,
         showLast7Days: DateTime.now().month == event.inThisDate.month,
         monthBalance: _buildMonthBalance(0, 0, []),
-        incomeTransactionsPerWeek: [],
-        expenseTransactionsPerWeek: [],
+        incomeTransactionsPerWeek: const [],
+        expenseTransactionsPerWeek: const [],
         transactionsPerMonth: _buildTransactionsPerMonth([]),
+        language: _settingsService.language,
       );
     }
   }
 
   Stream<TransactionsLoadedState> _buildRecurringState() async* {
     try {
-      _logger.info(runtimeType,
-          '_buildRecurringState: Getting all parent transactions...');
-      final transactions = await _transactionsDao.getAllParentTransactions();
+      _logger.info(
+        runtimeType,
+        '_buildRecurringState: Getting all parent transactions...',
+      );
+      final currentUser = await _usersDao.getActiveUser();
+      final transactions = await _transactionsDao.getAllParentTransactions(
+        currentUser?.id,
+      );
       final transPerMonth = _buildTransactionsPerMonth(transactions);
       yield currentState.copyWith(
         showParentTransactions: true,
         transactionsPerMonth: transPerMonth,
       );
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(runtimeType, '_buildRecurringState: Unknown error', e, s);
-    }
-  }
-
-  Future _checkRecurringTransactions(DateTime now) async {
-    _logger.info(
-      runtimeType,
-      '_checkRecurringTransactions: Getting all parent transactions...',
-    );
-    final until = DateTime(now.year, now.month, now.day, 23, 59, 59);
-    final parents = await _transactionsDao.getAllParentTransactionsUntil(until);
-
-    if (parents.isEmpty) {
-      _logger.info(
-        runtimeType,
-        '_checkRecurringTransactions: There are no parent transactions...',
-      );
-      return;
-    }
-
-    for (final parent in parents) {
-      if (parent.repetitionCycle == RepetitionCycleType.none) {
-        _logger.warning(
-          runtimeType,
-          '_checkRecurringTransactions: Transaction = ${parent.description} is marked as parent , ' +
-              'but the repetition cycle is none...',
-        );
-        continue;
-      }
-
-      _logger.info(
-        runtimeType,
-        '_checkRecurringTransactions: Transaction initial date is = ${parent.transactionDate}\n' +
-            'and next recurring date is = ${parent.nextRecurringDate}',
-      );
-
-      bool allCompleted = false;
-      var currentRecurringDate = parent.nextRecurringDate;
-      final periods = <DateTime>[];
-      while (!allCompleted) {
-        if (currentRecurringDate.isAfter(now)) {
-          allCompleted = true;
-          break;
-        }
-        periods.add(currentRecurringDate);
-
-        currentRecurringDate = TransactionUtils.getNextRecurringDate(
-          parent.repetitionCycle,
-          currentRecurringDate,
-        );
-      }
-
-      _logger.info(
-        runtimeType,
-        '_checkRecurringTransactions: Saving ${periods.length} periods for parent transaction id = ${parent.id}',
-      );
-
-      await _transactionsDao.checkAndSaveRecurringTransactions(
-        parent,
-        currentRecurringDate,
-        periods,
-      );
     }
   }
 
@@ -219,20 +178,22 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     double expenses,
     List<TransactionItem> transactions,
   ) {
-    final balance = (expenses.abs() + incomes).abs();
     if (transactions.isNotEmpty) {
-      final expensesPercentage = (expenses * 100 / balance).abs().round();
-      final incomesPercentage = (incomes * 100 / balance).round();
+      final incomeAmount = incomes <= 0 ? 0 : incomes;
+      final double expensesPercentage =
+          incomeAmount <= 0 ? 100 : (expenses * 100 / incomeAmount).abs();
+      final double incomesPercentage =
+          expensesPercentage >= 100 ? 0 : 100 - expensesPercentage;
 
       return [
         TransactionsSummaryPerMonth(
           order: 0,
-          percentage: expensesPercentage,
+          percentage: TransactionUtils.roundDouble(expensesPercentage),
           isAnIncome: false,
         ),
         TransactionsSummaryPerMonth(
           order: 1,
-          percentage: incomesPercentage,
+          percentage: TransactionUtils.roundDouble(incomesPercentage),
           isAnIncome: true,
         ),
       ];
@@ -266,9 +227,11 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     );
 
     try {
-      final transactions = (await _transactionsDao.getAllTransactions(from, to))
-          .where((t) => t.category.isAnIncome == onlyIncomes)
-          .toList();
+      final currentUser = await _usersDao.getActiveUser();
+      final transactions =
+          (await _transactionsDao.getAllTransactions(currentUser?.id, from, to))
+              .where((t) => t.category.isAnIncome == onlyIncomes)
+              .toList();
 
       final map = <DateTime, double>{};
       for (final transaction in transactions) {
@@ -295,13 +258,13 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
       final models = map.entries
           .map((kvp) => TransactionsSummaryPerDay(
                 date: kvp.key,
-                amount: kvp.value.round(),
+                totalDayAmount: kvp.value,
               ))
           .toList();
 
-      models.sort((t1, t2) => t1.createdAt.compareTo(t2.createdAt));
+      models.sort((t1, t2) => t1.date.compareTo(t2.date));
       return models;
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         '_buildTransactionSummaryPerDay: Unknown error ocurred',

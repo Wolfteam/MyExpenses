@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:equatable/equatable.dart';
 
-import 'base_transaction.dart';
+import '../common/mixins/transaction_mixin.dart';
 
-class ChartTransactionItem extends BaseTransaction {
-  Color _color;
+class ChartTransactionItem extends Equatable with TransactionMixin {
   final int order;
+  final double value;
   final bool dummyItem;
+  final Color categoryColor;
 
   @override
-  Color get color {
-    return _color;
-  }
+  List<Object> get props => [order, value, dummyItem, categoryColor];
 
-  set color(Color c) {
-    _color = c;
-  }
+  bool get isAnIncome => isTransactionAnIncome(value);
 
-  ChartTransactionItem(
-    this._color, {
-    @required int amount,
+  Color get transactionColor => getTransactionColor(isAnIncome: isAnIncome);
+
+  ChartTransactionItem({
+    @required this.value,
     @required this.order,
-    this.dummyItem = false
-  }) : super(amount: amount);
+    this.categoryColor,
+    this.dummyItem = false,
+  });
 }

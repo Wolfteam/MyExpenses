@@ -10,12 +10,18 @@ class AppUninitializedState extends AppState {
 }
 
 class AppInitializedState extends AppState {
+  final bool isInitialized;
   final ThemeData theme;
+  final bool bgTaskIsRunning;
 
-  const AppInitializedState(this.theme);
+  const AppInitializedState(
+    this.theme, {
+    this.isInitialized,
+    this.bgTaskIsRunning,
+  });
 
   @override
-  List<Object> get props => [theme];
+  List<Object> get props => [theme, isInitialized, bgTaskIsRunning];
 }
 
 class AuthenticationState extends AppState {

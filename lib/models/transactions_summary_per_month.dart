@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:equatable/equatable.dart';
 
-class TransactionsSummaryPerMonth {
+import '../common/mixins/transaction_mixin.dart';
+
+class TransactionsSummaryPerMonth extends Equatable with TransactionMixin {
   final int order;
-  final int percentage;
+  final double percentage;
   final bool isAnIncome;
 
-  Color get color {
-    return isAnIncome ? Colors.green : Colors.red;
-  }
+  @override
+  List<Object> get props => [order, percentage, isAnIncome];
+
+  Color get color => getTransactionColor(isAnIncome: isAnIncome);
 
   TransactionsSummaryPerMonth({
-    this.order,
-    this.percentage,
-    this.isAnIncome,
+    @required this.order,
+    @required this.percentage,
+    @required this.isAnIncome,
   });
 }

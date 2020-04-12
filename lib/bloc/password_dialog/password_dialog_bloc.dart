@@ -5,9 +5,10 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:password/password.dart';
 
+import '../../common/enums/secure_resource_type.dart';
 import '../../common/extensions/string_extensions.dart';
 import '../../services/logging_service.dart';
-import '../../services/settings_service.dart';
+import '../../services/secure_storage_service.dart';
 
 part 'password_dialog_event.dart';
 part 'password_dialog_state.dart';
@@ -15,9 +16,9 @@ part 'password_dialog_state.dart';
 class PasswordDialogBloc
     extends Bloc<PasswordDialogEvent, PasswordDialogState> {
   final LoggingService _logger;
-  final SettingsService _settings;
+  final SecureStorageService _secureStorageService;
 
-  PasswordDialogBloc(this._logger, this._settings);
+  PasswordDialogBloc(this._logger, this._secureStorageService);
 
   @override
   PasswordDialogState get initialState => PasswordDialogState.initial();
@@ -57,7 +58,11 @@ class PasswordDialogBloc
     if (event is SubmitForm) {
       _logger.info(runtimeType, 'Trying to save password...');
       final hash = _getHashedPassword(state.password);
-      _settings.password = hash;
+      _secureStorageService.save(
+        SecureResourceType.loginPassword,
+        _secureStorageService.defaultUsername,
+        hash,
+      );
 
       _logger.info(runtimeType, 'Password was successfully saved...');
 
@@ -66,7 +71,11 @@ class PasswordDialogBloc
     }
 
     if (event is ValidatePassword) {
-      final isValid = Password.verify(event.password, _settings.password);
+      final pass = await _secureStorageService.get(
+        SecureResourceType.loginPassword,
+        _secureStorageService.defaultUsername,
+      );
+      final isValid = Password.verify(event.password, pass);
       yield state.copyWith(userIsValid: isValid);
 
       if (isValid) {

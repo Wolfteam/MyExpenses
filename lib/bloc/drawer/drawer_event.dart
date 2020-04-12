@@ -4,6 +4,13 @@ abstract class DrawerEvent extends Equatable {
   const DrawerEvent();
 }
 
+class InitializeDrawer extends DrawerEvent {
+  @override
+  List<Object> get props => [];
+
+  const InitializeDrawer();
+}
+
 class DrawerItemSelectionChanged extends DrawerEvent {
   final AppDrawerItemType selectedPage;
 
@@ -11,4 +18,11 @@ class DrawerItemSelectionChanged extends DrawerEvent {
 
   @override
   List<Object> get props => [selectedPage];
+}
+
+class SignOut extends DrawerEvent {
+  @override
+  List<Object> get props => [];
+
+  const SignOut();
 }

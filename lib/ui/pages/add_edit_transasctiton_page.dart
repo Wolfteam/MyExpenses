@@ -12,6 +12,7 @@ import '../../bloc/transactions/transactions_bloc.dart';
 import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/extensions/i18n_extensions.dart';
 import '../../common/extensions/string_extensions.dart';
+import '../../common/utils/bloc_utils.dart';
 import '../../common/utils/date_utils.dart';
 import '../../common/utils/i18n_utils.dart';
 import '../../common/utils/toast_utils.dart';
@@ -68,7 +69,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
 
     if (_didChangeDependencies) return;
     if (widget.item != null) {
-      context.bloc<TransactionFormBloc>().add(EditTransaction(widget.item));
+      context.bloc<TransactionFormBloc>().add(EditTransaction(widget.item.id));
     } else {
       context.bloc<TransactionFormBloc>().add(AddTransaction());
     }
@@ -85,6 +86,13 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         if (state is TransactionFormLoadedState) {
           if (state.errorOccurred) {
             showWarningToast(i18n.unknownErrorOcurred);
+          }
+
+          if (state.nextRecurringDateWasUpdated) {
+            BlocUtils.raiseCommonBlocEvents(
+              context,
+              reloadTransactions: true,
+            );
           }
         }
 
@@ -131,7 +139,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               ),
               onPressed: state.isFormValid ? _saveTransaction : null,
             ),
-          if (!state.isNewTransaction != null && !state.isChildTransaction)
+          if (!state.isNewTransaction && !state.isChildTransaction)
             IconButton(
               icon: Icon(Icons.delete),
               onPressed: () => _showDeleteConfirmationDialog(state),
@@ -204,6 +212,14 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     const cornerRadius = Radius.circular(20);
     final theme = Theme.of(context);
     final i18n = I18n.of(context);
+    final dateString = state.isParentTransaction &&
+            state.nextRecurringDate != null &&
+            state.isRecurringTransactionRunning
+        ? i18n.nextDateOn(DateUtils.formatDateWithoutLocale(
+            state.nextRecurringDate,
+            DateUtils.monthDayAndYearFormat,
+          ))
+        : '${i18n.date}: ${state.transactionDateString}';
 
     return Container(
       height: 260.0,
@@ -243,7 +259,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                     height: 5.0,
                   ),
                   Text(
-                    '${i18n.date}: ${state.transactionDateString}',
+                    dateString,
                     style: theme.textTheme.subtitle,
                   ),
                   const SizedBox(
@@ -322,14 +338,18 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                   type: MaterialType.circle,
                   child: Padding(
                     padding: const EdgeInsets.all(10),
-                    child: IconButton(
-                      iconSize: 60,
-                      icon: Icon(state.category.icon),
-                      color: state.category.iconColor,
-                      onPressed: !state.isChildTransaction
-                          ? () => _changeCategory(state)
-                          : null,
-                    ),
+                    child: !state.isChildTransaction
+                        ? IconButton(
+                            iconSize: 60,
+                            icon: Icon(state.category.icon),
+                            color: state.category.iconColor,
+                            onPressed: () => _changeCategory(state),
+                          )
+                        : Icon(
+                            state.category.icon,
+                            size: 75,
+                            color: state.category.iconColor,
+                          ),
                   ),
                 ),
               ],
@@ -351,6 +371,8 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            if (state.isParentTransaction)
+              _buildRecurringSwitch(context, state),
             _buildAmountInput(context, state),
             _buildDescriptionInput(state),
             _buildTransactionDateButton(context, state),
@@ -358,6 +380,42 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
             ..._buildPickImageButtons(context, state),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildRecurringSwitch(
+    final BuildContext context,
+    final TransactionFormLoadedState state,
+  ) {
+    final theme = Theme.of(context);
+    final i18n = I18n.of(context);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          SwitchListTile(
+            activeColor: theme.accentColor,
+            value: state.isRecurringTransactionRunning,
+            title: Text(
+              state.isRecurringTransactionRunning ? i18n.running : i18n.stopped,
+            ),
+            secondary: Icon(
+              state.isRecurringTransactionRunning
+                  ? Icons.play_arrow
+                  : Icons.stop,
+              size: 30,
+            ),
+            subtitle: Text(
+              state.isRecurringTransactionRunning
+                  ? '${i18n.recurringTransactionIsNowRunning}'
+                  : i18n.recurringTransactionIsNowStopped,
+            ),
+            onChanged: _isRunningChanged,
+          ),
+        ],
       ),
     );
   }
@@ -510,6 +568,13 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     final i18n = I18n.of(context);
     final theme = Theme.of(context);
 
+    //This is to avoid loosing the isParentTransaction property and
+    //to avoid a potential bug
+    final repetitionCyclesToUse = state.isParentTransaction
+        ? _repetitionCycles
+            .where((c) => c.index != RepetitionCycleType.none.index)
+        : _repetitionCycles;
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
@@ -542,7 +607,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                     onChanged: !state.isChildTransaction
                         ? _repetitionCycleChanged
                         : null,
-                    items: _repetitionCycles
+                    items: repetitionCyclesToUse
                         .map<DropdownMenuItem<RepetitionCycleType>>((value) {
                       return DropdownMenuItem<RepetitionCycleType>(
                         value: value,
@@ -745,6 +810,9 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
       final amount = (double.tryParse(_amountController.text) ?? 0).abs();
       final amountText = selectedCat.isAnIncome ? '$amount' : '${amount * -1}';
       _amountController.text = amountText;
+      if (_descriptionController.text.isNullEmptyOrWhitespace) {
+        _descriptionController.text = selectedCat.name;
+      }
       context.bloc<TransactionFormBloc>().add(CategoryWasUpdated(selectedCat));
     }
   }
@@ -868,4 +936,8 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
       showWarningToast(i18n.acceptPermissionsToUseThisFeature);
     }
   }
+
+  void _isRunningChanged(bool newValue) => context
+      .bloc<TransactionFormBloc>()
+      .add(IsRunningChanged(isRunning: newValue));
 }

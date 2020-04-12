@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 
+import '../../../bloc/currency/currency_bloc.dart';
 import '../../../bloc/transactions/transactions_bloc.dart';
 import '../../../generated/i18n.dart';
 import '../../../models/transactions_summary_per_month.dart';
+import '../custom_arc_renderer.dart';
 
 class HomeTransactionSummaryPerMonth extends StatelessWidget {
   final String month;
@@ -14,6 +16,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
   final double total;
   final List<TransactionsSummaryPerMonth> data;
   final DateTime currentDate;
+  final Locale locale;
 
   const HomeTransactionSummaryPerMonth({
     @required this.month,
@@ -22,6 +25,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
     @required this.total,
     @required this.data,
     @required this.currentDate,
+    @required this.locale,
   });
 
   @override
@@ -31,35 +35,30 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
       margin: const EdgeInsets.all(10),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
-          // bottomLeft: Radius.circular(20),
           bottomRight: Radius.circular(60),
-          // topRight: Radius.circular(30),
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            _buildTitle(context),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                _buildPieChart(),
-                _buildSummary(context),
-              ],
-            ),
-          ],
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          _buildTitle(context),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              _buildPieChart(),
+              _buildSummary(context),
+            ],
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildTitle(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10, left: 10),
+      padding: const EdgeInsets.only(top: 10, left: 20, right: 15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -84,8 +83,9 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
       child: charts.PieChart(
         _createSampleData(),
         animate: true,
-        defaultRenderer: charts.ArcRendererConfig(
+        defaultRenderer: CustomArcRendererConfig(
           arcRatio: 1,
+          strokeWidthPx: 0,
           arcRendererDecorators: [
             charts.ArcLabelDecorator(
               labelPosition: charts.ArcLabelPosition.inside,
@@ -104,6 +104,8 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
     );
     final expenseTextStyle = textStyle.copyWith(color: Colors.red);
     final incomeTextStyle = textStyle.copyWith(color: Colors.green);
+
+    final currencyBloc = context.bloc<CurrencyBloc>();
 
     return Expanded(
       child: Row(
@@ -140,21 +142,21 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   Text(
-                    '\$ $incomes',
+                    currencyBloc.format(incomes),
                     textAlign: TextAlign.end,
-                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: incomeTextStyle,
                   ),
                   Text(
-                    '\$ $expenses',
+                    currencyBloc.format(expenses),
                     textAlign: TextAlign.end,
-                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: expenseTextStyle,
                   ),
                   Text(
-                    '\$ $total',
+                    currencyBloc.format(total),
                     textAlign: TextAlign.end,
-                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: total >= 0 ? incomeTextStyle : expenseTextStyle,
                   ),
                 ],
@@ -186,6 +188,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
       context: context,
       initialDate: currentDate,
       lastDate: DateTime(now.year + 1),
+      locale: locale,
     );
 
     if (selectedDate == null) return;

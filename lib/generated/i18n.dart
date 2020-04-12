@@ -204,10 +204,10 @@ class I18n implements WidgetsLocalizations {
   String get childTransactionCantBeDeleted => "A child transaction can not be deleted nor edited";
   /// "Recurring transaction starts on ${date} and runs ${cycle}"
   String recurringTransactionStartsOn(String date, String cycle) => "Recurring transaction starts on ${date} and runs ${cycle}";
-  /// "No recurring transactions were founud"
-  String get noRecurringTransactionsWereFound => "No recurring transactions were founud";
-  /// "no"
-  String get no => "no";
+  /// "No recurring transactions were found"
+  String get noRecurringTransactionsWereFound => "No recurring transactions were found";
+  /// "No"
+  String get no => "No";
   /// "Remove image"
   String get removeImg => "Remove image";
   /// "Are you sure ?"
@@ -242,6 +242,52 @@ class I18n implements WidgetsLocalizations {
   String get childTransactions => "Child Transactions";
   /// "Since you are deleting a recurring transaction, if you want, I can delete all associated transactions. Otherwise they will be kept and only the parent transaction will be deleted"
   String get deleteChildTransactionsConfirmation => "Since you are deleting a recurring transaction, if you want, I can delete all associated transactions. Otherwise they will be kept and only the parent transaction will be deleted";
+  /// "User Accounts"
+  String get accounts => "User Accounts";
+  /// "No user accounts were found"
+  String get noUserAccountsFound => "No user accounts were found";
+  /// "Add"
+  String get add => "Add";
+  /// "Are you sure you wanna logout ?"
+  String get confirmSignOut => "Are you sure you wanna logout ?";
+  /// "Tap the icon to sign in"
+  String get tapToSignIn => "Tap the icon to sign in";
+  /// "Network is not available"
+  String get networkIsNotAvailable => "Network is not available";
+  /// "Loading"
+  String get loading => "Loading";
+  /// "User was successfully deleted"
+  String get userWasSuccessfullyDeleted => "User was successfully deleted";
+  /// "Confirmation"
+  String get confirmation => "Confirmation";
+  /// "Stopped"
+  String get stopped => "Stopped";
+  /// "Running"
+  String get running => "Running";
+  /// "Recurring transaction is now stopped"
+  String get recurringTransactionIsNowStopped => "Recurring transaction is now stopped";
+  /// "Recurring transaction is now running"
+  String get recurringTransactionIsNowRunning => "Recurring transaction is now running";
+  /// "Next date: ${on}"
+  String nextDateOn(String on) => "Next date: ${on}";
+  /// "Date: ${on}"
+  String dateOn(String on) => "Date: ${on}";
+  /// "Currency symbol"
+  String get currencySimbol => "Currency symbol";
+  /// "Currency symbol to the right"
+  String get currencySymbolToRight => "Currency symbol to the right";
+  /// "Automatic sync"
+  String get automaticSync => "Automatic sync";
+  /// "Sync was successfully performed"
+  String get syncWasSuccessfullyPerformed => "Sync was successfully performed";
+  /// "Show a notification after a full sync"
+  String get showNotificationAfterFullSync => "Show a notification after a full sync";
+  /// "Show a notification when a recurring transactions is executed"
+  String get showNotificationForRecurringTrans => "Show a notification when a recurring transactions is executed";
+  /// "You must grant permissions to open the file"
+  String get openFilePermissionRequestFailedMsg => "You must grant permissions to open the file";
+  /// "You may need to restart the app for the changes to take effect"
+  String get restartTheAppToApplyChanges => "You may need to restart the app for the changes to take effect";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -308,6 +354,10 @@ class I18n implements WidgetsLocalizations {
   String get settingsDonations => "Donations";
   /// "Support"
   String get settingsSupport => "Support";
+  /// "Currency, security, others"
+  String get settingsOthersSubTitle => "Currency, security, others";
+  /// "App information"
+  String get settingsAboutSubTitle => "App information";
   /// "I hope you are enjoying using this app, if you would like to buy me a coffee/beer, just send me an email."
   String get settingsDonationsMsg => "I hope you are enjoying using this app, if you would like to buy me a coffee/beer, just send me an email.";
   /// "I made this app in my free time and it is also open source. If you would like to help me, report an issue, have an idea, want a feature to be implemented, etc please open an issue here:"
@@ -599,9 +649,9 @@ class _I18n_es_VE extends I18n {
   /// "No se encontraron transacciones recurrentes"
   @override
   String get noRecurringTransactionsWereFound => "No se encontraron transacciones recurrentes";
-  /// "no"
+  /// "No"
   @override
-  String get no => "no";
+  String get no => "No";
   /// "Remover imagen"
   @override
   String get removeImg => "Remover imagen";
@@ -653,6 +703,75 @@ class _I18n_es_VE extends I18n {
   /// "Ya que estas borrando una transacción recurrente, si lo deseas, tambien puedo borrar todas las transacciones asociadas a esta. De lo contrario seran conservadas y solo la transacción padre será borrada"
   @override
   String get deleteChildTransactionsConfirmation => "Ya que estas borrando una transacción recurrente, si lo deseas, tambien puedo borrar todas las transacciones asociadas a esta. De lo contrario seran conservadas y solo la transacción padre será borrada";
+  /// "Cuentas de Usuario"
+  @override
+  String get accounts => "Cuentas de Usuario";
+  /// "No se encontraron cuentas de usuario"
+  @override
+  String get noUserAccountsFound => "No se encontraron cuentas de usuario";
+  /// "Agregar"
+  @override
+  String get add => "Agregar";
+  /// "¿ Estás seguro que deseas loguearte ?"
+  @override
+  String get confirmSignOut => "¿ Estás seguro que deseas loguearte ?";
+  /// "Toca el ícono para iniciar sesión"
+  @override
+  String get tapToSignIn => "Toca el ícono para iniciar sesión";
+  /// "Red no disponible"
+  @override
+  String get networkIsNotAvailable => "Red no disponible";
+  /// "Cargando"
+  @override
+  String get loading => "Cargando";
+  /// "El usuario fue borrado exitosamente"
+  @override
+  String get userWasSuccessfullyDeleted => "El usuario fue borrado exitosamente";
+  /// "Confirmación"
+  @override
+  String get confirmation => "Confirmación";
+  /// "Detenida"
+  @override
+  String get stopped => "Detenida";
+  /// "Ejecutandose"
+  @override
+  String get running => "Ejecutandose";
+  /// "La transacción recurrente ahora está detenida"
+  @override
+  String get recurringTransactionIsNowStopped => "La transacción recurrente ahora está detenida";
+  /// "La transacción recurrente ahora está en ejecución"
+  @override
+  String get recurringTransactionIsNowRunning => "La transacción recurrente ahora está en ejecución";
+  /// "Siguiente fecha: ${on}"
+  @override
+  String nextDateOn(String on) => "Siguiente fecha: ${on}";
+  /// "Fecha: ${on}"
+  @override
+  String dateOn(String on) => "Fecha: ${on}";
+  /// "Símbolo de moneda"
+  @override
+  String get currencySimbol => "Símbolo de moneda";
+  /// "Símbolo de moneda a la derecha"
+  @override
+  String get currencySymbolToRight => "Símbolo de moneda a la derecha";
+  /// "Sincronización automática"
+  @override
+  String get automaticSync => "Sincronización automática";
+  /// "La sincronización fue ejecutada exitosamente"
+  @override
+  String get syncWasSuccessfullyPerformed => "La sincronización fue ejecutada exitosamente";
+  /// "Mostrar una notificación después de una sincronización"
+  @override
+  String get showNotificationAfterFullSync => "Mostrar una notificación después de una sincronización";
+  /// "Mostrar una notification cuando se ejecute una transacción recurrente"
+  @override
+  String get showNotificationForRecurringTrans => "Mostrar una notification cuando se ejecute una transacción recurrente";
+  /// "Debe otorgar permisos para abrir el archivo"
+  @override
+  String get openFilePermissionRequestFailedMsg => "Debe otorgar permisos para abrir el archivo";
+  /// "Puede que tengas que reinicar la aplicación, para que los cambios sean aplicados"
+  @override
+  String get restartTheAppToApplyChanges => "Puede que tengas que reinicar la aplicación, para que los cambios sean aplicados";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";
@@ -752,6 +871,12 @@ class _I18n_es_VE extends I18n {
   /// "Soporte"
   @override
   String get settingsSupport => "Soporte";
+  /// "Moneda, seguridad, otros"
+  @override
+  String get settingsOthersSubTitle => "Moneda, seguridad, otros";
+  /// "Información de la aplicación"
+  @override
+  String get settingsAboutSubTitle => "Información de la aplicación";
   /// "Espero que disfrutes al usar esta aplicación, si te gustaría comprarme un cafe o una cerveza, envíame un email."
   @override
   String get settingsDonationsMsg => "Espero que disfrutes al usar esta aplicación, si te gustaría comprarme un cafe o una cerveza, envíame un email.";

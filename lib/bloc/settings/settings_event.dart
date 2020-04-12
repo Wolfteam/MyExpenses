@@ -64,3 +64,39 @@ class AskForFingerPrintChanged extends SettingsEvent {
 
   const AskForFingerPrintChanged({@required this.ask});
 }
+
+class CurrencyChanged extends SettingsEvent {
+  final CurrencySymbolType selectedCurrency;
+
+  @override
+  List<Object> get props => [selectedCurrency];
+
+  const CurrencyChanged(this.selectedCurrency);
+}
+
+class CurrencyPlacementChanged extends SettingsEvent {
+  final bool placeToTheRight;
+
+  @override
+  List<Object> get props => [placeToTheRight];
+
+  const CurrencyPlacementChanged({@required this.placeToTheRight});
+}
+
+class ShowNotifAfterFullSyncChanged extends SettingsEvent {
+  final bool show;
+
+  @override
+  List<Object> get props => [show];
+
+  const ShowNotifAfterFullSyncChanged({@required this.show});
+}
+
+class ShowNotifForRecurringTransChanged extends SettingsEvent {
+  final bool show;
+
+  @override
+  List<Object> get props => [show];
+
+  const ShowNotifForRecurringTransChanged({@required this.show});
+}

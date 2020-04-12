@@ -9,8 +9,10 @@ part of 'database.dart';
 // ignore_for_file: unnecessary_brace_in_string_interps, unnecessary_this
 class User extends DataClass implements Insertable<User> {
   final int id;
+  final LocalStatusType localStatus;
   final DateTime createdAt;
   final String createdBy;
+  final String createdHash;
   final DateTime updatedAt;
   final String updatedBy;
   final String googleUserId;
@@ -20,8 +22,10 @@ class User extends DataClass implements Insertable<User> {
   final bool isActive;
   User(
       {@required this.id,
+      @required this.localStatus,
       @required this.createdAt,
       @required this.createdBy,
+      @required this.createdHash,
       this.updatedAt,
       this.updatedBy,
       @required this.googleUserId,
@@ -38,10 +42,14 @@ class User extends DataClass implements Insertable<User> {
     final boolType = db.typeSystem.forDartType<bool>();
     return User(
       id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id']),
+      localStatus: $UsersTable.$converter0.mapToDart(intType
+          .mapFromDatabaseResponse(data['${effectivePrefix}local_status'])),
       createdAt: dateTimeType
           .mapFromDatabaseResponse(data['${effectivePrefix}created_at']),
       createdBy: stringType
           .mapFromDatabaseResponse(data['${effectivePrefix}created_by']),
+      createdHash: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}created_hash']),
       updatedAt: dateTimeType
           .mapFromDatabaseResponse(data['${effectivePrefix}updated_at']),
       updatedBy: stringType
@@ -62,8 +70,10 @@ class User extends DataClass implements Insertable<User> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return User(
       id: serializer.fromJson<int>(json['id']),
+      localStatus: serializer.fromJson<LocalStatusType>(json['localStatus']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       createdBy: serializer.fromJson<String>(json['createdBy']),
+      createdHash: serializer.fromJson<String>(json['createdHash']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       updatedBy: serializer.fromJson<String>(json['updatedBy']),
       googleUserId: serializer.fromJson<String>(json['googleUserId']),
@@ -78,8 +88,10 @@ class User extends DataClass implements Insertable<User> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
+      'localStatus': serializer.toJson<LocalStatusType>(localStatus),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'createdBy': serializer.toJson<String>(createdBy),
+      'createdHash': serializer.toJson<String>(createdHash),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'updatedBy': serializer.toJson<String>(updatedBy),
       'googleUserId': serializer.toJson<String>(googleUserId),
@@ -94,12 +106,18 @@ class User extends DataClass implements Insertable<User> {
   UsersCompanion createCompanion(bool nullToAbsent) {
     return UsersCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
+      localStatus: localStatus == null && nullToAbsent
+          ? const Value.absent()
+          : Value(localStatus),
       createdAt: createdAt == null && nullToAbsent
           ? const Value.absent()
           : Value(createdAt),
       createdBy: createdBy == null && nullToAbsent
           ? const Value.absent()
           : Value(createdBy),
+      createdHash: createdHash == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdHash),
       updatedAt: updatedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(updatedAt),
@@ -123,8 +141,10 @@ class User extends DataClass implements Insertable<User> {
 
   User copyWith(
           {int id,
+          LocalStatusType localStatus,
           DateTime createdAt,
           String createdBy,
+          String createdHash,
           DateTime updatedAt,
           String updatedBy,
           String googleUserId,
@@ -134,8 +154,10 @@ class User extends DataClass implements Insertable<User> {
           bool isActive}) =>
       User(
         id: id ?? this.id,
+        localStatus: localStatus ?? this.localStatus,
         createdAt: createdAt ?? this.createdAt,
         createdBy: createdBy ?? this.createdBy,
+        createdHash: createdHash ?? this.createdHash,
         updatedAt: updatedAt ?? this.updatedAt,
         updatedBy: updatedBy ?? this.updatedBy,
         googleUserId: googleUserId ?? this.googleUserId,
@@ -148,8 +170,10 @@ class User extends DataClass implements Insertable<User> {
   String toString() {
     return (StringBuffer('User(')
           ..write('id: $id, ')
+          ..write('localStatus: $localStatus, ')
           ..write('createdAt: $createdAt, ')
           ..write('createdBy: $createdBy, ')
+          ..write('createdHash: $createdHash, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('updatedBy: $updatedBy, ')
           ..write('googleUserId: $googleUserId, ')
@@ -165,28 +189,34 @@ class User extends DataClass implements Insertable<User> {
   int get hashCode => $mrjf($mrjc(
       id.hashCode,
       $mrjc(
-          createdAt.hashCode,
+          localStatus.hashCode,
           $mrjc(
-              createdBy.hashCode,
+              createdAt.hashCode,
               $mrjc(
-                  updatedAt.hashCode,
+                  createdBy.hashCode,
                   $mrjc(
-                      updatedBy.hashCode,
+                      createdHash.hashCode,
                       $mrjc(
-                          googleUserId.hashCode,
+                          updatedAt.hashCode,
                           $mrjc(
-                              name.hashCode,
+                              updatedBy.hashCode,
                               $mrjc(
-                                  email.hashCode,
-                                  $mrjc(pictureUrl.hashCode,
-                                      isActive.hashCode))))))))));
+                                  googleUserId.hashCode,
+                                  $mrjc(
+                                      name.hashCode,
+                                      $mrjc(
+                                          email.hashCode,
+                                          $mrjc(pictureUrl.hashCode,
+                                              isActive.hashCode))))))))))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
       (other is User &&
           other.id == this.id &&
+          other.localStatus == this.localStatus &&
           other.createdAt == this.createdAt &&
           other.createdBy == this.createdBy &&
+          other.createdHash == this.createdHash &&
           other.updatedAt == this.updatedAt &&
           other.updatedBy == this.updatedBy &&
           other.googleUserId == this.googleUserId &&
@@ -198,8 +228,10 @@ class User extends DataClass implements Insertable<User> {
 
 class UsersCompanion extends UpdateCompanion<User> {
   final Value<int> id;
+  final Value<LocalStatusType> localStatus;
   final Value<DateTime> createdAt;
   final Value<String> createdBy;
+  final Value<String> createdHash;
   final Value<DateTime> updatedAt;
   final Value<String> updatedBy;
   final Value<String> googleUserId;
@@ -209,8 +241,10 @@ class UsersCompanion extends UpdateCompanion<User> {
   final Value<bool> isActive;
   const UsersCompanion({
     this.id = const Value.absent(),
+    this.localStatus = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.createdBy = const Value.absent(),
+    this.createdHash = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.updatedBy = const Value.absent(),
     this.googleUserId = const Value.absent(),
@@ -221,8 +255,10 @@ class UsersCompanion extends UpdateCompanion<User> {
   });
   UsersCompanion.insert({
     this.id = const Value.absent(),
-    this.createdAt = const Value.absent(),
+    @required LocalStatusType localStatus,
+    @required DateTime createdAt,
     @required String createdBy,
+    @required String createdHash,
     this.updatedAt = const Value.absent(),
     this.updatedBy = const Value.absent(),
     @required String googleUserId,
@@ -230,14 +266,19 @@ class UsersCompanion extends UpdateCompanion<User> {
     @required String email,
     this.pictureUrl = const Value.absent(),
     this.isActive = const Value.absent(),
-  })  : createdBy = Value(createdBy),
+  })  : localStatus = Value(localStatus),
+        createdAt = Value(createdAt),
+        createdBy = Value(createdBy),
+        createdHash = Value(createdHash),
         googleUserId = Value(googleUserId),
         name = Value(name),
         email = Value(email);
   UsersCompanion copyWith(
       {Value<int> id,
+      Value<LocalStatusType> localStatus,
       Value<DateTime> createdAt,
       Value<String> createdBy,
+      Value<String> createdHash,
       Value<DateTime> updatedAt,
       Value<String> updatedBy,
       Value<String> googleUserId,
@@ -247,8 +288,10 @@ class UsersCompanion extends UpdateCompanion<User> {
       Value<bool> isActive}) {
     return UsersCompanion(
       id: id ?? this.id,
+      localStatus: localStatus ?? this.localStatus,
       createdAt: createdAt ?? this.createdAt,
       createdBy: createdBy ?? this.createdBy,
+      createdHash: createdHash ?? this.createdHash,
       updatedAt: updatedAt ?? this.updatedAt,
       updatedBy: updatedBy ?? this.updatedBy,
       googleUserId: googleUserId ?? this.googleUserId,
@@ -273,6 +316,20 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
         hasAutoIncrement: true, declaredAsPrimaryKey: true);
   }
 
+  final VerificationMeta _localStatusMeta =
+      const VerificationMeta('localStatus');
+  GeneratedIntColumn _localStatus;
+  @override
+  GeneratedIntColumn get localStatus =>
+      _localStatus ??= _constructLocalStatus();
+  GeneratedIntColumn _constructLocalStatus() {
+    return GeneratedIntColumn(
+      'local_status',
+      $tableName,
+      false,
+    );
+  }
+
   final VerificationMeta _createdAtMeta = const VerificationMeta('createdAt');
   GeneratedDateTimeColumn _createdAt;
   @override
@@ -282,7 +339,7 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
       'created_at',
       $tableName,
       false,
-    )..clientDefault = () => DateTime.now();
+    );
   }
 
   final VerificationMeta _createdByMeta = const VerificationMeta('createdBy');
@@ -292,6 +349,20 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   GeneratedTextColumn _constructCreatedBy() {
     return GeneratedTextColumn('created_by', $tableName, false,
         minTextLength: 0, maxTextLength: 255);
+  }
+
+  final VerificationMeta _createdHashMeta =
+      const VerificationMeta('createdHash');
+  GeneratedTextColumn _createdHash;
+  @override
+  GeneratedTextColumn get createdHash =>
+      _createdHash ??= _constructCreatedHash();
+  GeneratedTextColumn _constructCreatedHash() {
+    return GeneratedTextColumn(
+      'created_hash',
+      $tableName,
+      false,
+    );
   }
 
   final VerificationMeta _updatedAtMeta = const VerificationMeta('updatedAt');
@@ -371,8 +442,10 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   @override
   List<GeneratedColumn> get $columns => [
         id,
+        localStatus,
         createdAt,
         createdBy,
+        createdHash,
         updatedAt,
         updatedBy,
         googleUserId,
@@ -394,15 +467,24 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     if (d.id.present) {
       context.handle(_idMeta, id.isAcceptableValue(d.id.value, _idMeta));
     }
+    context.handle(_localStatusMeta, const VerificationResult.success());
     if (d.createdAt.present) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableValue(d.createdAt.value, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
     }
     if (d.createdBy.present) {
       context.handle(_createdByMeta,
           createdBy.isAcceptableValue(d.createdBy.value, _createdByMeta));
     } else if (isInserting) {
       context.missing(_createdByMeta);
+    }
+    if (d.createdHash.present) {
+      context.handle(_createdHashMeta,
+          createdHash.isAcceptableValue(d.createdHash.value, _createdHashMeta));
+    } else if (isInserting) {
+      context.missing(_createdHashMeta);
     }
     if (d.updatedAt.present) {
       context.handle(_updatedAtMeta,
@@ -457,11 +539,19 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     if (d.id.present) {
       map['id'] = Variable<int, IntType>(d.id.value);
     }
+    if (d.localStatus.present) {
+      final converter = $UsersTable.$converter0;
+      map['local_status'] =
+          Variable<int, IntType>(converter.mapToSql(d.localStatus.value));
+    }
     if (d.createdAt.present) {
       map['created_at'] = Variable<DateTime, DateTimeType>(d.createdAt.value);
     }
     if (d.createdBy.present) {
       map['created_by'] = Variable<String, StringType>(d.createdBy.value);
+    }
+    if (d.createdHash.present) {
+      map['created_hash'] = Variable<String, StringType>(d.createdHash.value);
     }
     if (d.updatedAt.present) {
       map['updated_at'] = Variable<DateTime, DateTimeType>(d.updatedAt.value);
@@ -492,12 +582,17 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
   $UsersTable createAlias(String alias) {
     return $UsersTable(_db, alias);
   }
+
+  static TypeConverter<LocalStatusType, int> $converter0 =
+      const LocalStatusConverter();
 }
 
 class Transaction extends DataClass implements Insertable<Transaction> {
   final int id;
+  final LocalStatusType localStatus;
   final DateTime createdAt;
   final String createdBy;
+  final String createdHash;
   final DateTime updatedAt;
   final String updatedBy;
   final double amount;
@@ -511,8 +606,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   final int categoryId;
   Transaction(
       {@required this.id,
+      @required this.localStatus,
       @required this.createdAt,
       @required this.createdBy,
+      @required this.createdHash,
       this.updatedAt,
       this.updatedBy,
       @required this.amount,
@@ -534,10 +631,14 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     final boolType = db.typeSystem.forDartType<bool>();
     return Transaction(
       id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id']),
+      localStatus: $TransactionsTable.$converter0.mapToDart(intType
+          .mapFromDatabaseResponse(data['${effectivePrefix}local_status'])),
       createdAt: dateTimeType
           .mapFromDatabaseResponse(data['${effectivePrefix}created_at']),
       createdBy: stringType
           .mapFromDatabaseResponse(data['${effectivePrefix}created_by']),
+      createdHash: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}created_hash']),
       updatedAt: dateTimeType
           .mapFromDatabaseResponse(data['${effectivePrefix}updated_at']),
       updatedBy: stringType
@@ -548,7 +649,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           .mapFromDatabaseResponse(data['${effectivePrefix}description']),
       transactionDate: dateTimeType
           .mapFromDatabaseResponse(data['${effectivePrefix}transaction_date']),
-      repetitionCycle: $TransactionsTable.$converter0.mapToDart(intType
+      repetitionCycle: $TransactionsTable.$converter1.mapToDart(intType
           .mapFromDatabaseResponse(data['${effectivePrefix}repetition_cycle'])),
       parentTransactionId: intType.mapFromDatabaseResponse(
           data['${effectivePrefix}parent_transaction_id']),
@@ -567,8 +668,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return Transaction(
       id: serializer.fromJson<int>(json['id']),
+      localStatus: serializer.fromJson<LocalStatusType>(json['localStatus']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       createdBy: serializer.fromJson<String>(json['createdBy']),
+      createdHash: serializer.fromJson<String>(json['createdHash']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       updatedBy: serializer.fromJson<String>(json['updatedBy']),
       amount: serializer.fromJson<double>(json['amount']),
@@ -591,8 +694,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
+      'localStatus': serializer.toJson<LocalStatusType>(localStatus),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'createdBy': serializer.toJson<String>(createdBy),
+      'createdHash': serializer.toJson<String>(createdHash),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'updatedBy': serializer.toJson<String>(updatedBy),
       'amount': serializer.toJson<double>(amount),
@@ -612,12 +717,18 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   TransactionsCompanion createCompanion(bool nullToAbsent) {
     return TransactionsCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
+      localStatus: localStatus == null && nullToAbsent
+          ? const Value.absent()
+          : Value(localStatus),
       createdAt: createdAt == null && nullToAbsent
           ? const Value.absent()
           : Value(createdAt),
       createdBy: createdBy == null && nullToAbsent
           ? const Value.absent()
           : Value(createdBy),
+      createdHash: createdHash == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdHash),
       updatedAt: updatedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(updatedAt),
@@ -655,8 +766,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
 
   Transaction copyWith(
           {int id,
+          LocalStatusType localStatus,
           DateTime createdAt,
           String createdBy,
+          String createdHash,
           DateTime updatedAt,
           String updatedBy,
           double amount,
@@ -670,8 +783,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           int categoryId}) =>
       Transaction(
         id: id ?? this.id,
+        localStatus: localStatus ?? this.localStatus,
         createdAt: createdAt ?? this.createdAt,
         createdBy: createdBy ?? this.createdBy,
+        createdHash: createdHash ?? this.createdHash,
         updatedAt: updatedAt ?? this.updatedAt,
         updatedBy: updatedBy ?? this.updatedBy,
         amount: amount ?? this.amount,
@@ -688,8 +803,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   String toString() {
     return (StringBuffer('Transaction(')
           ..write('id: $id, ')
+          ..write('localStatus: $localStatus, ')
           ..write('createdAt: $createdAt, ')
           ..write('createdBy: $createdBy, ')
+          ..write('createdHash: $createdHash, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('updatedBy: $updatedBy, ')
           ..write('amount: $amount, ')
@@ -709,38 +826,47 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   int get hashCode => $mrjf($mrjc(
       id.hashCode,
       $mrjc(
-          createdAt.hashCode,
+          localStatus.hashCode,
           $mrjc(
-              createdBy.hashCode,
+              createdAt.hashCode,
               $mrjc(
-                  updatedAt.hashCode,
+                  createdBy.hashCode,
                   $mrjc(
-                      updatedBy.hashCode,
+                      createdHash.hashCode,
                       $mrjc(
-                          amount.hashCode,
+                          updatedAt.hashCode,
                           $mrjc(
-                              description.hashCode,
+                              updatedBy.hashCode,
                               $mrjc(
-                                  transactionDate.hashCode,
+                                  amount.hashCode,
                                   $mrjc(
-                                      repetitionCycle.hashCode,
+                                      description.hashCode,
                                       $mrjc(
-                                          parentTransactionId.hashCode,
+                                          transactionDate.hashCode,
                                           $mrjc(
-                                              isParentTransaction.hashCode,
+                                              repetitionCycle.hashCode,
                                               $mrjc(
-                                                  nextRecurringDate.hashCode,
+                                                  parentTransactionId.hashCode,
                                                   $mrjc(
-                                                      imagePath.hashCode,
-                                                      categoryId
-                                                          .hashCode))))))))))))));
+                                                      isParentTransaction
+                                                          .hashCode,
+                                                      $mrjc(
+                                                          nextRecurringDate
+                                                              .hashCode,
+                                                          $mrjc(
+                                                              imagePath
+                                                                  .hashCode,
+                                                              categoryId
+                                                                  .hashCode))))))))))))))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
       (other is Transaction &&
           other.id == this.id &&
+          other.localStatus == this.localStatus &&
           other.createdAt == this.createdAt &&
           other.createdBy == this.createdBy &&
+          other.createdHash == this.createdHash &&
           other.updatedAt == this.updatedAt &&
           other.updatedBy == this.updatedBy &&
           other.amount == this.amount &&
@@ -756,8 +882,10 @@ class Transaction extends DataClass implements Insertable<Transaction> {
 
 class TransactionsCompanion extends UpdateCompanion<Transaction> {
   final Value<int> id;
+  final Value<LocalStatusType> localStatus;
   final Value<DateTime> createdAt;
   final Value<String> createdBy;
+  final Value<String> createdHash;
   final Value<DateTime> updatedAt;
   final Value<String> updatedBy;
   final Value<double> amount;
@@ -771,8 +899,10 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   final Value<int> categoryId;
   const TransactionsCompanion({
     this.id = const Value.absent(),
+    this.localStatus = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.createdBy = const Value.absent(),
+    this.createdHash = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.updatedBy = const Value.absent(),
     this.amount = const Value.absent(),
@@ -787,8 +917,10 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   });
   TransactionsCompanion.insert({
     this.id = const Value.absent(),
-    this.createdAt = const Value.absent(),
+    @required LocalStatusType localStatus,
+    @required DateTime createdAt,
     @required String createdBy,
+    @required String createdHash,
     this.updatedAt = const Value.absent(),
     this.updatedBy = const Value.absent(),
     @required double amount,
@@ -800,7 +932,10 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.nextRecurringDate = const Value.absent(),
     this.imagePath = const Value.absent(),
     @required int categoryId,
-  })  : createdBy = Value(createdBy),
+  })  : localStatus = Value(localStatus),
+        createdAt = Value(createdAt),
+        createdBy = Value(createdBy),
+        createdHash = Value(createdHash),
         amount = Value(amount),
         description = Value(description),
         transactionDate = Value(transactionDate),
@@ -809,8 +944,10 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
         categoryId = Value(categoryId);
   TransactionsCompanion copyWith(
       {Value<int> id,
+      Value<LocalStatusType> localStatus,
       Value<DateTime> createdAt,
       Value<String> createdBy,
+      Value<String> createdHash,
       Value<DateTime> updatedAt,
       Value<String> updatedBy,
       Value<double> amount,
@@ -824,8 +961,10 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       Value<int> categoryId}) {
     return TransactionsCompanion(
       id: id ?? this.id,
+      localStatus: localStatus ?? this.localStatus,
       createdAt: createdAt ?? this.createdAt,
       createdBy: createdBy ?? this.createdBy,
+      createdHash: createdHash ?? this.createdHash,
       updatedAt: updatedAt ?? this.updatedAt,
       updatedBy: updatedBy ?? this.updatedBy,
       amount: amount ?? this.amount,
@@ -855,6 +994,20 @@ class $TransactionsTable extends Transactions
         hasAutoIncrement: true, declaredAsPrimaryKey: true);
   }
 
+  final VerificationMeta _localStatusMeta =
+      const VerificationMeta('localStatus');
+  GeneratedIntColumn _localStatus;
+  @override
+  GeneratedIntColumn get localStatus =>
+      _localStatus ??= _constructLocalStatus();
+  GeneratedIntColumn _constructLocalStatus() {
+    return GeneratedIntColumn(
+      'local_status',
+      $tableName,
+      false,
+    );
+  }
+
   final VerificationMeta _createdAtMeta = const VerificationMeta('createdAt');
   GeneratedDateTimeColumn _createdAt;
   @override
@@ -864,7 +1017,7 @@ class $TransactionsTable extends Transactions
       'created_at',
       $tableName,
       false,
-    )..clientDefault = () => DateTime.now();
+    );
   }
 
   final VerificationMeta _createdByMeta = const VerificationMeta('createdBy');
@@ -874,6 +1027,20 @@ class $TransactionsTable extends Transactions
   GeneratedTextColumn _constructCreatedBy() {
     return GeneratedTextColumn('created_by', $tableName, false,
         minTextLength: 0, maxTextLength: 255);
+  }
+
+  final VerificationMeta _createdHashMeta =
+      const VerificationMeta('createdHash');
+  GeneratedTextColumn _createdHash;
+  @override
+  GeneratedTextColumn get createdHash =>
+      _createdHash ??= _constructCreatedHash();
+  GeneratedTextColumn _constructCreatedHash() {
+    return GeneratedTextColumn(
+      'created_hash',
+      $tableName,
+      false,
+    );
   }
 
   final VerificationMeta _updatedAtMeta = const VerificationMeta('updatedAt');
@@ -1014,8 +1181,10 @@ class $TransactionsTable extends Transactions
   @override
   List<GeneratedColumn> get $columns => [
         id,
+        localStatus,
         createdAt,
         createdBy,
+        createdHash,
         updatedAt,
         updatedBy,
         amount,
@@ -1041,15 +1210,24 @@ class $TransactionsTable extends Transactions
     if (d.id.present) {
       context.handle(_idMeta, id.isAcceptableValue(d.id.value, _idMeta));
     }
+    context.handle(_localStatusMeta, const VerificationResult.success());
     if (d.createdAt.present) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableValue(d.createdAt.value, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
     }
     if (d.createdBy.present) {
       context.handle(_createdByMeta,
           createdBy.isAcceptableValue(d.createdBy.value, _createdByMeta));
     } else if (isInserting) {
       context.missing(_createdByMeta);
+    }
+    if (d.createdHash.present) {
+      context.handle(_createdHashMeta,
+          createdHash.isAcceptableValue(d.createdHash.value, _createdHashMeta));
+    } else if (isInserting) {
+      context.missing(_createdHashMeta);
     }
     if (d.updatedAt.present) {
       context.handle(_updatedAtMeta,
@@ -1127,11 +1305,19 @@ class $TransactionsTable extends Transactions
     if (d.id.present) {
       map['id'] = Variable<int, IntType>(d.id.value);
     }
+    if (d.localStatus.present) {
+      final converter = $TransactionsTable.$converter0;
+      map['local_status'] =
+          Variable<int, IntType>(converter.mapToSql(d.localStatus.value));
+    }
     if (d.createdAt.present) {
       map['created_at'] = Variable<DateTime, DateTimeType>(d.createdAt.value);
     }
     if (d.createdBy.present) {
       map['created_by'] = Variable<String, StringType>(d.createdBy.value);
+    }
+    if (d.createdHash.present) {
+      map['created_hash'] = Variable<String, StringType>(d.createdHash.value);
     }
     if (d.updatedAt.present) {
       map['updated_at'] = Variable<DateTime, DateTimeType>(d.updatedAt.value);
@@ -1150,7 +1336,7 @@ class $TransactionsTable extends Transactions
           Variable<DateTime, DateTimeType>(d.transactionDate.value);
     }
     if (d.repetitionCycle.present) {
-      final converter = $TransactionsTable.$converter0;
+      final converter = $TransactionsTable.$converter1;
       map['repetition_cycle'] =
           Variable<int, IntType>(converter.mapToSql(d.repetitionCycle.value));
     }
@@ -1180,30 +1366,38 @@ class $TransactionsTable extends Transactions
     return $TransactionsTable(_db, alias);
   }
 
-  static TypeConverter<RepetitionCycleType, int> $converter0 =
+  static TypeConverter<LocalStatusType, int> $converter0 =
+      const LocalStatusConverter();
+  static TypeConverter<RepetitionCycleType, int> $converter1 =
       const RepetitionCycleConverter();
 }
 
 class Category extends DataClass implements Insertable<Category> {
   final int id;
+  final LocalStatusType localStatus;
   final DateTime createdAt;
   final String createdBy;
+  final String createdHash;
   final DateTime updatedAt;
   final String updatedBy;
   final String name;
   final bool isAnIncome;
   final IconData icon;
   final Color iconColor;
+  final int userId;
   Category(
       {@required this.id,
+      @required this.localStatus,
       @required this.createdAt,
       @required this.createdBy,
+      @required this.createdHash,
       this.updatedAt,
       this.updatedBy,
       @required this.name,
       @required this.isAnIncome,
       @required this.icon,
-      @required this.iconColor});
+      @required this.iconColor,
+      this.userId});
   factory Category.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
     final effectivePrefix = prefix ?? '';
@@ -1213,10 +1407,14 @@ class Category extends DataClass implements Insertable<Category> {
     final boolType = db.typeSystem.forDartType<bool>();
     return Category(
       id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id']),
+      localStatus: $CategoriesTable.$converter0.mapToDart(intType
+          .mapFromDatabaseResponse(data['${effectivePrefix}local_status'])),
       createdAt: dateTimeType
           .mapFromDatabaseResponse(data['${effectivePrefix}created_at']),
       createdBy: stringType
           .mapFromDatabaseResponse(data['${effectivePrefix}created_by']),
+      createdHash: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}created_hash']),
       updatedAt: dateTimeType
           .mapFromDatabaseResponse(data['${effectivePrefix}updated_at']),
       updatedBy: stringType
@@ -1224,10 +1422,12 @@ class Category extends DataClass implements Insertable<Category> {
       name: stringType.mapFromDatabaseResponse(data['${effectivePrefix}name']),
       isAnIncome: boolType
           .mapFromDatabaseResponse(data['${effectivePrefix}is_an_income']),
-      icon: $CategoriesTable.$converter0.mapToDart(
+      icon: $CategoriesTable.$converter1.mapToDart(
           stringType.mapFromDatabaseResponse(data['${effectivePrefix}icon'])),
-      iconColor: $CategoriesTable.$converter1.mapToDart(intType
+      iconColor: $CategoriesTable.$converter2.mapToDart(intType
           .mapFromDatabaseResponse(data['${effectivePrefix}icon_color'])),
+      userId:
+          intType.mapFromDatabaseResponse(data['${effectivePrefix}user_id']),
     );
   }
   factory Category.fromJson(Map<String, dynamic> json,
@@ -1235,14 +1435,17 @@ class Category extends DataClass implements Insertable<Category> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return Category(
       id: serializer.fromJson<int>(json['id']),
+      localStatus: serializer.fromJson<LocalStatusType>(json['localStatus']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       createdBy: serializer.fromJson<String>(json['createdBy']),
+      createdHash: serializer.fromJson<String>(json['createdHash']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       updatedBy: serializer.fromJson<String>(json['updatedBy']),
       name: serializer.fromJson<String>(json['name']),
       isAnIncome: serializer.fromJson<bool>(json['isAnIncome']),
       icon: serializer.fromJson<IconData>(json['icon']),
       iconColor: serializer.fromJson<Color>(json['iconColor']),
+      userId: serializer.fromJson<int>(json['userId']),
     );
   }
   @override
@@ -1250,14 +1453,17 @@ class Category extends DataClass implements Insertable<Category> {
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
+      'localStatus': serializer.toJson<LocalStatusType>(localStatus),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'createdBy': serializer.toJson<String>(createdBy),
+      'createdHash': serializer.toJson<String>(createdHash),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'updatedBy': serializer.toJson<String>(updatedBy),
       'name': serializer.toJson<String>(name),
       'isAnIncome': serializer.toJson<bool>(isAnIncome),
       'icon': serializer.toJson<IconData>(icon),
       'iconColor': serializer.toJson<Color>(iconColor),
+      'userId': serializer.toJson<int>(userId),
     };
   }
 
@@ -1265,12 +1471,18 @@ class Category extends DataClass implements Insertable<Category> {
   CategoriesCompanion createCompanion(bool nullToAbsent) {
     return CategoriesCompanion(
       id: id == null && nullToAbsent ? const Value.absent() : Value(id),
+      localStatus: localStatus == null && nullToAbsent
+          ? const Value.absent()
+          : Value(localStatus),
       createdAt: createdAt == null && nullToAbsent
           ? const Value.absent()
           : Value(createdAt),
       createdBy: createdBy == null && nullToAbsent
           ? const Value.absent()
           : Value(createdBy),
+      createdHash: createdHash == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdHash),
       updatedAt: updatedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(updatedAt),
@@ -1285,42 +1497,53 @@ class Category extends DataClass implements Insertable<Category> {
       iconColor: iconColor == null && nullToAbsent
           ? const Value.absent()
           : Value(iconColor),
+      userId:
+          userId == null && nullToAbsent ? const Value.absent() : Value(userId),
     );
   }
 
   Category copyWith(
           {int id,
+          LocalStatusType localStatus,
           DateTime createdAt,
           String createdBy,
+          String createdHash,
           DateTime updatedAt,
           String updatedBy,
           String name,
           bool isAnIncome,
           IconData icon,
-          Color iconColor}) =>
+          Color iconColor,
+          int userId}) =>
       Category(
         id: id ?? this.id,
+        localStatus: localStatus ?? this.localStatus,
         createdAt: createdAt ?? this.createdAt,
         createdBy: createdBy ?? this.createdBy,
+        createdHash: createdHash ?? this.createdHash,
         updatedAt: updatedAt ?? this.updatedAt,
         updatedBy: updatedBy ?? this.updatedBy,
         name: name ?? this.name,
         isAnIncome: isAnIncome ?? this.isAnIncome,
         icon: icon ?? this.icon,
         iconColor: iconColor ?? this.iconColor,
+        userId: userId ?? this.userId,
       );
   @override
   String toString() {
     return (StringBuffer('Category(')
           ..write('id: $id, ')
+          ..write('localStatus: $localStatus, ')
           ..write('createdAt: $createdAt, ')
           ..write('createdBy: $createdBy, ')
+          ..write('createdHash: $createdHash, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('updatedBy: $updatedBy, ')
           ..write('name: $name, ')
           ..write('isAnIncome: $isAnIncome, ')
           ..write('icon: $icon, ')
-          ..write('iconColor: $iconColor')
+          ..write('iconColor: $iconColor, ')
+          ..write('userId: $userId')
           ..write(')'))
         .toString();
   }
@@ -1329,88 +1552,117 @@ class Category extends DataClass implements Insertable<Category> {
   int get hashCode => $mrjf($mrjc(
       id.hashCode,
       $mrjc(
-          createdAt.hashCode,
+          localStatus.hashCode,
           $mrjc(
-              createdBy.hashCode,
+              createdAt.hashCode,
               $mrjc(
-                  updatedAt.hashCode,
+                  createdBy.hashCode,
                   $mrjc(
-                      updatedBy.hashCode,
+                      createdHash.hashCode,
                       $mrjc(
-                          name.hashCode,
-                          $mrjc(isAnIncome.hashCode,
-                              $mrjc(icon.hashCode, iconColor.hashCode)))))))));
+                          updatedAt.hashCode,
+                          $mrjc(
+                              updatedBy.hashCode,
+                              $mrjc(
+                                  name.hashCode,
+                                  $mrjc(
+                                      isAnIncome.hashCode,
+                                      $mrjc(
+                                          icon.hashCode,
+                                          $mrjc(iconColor.hashCode,
+                                              userId.hashCode))))))))))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
       (other is Category &&
           other.id == this.id &&
+          other.localStatus == this.localStatus &&
           other.createdAt == this.createdAt &&
           other.createdBy == this.createdBy &&
+          other.createdHash == this.createdHash &&
           other.updatedAt == this.updatedAt &&
           other.updatedBy == this.updatedBy &&
           other.name == this.name &&
           other.isAnIncome == this.isAnIncome &&
           other.icon == this.icon &&
-          other.iconColor == this.iconColor);
+          other.iconColor == this.iconColor &&
+          other.userId == this.userId);
 }
 
 class CategoriesCompanion extends UpdateCompanion<Category> {
   final Value<int> id;
+  final Value<LocalStatusType> localStatus;
   final Value<DateTime> createdAt;
   final Value<String> createdBy;
+  final Value<String> createdHash;
   final Value<DateTime> updatedAt;
   final Value<String> updatedBy;
   final Value<String> name;
   final Value<bool> isAnIncome;
   final Value<IconData> icon;
   final Value<Color> iconColor;
+  final Value<int> userId;
   const CategoriesCompanion({
     this.id = const Value.absent(),
+    this.localStatus = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.createdBy = const Value.absent(),
+    this.createdHash = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.updatedBy = const Value.absent(),
     this.name = const Value.absent(),
     this.isAnIncome = const Value.absent(),
     this.icon = const Value.absent(),
     this.iconColor = const Value.absent(),
+    this.userId = const Value.absent(),
   });
   CategoriesCompanion.insert({
     this.id = const Value.absent(),
-    this.createdAt = const Value.absent(),
+    @required LocalStatusType localStatus,
+    @required DateTime createdAt,
     @required String createdBy,
+    @required String createdHash,
     this.updatedAt = const Value.absent(),
     this.updatedBy = const Value.absent(),
     @required String name,
     @required bool isAnIncome,
     @required IconData icon,
     @required Color iconColor,
-  })  : createdBy = Value(createdBy),
+    this.userId = const Value.absent(),
+  })  : localStatus = Value(localStatus),
+        createdAt = Value(createdAt),
+        createdBy = Value(createdBy),
+        createdHash = Value(createdHash),
         name = Value(name),
         isAnIncome = Value(isAnIncome),
         icon = Value(icon),
         iconColor = Value(iconColor);
   CategoriesCompanion copyWith(
       {Value<int> id,
+      Value<LocalStatusType> localStatus,
       Value<DateTime> createdAt,
       Value<String> createdBy,
+      Value<String> createdHash,
       Value<DateTime> updatedAt,
       Value<String> updatedBy,
       Value<String> name,
       Value<bool> isAnIncome,
       Value<IconData> icon,
-      Value<Color> iconColor}) {
+      Value<Color> iconColor,
+      Value<int> userId}) {
     return CategoriesCompanion(
       id: id ?? this.id,
+      localStatus: localStatus ?? this.localStatus,
       createdAt: createdAt ?? this.createdAt,
       createdBy: createdBy ?? this.createdBy,
+      createdHash: createdHash ?? this.createdHash,
       updatedAt: updatedAt ?? this.updatedAt,
       updatedBy: updatedBy ?? this.updatedBy,
       name: name ?? this.name,
       isAnIncome: isAnIncome ?? this.isAnIncome,
       icon: icon ?? this.icon,
       iconColor: iconColor ?? this.iconColor,
+      userId: userId ?? this.userId,
     );
   }
 }
@@ -1429,6 +1681,20 @@ class $CategoriesTable extends Categories
         hasAutoIncrement: true, declaredAsPrimaryKey: true);
   }
 
+  final VerificationMeta _localStatusMeta =
+      const VerificationMeta('localStatus');
+  GeneratedIntColumn _localStatus;
+  @override
+  GeneratedIntColumn get localStatus =>
+      _localStatus ??= _constructLocalStatus();
+  GeneratedIntColumn _constructLocalStatus() {
+    return GeneratedIntColumn(
+      'local_status',
+      $tableName,
+      false,
+    );
+  }
+
   final VerificationMeta _createdAtMeta = const VerificationMeta('createdAt');
   GeneratedDateTimeColumn _createdAt;
   @override
@@ -1438,7 +1704,7 @@ class $CategoriesTable extends Categories
       'created_at',
       $tableName,
       false,
-    )..clientDefault = () => DateTime.now();
+    );
   }
 
   final VerificationMeta _createdByMeta = const VerificationMeta('createdBy');
@@ -1448,6 +1714,20 @@ class $CategoriesTable extends Categories
   GeneratedTextColumn _constructCreatedBy() {
     return GeneratedTextColumn('created_by', $tableName, false,
         minTextLength: 0, maxTextLength: 255);
+  }
+
+  final VerificationMeta _createdHashMeta =
+      const VerificationMeta('createdHash');
+  GeneratedTextColumn _createdHash;
+  @override
+  GeneratedTextColumn get createdHash =>
+      _createdHash ??= _constructCreatedHash();
+  GeneratedTextColumn _constructCreatedHash() {
+    return GeneratedTextColumn(
+      'created_hash',
+      $tableName,
+      false,
+    );
   }
 
   final VerificationMeta _updatedAtMeta = const VerificationMeta('updatedAt');
@@ -1516,17 +1796,29 @@ class $CategoriesTable extends Categories
     );
   }
 
+  final VerificationMeta _userIdMeta = const VerificationMeta('userId');
+  GeneratedIntColumn _userId;
+  @override
+  GeneratedIntColumn get userId => _userId ??= _constructUserId();
+  GeneratedIntColumn _constructUserId() {
+    return GeneratedIntColumn('user_id', $tableName, true,
+        $customConstraints: 'REFERENCES users(id)');
+  }
+
   @override
   List<GeneratedColumn> get $columns => [
         id,
+        localStatus,
         createdAt,
         createdBy,
+        createdHash,
         updatedAt,
         updatedBy,
         name,
         isAnIncome,
         icon,
-        iconColor
+        iconColor,
+        userId
       ];
   @override
   $CategoriesTable get asDslTable => this;
@@ -1541,15 +1833,24 @@ class $CategoriesTable extends Categories
     if (d.id.present) {
       context.handle(_idMeta, id.isAcceptableValue(d.id.value, _idMeta));
     }
+    context.handle(_localStatusMeta, const VerificationResult.success());
     if (d.createdAt.present) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableValue(d.createdAt.value, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
     }
     if (d.createdBy.present) {
       context.handle(_createdByMeta,
           createdBy.isAcceptableValue(d.createdBy.value, _createdByMeta));
     } else if (isInserting) {
       context.missing(_createdByMeta);
+    }
+    if (d.createdHash.present) {
+      context.handle(_createdHashMeta,
+          createdHash.isAcceptableValue(d.createdHash.value, _createdHashMeta));
+    } else if (isInserting) {
+      context.missing(_createdHashMeta);
     }
     if (d.updatedAt.present) {
       context.handle(_updatedAtMeta,
@@ -1573,6 +1874,10 @@ class $CategoriesTable extends Categories
     }
     context.handle(_iconMeta, const VerificationResult.success());
     context.handle(_iconColorMeta, const VerificationResult.success());
+    if (d.userId.present) {
+      context.handle(
+          _userIdMeta, userId.isAcceptableValue(d.userId.value, _userIdMeta));
+    }
     return context;
   }
 
@@ -1590,11 +1895,19 @@ class $CategoriesTable extends Categories
     if (d.id.present) {
       map['id'] = Variable<int, IntType>(d.id.value);
     }
+    if (d.localStatus.present) {
+      final converter = $CategoriesTable.$converter0;
+      map['local_status'] =
+          Variable<int, IntType>(converter.mapToSql(d.localStatus.value));
+    }
     if (d.createdAt.present) {
       map['created_at'] = Variable<DateTime, DateTimeType>(d.createdAt.value);
     }
     if (d.createdBy.present) {
       map['created_by'] = Variable<String, StringType>(d.createdBy.value);
+    }
+    if (d.createdHash.present) {
+      map['created_hash'] = Variable<String, StringType>(d.createdHash.value);
     }
     if (d.updatedAt.present) {
       map['updated_at'] = Variable<DateTime, DateTimeType>(d.updatedAt.value);
@@ -1609,14 +1922,17 @@ class $CategoriesTable extends Categories
       map['is_an_income'] = Variable<bool, BoolType>(d.isAnIncome.value);
     }
     if (d.icon.present) {
-      final converter = $CategoriesTable.$converter0;
+      final converter = $CategoriesTable.$converter1;
       map['icon'] =
           Variable<String, StringType>(converter.mapToSql(d.icon.value));
     }
     if (d.iconColor.present) {
-      final converter = $CategoriesTable.$converter1;
+      final converter = $CategoriesTable.$converter2;
       map['icon_color'] =
           Variable<int, IntType>(converter.mapToSql(d.iconColor.value));
+    }
+    if (d.userId.present) {
+      map['user_id'] = Variable<int, IntType>(d.userId.value);
     }
     return map;
   }
@@ -1626,9 +1942,472 @@ class $CategoriesTable extends Categories
     return $CategoriesTable(_db, alias);
   }
 
-  static TypeConverter<IconData, String> $converter0 =
+  static TypeConverter<LocalStatusType, int> $converter0 =
+      const LocalStatusConverter();
+  static TypeConverter<IconData, String> $converter1 =
       const IconDataConverter();
-  static TypeConverter<Color, int> $converter1 = const ColorConverter();
+  static TypeConverter<Color, int> $converter2 = const ColorConverter();
+}
+
+class RunningTask extends DataClass implements Insertable<RunningTask> {
+  final int id;
+  final LocalStatusType localStatus;
+  final DateTime createdAt;
+  final String createdBy;
+  final String createdHash;
+  final DateTime updatedAt;
+  final String updatedBy;
+  final String name;
+  final bool isRunning;
+  RunningTask(
+      {@required this.id,
+      @required this.localStatus,
+      @required this.createdAt,
+      @required this.createdBy,
+      @required this.createdHash,
+      this.updatedAt,
+      this.updatedBy,
+      @required this.name,
+      @required this.isRunning});
+  factory RunningTask.fromData(Map<String, dynamic> data, GeneratedDatabase db,
+      {String prefix}) {
+    final effectivePrefix = prefix ?? '';
+    final intType = db.typeSystem.forDartType<int>();
+    final dateTimeType = db.typeSystem.forDartType<DateTime>();
+    final stringType = db.typeSystem.forDartType<String>();
+    final boolType = db.typeSystem.forDartType<bool>();
+    return RunningTask(
+      id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id']),
+      localStatus: $RunningTasksTable.$converter0.mapToDart(intType
+          .mapFromDatabaseResponse(data['${effectivePrefix}local_status'])),
+      createdAt: dateTimeType
+          .mapFromDatabaseResponse(data['${effectivePrefix}created_at']),
+      createdBy: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}created_by']),
+      createdHash: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}created_hash']),
+      updatedAt: dateTimeType
+          .mapFromDatabaseResponse(data['${effectivePrefix}updated_at']),
+      updatedBy: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}updated_by']),
+      name: stringType.mapFromDatabaseResponse(data['${effectivePrefix}name']),
+      isRunning: boolType
+          .mapFromDatabaseResponse(data['${effectivePrefix}is_running']),
+    );
+  }
+  factory RunningTask.fromJson(Map<String, dynamic> json,
+      {ValueSerializer serializer}) {
+    serializer ??= moorRuntimeOptions.defaultSerializer;
+    return RunningTask(
+      id: serializer.fromJson<int>(json['id']),
+      localStatus: serializer.fromJson<LocalStatusType>(json['localStatus']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      createdBy: serializer.fromJson<String>(json['createdBy']),
+      createdHash: serializer.fromJson<String>(json['createdHash']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      updatedBy: serializer.fromJson<String>(json['updatedBy']),
+      name: serializer.fromJson<String>(json['name']),
+      isRunning: serializer.fromJson<bool>(json['isRunning']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer serializer}) {
+    serializer ??= moorRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'localStatus': serializer.toJson<LocalStatusType>(localStatus),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'createdBy': serializer.toJson<String>(createdBy),
+      'createdHash': serializer.toJson<String>(createdHash),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'updatedBy': serializer.toJson<String>(updatedBy),
+      'name': serializer.toJson<String>(name),
+      'isRunning': serializer.toJson<bool>(isRunning),
+    };
+  }
+
+  @override
+  RunningTasksCompanion createCompanion(bool nullToAbsent) {
+    return RunningTasksCompanion(
+      id: id == null && nullToAbsent ? const Value.absent() : Value(id),
+      localStatus: localStatus == null && nullToAbsent
+          ? const Value.absent()
+          : Value(localStatus),
+      createdAt: createdAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdAt),
+      createdBy: createdBy == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdBy),
+      createdHash: createdHash == null && nullToAbsent
+          ? const Value.absent()
+          : Value(createdHash),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
+      updatedBy: updatedBy == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedBy),
+      name: name == null && nullToAbsent ? const Value.absent() : Value(name),
+      isRunning: isRunning == null && nullToAbsent
+          ? const Value.absent()
+          : Value(isRunning),
+    );
+  }
+
+  RunningTask copyWith(
+          {int id,
+          LocalStatusType localStatus,
+          DateTime createdAt,
+          String createdBy,
+          String createdHash,
+          DateTime updatedAt,
+          String updatedBy,
+          String name,
+          bool isRunning}) =>
+      RunningTask(
+        id: id ?? this.id,
+        localStatus: localStatus ?? this.localStatus,
+        createdAt: createdAt ?? this.createdAt,
+        createdBy: createdBy ?? this.createdBy,
+        createdHash: createdHash ?? this.createdHash,
+        updatedAt: updatedAt ?? this.updatedAt,
+        updatedBy: updatedBy ?? this.updatedBy,
+        name: name ?? this.name,
+        isRunning: isRunning ?? this.isRunning,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('RunningTask(')
+          ..write('id: $id, ')
+          ..write('localStatus: $localStatus, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('createdBy: $createdBy, ')
+          ..write('createdHash: $createdHash, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('updatedBy: $updatedBy, ')
+          ..write('name: $name, ')
+          ..write('isRunning: $isRunning')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => $mrjf($mrjc(
+      id.hashCode,
+      $mrjc(
+          localStatus.hashCode,
+          $mrjc(
+              createdAt.hashCode,
+              $mrjc(
+                  createdBy.hashCode,
+                  $mrjc(
+                      createdHash.hashCode,
+                      $mrjc(
+                          updatedAt.hashCode,
+                          $mrjc(updatedBy.hashCode,
+                              $mrjc(name.hashCode, isRunning.hashCode)))))))));
+  @override
+  bool operator ==(dynamic other) =>
+      identical(this, other) ||
+      (other is RunningTask &&
+          other.id == this.id &&
+          other.localStatus == this.localStatus &&
+          other.createdAt == this.createdAt &&
+          other.createdBy == this.createdBy &&
+          other.createdHash == this.createdHash &&
+          other.updatedAt == this.updatedAt &&
+          other.updatedBy == this.updatedBy &&
+          other.name == this.name &&
+          other.isRunning == this.isRunning);
+}
+
+class RunningTasksCompanion extends UpdateCompanion<RunningTask> {
+  final Value<int> id;
+  final Value<LocalStatusType> localStatus;
+  final Value<DateTime> createdAt;
+  final Value<String> createdBy;
+  final Value<String> createdHash;
+  final Value<DateTime> updatedAt;
+  final Value<String> updatedBy;
+  final Value<String> name;
+  final Value<bool> isRunning;
+  const RunningTasksCompanion({
+    this.id = const Value.absent(),
+    this.localStatus = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.createdBy = const Value.absent(),
+    this.createdHash = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.updatedBy = const Value.absent(),
+    this.name = const Value.absent(),
+    this.isRunning = const Value.absent(),
+  });
+  RunningTasksCompanion.insert({
+    this.id = const Value.absent(),
+    @required LocalStatusType localStatus,
+    @required DateTime createdAt,
+    @required String createdBy,
+    @required String createdHash,
+    this.updatedAt = const Value.absent(),
+    this.updatedBy = const Value.absent(),
+    @required String name,
+    @required bool isRunning,
+  })  : localStatus = Value(localStatus),
+        createdAt = Value(createdAt),
+        createdBy = Value(createdBy),
+        createdHash = Value(createdHash),
+        name = Value(name),
+        isRunning = Value(isRunning);
+  RunningTasksCompanion copyWith(
+      {Value<int> id,
+      Value<LocalStatusType> localStatus,
+      Value<DateTime> createdAt,
+      Value<String> createdBy,
+      Value<String> createdHash,
+      Value<DateTime> updatedAt,
+      Value<String> updatedBy,
+      Value<String> name,
+      Value<bool> isRunning}) {
+    return RunningTasksCompanion(
+      id: id ?? this.id,
+      localStatus: localStatus ?? this.localStatus,
+      createdAt: createdAt ?? this.createdAt,
+      createdBy: createdBy ?? this.createdBy,
+      createdHash: createdHash ?? this.createdHash,
+      updatedAt: updatedAt ?? this.updatedAt,
+      updatedBy: updatedBy ?? this.updatedBy,
+      name: name ?? this.name,
+      isRunning: isRunning ?? this.isRunning,
+    );
+  }
+}
+
+class $RunningTasksTable extends RunningTasks
+    with TableInfo<$RunningTasksTable, RunningTask> {
+  final GeneratedDatabase _db;
+  final String _alias;
+  $RunningTasksTable(this._db, [this._alias]);
+  final VerificationMeta _idMeta = const VerificationMeta('id');
+  GeneratedIntColumn _id;
+  @override
+  GeneratedIntColumn get id => _id ??= _constructId();
+  GeneratedIntColumn _constructId() {
+    return GeneratedIntColumn('id', $tableName, false,
+        hasAutoIncrement: true, declaredAsPrimaryKey: true);
+  }
+
+  final VerificationMeta _localStatusMeta =
+      const VerificationMeta('localStatus');
+  GeneratedIntColumn _localStatus;
+  @override
+  GeneratedIntColumn get localStatus =>
+      _localStatus ??= _constructLocalStatus();
+  GeneratedIntColumn _constructLocalStatus() {
+    return GeneratedIntColumn(
+      'local_status',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _createdAtMeta = const VerificationMeta('createdAt');
+  GeneratedDateTimeColumn _createdAt;
+  @override
+  GeneratedDateTimeColumn get createdAt => _createdAt ??= _constructCreatedAt();
+  GeneratedDateTimeColumn _constructCreatedAt() {
+    return GeneratedDateTimeColumn(
+      'created_at',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _createdByMeta = const VerificationMeta('createdBy');
+  GeneratedTextColumn _createdBy;
+  @override
+  GeneratedTextColumn get createdBy => _createdBy ??= _constructCreatedBy();
+  GeneratedTextColumn _constructCreatedBy() {
+    return GeneratedTextColumn('created_by', $tableName, false,
+        minTextLength: 0, maxTextLength: 255);
+  }
+
+  final VerificationMeta _createdHashMeta =
+      const VerificationMeta('createdHash');
+  GeneratedTextColumn _createdHash;
+  @override
+  GeneratedTextColumn get createdHash =>
+      _createdHash ??= _constructCreatedHash();
+  GeneratedTextColumn _constructCreatedHash() {
+    return GeneratedTextColumn(
+      'created_hash',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _updatedAtMeta = const VerificationMeta('updatedAt');
+  GeneratedDateTimeColumn _updatedAt;
+  @override
+  GeneratedDateTimeColumn get updatedAt => _updatedAt ??= _constructUpdatedAt();
+  GeneratedDateTimeColumn _constructUpdatedAt() {
+    return GeneratedDateTimeColumn(
+      'updated_at',
+      $tableName,
+      true,
+    );
+  }
+
+  final VerificationMeta _updatedByMeta = const VerificationMeta('updatedBy');
+  GeneratedTextColumn _updatedBy;
+  @override
+  GeneratedTextColumn get updatedBy => _updatedBy ??= _constructUpdatedBy();
+  GeneratedTextColumn _constructUpdatedBy() {
+    return GeneratedTextColumn('updated_by', $tableName, true,
+        minTextLength: 0, maxTextLength: 255);
+  }
+
+  final VerificationMeta _nameMeta = const VerificationMeta('name');
+  GeneratedTextColumn _name;
+  @override
+  GeneratedTextColumn get name => _name ??= _constructName();
+  GeneratedTextColumn _constructName() {
+    return GeneratedTextColumn(
+      'name',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _isRunningMeta = const VerificationMeta('isRunning');
+  GeneratedBoolColumn _isRunning;
+  @override
+  GeneratedBoolColumn get isRunning => _isRunning ??= _constructIsRunning();
+  GeneratedBoolColumn _constructIsRunning() {
+    return GeneratedBoolColumn(
+      'is_running',
+      $tableName,
+      false,
+    );
+  }
+
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        localStatus,
+        createdAt,
+        createdBy,
+        createdHash,
+        updatedAt,
+        updatedBy,
+        name,
+        isRunning
+      ];
+  @override
+  $RunningTasksTable get asDslTable => this;
+  @override
+  String get $tableName => _alias ?? 'running_tasks';
+  @override
+  final String actualTableName = 'running_tasks';
+  @override
+  VerificationContext validateIntegrity(RunningTasksCompanion d,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    if (d.id.present) {
+      context.handle(_idMeta, id.isAcceptableValue(d.id.value, _idMeta));
+    }
+    context.handle(_localStatusMeta, const VerificationResult.success());
+    if (d.createdAt.present) {
+      context.handle(_createdAtMeta,
+          createdAt.isAcceptableValue(d.createdAt.value, _createdAtMeta));
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (d.createdBy.present) {
+      context.handle(_createdByMeta,
+          createdBy.isAcceptableValue(d.createdBy.value, _createdByMeta));
+    } else if (isInserting) {
+      context.missing(_createdByMeta);
+    }
+    if (d.createdHash.present) {
+      context.handle(_createdHashMeta,
+          createdHash.isAcceptableValue(d.createdHash.value, _createdHashMeta));
+    } else if (isInserting) {
+      context.missing(_createdHashMeta);
+    }
+    if (d.updatedAt.present) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableValue(d.updatedAt.value, _updatedAtMeta));
+    }
+    if (d.updatedBy.present) {
+      context.handle(_updatedByMeta,
+          updatedBy.isAcceptableValue(d.updatedBy.value, _updatedByMeta));
+    }
+    if (d.name.present) {
+      context.handle(
+          _nameMeta, name.isAcceptableValue(d.name.value, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (d.isRunning.present) {
+      context.handle(_isRunningMeta,
+          isRunning.isAcceptableValue(d.isRunning.value, _isRunningMeta));
+    } else if (isInserting) {
+      context.missing(_isRunningMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  RunningTask map(Map<String, dynamic> data, {String tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
+    return RunningTask.fromData(data, _db, prefix: effectivePrefix);
+  }
+
+  @override
+  Map<String, Variable> entityToSql(RunningTasksCompanion d) {
+    final map = <String, Variable>{};
+    if (d.id.present) {
+      map['id'] = Variable<int, IntType>(d.id.value);
+    }
+    if (d.localStatus.present) {
+      final converter = $RunningTasksTable.$converter0;
+      map['local_status'] =
+          Variable<int, IntType>(converter.mapToSql(d.localStatus.value));
+    }
+    if (d.createdAt.present) {
+      map['created_at'] = Variable<DateTime, DateTimeType>(d.createdAt.value);
+    }
+    if (d.createdBy.present) {
+      map['created_by'] = Variable<String, StringType>(d.createdBy.value);
+    }
+    if (d.createdHash.present) {
+      map['created_hash'] = Variable<String, StringType>(d.createdHash.value);
+    }
+    if (d.updatedAt.present) {
+      map['updated_at'] = Variable<DateTime, DateTimeType>(d.updatedAt.value);
+    }
+    if (d.updatedBy.present) {
+      map['updated_by'] = Variable<String, StringType>(d.updatedBy.value);
+    }
+    if (d.name.present) {
+      map['name'] = Variable<String, StringType>(d.name.value);
+    }
+    if (d.isRunning.present) {
+      map['is_running'] = Variable<bool, BoolType>(d.isRunning.value);
+    }
+    return map;
+  }
+
+  @override
+  $RunningTasksTable createAlias(String alias) {
+    return $RunningTasksTable(_db, alias);
+  }
+
+  static TypeConverter<LocalStatusType, int> $converter0 =
+      const LocalStatusConverter();
 }
 
 abstract class _$AppDatabase extends GeneratedDatabase {
@@ -1640,6 +2419,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       _transactions ??= $TransactionsTable(this);
   $CategoriesTable _categories;
   $CategoriesTable get categories => _categories ??= $CategoriesTable(this);
+  $RunningTasksTable _runningTasks;
+  $RunningTasksTable get runningTasks =>
+      _runningTasks ??= $RunningTasksTable(this);
   UsersDaoImpl _usersDaoImpl;
   UsersDaoImpl get usersDaoImpl =>
       _usersDaoImpl ??= UsersDaoImpl(this as AppDatabase);
@@ -1653,7 +2435,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [users, transactions, categories];
+      [users, transactions, categories, runningTasks];
 }
 
 // **************************************************************************

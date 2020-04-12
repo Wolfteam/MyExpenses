@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../common/enums/app_accent_color_type.dart';
 import '../common/enums/app_language_type.dart';
 import '../common/enums/app_theme_type.dart';
+import '../common/enums/currency_symbol_type.dart';
 import '../common/enums/sync_intervals_type.dart';
 import '../models/app_settings.dart';
 import 'logging_service.dart';
@@ -22,14 +23,26 @@ abstract class SettingsService {
   SyncIntervalType get syncInterval;
   set syncInterval(SyncIntervalType interval);
 
+  bool get showNotifAfterFullSync;
+  set showNotifAfterFullSync(bool show);
+
   bool get askForPassword;
   set askForPassword(bool ask);
 
-  String get password;
-  set password(String password);
-
   bool get askForFingerPrint;
   set askForFingerPrint(bool ask);
+
+  CurrencySymbolType get currencySymbol;
+  set currencySymbol(CurrencySymbolType type);
+
+  bool get currencyToTheRight;
+  set currencyToTheRight(bool toTheRight);
+
+  bool get showNotifForRecurringTrans;
+  set showNotifForRecurringTrans(bool show);
+
+  bool get isRecurringTransTaskRegistered;
+  set isRecurringTransTaskRegistered(bool itIs);
 
   Future init();
 }
@@ -39,9 +52,15 @@ class SettingsServiceImpl implements SettingsService {
   final _accentColorKey = 'AccentColor';
   final _appLanguageKey = 'AppLanguage';
   final _syncIntervalKey = 'SyncInterval';
+  final _showNotifAfterFullSyncKey = 'ShowNotificationAfterFullSync';
   final _askForPasswordKey = 'AskForPassword';
   final _askForFingerPrintKey = 'AskForFingerPrint';
-  final _passwordKey = 'Password';
+  final _currencySymbolKey = 'CurrencySymbol';
+  final _currencyToTheRightKey = 'CurrencyToTheRight';
+  final _showNotifForRecurringTransKey =
+      'ShowNotificationForRecurringTransactions';
+  final _recurringTransTaskIsRegisteredKey = 'RecurringTransIsRegistered';
+
   final LoggingService _logger;
 
   bool _initialized = false;
@@ -55,8 +74,13 @@ class SettingsServiceImpl implements SettingsService {
         accentColor: accentColor,
         appLanguage: language,
         syncInterval: syncInterval,
+        showNotifAfterFullSync: showNotifAfterFullSync,
         askForPassword: askForPassword,
         askForFingerPrint: askForFingerPrint,
+        currencySymbol: currencySymbol,
+        currencyToTheRight: currencyToTheRight,
+        showNotifForRecurringTrans: showNotifForRecurringTrans,
+        isRecurringTransTaskRegistered: isRecurringTransTaskRegistered,
       );
 
   @override
@@ -87,6 +111,14 @@ class SettingsServiceImpl implements SettingsService {
       _prefs.setInt(_syncIntervalKey, interval.index);
 
   @override
+  bool get showNotifAfterFullSync => _prefs.getBool(_showNotifAfterFullSyncKey);
+  @override
+  set showNotifAfterFullSync(bool show) => _prefs.setBool(
+        _showNotifAfterFullSyncKey,
+        show,
+      );
+
+  @override
   bool get askForPassword => _prefs.getBool(_askForPasswordKey);
   @override
   set askForPassword(bool ask) => _prefs.setBool(_askForPasswordKey, ask);
@@ -97,9 +129,35 @@ class SettingsServiceImpl implements SettingsService {
   set askForFingerPrint(bool ask) => _prefs.setBool(_askForFingerPrintKey, ask);
 
   @override
-  String get password => _prefs.getString(_passwordKey);
+  CurrencySymbolType get currencySymbol =>
+      CurrencySymbolType.values[_prefs.getInt(_currencySymbolKey)];
   @override
-  set password(String pass) => _prefs.setString(_passwordKey, pass);
+  set currencySymbol(CurrencySymbolType type) =>
+      _prefs.setInt(_currencySymbolKey, type.index);
+
+  @override
+  bool get currencyToTheRight => _prefs.getBool(_currencyToTheRightKey);
+  @override
+  set currencyToTheRight(bool toTheRight) =>
+      _prefs.setBool(_currencyToTheRightKey, toTheRight);
+
+  @override
+  bool get showNotifForRecurringTrans =>
+      _prefs.getBool(_showNotifForRecurringTransKey);
+  @override
+  set showNotifForRecurringTrans(bool show) => _prefs.setBool(
+        _showNotifForRecurringTransKey,
+        show,
+      );
+
+  @override
+  bool get isRecurringTransTaskRegistered =>
+      _prefs.getBool(_recurringTransTaskIsRegisteredKey);
+  @override
+  set isRecurringTransTaskRegistered(bool itIs) => _prefs.setBool(
+        _recurringTransTaskIsRegisteredKey,
+        itIs,
+      );
 
   SettingsServiceImpl(this._logger);
 
@@ -134,6 +192,14 @@ class SettingsServiceImpl implements SettingsService {
       _prefs.setInt(_syncIntervalKey, SyncIntervalType.none.index);
     }
 
+    if (_prefs.get(_showNotifAfterFullSyncKey) == null) {
+      _logger.info(
+        runtimeType,
+        'Setting show notif after full sync to false...',
+      );
+      _prefs.setBool(_showNotifAfterFullSyncKey, false);
+    }
+
     if (_prefs.get(_askForPasswordKey) == null) {
       _logger.info(runtimeType, 'Setting ask for password to false...');
       _prefs.setBool(_askForPasswordKey, false);
@@ -142,6 +208,35 @@ class SettingsServiceImpl implements SettingsService {
     if (_prefs.get(_askForFingerPrintKey) == null) {
       _logger.info(runtimeType, 'Setting ask for fingerprint to false...');
       _prefs.setBool(_askForFingerPrintKey, false);
+    }
+
+    if (_prefs.get(_currencySymbolKey) == null) {
+      _logger.info(
+        runtimeType,
+        'Setting current currency to ${CurrencySymbolType.dolar}...',
+      );
+      _prefs.setInt(_currencySymbolKey, CurrencySymbolType.dolar.index);
+    }
+
+    if (_prefs.get(_currencyToTheRightKey) == null) {
+      _logger.info(runtimeType, 'Setting currency to the right to true...');
+      _prefs.setBool(_currencyToTheRightKey, true);
+    }
+
+    if (_prefs.get(_showNotifForRecurringTransKey) == null) {
+      _logger.info(
+        runtimeType,
+        'Setting show notif for recurring trans to false...',
+      );
+      _prefs.setBool(_showNotifForRecurringTransKey, false);
+    }
+
+    if (_prefs.get(_recurringTransTaskIsRegisteredKey) == null) {
+      _logger.info(
+        runtimeType,
+        'Setting recurring trans task is registered to false...',
+      );
+      _prefs.setBool(_recurringTransTaskIsRegisteredKey, false);
     }
 
     _initialized = true;

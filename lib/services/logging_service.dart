@@ -4,9 +4,9 @@ import 'package:sprintf/sprintf.dart';
 abstract class LoggingService {
   void info(Type type, String msg, [List<Object> args]);
 
-  void warning(Type type, String msg, [Exception ex, StackTrace trace]);
+  void warning(Type type, String msg, [dynamic ex, StackTrace trace]);
 
-  void error(Type type, String msg, [Exception ex, StackTrace trace]);
+  void error(Type type, String msg, [dynamic ex, StackTrace trace]);
 }
 
 class LoggingServiceImpl implements LoggingService {
@@ -24,7 +24,7 @@ class LoggingServiceImpl implements LoggingService {
   }
 
   @override
-  void warning(Type type, String msg, [Exception ex, StackTrace trace]) {
+  void warning(Type type, String msg, [dynamic ex, StackTrace trace]) {
     if (ex != null) {
       _logger.warning(type.toString(), _formatEx(msg, ex), ex, trace);
     } else {
@@ -33,7 +33,7 @@ class LoggingServiceImpl implements LoggingService {
   }
 
   @override
-  void error(Type type, String msg, [Exception ex, StackTrace trace]) {
+  void error(Type type, String msg, [dynamic ex, StackTrace trace]) {
     if (ex != null) {
       _logger.error(type.toString(), _formatEx(msg, ex), ex, trace);
     } else {
@@ -41,7 +41,7 @@ class LoggingServiceImpl implements LoggingService {
     }
   }
 
-  String _formatEx(String msg, Exception ex) {
+  String _formatEx(String msg, dynamic ex) {
     return '$msg \n $ex';
   }
 }

@@ -1,16 +1,20 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 import '../../common/enums/app_accent_color_type.dart';
+import '../../common/enums/app_drawer_item_type.dart';
 import '../../common/enums/app_language_type.dart';
 import '../../common/enums/app_theme_type.dart';
 import '../../common/extensions/app_theme_type_extensions.dart';
+import '../../common/utils/background_utils.dart';
 import '../../generated/i18n.dart';
 import '../../services/logging_service.dart';
 import '../../services/settings_service.dart';
+import '../drawer/drawer_bloc.dart';
 
 part 'app_event.dart';
 part 'app_state.dart';
@@ -18,16 +22,37 @@ part 'app_state.dart';
 class AppBloc extends Bloc<AppEvent, AppState> {
   final LoggingService _logger;
   final SettingsService _settingsService;
+  final DrawerBloc _drawerBloc;
+  StreamSubscription _portSubscription;
 
   @override
   AppState get initialState => AppUninitializedState();
 
-  AppBloc(this._logger, this._settingsService);
+  AppBloc(
+    this._logger,
+    this._settingsService,
+    this._drawerBloc,
+  ) {
+    IsolateNameServer.registerPortWithName(
+      BackgroundUtils.port.sendPort,
+      BackgroundUtils.portName,
+    );
+    _portSubscription = BackgroundUtils.port.listen((data) {
+      final isRunning = data[0] as bool;
+      add(BgTaskIsRunning(isRunning: isRunning));
+      if (!isRunning) {
+        _drawerBloc.add(
+          const DrawerItemSelectionChanged(AppDrawerItemType.transactions),
+        );
+      }
+    });
+  }
 
   @override
   Stream<AppState> mapEventToState(
     AppEvent event,
   ) async* {
+    _logger.info(runtimeType, 'Initializing app settings');
     await _settingsService.init();
 
     if (event is AuthenticateUser) {
@@ -35,14 +60,20 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     }
 
     if (event is InitializeApp) {
-      _logger.info(runtimeType, 'Initializing app settings');
-
+      await BackgroundUtils.initBg();
+      if (!_settingsService.isRecurringTransTaskRegistered) {
+        _logger.info(
+          runtimeType,
+          'Recurring trans task is not registered, registering it...',
+        );
+        await BackgroundUtils.registerRecurringTransactionsTask();
+      }
       _logger.info(
         runtimeType,
         'Current settings are: ${_settingsService.appSettings.toJson()}',
       );
 
-      await Future.delayed(const Duration(seconds: 1));
+      await Future.delayed(const Duration(milliseconds: 500));
 
       yield* _loadThemeData(
         _settingsService.appTheme,
@@ -75,16 +106,38 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         _settingsService.language,
       );
     }
+
+    if (event is BgTaskIsRunning) {
+      yield* _loadThemeData(
+        _settingsService.appTheme,
+        _settingsService.accentColor,
+        _settingsService.language,
+        bgTaskIsRunning: event.isRunning,
+      );
+    }
+  }
+
+  @override
+  Future<void> close() async {
+    IsolateNameServer.removePortNameMapping(BackgroundUtils.portName);
+    await _portSubscription.cancel();
+    await super.close();
   }
 
   Stream<AppState> _loadThemeData(
     AppThemeType theme,
     AppAccentColorType accentColor,
-    AppLanguageType language,
-  ) async* {
+    AppLanguageType language, {
+    bool isInitialized = true,
+    bool bgTaskIsRunning = false,
+  }) async* {
     final themeData = accentColor.getThemeData(theme);
     _setLocale(language);
-    yield AppInitializedState(themeData);
+    yield AppInitializedState(
+      themeData,
+      isInitialized: isInitialized,
+      bgTaskIsRunning: bgTaskIsRunning,
+    );
   }
 
   void _setLocale(AppLanguageType language) {

@@ -7,7 +7,9 @@ import '../transactions/transaction_item.dart' as trans_item;
 
 class ChartTransactionCardContainer extends StatelessWidget {
   final TransactionItem item;
-  final int transactionsTotalAmount;
+  final double transactionsTotalAmount;
+
+  double get percentage => item.amount * 100 / transactionsTotalAmount;
 
   const ChartTransactionCardContainer(
     this.item,
@@ -22,9 +24,7 @@ class ChartTransactionCardContainer extends StatelessWidget {
       DateUtils.monthDayAndYearFormat,
     );
     final dateString = '${i18n.date}: $formattedDate';
-    final percentageString =
-        (item.amount.round() * 100 / transactionsTotalAmount)
-            .toStringAsFixed(2);
+    final percentageString = percentage.toStringAsFixed(2);
 
     return Card(
       shape: RoundedRectangleBorder(
@@ -35,7 +35,12 @@ class ChartTransactionCardContainer extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.only(top: 10, left: 16, right: 16),
+            padding: const EdgeInsets.only(
+              top: 8,
+              left: 16,
+              right: 16,
+              bottom: 5,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -59,6 +64,7 @@ class ChartTransactionCardContainer extends StatelessWidget {
           ),
           Divider(
             color: Colors.grey,
+            height: 1,
           ),
           trans_item.TransactionItem(item: item),
         ],

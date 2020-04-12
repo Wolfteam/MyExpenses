@@ -7,7 +7,8 @@ import '../../common/enums/sort_direction_type.dart';
 import '../../common/extensions/i18n_extensions.dart';
 import '../../generated/i18n.dart';
 import '../../models/chart_transaction_item.dart';
-import '../widgets/charts/char_transaction_card_container.dart';
+import '../widgets/charts/chart_grouped_transactions_card_container.dart';
+import '../widgets/charts/chart_transaction_card_container.dart';
 import '../widgets/charts/pie_chart_transactions_per_month.dart';
 
 class ChartDetailsPage extends StatelessWidget {
@@ -62,36 +63,9 @@ class ChartDetailsPage extends StatelessWidget {
           ),
         ),
       ),
-      PieChartTransactionsPerMonths(chartData, 300, 0.7),
+      PieChartTransactionsPerMonths(chartData, 300, 0.8),
       const Divider(),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Text(
-              i18n.transactions,
-              style: theme.textTheme.title,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                _buildFilters(context, state),
-                _buildSortDirection(context, state),
-              ],
-            ),
-          ],
-        ),
-      ),
-      ListView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: state.transactions.length,
-        itemBuilder: (ctx, index) => ChartTransactionCardContainer(
-          state.transactions[index],
-          state.transactionsTotalAmount,
-        ),
-      ),
+      ..._buildTransactions(context, state),
     ];
   }
 
@@ -136,6 +110,53 @@ class ChartDetailsPage extends StatelessWidget {
       onSelected: (direction) => _sortDirectionChanged(context, direction),
       itemBuilder: (context) => values,
     );
+  }
+
+  List<Widget> _buildTransactions(
+    BuildContext context,
+    ChartDetailsState state,
+  ) {
+    final i18n = I18n.of(context);
+    final theme = Theme.of(context);
+
+    return [
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Text(
+              i18n.transactions,
+              style: theme.textTheme.title,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                _buildFilters(context, state),
+                _buildSortDirection(context, state),
+              ],
+            ),
+          ],
+        ),
+      ),
+      ListView.builder(
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: state.filter != ChartDetailsFilterType.category
+            ? state.transactions.length
+            : state.groupedTransactionsByCategory.length,
+        itemBuilder: (ctx, index) =>
+            state.filter != ChartDetailsFilterType.category
+                ? ChartTransactionCardContainer(
+                    state.transactions[index],
+                    state.transactionsTotalAmount,
+                  )
+                : ChartGroupedTransactionsCardContainer(
+                    grouped: state.groupedTransactionsByCategory[index],
+                    transactionsTotalAmount: state.transactionsTotalAmount,
+                  ),
+      )
+    ];
   }
 
   void _filterChanged(BuildContext context, ChartDetailsFilterType newValue) =>

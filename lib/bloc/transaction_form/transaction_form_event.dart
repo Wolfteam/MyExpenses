@@ -11,12 +11,12 @@ abstract class TransactionFormEvent extends Equatable {
 class AddTransaction extends TransactionFormEvent {}
 
 class EditTransaction extends TransactionFormEvent {
-  final TransactionItem item;
+  final int id;
 
-  const EditTransaction(this.item);
+  const EditTransaction(this.id);
 
   @override
-  List<Object> get props => [item];
+  List<Object> get props => [id];
 }
 
 class AmountChanged extends TransactionFormEvent {
@@ -72,6 +72,15 @@ class ImageChanged extends TransactionFormEvent {
 
   @override
   List<Object> get props => [path, imageExists];
+}
+
+class IsRunningChanged extends TransactionFormEvent {
+  final bool isRunning;
+
+  const IsRunningChanged({@required this.isRunning});
+
+  @override
+  List<Object> get props => [isRunning];
 }
 
 class DeleteTransaction extends TransactionFormEvent {

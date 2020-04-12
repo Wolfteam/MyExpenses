@@ -5,10 +5,12 @@ import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 import '../../bloc/chart_details/chart_details_bloc.dart';
 import '../../bloc/charts/charts_bloc.dart';
+import '../../bloc/currency/currency_bloc.dart';
+import '../../common/utils/i18n_utils.dart';
 import '../../generated/i18n.dart';
 import '../../models/transactions_summary_per_date.dart';
-import '../../ui/widgets/transactions/no_transactions_found.dart';
 import '../widgets/charts/pie_chart_transactions_per_month.dart';
+import '../widgets/nothing_found.dart';
 import 'chart_details_page.dart';
 
 class ChartsPage extends StatefulWidget {
@@ -73,7 +75,7 @@ class _ChartsPageState extends State<ChartsPage>
         if (state.transactions.isNotEmpty)
           _buildIncomesAndExpensesCharts(context, state)
         else
-          NoTransactionsFound()
+          NothingFound(msg: i18n.noRecurringTransactionsWereFound)
       ];
     }
 
@@ -144,20 +146,26 @@ class _ChartsPageState extends State<ChartsPage>
         isDark ? Colors.white : Colors.black,
       ),
     );
+
+    final currency = context.bloc<CurrencyBloc>();
+
     return [
       charts.Series<TransactionsSummaryPerDate, String>(
         id: 'BarChartMonthSummary',
         data: state.transactionsPerDate,
-        colorFn: (item, _) => item.amount == 0
+        colorFn: (item, _) => item.totalAmount == 0
             ? charts.MaterialPalette.white
             : item.isAnIncome
                 ? charts.MaterialPalette.green.shadeDefault
                 : charts.MaterialPalette.red.shadeDefault,
         domainFn: (item, _) => item.dateRangeString,
-        measureFn: (item, _) => item.amount,
+        measureFn: (item, _) => item.totalAmount,
         insideLabelStyleAccessorFn: (item, index) => labelStyle,
         outsideLabelStyleAccessorFn: (item, index) => labelStyle,
-        labelAccessorFn: (item, _) => '${item.amount}\$',
+        labelAccessorFn: (item, _) => currency.format(
+          item.totalAmount,
+          showSymbol: false,
+        ),
       ),
     ];
   }
@@ -193,6 +201,8 @@ class _ChartsPageState extends State<ChartsPage>
         ? state.incomeChartTransactions
         : state.expenseChartTransactions;
 
+    final currencyBloc = context.bloc<CurrencyBloc>();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -217,9 +227,15 @@ class _ChartsPageState extends State<ChartsPage>
                   Container(
                     margin: const EdgeInsets.only(left: 20),
                     child: Text(
-                      '${incomes ? state.totalIncomeAmount : state.totalExpenseAmount} \$',
+                      currencyBloc.format(
+                        incomes
+                            ? state.totalIncomeAmount
+                            : state.totalExpenseAmount,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                       style: textStyle.copyWith(
-                          color: incomes ? Colors.green : Colors.red),
+                        color: incomes ? Colors.green : Colors.red,
+                      ),
                     ),
                   ),
                 ],
@@ -246,7 +262,7 @@ class _ChartsPageState extends State<ChartsPage>
         .toList();
 
     context.bloc<ChartDetailsBloc>().add(Initialize(transactions));
-    
+
     final route = MaterialPageRoute(
       fullscreenDialog: true,
       builder: (ctx) => ChartDetailsPage(
@@ -260,7 +276,6 @@ class _ChartsPageState extends State<ChartsPage>
     Navigator.of(context).push(route);
   }
 
-  //TODO: CHANGE THE LOCALE HERE
   Future _changeCurrentDate(LoadedState state) async {
     final now = DateTime.now();
     final selectedDate = await showMonthPicker(
@@ -268,6 +283,7 @@ class _ChartsPageState extends State<ChartsPage>
       initialDate: state.currentDate,
       // firstDate: state.currentDate,
       lastDate: DateTime(now.year + 1),
+      locale: currentLocale(state.language)
     );
 
     if (selectedDate == null) return;

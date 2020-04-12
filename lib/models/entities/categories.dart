@@ -6,4 +6,7 @@ class Categories extends BaseEntity {
   BoolColumn get isAnIncome => boolean()();
   TextColumn get icon => text().map(const IconDataConverter())();
   IntColumn get iconColor => integer().map(const ColorConverter())();
+
+  IntColumn get userId =>
+      integer().nullable().customConstraint('REFERENCES users(id)')();
 }

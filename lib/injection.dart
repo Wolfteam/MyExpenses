@@ -7,8 +7,12 @@ import 'daos/transactions_dao.dart';
 import 'daos/users_dao.dart';
 import 'injection.iconfig.dart';
 import 'models/entities/database.dart';
+import 'services/google_service.dart';
 import 'services/logging_service.dart';
+import 'services/network_service.dart';
+import 'services/secure_storage_service.dart';
 import 'services/settings_service.dart';
+import 'services/sync_service.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -27,5 +31,24 @@ void initInjection() {
     TransactionsDaoImpl(getIt<AppDatabase>()),
   );
   getIt.registerSingleton<UsersDao>(UsersDaoImpl(getIt<AppDatabase>()));
+
+  getIt.registerSingleton<SecureStorageService>(SecureStorageServiceImpl());
+
+  getIt.registerSingleton<GoogleService>(GoogleServiceImpl(
+    getIt<LoggingService>(),
+    getIt<SecureStorageService>(),
+  ));
+
+  getIt.registerSingleton<NetworkService>(NetworkServiceImpl());
+
+  getIt.registerSingleton<SyncService>(SyncServiceImpl(
+    getIt<LoggingService>(),
+    getIt<TransactionsDao>(),
+    getIt<CategoriesDao>(),
+    getIt<UsersDao>(),
+    getIt<GoogleService>(),
+    getIt<SecureStorageService>(),
+  ));
+
   $initGetIt(getIt);
 }

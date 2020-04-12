@@ -44,7 +44,11 @@ class TransactionFormLoadedState extends TransactionFormState {
 
   final bool isSavingForm;
 
-  bool get isNewTransaction => id <= 0;
+  final bool isRecurringTransactionRunning;
+  final DateTime nextRecurringDate;
+  final bool nextRecurringDateWasUpdated;
+
+  bool get isNewTransaction => id == null || id <= 0;
 
   bool get isChildTransaction =>
       !isParentTransaction && parentTransactionId != null;
@@ -79,6 +83,9 @@ class TransactionFormLoadedState extends TransactionFormState {
         imagePath,
         imageExists,
         isSavingForm,
+        isRecurringTransactionRunning,
+        nextRecurringDate,
+        nextRecurringDateWasUpdated,
       ];
 
   const TransactionFormLoadedState({
@@ -104,6 +111,9 @@ class TransactionFormLoadedState extends TransactionFormState {
     this.imagePath,
     this.imageExists = false,
     this.isSavingForm = false,
+    this.isRecurringTransactionRunning = true,
+    this.nextRecurringDate,
+    this.nextRecurringDateWasUpdated = false,
   });
 
   factory TransactionFormLoadedState.initial(AppLanguageType language) {
@@ -164,6 +174,9 @@ class TransactionFormLoadedState extends TransactionFormState {
     String imagePath,
     bool imageExists,
     bool isSavingForm,
+    bool isRecurringTransactionRunning,
+    DateTime nextRecurringDate,
+    bool nextRecurringDateWasUpdated,
   }) {
     final date = transactionDate ?? this.transactionDate;
     final transactionDateString = DateUtils.formatAppDate(
@@ -196,13 +209,24 @@ class TransactionFormLoadedState extends TransactionFormState {
       imagePath: imagePath ?? this.imagePath,
       imageExists: imageExists ?? this.imageExists,
       isSavingForm: isSavingForm ?? this.isSavingForm,
+      isRecurringTransactionRunning:
+          isRecurringTransactionRunning ?? this.isRecurringTransactionRunning,
+      nextRecurringDate: nextRecurringDate ?? this.nextRecurringDate,
+      nextRecurringDateWasUpdated:
+          nextRecurringDateWasUpdated ?? this.nextRecurringDateWasUpdated,
     );
   }
 
-  TransactionItem buildTransactionItem(String imagePath) {
+  TransactionItem buildTransactionItem(String imgFilename) {
     final amountToSave = amount.abs();
-    final nextecurringDate =
+    DateTime nextecurringDate =
         repetitionCycle == RepetitionCycleType.none ? null : transactionDate;
+    final isParentTransaction = nextecurringDate != null;
+
+    if (!isRecurringTransactionRunning) {
+      nextecurringDate = null;
+    }
+
     return TransactionItem(
       id: id,
       amount: category.isAnIncome ? amountToSave : amountToSave * -1,
@@ -210,10 +234,10 @@ class TransactionFormLoadedState extends TransactionFormState {
       description: description.trim(),
       repetitionCycle: repetitionCycle,
       transactionDate: transactionDate,
-      isParentTransaction: nextecurringDate != null,
+      isParentTransaction: isParentTransaction,
       parentTransactionId: parentTransactionId,
       nextRecurringDate: nextecurringDate,
-      imagePath: imagePath,
+      imagePath: imgFilename,
     );
   }
 }

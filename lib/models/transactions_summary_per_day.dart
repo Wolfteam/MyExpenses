@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:my_expenses/models/base_transaction.dart';
+import 'package:equatable/equatable.dart';
 
-class TransactionsSummaryPerDay extends BaseTransaction {
+import '../common/mixins/transaction_mixin.dart';
+
+class TransactionsSummaryPerDay extends Equatable with TransactionMixin {
+  final DateTime date;
+  final double totalDayAmount;
+
+  @override
+  List<Object> get props => [date, totalDayAmount];
+
+  Color get color => getTransactionColor(
+        isAnIncome: isTransactionAnIncome(totalDayAmount),
+      );
+
   TransactionsSummaryPerDay({
-    @required DateTime date,
-    @required int amount,
-  }) : super.withDate(amount: amount, createdAt: date);
+    @required this.date,
+    @required this.totalDayAmount,
+  });
 }

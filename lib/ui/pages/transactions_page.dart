@@ -3,10 +3,11 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../bloc/transactions/transactions_bloc.dart';
+import '../../common/utils/i18n_utils.dart';
 import '../../generated/i18n.dart';
+import '../widgets/nothing_found.dart';
 import '../widgets/transactions/home_last_7_days_summary.dart';
 import '../widgets/transactions/home_transactions_summary_per_month.dart';
-import '../widgets/transactions/no_transactions_found.dart';
 import '../widgets/transactions/transactions_card_container.dart';
 
 class TransactionsPage extends StatefulWidget {
@@ -136,6 +137,7 @@ class _TransactionsPageState extends State<TransactionsPage>
           month: state.month,
           data: state.monthBalance,
           currentDate: state.currentDate,
+          locale: currentLocale(state.language),
         ),
         if (state.showLast7Days)
           HomeLast7DaysSummary(
@@ -161,14 +163,17 @@ class _TransactionsPageState extends State<TransactionsPage>
             ],
           ),
         ),
-        _buildTransactionsCard(state),
+        _buildTransactionsCard(state, i18n),
       ];
     }
 
     return [];
   }
 
-  Widget _buildTransactionsCard(TransactionsLoadedState state) {
+  Widget _buildTransactionsCard(
+    TransactionsLoadedState state,
+    I18n i18n,
+  ) {
     if (state.transactionsPerMonth.isNotEmpty) {
       return ListView.builder(
         physics: const NeverScrollableScrollPhysics(),
@@ -181,8 +186,10 @@ class _TransactionsPageState extends State<TransactionsPage>
       );
     }
 
-    return NoTransactionsFound(
-      recurringTransactions: state.showParentTransactions,
+    return NothingFound(
+      msg: state.showParentTransactions
+          ? i18n.noRecurringTransactionsWereFound
+          : i18n.noTransactionsForThisPeriod,
     );
   }
 

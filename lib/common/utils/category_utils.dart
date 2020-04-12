@@ -135,7 +135,7 @@ class CategoryUtils {
   static const waterDrop = 'Water';
   static const question = 'Help';
 
-  static final educationIcons = <CategoryIcon>[
+  static final List<CategoryIcon> educationIcons = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(Icons.school),
       name: school,
@@ -148,7 +148,7 @@ class CategoryUtils {
     ),
   ];
 
-  static final electronicIcons = <CategoryIcon>[
+  static final List<CategoryIcon> electronicIcons = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(Icons.headset),
       name: headset,
@@ -206,7 +206,7 @@ class CategoryUtils {
     ),
   ];
 
-  static final familyIcons = <CategoryIcon>[
+  static final List<CategoryIcon> familyIcons = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(Icons.people),
       name: people,
@@ -239,7 +239,7 @@ class CategoryUtils {
     ),
   ];
 
-  static final foodIcons = <CategoryIcon>[
+  static final List<CategoryIcon> foodIcons = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(Icons.fastfood),
       name: fastFood,
@@ -277,7 +277,7 @@ class CategoryUtils {
     ),
   ];
 
-  static final furnitureIcons = <CategoryIcon>[
+  static final List<CategoryIcon> furnitureIcons = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(Icons.event_seat),
       name: seat,
@@ -300,7 +300,7 @@ class CategoryUtils {
     ),
   ];
 
-  static final incomeIcons = <CategoryIcon>[
+  static final List<CategoryIcon> incomeIcons = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(CustomIcons.money),
       name: money2,
@@ -373,7 +373,7 @@ class CategoryUtils {
     ),
   ];
 
-  static final lifeIcons = <CategoryIcon>[
+  static final List<CategoryIcon> lifeIcons = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(Icons.movie),
       name: movie,
@@ -536,7 +536,7 @@ class CategoryUtils {
     ),
   ];
 
-  static final personalIcons = <CategoryIcon>[
+  static final List<CategoryIcon> personalIcons = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(Icons.home),
       name: home,
@@ -604,7 +604,7 @@ class CategoryUtils {
     ),
   ];
 
-  static final shoppingIcons = <CategoryIcon>[
+  static final List<CategoryIcon> shoppingIcons = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(Icons.add_shopping_cart),
       name: shoppingCart,
@@ -642,7 +642,7 @@ class CategoryUtils {
     ),
   ];
 
-  static final transportationIcon = <CategoryIcon>[
+  static final List<CategoryIcon> transportationIcon = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(Icons.directions_boat),
       name: boat,
@@ -675,7 +675,7 @@ class CategoryUtils {
     ),
   ];
 
-  static final otherIcons = <CategoryIcon>[
+  static final List<CategoryIcon> otherIcons = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(CustomIcons.na),
       name: na,

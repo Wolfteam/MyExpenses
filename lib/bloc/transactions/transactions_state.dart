@@ -24,6 +24,7 @@ class TransactionsLoadedState extends TransactionsState {
   final List<TransactionsSummaryPerDay> expenseTransactionsPerWeek;
 
   final bool showParentTransactions;
+  final AppLanguageType language;
 
   @override
   List<Object> get props => [
@@ -38,6 +39,7 @@ class TransactionsLoadedState extends TransactionsState {
         incomeTransactionsPerWeek,
         expenseTransactionsPerWeek,
         showParentTransactions,
+        language,
       ];
 
   const TransactionsLoadedState({
@@ -51,6 +53,7 @@ class TransactionsLoadedState extends TransactionsState {
     @required this.transactionsPerMonth,
     @required this.incomeTransactionsPerWeek,
     @required this.expenseTransactionsPerWeek,
+    @required this.language,
     this.showParentTransactions = false,
   });
 
@@ -59,18 +62,19 @@ class TransactionsLoadedState extends TransactionsState {
     bool showParentTransactions,
   }) {
     return TransactionsLoadedState(
-      month: this.month,
-      incomeAmount: this.incomeAmount,
-      expenseAmount: this.expenseAmount,
-      balanceAmount: this.balanceAmount,
-      currentDate: this.currentDate,
-      showLast7Days: this.showLast7Days,
-      monthBalance: this.monthBalance,
+      month: month,
+      incomeAmount: incomeAmount,
+      expenseAmount: expenseAmount,
+      balanceAmount: balanceAmount,
+      currentDate: currentDate,
+      showLast7Days: showLast7Days,
+      monthBalance: monthBalance,
       transactionsPerMonth: transactionsPerMonth ?? this.transactionsPerMonth,
-      incomeTransactionsPerWeek: this.incomeTransactionsPerWeek,
-      expenseTransactionsPerWeek: this.expenseTransactionsPerWeek,
+      incomeTransactionsPerWeek: incomeTransactionsPerWeek,
+      expenseTransactionsPerWeek: expenseTransactionsPerWeek,
       showParentTransactions:
           showParentTransactions ?? this.showParentTransactions,
+      language: language,
     );
   }
 }

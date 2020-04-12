@@ -5,10 +5,11 @@ abstract class AppEvent extends Equatable {
 }
 
 class InitializeApp extends AppEvent {
-  const InitializeApp();
+  final bool bgTaskIsRunning;
+  const InitializeApp({this.bgTaskIsRunning});
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [bgTaskIsRunning];
 }
 
 class AppThemeChanged extends AppEvent {
@@ -34,4 +35,13 @@ class AuthenticateUser extends AppEvent {
   List<Object> get props => [];
 
   const AuthenticateUser();
+}
+
+class BgTaskIsRunning extends AppEvent {
+  final bool isRunning;
+  
+  @override
+  List<Object> get props => [isRunning];
+
+  const BgTaskIsRunning({@required this.isRunning});
 }

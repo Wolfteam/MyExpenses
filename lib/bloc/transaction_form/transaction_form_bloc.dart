@@ -5,14 +5,17 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart';
 
 import '../../common/enums/app_language_type.dart';
 import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/extensions/string_extensions.dart';
+import '../../common/utils/app_path_utils.dart';
 import '../../common/utils/category_utils.dart';
 import '../../common/utils/date_utils.dart';
+import '../../common/utils/transaction_utils.dart';
 import '../../daos/transactions_dao.dart';
+import '../../daos/users_dao.dart';
 import '../../models/category_item.dart';
 import '../../models/transaction_item.dart';
 import '../../services/logging_service.dart';
@@ -25,11 +28,13 @@ class TransactionFormBloc
     extends Bloc<TransactionFormEvent, TransactionFormState> {
   final LoggingService _logger;
   final TransactionsDao _transactionsDao;
+  final UsersDao _usersDao;
   final SettingsService _settingsService;
 
   TransactionFormBloc(
     this._logger,
     this._transactionsDao,
+    this._usersDao,
     this._settingsService,
   );
 
@@ -48,38 +53,51 @@ class TransactionFormBloc
     }
 
     if (event is EditTransaction) {
+      final transaction = await _transactionsDao.getTransaction(event.id);
+      String imgPath = transaction.imagePath;
+
       bool imageExists = false;
-      if (!event.item.imagePath.isNullEmptyOrWhitespace) {
-        imageExists = await File(event.item.imagePath).exists();
+      if (!transaction.imagePath.isNullEmptyOrWhitespace) {
+        final user = await _usersDao.getActiveUser();
+        imgPath = await AppPathUtils.buildUserImgPath(
+          transaction.imagePath,
+          user?.id,
+        );
+        imageExists = await File(imgPath).exists();
+        if (!imageExists) {
+          imgPath = null;
+        }
       }
 
       final firstDate = _getFirstDateToUse(
-        event.item.repetitionCycle,
-        event.item.transactionDate,
+        transaction.repetitionCycle,
+        transaction.transactionDate,
       );
 
       yield TransactionFormLoadedState.initial(_settingsService.language)
           .copyWith(
-        id: event.item.id,
-        amount: event.item.amount,
+        id: transaction.id,
+        amount: transaction.amount,
         isAmountValid: true,
         isAmountDirty: true,
-        category: event.item.category,
+        category: transaction.category,
         isCategoryValid: true,
-        description: event.item.description,
+        description: transaction.description,
         isDescriptionValid: true,
         isDescriptionDirty: true,
-        repetitionCycle: event.item.repetitionCycle,
-        transactionDate: event.item.transactionDate,
+        repetitionCycle: transaction.repetitionCycle,
+        transactionDate: transaction.transactionDate,
         isTransactionDateValid: _isTransactionDateValid(
-          event.item.transactionDate,
-          event.item.repetitionCycle,
+          transaction.transactionDate,
+          transaction.repetitionCycle,
         ),
-        isParentTransaction: event.item.isParentTransaction,
-        parentTransactionId: event.item.parentTransactionId,
+        isParentTransaction: transaction.isParentTransaction,
+        parentTransactionId: transaction.parentTransactionId,
         firstDate: firstDate,
-        imagePath: event.item.imagePath,
+        imagePath: imgPath,
         imageExists: imageExists,
+        isRecurringTransactionRunning: transaction.nextRecurringDate != null,
+        nextRecurringDate: transaction.nextRecurringDate,
       );
     }
 
@@ -141,6 +159,10 @@ class TransactionFormBloc
       );
     }
 
+    if (event is IsRunningChanged) {
+      yield* _isRunningChanged(event.isRunning);
+    }
+
     if (event is DeleteTransaction) {
       yield* _deleteTransaction(currentState.id, event.keepChilds);
     }
@@ -171,7 +193,7 @@ class TransactionFormBloc
     try {
       yield currentState.copyWith(isSavingForm: true);
 
-      String imagePath;
+      String imgFilename;
       if (!currentState.imagePath.isNullEmptyOrWhitespace) {
         _logger.info(
           runtimeType,
@@ -179,10 +201,10 @@ class TransactionFormBloc
         );
         final fileExists = await File(currentState.imagePath).exists();
         if (fileExists) {
-          imagePath = await _saveImage(currentState.imagePath);
+          imgFilename = await _saveImage(currentState.imagePath);
         }
       }
-      final transaction = currentState.buildTransactionItem(imagePath);
+      final transaction = currentState.buildTransactionItem(imgFilename);
       _logger.info(
         runtimeType,
         '_saveTransaction: Trying to save transaction = ${transaction.toJson()}',
@@ -195,7 +217,7 @@ class TransactionFormBloc
       } else {
         yield TransactionChangedState.updated(createdTrans.transactionDate);
       }
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         '_saveTransaction: Unknown error occurred:',
@@ -235,7 +257,7 @@ class TransactionFormBloc
         await _transactionsDao.deleteTransaction(id);
         yield TransactionChangedState.deleted(transToDelete.transactionDate);
       }
-    } on Exception catch (e, s) {
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         '_deleteTransaction: Unknown error occurred:',
@@ -247,25 +269,78 @@ class TransactionFormBloc
     }
   }
 
+  Stream<TransactionFormState> _isRunningChanged(bool isRunning) async* {
+    final now = DateTime.now();
+    DateTime recurringDateTouse;
+
+    try {
+      _logger.info(
+        runtimeType,
+        '_isRunningChanged: Updating nextRecurringDate of ' +
+            'transactionId = ${currentState.id}. IsNowRunning = $isRunning',
+      );
+      if (isRunning) {
+        bool allCompleted = false;
+        recurringDateTouse = currentState.transactionDate;
+        while (!allCompleted) {
+          if (recurringDateTouse.isAfter(now)) {
+            allCompleted = true;
+            break;
+          }
+          recurringDateTouse = TransactionUtils.getNextRecurringDate(
+            currentState.repetitionCycle,
+            recurringDateTouse,
+          );
+        }
+      }
+
+      _logger.info(
+        runtimeType,
+        '_isRunningChanged: The next recurringDate will be $recurringDateTouse',
+      );
+
+      await _transactionsDao.updateNextRecurringDate(
+        currentState.id,
+        recurringDateTouse,
+      );
+      yield currentState.copyWith(
+        isRecurringTransactionRunning: isRunning,
+        nextRecurringDate: recurringDateTouse,
+        nextRecurringDateWasUpdated: true,
+      );
+      yield currentState.copyWith(
+        isRecurringTransactionRunning: isRunning,
+        nextRecurringDate: recurringDateTouse,
+        nextRecurringDateWasUpdated: false,
+      );
+    } catch (e, s) {
+      _logger.error(
+        runtimeType,
+        '_isRunningChanged: Unknown error occurred',
+        e,
+        s,
+      );
+    }
+  }
+
   Future<String> _saveImage(String path) async {
     try {
       _logger.info(
         runtimeType,
-        '_saveTransaction: Trying to save image',
+        '_saveImage: Trying to save image',
       );
-      final dir = await getApplicationDocumentsDirectory();
-      final now = DateTime.now();
-      final finalPath = '${dir.path}/${now}_img.png';
+      final user = await _usersDao.getActiveUser();
+      final finalPath = await AppPathUtils.generateTransactionImgPath(user?.id);
 
       await File(finalPath).writeAsBytes(await File(path).readAsBytes());
 
       _logger.info(
         runtimeType,
-        '_saveTransaction: Image was successfully saved',
+        '_saveImage: Image was successfully saved',
       );
 
-      return finalPath;
-    } on Exception catch (e, s) {
+      return basename(finalPath);
+    } catch (e, s) {
       _logger.error(
         runtimeType,
         '_saveImage: Unknown error occurred:',

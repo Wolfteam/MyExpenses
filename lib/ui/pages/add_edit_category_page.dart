@@ -7,6 +7,7 @@ import '../../bloc/category_form/category_form_bloc.dart';
 import '../../bloc/category_icon/category_icon_bloc.dart';
 import '../../common/enums/transaction_type.dart';
 import '../../common/extensions/string_extensions.dart';
+import '../../common/utils/bloc_utils.dart';
 import '../../common/utils/category_utils.dart';
 import '../../common/utils/toast_utils.dart';
 import '../../generated/i18n.dart';
@@ -435,5 +436,12 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
     context
         .bloc<ExpensesCategoriesBloc>()
         .add(const GetCategories(loadIncomes: false));
+
+    BlocUtils.raiseCommonBlocEvents(
+      context,
+      reloadCategories: true,
+      reloadCharts: true,
+      reloadTransactions: true,
+    );
   }
 }
