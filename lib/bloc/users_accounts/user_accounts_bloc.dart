@@ -1,10 +1,14 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 import '../../common/enums/secure_resource_type.dart';
+import '../../common/utils/app_path_utils.dart';
+import '../../daos/categories_dao.dart';
+import '../../daos/transactions_dao.dart';
 import '../../daos/users_dao.dart';
 import '../../models/user_item.dart';
 import '../../services/logging_service.dart';
@@ -15,11 +19,15 @@ part 'user_accounts_state.dart';
 
 class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
   final LoggingService _logger;
+  final CategoriesDao _categoriesDao;
+  final TransactionsDao _transactionsDao;
   final UsersDao _usersDao;
   final SecureStorageService _secureStorageService;
 
   UserAccountsBloc(
     this._logger,
+    this._categoriesDao,
+    this._transactionsDao,
     this._usersDao,
     this._secureStorageService,
   );
@@ -55,7 +63,30 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
   Stream<UserAccountsState> _deleteUser(int id) async* {
     try {
       _logger.info(runtimeType, '_deleteUser: Trying to delete userId = $id');
+      _logger.info(
+        runtimeType,
+        '_deleteUser: Deleting all transactions for userId = $id',
+      );
+      await _transactionsDao.deleteAll(id);
+
+      _logger.info(
+        runtimeType,
+        '_deleteUser: Deleting all categories for userId = $id',
+      );
+      await _categoriesDao.deleteAll(id);
+
+      _logger.info(runtimeType, '_deleteUser: Deleting userId = $id');
       await _usersDao.deleteUser(id);
+      
+      final userImgPath = await AppPathUtils.getUserImgPath(id);
+      final dir = Directory(userImgPath);
+      if (await dir.exists()) {
+        _logger.info(
+          runtimeType,
+          '_deleteUser: Deleting user img path = $userImgPath',
+        );
+        await dir.delete(recursive: true);
+      }
 
       final username = await _secureStorageService.get(
         SecureResourceType.currentUser,

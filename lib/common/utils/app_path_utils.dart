@@ -4,14 +4,6 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 class AppPathUtils {
-  //root/data/data/com.miraisoft.my_expenses/app_flutter/images
-  static Future<String> get imagesPath async {
-    final dir = await getApplicationDocumentsDirectory();
-    final dirPath = '${dir.path}/Images';
-    await _generateDirectoryIfItDoesntExist(dirPath);
-    return dirPath;
-  }
-
   //internal memory/android/data/com.miraisoft.my_expenses/files/reports
   static Future<String> get reportsPath async {
     final dir = await getExternalStorageDirectory();
@@ -30,8 +22,10 @@ class AppPathUtils {
 
   static String get transactionImgPrefix => 'user_picked_img_';
 
-  static Future<String> generateTransactionImgPath() async {
-    final imgPath = await imagesPath;
+  static String get userProfileImgPrefix => 'user_profile_img_';
+
+  static Future<String> generateTransactionImgPath(int userId) async {
+    final imgPath = await getUserImgPath(userId);
     final now = DateTime.now();
     final filename = '$transactionImgPrefix$now.png';
     return join(imgPath, filename);
@@ -42,6 +36,22 @@ class AppPathUtils {
     final path = await reportsPath;
     final filename = '${isPdf ? '$now.pdf' : '$now.csv'}';
     return join(path, filename);
+  }
+
+  //root/data/data/com.miraisoft.my_expenses/app_flutter/images
+  static Future<String> getUserImgPath(int userId) async {
+    final dir = await getApplicationDocumentsDirectory();
+    final dirPath =
+        userId == null ? '${dir.path}/Images' : '${dir.path}/Images_$userId';
+    await _generateDirectoryIfItDoesntExist(dirPath);
+    return dirPath;
+  }
+
+  static Future<String> getUserProfileImgPath() async {
+    final imgPath = await getUserImgPath(null);
+    final now = DateTime.now();
+    final filename = '$userProfileImgPrefix$now.png';
+    return join(imgPath, filename);
   }
 
   static Future<void> _generateDirectoryIfItDoesntExist(String path) async {

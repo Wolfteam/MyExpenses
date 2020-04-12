@@ -188,15 +188,20 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
   }
 
   @override
-  Future<void> deleteAll() {
-    return delete(categories).go();
+  Future<void> deleteAll(int userId) {
+    if (userId == null) {
+      return (delete(categories)..where((c) => isNull(c.userId))).go();
+    }
+    return (delete(categories)..where((c) => c.userId.equals(userId))).go();
   }
 
   @override
   Future<List<sync_cat.Category>> getAllCategoriesToSync(int userId) {
     return (select(categories)
           ..where(
-            (c) => c.localStatus.equals(LocalStatusType.deleted.index).not(),
+            (c) =>
+                c.localStatus.equals(LocalStatusType.deleted.index).not() &
+                c.userId.equals(userId),
           )
           ..orderBy(
             [(c) => OrderingTerm(expression: c.id)],

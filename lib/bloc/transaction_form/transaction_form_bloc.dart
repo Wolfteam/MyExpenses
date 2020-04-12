@@ -5,6 +5,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
+import 'package:path/path.dart';
 
 import '../../common/enums/app_language_type.dart';
 import '../../common/enums/repetition_cycle_type.dart';
@@ -14,6 +15,7 @@ import '../../common/utils/category_utils.dart';
 import '../../common/utils/date_utils.dart';
 import '../../common/utils/transaction_utils.dart';
 import '../../daos/transactions_dao.dart';
+import '../../daos/users_dao.dart';
 import '../../models/category_item.dart';
 import '../../models/transaction_item.dart';
 import '../../services/logging_service.dart';
@@ -26,11 +28,13 @@ class TransactionFormBloc
     extends Bloc<TransactionFormEvent, TransactionFormState> {
   final LoggingService _logger;
   final TransactionsDao _transactionsDao;
+  final UsersDao _usersDao;
   final SettingsService _settingsService;
 
   TransactionFormBloc(
     this._logger,
     this._transactionsDao,
+    this._usersDao,
     this._settingsService,
   );
 
@@ -50,10 +54,18 @@ class TransactionFormBloc
 
     if (event is EditTransaction) {
       final transaction = await _transactionsDao.getTransaction(event.id);
+      String imgPath = transaction.imagePath;
 
       bool imageExists = false;
       if (!transaction.imagePath.isNullEmptyOrWhitespace) {
         imageExists = await File(transaction.imagePath).exists();
+        if (imageExists) {
+          final user = await _usersDao.getActiveUser();
+          final baseImgPath = await AppPathUtils.getUserImgPath(user?.id);
+          imgPath = join(baseImgPath, imgPath);
+        } else {
+          imgPath = null;
+        }
       }
 
       final firstDate = _getFirstDateToUse(
@@ -81,7 +93,7 @@ class TransactionFormBloc
         isParentTransaction: transaction.isParentTransaction,
         parentTransactionId: transaction.parentTransactionId,
         firstDate: firstDate,
-        imagePath: transaction.imagePath,
+        imagePath: imgPath,
         imageExists: imageExists,
         isRecurringTransactionRunning: transaction.nextRecurringDate != null,
         nextRecurringDate: transaction.nextRecurringDate,
@@ -180,7 +192,7 @@ class TransactionFormBloc
     try {
       yield currentState.copyWith(isSavingForm: true);
 
-      String imagePath;
+      String imgFilename;
       if (!currentState.imagePath.isNullEmptyOrWhitespace) {
         _logger.info(
           runtimeType,
@@ -188,10 +200,10 @@ class TransactionFormBloc
         );
         final fileExists = await File(currentState.imagePath).exists();
         if (fileExists) {
-          imagePath = await _saveImage(currentState.imagePath);
+          imgFilename = await _saveImage(currentState.imagePath);
         }
       }
-      final transaction = currentState.buildTransactionItem(imagePath);
+      final transaction = currentState.buildTransactionItem(imgFilename);
       _logger.info(
         runtimeType,
         '_saveTransaction: Trying to save transaction = ${transaction.toJson()}',
@@ -314,18 +326,19 @@ class TransactionFormBloc
     try {
       _logger.info(
         runtimeType,
-        '_saveTransaction: Trying to save image',
+        '_saveImage: Trying to save image',
       );
-      final finalPath = await AppPathUtils.generateTransactionImgPath();
+      final user = await _usersDao.getActiveUser();
+      final finalPath = await AppPathUtils.generateTransactionImgPath(user?.id);
 
       await File(finalPath).writeAsBytes(await File(path).readAsBytes());
 
       _logger.info(
         runtimeType,
-        '_saveTransaction: Image was successfully saved',
+        '_saveImage: Image was successfully saved',
       );
 
-      return finalPath;
+      return basename(finalPath);
     } catch (e, s) {
       _logger.error(
         runtimeType,

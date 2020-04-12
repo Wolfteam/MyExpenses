@@ -125,7 +125,9 @@ class SignInWithGoogleBloc
 
       if (!user.pictureUrl.isNullEmptyOrWhitespace) {
         _logger.info(runtimeType, '_signIn: Saving user img...');
-        final imgPath = await ImageUtils.saveNetworkImage(user.pictureUrl);
+        final imgPath = await ImageUtils.saveNetworkImage(
+          user.pictureUrl,
+        );
         user = user.copyWith(pictureUrl: imgPath);
       }
 

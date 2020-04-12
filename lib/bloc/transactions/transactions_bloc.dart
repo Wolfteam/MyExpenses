@@ -137,8 +137,8 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         currentDate: event.inThisDate,
         showLast7Days: DateTime.now().month == event.inThisDate.month,
         monthBalance: _buildMonthBalance(0, 0, []),
-        incomeTransactionsPerWeek: [],
-        expenseTransactionsPerWeek: [],
+        incomeTransactionsPerWeek: const [],
+        expenseTransactionsPerWeek: const [],
         transactionsPerMonth: _buildTransactionsPerMonth([]),
         language: _settingsService.language,
       );

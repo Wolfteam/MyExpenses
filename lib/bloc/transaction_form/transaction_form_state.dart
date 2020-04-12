@@ -217,7 +217,7 @@ class TransactionFormLoadedState extends TransactionFormState {
     );
   }
 
-  TransactionItem buildTransactionItem(String imagePath) {
+  TransactionItem buildTransactionItem(String imgFilename) {
     final amountToSave = amount.abs();
     DateTime nextecurringDate =
         repetitionCycle == RepetitionCycleType.none ? null : transactionDate;
@@ -237,7 +237,7 @@ class TransactionFormLoadedState extends TransactionFormState {
       isParentTransaction: isParentTransaction,
       parentTransactionId: parentTransactionId,
       nextRecurringDate: nextecurringDate,
-      imagePath: imagePath,
+      imagePath: imgFilename,
     );
   }
 }

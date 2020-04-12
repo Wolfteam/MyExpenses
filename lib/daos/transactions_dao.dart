@@ -43,7 +43,7 @@ abstract class TransactionsDao {
 
   Future<void> updateNextRecurringDate(int id, DateTime nextRecurringDate);
 
-  Future<void> deleteAll();
+  Future<void> deleteAll(int userId);
 
   Future<List<sync_trans.Transaction>> getAllTransactionsToSync(
     int userId,

@@ -346,8 +346,23 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
   }
 
   @override
-  Future<void> deleteAll() {
-    return delete(transactions).go();
+  Future<void> deleteAll(int userId) async {
+    final joinStatement = select(transactions).join([
+      innerJoin(categories, categories.id.equalsExp(transactions.categoryId))
+    ]);
+
+    if (userId == null) {
+      joinStatement.where(isNull(categories.userId));
+    } else {
+      joinStatement.where(categories.userId.equals(userId));
+    }
+
+    final transToDelete = await joinStatement.map((row) {
+      final trans = row.readTable(transactions);
+      return trans.id;
+    }).get();
+
+    return (delete(transactions)..where((t) => t.id.isIn(transToDelete))).go();
   }
 
   @override

@@ -120,8 +120,13 @@ class _MyAppState extends State<MyApp> {
             final logger = getIt<LoggingService>();
             final transactionsDao = getIt<TransactionsDao>();
             final settingsService = getIt<SettingsService>();
+            final usersDao = getIt<UsersDao>();
             return TransactionFormBloc(
-                logger, transactionsDao, settingsService);
+              logger,
+              transactionsDao,
+              usersDao,
+              settingsService,
+            );
           }),
           BlocProvider(create: (ctx) => TransactionsLast7DaysBloc()),
           BlocProvider(create: (ctx) {
@@ -183,9 +188,17 @@ class _MyAppState extends State<MyApp> {
           }),
           BlocProvider(create: (ctx) {
             final logger = getIt<LoggingService>();
+            final categoriesDao = getIt<CategoriesDao>();
+            final transactionsDao = getIt<TransactionsDao>();
             final usersDao = getIt<UsersDao>();
             final secureStorage = getIt<SecureStorageService>();
-            return UserAccountsBloc(logger, usersDao, secureStorage);
+            return UserAccountsBloc(
+              logger,
+              categoriesDao,
+              transactionsDao,
+              usersDao,
+              secureStorage,
+            );
           }),
           BlocProvider(create: (ctx) {
             final logger = getIt<LoggingService>();

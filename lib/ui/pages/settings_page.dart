@@ -15,9 +15,9 @@ import '../../common/extensions/i18n_extensions.dart';
 import '../../common/presentation/custom_assets.dart';
 import '../../common/utils/bloc_utils.dart';
 import '../../common/utils/currency_utils.dart';
+import '../../common/utils/toast_utils.dart';
 import '../../generated/i18n.dart';
 import '../widgets/settings/password_dialog.dart';
-import '../../common/utils/toast_utils.dart';
 
 class SettingsPage extends StatefulWidget {
   @override

@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 
 import '../../common/enums/app_drawer_item_type.dart';
 import '../../common/utils/background_utils.dart';
-import '../../daos/users_dao.dart';
 import '../../daos/categories_dao.dart';
+import '../../daos/users_dao.dart';
 import '../../services/logging_service.dart';
 
 part 'drawer_event.dart';

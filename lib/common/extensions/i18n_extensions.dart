@@ -8,7 +8,6 @@ import '../../common/enums/sort_direction_type.dart';
 import '../../common/enums/sync_intervals_type.dart';
 import '../../common/enums/transaction_type.dart';
 import '../../generated/i18n.dart';
-import 'package:intl/intl.dart';
 
 extension I18nExtensions on I18n {
   String translateAppThemeType(AppThemeType theme) {

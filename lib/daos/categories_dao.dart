@@ -21,7 +21,7 @@ abstract class CategoriesDao {
 
   Future<void> onUserSignedOut();
 
-  Future<void> deleteAll();
+  Future<void> deleteAll(int userId);
 
   Future<List<sync_cat.Category>> getAllCategoriesToSync(int userId);
 

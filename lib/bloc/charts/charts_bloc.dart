@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:intl/intl.dart';
 
+import '../../common/enums/app_language_type.dart';
 import '../../common/utils/date_utils.dart';
 import '../../common/utils/transaction_utils.dart';
 import '../../daos/transactions_dao.dart';
@@ -13,7 +14,6 @@ import '../../models/transaction_item.dart';
 import '../../models/transactions_summary_per_date.dart';
 import '../../services/logging_service.dart';
 import '../../services/settings_service.dart';
-import '../../common/enums/app_language_type.dart';
 
 part 'charts_event.dart';
 part 'charts_state.dart';

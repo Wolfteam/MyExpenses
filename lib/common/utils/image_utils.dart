@@ -33,14 +33,14 @@ class ImageUtils {
     int width = 120,
     int height = 120,
   }) async {
-    final dirPath = await AppPathUtils.imagesPath;
     final receivePort = ReceivePort();
+    final filePath = await AppPathUtils.getUserProfileImgPath();
 
     await Isolate.spawn(
       _saveNetworkImage,
       _SaveNetworkImageParams(
         receivePort.sendPort,
-        dirPath,
+        filePath,
         url,
         width,
         height,
@@ -53,14 +53,15 @@ class ImageUtils {
   static Future<void> _saveNetworkImage(_SaveNetworkImageParams params) async {
     final response = await http.get(params.url);
     final image = decodeImage(response.bodyBytes);
-    final thumbnail =
-        copyResize(image, width: params.width, height: params.height);
+    final thumbnail = copyResize(
+      image,
+      width: params.width,
+      height: params.height,
+    );
     final png = encodePng(thumbnail);
 
-    final filePath = '${params.dirPath}/user_profile_img_${DateTime.now()}.png';
-
-    File(filePath).writeAsBytesSync(png);
-    params.sendPort.send(filePath);
+    File(params.filePath).writeAsBytesSync(png);
+    params.sendPort.send(params.filePath);
   }
 
   static void _resizeImage(_ResizeParams params) {
@@ -101,14 +102,14 @@ class _ResizeParams {
 
 class _SaveNetworkImageParams {
   final SendPort sendPort;
-  final String dirPath;
+  final String filePath;
   final String url;
   final int width;
   final int height;
 
   const _SaveNetworkImageParams(
     this.sendPort,
-    this.dirPath,
+    this.filePath,
     this.url,
     this.width,
     this.height,

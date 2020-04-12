@@ -93,6 +93,10 @@ class SyncServiceImpl implements SyncService {
       final fileId = await _googleService.downloadFile(_appFile, filePath);
       final appFile = await _getLocalAppFile(filePath);
       final user = await _usersDao.getActiveUser();
+      _logger.info(
+        runtimeType,
+        'downloadAndUpdateFile: Performing sync for user = ${user.email} ....',
+      );
       await _performSyncDown(user.id, appFile);
 
       await _performSyncUp(user.id);
@@ -110,7 +114,7 @@ class SyncServiceImpl implements SyncService {
 
       await _updateLocalStatus(LocalStatusType.nothing);
 
-      await _updateImgFiles();
+      await _updateImgFiles(user.id);
     } catch (e, s) {
       _logger.error(
         runtimeType,
@@ -249,7 +253,7 @@ class SyncServiceImpl implements SyncService {
     );
     await _uploadAppFile(currentUser.email);
     // await _uploadReadmeFile(folderId);
-    await _uploadAllLocalImgs();
+    await _uploadAllLocalImgs(currentUser.id);
   }
 
   Future<void> _onExistingInstall(
@@ -261,6 +265,7 @@ class SyncServiceImpl implements SyncService {
     );
     final filePath = await appFilePath;
     final fileId = await _googleService.downloadFile(_appFile, filePath);
+    final user = await _usersDao.getActiveUser();
     await _secureStorageService.save(
       SecureResourceType.currentUserAppFileId,
       currentUser,
@@ -271,17 +276,16 @@ class SyncServiceImpl implements SyncService {
       runtimeType,
       '_onExistingInstall: Getting remote imgs...',
     );
-    await _downloadAllRemoteImgs();
+    await _downloadAllRemoteImgs(user.id);
 
     final appFile = await _getLocalAppFile(filePath);
-    final user = await _usersDao.getActiveUser();
 
     _logger.info(
       runtimeType,
       '_onExistingInstall: Deleting all existing categories and transactions...',
     );
-    await _categoriesDao.deleteAll();
-    await _transactionsDao.deleteAll();
+    await _categoriesDao.deleteAll(null);
+    await _transactionsDao.deleteAll(null);
 
     await _performSyncDown(user.id, appFile);
   }
@@ -320,10 +324,6 @@ class SyncServiceImpl implements SyncService {
     );
     await _categoriesDao.syncDownUpdate(userId, appFile.categories);
     await _transactionsDao.syncDownUpdate(userId, appFile.transactions);
-
-    //TODO: SYNC IMG in the bg
-    //TODO: IF THE USER SWITCHES ACCOUNTS, YOU SHOULD ONLY SYNC THE USER TRANSACTIONS SO, WHEN YOU GET THE
-    //TRANSACTIONS YOU MUST DO AN INNER JOIN WITH CATEGORIES AND SEARCH FOR THE ID
   }
 
   Future<void> _performSyncUp(int userId) async {
@@ -347,14 +347,14 @@ class SyncServiceImpl implements SyncService {
     ]);
   }
 
-  Future<void> _uploadAllLocalImgs() async {
+  Future<void> _uploadAllLocalImgs(int userId) async {
     _logger.info(
       runtimeType,
       '_uploadAllLocalImgs: Trying to upload all local imgs...',
     );
 
     try {
-      final imgPath = await AppPathUtils.imagesPath;
+      final imgPath = await AppPathUtils.getUserImgPath(userId);
       final imgs = await Directory(imgPath)
           .list()
           .asyncMap((f) => f.path)
@@ -383,7 +383,7 @@ class SyncServiceImpl implements SyncService {
     }
   }
 
-  Future<void> _downloadAllRemoteImgs() async {
+  Future<void> _downloadAllRemoteImgs(int userId) async {
     try {
       _logger.info(
         runtimeType,
@@ -398,7 +398,7 @@ class SyncServiceImpl implements SyncService {
         '_downloadAllRemoteImgs: ${currentImgsMap.length} images will be downloaded...',
       );
 
-      final imgPath = await AppPathUtils.imagesPath;
+      final imgPath = await AppPathUtils.getUserImgPath(userId);
 
       for (final kvp in currentImgsMap.entries) {
         final filePath = join(imgPath, kvp.value);
@@ -419,7 +419,7 @@ class SyncServiceImpl implements SyncService {
     }
   }
 
-  Future<void> _updateImgFiles() async {
+  Future<void> _updateImgFiles(int userId) async {
     try {
       _logger.info(runtimeType, '_updateImgFiles: Getting all remote imgs...');
       final currentImgsMap = await _googleService.getAllImgs(
@@ -427,7 +427,7 @@ class SyncServiceImpl implements SyncService {
       );
 
       _logger.info(runtimeType, '_updateImgFiles: Getting all local imgs...');
-      final imgPath = await AppPathUtils.imagesPath;
+      final imgPath = await AppPathUtils.getUserImgPath(userId);
 
       final imgs = await Directory(imgPath)
           .list()
