@@ -178,10 +178,12 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     double expenses,
     List<TransactionItem> transactions,
   ) {
-    final balance = (expenses.abs() + incomes).abs();
     if (transactions.isNotEmpty) {
-      final expensesPercentage = (expenses * 100 / balance).abs();
-      final incomesPercentage = incomes * 100 / balance;
+      final incomeAmount = incomes <= 0 ? 0 : incomes;
+      final double expensesPercentage =
+          incomeAmount <= 0 ? 100 : (expenses * 100 / incomeAmount).abs();
+      final double incomesPercentage =
+          expensesPercentage >= 100 ? 0 : 100 - expensesPercentage;
 
       return [
         TransactionsSummaryPerMonth(

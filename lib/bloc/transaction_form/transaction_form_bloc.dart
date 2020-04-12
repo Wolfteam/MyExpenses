@@ -58,12 +58,13 @@ class TransactionFormBloc
 
       bool imageExists = false;
       if (!transaction.imagePath.isNullEmptyOrWhitespace) {
-        imageExists = await File(transaction.imagePath).exists();
-        if (imageExists) {
-          final user = await _usersDao.getActiveUser();
-          final baseImgPath = await AppPathUtils.getUserImgPath(user?.id);
-          imgPath = join(baseImgPath, imgPath);
-        } else {
+        final user = await _usersDao.getActiveUser();
+        imgPath = await AppPathUtils.buildUserImgPath(
+          transaction.imagePath,
+          user?.id,
+        );
+        imageExists = await File(imgPath).exists();
+        if (!imageExists) {
           imgPath = null;
         }
       }

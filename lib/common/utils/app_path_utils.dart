@@ -54,6 +54,11 @@ class AppPathUtils {
     return join(imgPath, filename);
   }
 
+  static Future<String> buildUserImgPath(String filename, int userId) async {
+    final baseImgPath = await getUserImgPath(userId);
+    return join(baseImgPath, filename);
+  }
+
   static Future<void> _generateDirectoryIfItDoesntExist(String path) async {
     final dirExists = await Directory(path).exists();
     if (!dirExists) {
