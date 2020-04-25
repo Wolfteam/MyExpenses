@@ -29,11 +29,20 @@ class TransactionItem extends StatelessWidget {
       dateToUse,
       DateUtils.monthDayAndYearFormat,
     );
+    final daysToNextRecurringDate = item.nextRecurringDate == null
+        ? 0
+        : item.nextRecurringDate.difference(DateTime.now()).inDays;
+
+    final daysLeft = Text(daysToNextRecurringDate == 0
+        ? i18n.tomorrow
+        : i18n.executesInXDays('$daysToNextRecurringDate'));
+
     final subtitle = item.isParentTransaction && item.nextRecurringDate != null
         ? Text(i18n.nextDateOn(dateString))
         : item.isParentTransaction
             ? Text(i18n.stopped)
             : showDate ? Text(i18n.dateOn(dateString)) : null;
+
     final amountWidget = Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -80,7 +89,15 @@ class TransactionItem extends StatelessWidget {
           ],
         ),
         title: Text(item.description),
-        subtitle: subtitle,
+        subtitle: !item.isParentTransaction || item.nextRecurringDate == null
+            ? subtitle
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  subtitle,
+                  daysLeft,
+                ],
+              ),
         trailing: amountWidget,
       ),
     );

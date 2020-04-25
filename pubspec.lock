@@ -63,7 +63,7 @@ packages:
       name: barcode
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.5.0"
+    version: "1.8.0"
   basic_utils:
     dependency: transitive
     description:
@@ -77,7 +77,7 @@ packages:
       name: bloc
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.0"
+    version: "4.0.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -271,21 +271,21 @@ packages:
       name: flutter_appcenter_bundle
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.1.0+1"
+    version: "3.1.1+1"
   flutter_bloc:
     dependency: "direct main"
     description:
       name: flutter_bloc
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.2.0"
+    version: "4.0.0"
   flutter_colorpicker:
     dependency: "direct main"
     description:
       name: flutter_colorpicker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.2"
+    version: "0.3.4"
   flutter_cupertino_localizations:
     dependency: "direct main"
     description:
@@ -313,7 +313,7 @@ packages:
       name: flutter_local_notifications
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.4.0"
+    version: "1.4.1"
   flutter_local_notifications_platform_interface:
     dependency: transitive
     description:
@@ -339,7 +339,7 @@ packages:
       name: flutter_secure_storage
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.3.2"
+    version: "3.3.3"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -442,7 +442,7 @@ packages:
       name: image_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.4"
+    version: "0.6.5+2"
   injectable:
     dependency: "direct main"
     description:
@@ -505,7 +505,7 @@ packages:
       name: local_auth
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.1+3"
+    version: "0.6.2+1"
   log_4_dart_2:
     dependency: "direct main"
     description:
@@ -553,7 +553,7 @@ packages:
     description:
       path: "."
       ref: "feature/support_custom_locale"
-      resolved-ref: "65596391b12cbe580300734afa97f379b13a9baa"
+      resolved-ref: "8208d213b88e10f519003658d324e90bbec4b5da"
       url: "git://github.com/Wolfteam/month_picker_dialog.git"
     source: git
     version: "0.3.1"
@@ -654,7 +654,7 @@ packages:
       name: path_provider
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.6.5"
+    version: "1.6.7"
   path_provider_macos:
     dependency: transitive
     description:
@@ -675,7 +675,7 @@ packages:
       name: pdf
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.6.0"
+    version: "1.6.2"
   pedantic:
     dependency: transitive
     description:
@@ -689,7 +689,7 @@ packages:
       name: permission_handler
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.0.0+hotfix.3"
+    version: "5.0.0+hotfix.4"
   permission_handler_platform_interface:
     dependency: transitive
     description:
@@ -738,7 +738,7 @@ packages:
       name: provider
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.4"
+    version: "4.0.5"
   pub_semver:
     dependency: transitive
     description:
@@ -787,7 +787,7 @@ packages:
       name: shared_preferences
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.6+2"
+    version: "0.5.7"
   shared_preferences_macos:
     dependency: transitive
     description:
@@ -932,7 +932,7 @@ packages:
       name: url_launcher
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.4.2"
+    version: "5.4.5"
   url_launcher_macos:
     dependency: transitive
     description:

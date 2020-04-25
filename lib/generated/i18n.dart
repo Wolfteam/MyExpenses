@@ -288,6 +288,10 @@ class I18n implements WidgetsLocalizations {
   String get openFilePermissionRequestFailedMsg => "You must grant permissions to open the file";
   /// "You may need to restart the app for the changes to take effect"
   String get restartTheAppToApplyChanges => "You may need to restart the app for the changes to take effect";
+  /// "Tomorrow"
+  String get tomorrow => "Tomorrow";
+  /// "Executes in ${x} day(s)"
+  String executesInXDays(String x) => "Executes in ${x} day(s)";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -772,6 +776,12 @@ class _I18n_es_VE extends I18n {
   /// "Puede que tengas que reinicar la aplicación, para que los cambios sean aplicados"
   @override
   String get restartTheAppToApplyChanges => "Puede que tengas que reinicar la aplicación, para que los cambios sean aplicados";
+  /// "Mañana"
+  @override
+  String get tomorrow => "Mañana";
+  /// "Se ejecuta en ${x} dia(s)"
+  @override
+  String executesInXDays(String x) => "Se ejecuta en ${x} dia(s)";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";
