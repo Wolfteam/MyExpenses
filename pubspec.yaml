@@ -11,7 +11,7 @@ description: An app that helps you to keep track of your expenses.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+6
+version: 1.0.0+8
 
 environment:
   sdk: ">=2.6.0 <3.0.0"
@@ -48,8 +48,9 @@ dependencies:
   local_auth: ^0.6.2+3
   log_4_dart_2: ^0.4.0
   month_picker_dialog: ^0.3.2
-  moor: ^2.4.2
-  moor_ffi: ^0.4.0
+  moor: ^3.1.0
+  # Downgraded until this is fixed: https://github.com/simolus3/moor/issues/581
+  moor_ffi: ^0.5.0
   open_file: ^3.0.1
   package_info: ^0.4.1
   password: ^1.0.0
@@ -72,7 +73,7 @@ dev_dependencies:
   injectable_generator:
   json_serializable: ^3.3.0
   lint: ^1.2.0
-  moor_generator: ^2.4.0
+  moor_generator: ^3.1.0
 
 flutter_icons:
   android: "launcher_icon"
