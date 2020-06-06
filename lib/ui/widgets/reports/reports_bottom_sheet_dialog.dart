@@ -76,7 +76,7 @@ class ReportsBottomSheetDialog extends StatelessWidget {
         ModalSheetSeparator(),
         Text(
           i18n.exportFrom,
-          style: Theme.of(context).textTheme.title,
+          style: Theme.of(context).textTheme.headline6,
         ),
         Padding(
           padding: const EdgeInsets.only(

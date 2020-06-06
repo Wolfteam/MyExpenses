@@ -108,7 +108,7 @@ class HomeLast7DaysSummary extends StatelessWidget {
           padding: const EdgeInsets.only(left: 5),
           child: Text(
             i18n.last7Days,
-            style: Theme.of(context).textTheme.title,
+            style: Theme.of(context).textTheme.headline6,
           ),
         ),
         PopupMenuButton(

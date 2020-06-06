@@ -26,7 +26,7 @@ class NothingFound extends StatelessWidget {
             Text(
               msg,
               textAlign: TextAlign.center,
-              style: theme.textTheme.title,
+              style: theme.textTheme.headline6,
             ),
           ],
         ),

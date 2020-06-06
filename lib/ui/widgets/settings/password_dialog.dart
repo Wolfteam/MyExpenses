@@ -75,7 +75,7 @@ class _PasswordDialogState extends State<PasswordDialog> {
                 ),
                 Text(
                   i18n.typeYourPassword,
-                  style: Theme.of(context).textTheme.title,
+                  style: Theme.of(context).textTheme.headline6,
                 ),
                 _buildPasswordInput(i18n, state),
                 if (!widget.promptForPassword)

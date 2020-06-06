@@ -56,7 +56,7 @@ class UserAccountsBottomSheetDialog extends StatelessWidget {
         ModalSheetSeparator(),
         Text(
           i18n.accounts,
-          style: Theme.of(context).textTheme.title,
+          style: Theme.of(context).textTheme.headline6,
         ),
         if (state.users.isNotEmpty)
           ListView.builder(

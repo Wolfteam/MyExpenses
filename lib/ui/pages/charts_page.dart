@@ -60,7 +60,7 @@ class _ChartsPageState extends State<ChartsPage>
           padding: const EdgeInsets.only(left: 5),
           child: Text(
             '${i18n.incomes} & ${i18n.expenses}',
-            style: Theme.of(context).textTheme.title,
+            style: Theme.of(context).textTheme.headline6,
           ),
         ),
         Align(
@@ -195,8 +195,8 @@ class _ChartsPageState extends State<ChartsPage>
     final theme = Theme.of(context);
     final i18n = I18n.of(context);
     final isDarkTheme = theme.brightness == Brightness.dark;
-    final titleStyle = theme.textTheme.subtitle;
-    final textStyle = theme.textTheme.title;
+    final titleStyle = theme.textTheme.subtitle2;
+    final textStyle = theme.textTheme.headline6;
     final dataToUse = incomes
         ? state.incomeChartTransactions
         : state.expenseChartTransactions;

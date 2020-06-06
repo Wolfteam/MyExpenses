@@ -253,14 +253,14 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                   ),
                   Text(
                     state.description,
-                    style: Theme.of(context).textTheme.title,
+                    style: Theme.of(context).textTheme.headline6,
                   ),
                   const SizedBox(
                     height: 5.0,
                   ),
                   Text(
                     dateString,
-                    style: theme.textTheme.subtitle,
+                    style: theme.textTheme.subtitle2,
                   ),
                   const SizedBox(
                     height: 16.0,
@@ -276,7 +276,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                               '${state.amount} \$',
                               textAlign: TextAlign.center,
                               overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.title,
+                              style: theme.textTheme.headline6,
                             ),
                             subtitle: Text(
                               i18n.amount.toUpperCase(),
@@ -293,7 +293,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                                   : i18n.expense,
                               textAlign: TextAlign.center,
                               overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.title,
+                              style: theme.textTheme.headline6,
                             ),
                             subtitle: Text(
                               i18n.category.toUpperCase(),
@@ -310,7 +310,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                               ),
                               textAlign: TextAlign.center,
                               overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.title,
+                              style: theme.textTheme.headline6,
                             ),
                             subtitle: Text(
                               i18n.repetitions.toUpperCase(),
@@ -923,7 +923,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
 
   Future<void> _pickPicture(bool fromGallery, I18n i18n) async {
     try {
-      final image = await ImagePicker.pickImage(
+      final image = await ImagePicker().getImage(
         source: fromGallery ? ImageSource.gallery : ImageSource.camera,
         maxHeight: 600,
         maxWidth: 600,

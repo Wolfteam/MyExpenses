@@ -123,14 +123,14 @@ class AppDrawer extends StatelessWidget {
                 margin: const EdgeInsets.only(top: 10),
                 child: Text(
                   i18n.tapToSignIn,
-                  style: theme.textTheme.subhead,
+                  style: theme.textTheme.subtitle1,
                 ),
               ),
             if (state.isUserSignedIn)
               Flexible(
                 child: Text(
                   state.fullName,
-                  style: theme.textTheme.subtitle,
+                  style: theme.textTheme.subtitle2,
                 ),
               ),
             if (state.isUserSignedIn)

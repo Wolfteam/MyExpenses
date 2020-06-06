@@ -150,7 +150,7 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
                   ),
                   Text(
                     state.name,
-                    style: Theme.of(context).textTheme.title,
+                    style: Theme.of(context).textTheme.headline6,
                   ),
                   const SizedBox(
                     height: 5.0,

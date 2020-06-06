@@ -121,7 +121,7 @@ class _SettingsPageState extends State<SettingsPage>
                   margin: const EdgeInsets.only(left: 5),
                   child: Text(
                     i18n.settingsTheme,
-                    style: Theme.of(context).textTheme.title,
+                    style: Theme.of(context).textTheme.headline6,
                   ),
                 ),
               ],
@@ -197,7 +197,7 @@ class _SettingsPageState extends State<SettingsPage>
                   margin: const EdgeInsets.only(left: 5),
                   child: Text(
                     i18n.settingsAccentColor,
-                    style: Theme.of(context).textTheme.title,
+                    style: Theme.of(context).textTheme.headline6,
                   ),
                 ),
               ],
@@ -261,7 +261,7 @@ class _SettingsPageState extends State<SettingsPage>
                   margin: const EdgeInsets.only(left: 5),
                   child: Text(
                     i18n.settingsLanguage,
-                    style: Theme.of(context).textTheme.title,
+                    style: Theme.of(context).textTheme.headline6,
                   ),
                 ),
               ],
@@ -345,7 +345,7 @@ class _SettingsPageState extends State<SettingsPage>
                   margin: const EdgeInsets.only(left: 5),
                   child: Text(
                     i18n.settingsSync,
-                    style: Theme.of(context).textTheme.title,
+                    style: Theme.of(context).textTheme.headline6
                   ),
                 ),
               ],
@@ -443,7 +443,7 @@ class _SettingsPageState extends State<SettingsPage>
                   margin: const EdgeInsets.only(left: 5),
                   child: Text(
                     i18n.others,
-                    style: theme.textTheme.title,
+                    style: theme.textTheme.headline6,
                   ),
                 ),
               ],
@@ -522,7 +522,7 @@ class _SettingsPageState extends State<SettingsPage>
                   margin: const EdgeInsets.only(left: 5),
                   child: Text(
                     i18n.settingsAbout,
-                    style: textTheme.title,
+                    style: textTheme.headline6,
                   ),
                 ),
               ],
@@ -554,12 +554,12 @@ class _SettingsPageState extends State<SettingsPage>
                   Text(
                     i18n.appName,
                     textAlign: TextAlign.center,
-                    style: textTheme.subtitle,
+                    style: textTheme.subtitle2,
                   ),
                   Text(
                     i18n.appVersion(state.appVersion),
                     textAlign: TextAlign.center,
-                    style: textTheme.subtitle,
+                    style: textTheme.subtitle2,
                   ),
                   Text(
                     i18n.settingsAboutSummary,
@@ -569,7 +569,7 @@ class _SettingsPageState extends State<SettingsPage>
                     margin: const EdgeInsets.only(top: 10),
                     child: Text(
                       i18n.settingsDonations,
-                      style: textTheme.subhead
+                      style: textTheme.subtitle1
                           .copyWith(fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -580,7 +580,7 @@ class _SettingsPageState extends State<SettingsPage>
                     margin: const EdgeInsets.only(top: 10),
                     child: Text(
                       i18n.settingsSupport,
-                      style: textTheme.subhead
+                      style: textTheme.subtitle1
                           .copyWith(fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -588,7 +588,7 @@ class _SettingsPageState extends State<SettingsPage>
                     margin: const EdgeInsets.only(top: 5),
                     child: Text(
                       i18n.settingsDonationSupport,
-                      style: textTheme.subtitle,
+                      style: textTheme.subtitle2,
                     ),
                   ),
                   Container(

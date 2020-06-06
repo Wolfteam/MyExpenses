@@ -19,13 +19,14 @@ Future<Document> buildPdf(
   DateTime from,
   DateTime to,
 ) async {
+  
   final packageInfo = await PackageInfo.fromPlatform();
   final pdf = Document(
     author: packageInfo.appName,
     creator: packageInfo.appName,
     keywords: '${i18n.transactions}, ${i18n.incomes}, ${i18n.expenses}',
     title: i18n.transactionsReport,
-    theme: Theme.withFont(
+    theme: ThemeData.withFont(
       base: Font.ttf(
         await rootBundle.load(CustomAssets.fontOpenSansRegular),
       ),

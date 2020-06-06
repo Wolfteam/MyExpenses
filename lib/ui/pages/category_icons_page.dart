@@ -97,7 +97,7 @@ class CategoryIconsPage extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 10),
             child: Text(
               categoryType,
-              style: theme.textTheme.title.copyWith(fontSize: 17),
+              style: theme.textTheme.headline6.copyWith(fontSize: 17),
               textAlign: TextAlign.center,
             ),
           ),

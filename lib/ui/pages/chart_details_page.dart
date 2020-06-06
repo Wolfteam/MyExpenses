@@ -51,14 +51,14 @@ class ChartDetailsPage extends StatelessWidget {
         margin: const EdgeInsets.only(left: 20),
         child: Text(
           onlyIncomes ? i18n.incomes : i18n.expenses,
-          style: theme.textTheme.title,
+          style: theme.textTheme.headline6,
         ),
       ),
       Container(
         margin: const EdgeInsets.only(left: 20),
         child: Text(
           '${state.transactionsTotalAmount} \$',
-          style: theme.textTheme.title.copyWith(
+          style: theme.textTheme.headline6.copyWith(
             color: onlyIncomes ? Colors.green : Colors.red,
           ),
         ),
@@ -127,7 +127,7 @@ class ChartDetailsPage extends StatelessWidget {
           children: <Widget>[
             Text(
               i18n.transactions,
-              style: theme.textTheme.title,
+              style: theme.textTheme.headline6,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,

@@ -64,7 +64,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
         children: <Widget>[
           Text(
             month,
-            style: Theme.of(context).textTheme.title,
+            style: Theme.of(context).textTheme.headline6,
           ),
           IconButton(
             icon: Icon(Icons.swap_horiz),
@@ -99,7 +99,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
   Widget _buildSummary(BuildContext context) {
     final theme = Theme.of(context);
     final i18n = I18n.of(context);
-    final textStyle = theme.textTheme.subhead.copyWith(
+    final textStyle = theme.textTheme.subtitle1.copyWith(
       fontWeight: FontWeight.bold,
     );
     final expenseTextStyle = textStyle.copyWith(color: Colors.red);

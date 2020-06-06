@@ -154,7 +154,7 @@ class _TransactionsPageState extends State<TransactionsPage>
                     ? i18n.recurringTransactions
                     : i18n.transactions,
                 textAlign: TextAlign.start,
-                style: Theme.of(context).textTheme.title,
+                style: Theme.of(context).textTheme.headline6,
               ),
               IconButton(
                 icon: Icon(Icons.swap_horiz),
