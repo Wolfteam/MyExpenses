@@ -287,7 +287,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
     if (catsToBeCreated.isEmpty) return;
 
     await batch((b) {
-      b.insertAll<Category>(categories, catsToBeCreated);
+      b.insertAll(categories, catsToBeCreated);
     });
   }
 

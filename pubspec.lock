@@ -63,7 +63,7 @@ packages:
       name: barcode
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.8.0"
+    version: "1.11.0"
   basic_utils:
     dependency: transitive
     description:
@@ -245,7 +245,7 @@ packages:
       name: equatable
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.1"
+    version: "1.2.0"
   ffi:
     dependency: transitive
     description:
@@ -253,6 +253,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.1.3"
+  file:
+    dependency: transitive
+    description:
+      name: file
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "5.1.0"
   fixnum:
     dependency: transitive
     description:
@@ -271,7 +278,7 @@ packages:
       name: flutter_appcenter_bundle
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.1.1+1"
+    version: "3.2.0+1"
   flutter_bloc:
     dependency: "direct main"
     description:
@@ -306,14 +313,14 @@ packages:
       name: flutter_launcher_icons
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.7.4"
+    version: "0.7.5"
   flutter_local_notifications:
     dependency: "direct main"
     description:
       name: flutter_local_notifications
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.4.1"
+    version: "1.4.4+1"
   flutter_local_notifications_platform_interface:
     dependency: transitive
     description:
@@ -348,12 +355,10 @@ packages:
   flutter_user_agent:
     dependency: "direct main"
     description:
-      path: "."
-      ref: master
-      resolved-ref: "9b9242881b88535d96fb43a3a27b316bf230ba14"
-      url: "git://github.com/yousifk/flutter_user_agent.git"
-    source: git
-    version: "1.3.0"
+      name: flutter_user_agent
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.2"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -372,7 +377,7 @@ packages:
       name: get_it
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.1"
+    version: "4.0.2"
   glob:
     dependency: transitive
     description:
@@ -386,14 +391,14 @@ packages:
       name: googleapis
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.54.0"
+    version: "0.55.0"
   googleapis_auth:
     dependency: "direct main"
     description:
       name: googleapis_auth
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.11+1"
+    version: "0.2.12"
   graphs:
     dependency: transitive
     description:
@@ -414,7 +419,7 @@ packages:
       name: http
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.12.0+4"
+    version: "0.12.1"
   http_multi_server:
     dependency: transitive
     description:
@@ -442,21 +447,28 @@ packages:
       name: image_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.5+2"
+    version: "0.6.7+1"
+  image_picker_platform_interface:
+    dependency: transitive
+    description:
+      name: image_picker_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
   injectable:
     dependency: "direct main"
     description:
       name: injectable
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.0"
+    version: "0.4.0+1"
   injectable_generator:
     dependency: "direct dev"
     description:
       name: injectable_generator
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.3"
+    version: "0.4.1"
   intl:
     dependency: transitive
     description:
@@ -498,14 +510,14 @@ packages:
       name: lint
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.1"
+    version: "1.2.0"
   local_auth:
     dependency: "direct main"
     description:
       name: local_auth
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.2+1"
+    version: "0.6.2+3"
   log_4_dart_2:
     dependency: "direct main"
     description:
@@ -551,12 +563,10 @@ packages:
   month_picker_dialog:
     dependency: "direct main"
     description:
-      path: "."
-      ref: "feature/support_custom_locale"
-      resolved-ref: "8208d213b88e10f519003658d324e90bbec4b5da"
-      url: "git://github.com/Wolfteam/month_picker_dialog.git"
-    source: git
-    version: "0.3.1"
+      name: month_picker_dialog
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.2"
   moor:
     dependency: "direct main"
     description:
@@ -626,7 +636,7 @@ packages:
       name: package_info
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.0+14"
+    version: "0.4.1"
   package_resolver:
     dependency: transitive
     description:
@@ -648,13 +658,27 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.6.4"
+  path_parsing:
+    dependency: transitive
+    description:
+      name: path_parsing
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.4"
   path_provider:
     dependency: "direct main"
     description:
       name: path_provider
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.6.7"
+    version: "1.6.10"
+  path_provider_linux:
+    dependency: transitive
+    description:
+      name: path_provider_linux
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.1+1"
   path_provider_macos:
     dependency: transitive
     description:
@@ -675,7 +699,7 @@ packages:
       name: pdf
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.6.2"
+    version: "1.8.1"
   pedantic:
     dependency: transitive
     description:
@@ -689,7 +713,7 @@ packages:
       name: permission_handler
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.0.0+hotfix.4"
+    version: "5.0.0+hotfix.8"
   permission_handler_platform_interface:
     dependency: transitive
     description:
@@ -732,13 +756,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.4.0"
+  process:
+    dependency: transitive
+    description:
+      name: process
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.13"
   provider:
     dependency: "direct main"
     description:
       name: provider
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.5"
+    version: "4.1.3"
   pub_semver:
     dependency: transitive
     description:
@@ -780,14 +811,14 @@ packages:
       name: rxdart
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.23.1"
+    version: "0.24.1"
   shared_preferences:
     dependency: "direct main"
     description:
       name: shared_preferences
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.7"
+    version: "0.5.7+3"
   shared_preferences_macos:
     dependency: transitive
     description:
@@ -932,7 +963,7 @@ packages:
       name: url_launcher
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.4.5"
+    version: "5.4.10"
   url_launcher_macos:
     dependency: transitive
     description:
@@ -989,6 +1020,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.2.2"
+  xdg_directories:
+    dependency: transitive
+    description:
+      name: xdg_directories
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.0"
   xml:
     dependency: transitive
     description:
@@ -1004,5 +1042,5 @@ packages:
     source: hosted
     version: "2.2.0"
 sdks:
-  dart: ">=2.7.0 <3.0.0"
-  flutter: ">=1.12.13+hotfix.5 <2.0.0"
+  dart: ">=2.8.0-dev.16.0 <3.0.0"
+  flutter: ">=1.16.0 <2.0.0"
