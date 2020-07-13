@@ -2,7 +2,7 @@
 <p align="center">
   <img height="120px" src="assets/images/cost.png">
 </p>
-An app that helps you to keep track of your expenses
+> An app that helps you to keep track of your expenses
 
 <p align="center">
   <img src="images/promo.png">
