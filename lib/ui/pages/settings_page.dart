@@ -343,10 +343,8 @@ class _SettingsPageState extends State<SettingsPage>
                 Icon(Icons.sync),
                 Container(
                   margin: const EdgeInsets.only(left: 5),
-                  child: Text(
-                    i18n.settingsSync,
-                    style: Theme.of(context).textTheme.headline6
-                  ),
+                  child: Text(i18n.settingsSync,
+                      style: Theme.of(context).textTheme.headline6),
                 ),
               ],
             ),
@@ -574,7 +572,7 @@ class _SettingsPageState extends State<SettingsPage>
                     ),
                   ),
                   Text(
-                    i18n.settingsDonationSupport,
+                    i18n.settingsDonationsMsg,
                   ),
                   Container(
                     margin: const EdgeInsets.only(top: 10),
@@ -588,7 +586,6 @@ class _SettingsPageState extends State<SettingsPage>
                     margin: const EdgeInsets.only(top: 5),
                     child: Text(
                       i18n.settingsDonationSupport,
-                      style: textTheme.subtitle2,
                     ),
                   ),
                   Container(

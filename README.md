@@ -2,24 +2,25 @@
 <p align="center">
   <img height="120px" src="assets/images/cost.png">
 </p>
-
 An app that helps you to keep track of your expenses
+
+<p align="center">
+  <img src="images/promo.png">
+</p>
 
 ### Screenshots
 
 <p align="center">
-  <img height="550" width="400" src="images/1.png">
-  <img height="550" width="400" src="images/2.png">
+  <img height="550" width="400" src="images/a.png">
+  <img height="550" width="400" src="images/b.png">
 </p>
 
 <p align="center">
-  <img height="550" width="400" src="images/3.png">
-  <img height="550" width="400" src="images/4.png">
+  <img height="550" src="images/c.png">
+  <img height="550" src="images/e.png">
+  <img height="550" src="images/d.png">
 </p>
 
-<p align="center">
-  <img height="550" width="400" src="images/5.png">
-</p>
 
 ### Features
 - Recurring Transactions
