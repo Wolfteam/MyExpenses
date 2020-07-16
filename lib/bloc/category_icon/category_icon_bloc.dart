@@ -10,8 +10,7 @@ part 'category_icon_event.dart';
 part 'category_icon_state.dart';
 
 class CategoryIconBloc extends Bloc<CategoryIconEvent, CategoryIconState> {
-  @override
-  CategoryIconState get initialState => CategoryIconState.initial();
+  CategoryIconBloc() : super(CategoryIconState.initial());
 
   @override
   Stream<CategoryIconState> mapEventToState(

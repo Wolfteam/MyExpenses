@@ -28,15 +28,8 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
   final UsersDao _usersDao;
   final SettingsService _settingsService;
 
-  TransactionsBloc(
-    this._logger,
-    this._transactionsDao,
-    this._usersDao,
-    this._settingsService,
-  );
-
-  @override
-  TransactionsState get initialState => TransactionsInitialState();
+  TransactionsBloc(this._logger, this._transactionsDao, this._usersDao, this._settingsService)
+      : super(TransactionsInitialState());
 
   TransactionsLoadedState get currentState => state as TransactionsLoadedState;
 
@@ -101,10 +94,8 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         '_buildInitialState: Generating incomes / expenses transactions per week...',
       );
 
-      final incomeTransPerWeek =
-          await _buildTransactionSummaryPerDay(onlyIncomes: true);
-      final expenseTransPerWeek =
-          await _buildTransactionSummaryPerDay(onlyIncomes: false);
+      final incomeTransPerWeek = await _buildTransactionSummaryPerDay(onlyIncomes: true);
+      final expenseTransPerWeek = await _buildTransactionSummaryPerDay(onlyIncomes: false);
 
       _logger.info(
         runtimeType,
@@ -127,8 +118,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         language: _settingsService.language,
       );
     } catch (e, s) {
-      _logger.error(
-          runtimeType, '_buildInitialState: An unknown error occurred', e, s);
+      _logger.error(runtimeType, '_buildInitialState: An unknown error occurred', e, s);
       yield TransactionsLoadedState(
         month: month,
         incomeAmount: 0,
@@ -166,12 +156,10 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
   }
 
   double _getTotalExpenses(List<TransactionItem> transactions) =>
-      TransactionUtils.getTotalTransactionAmounts(transactions,
-          onlyIncomes: false);
+      TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: false);
 
   double _getTotalIncomes(List<TransactionItem> transactions) =>
-      TransactionUtils.getTotalTransactionAmounts(transactions,
-          onlyIncomes: true);
+      TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: true);
 
   List<TransactionsSummaryPerMonth> _buildMonthBalance(
     double incomes,
@@ -180,10 +168,8 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
   ) {
     if (transactions.isNotEmpty) {
       final incomeAmount = incomes <= 0 ? 0 : incomes;
-      final double expensesPercentage =
-          incomeAmount <= 0 ? 100 : (expenses * 100 / incomeAmount).abs();
-      final double incomesPercentage =
-          expensesPercentage >= 100 ? 0 : 100 - expensesPercentage;
+      final double expensesPercentage = incomeAmount <= 0 ? 100 : (expenses * 100 / incomeAmount).abs();
+      final double incomesPercentage = expensesPercentage >= 100 ? 0 : 100 - expensesPercentage;
 
       return [
         TransactionsSummaryPerMonth(
@@ -228,10 +214,9 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
 
     try {
       final currentUser = await _usersDao.getActiveUser();
-      final transactions =
-          (await _transactionsDao.getAllTransactions(currentUser?.id, from, to))
-              .where((t) => t.category.isAnIncome == onlyIncomes)
-              .toList();
+      final transactions = (await _transactionsDao.getAllTransactions(currentUser?.id, from, to))
+          .where((t) => t.category.isAnIncome == onlyIncomes)
+          .toList();
 
       final map = <DateTime, double>{};
       for (final transaction in transactions) {
@@ -313,8 +298,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
 
       final locale = currentLocaleString(_settingsService.language);
 
-      final dateSummary =
-          '$dateString ${toBeginningOfSentenceCase(dayString, locale)}';
+      final dateSummary = '$dateString ${toBeginningOfSentenceCase(dayString, locale)}';
 
       models.add(TransactionCardItems(
         date: kvp.key,

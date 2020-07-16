@@ -10,6 +10,7 @@ import '../../common/enums/app_drawer_item_type.dart';
 import '../../common/enums/app_language_type.dart';
 import '../../common/enums/app_theme_type.dart';
 import '../../common/extensions/app_theme_type_extensions.dart';
+import '../../common/utils/app_path_utils.dart';
 import '../../common/utils/background_utils.dart';
 import '../../generated/i18n.dart';
 import '../../services/logging_service.dart';
@@ -25,14 +26,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DrawerBloc _drawerBloc;
   StreamSubscription _portSubscription;
 
-  @override
-  AppState get initialState => AppUninitializedState();
-
   AppBloc(
     this._logger,
     this._settingsService,
     this._drawerBloc,
-  ) {
+  ) : super(AppUninitializedState()) {
     IsolateNameServer.registerPortWithName(
       BackgroundUtils.port.sendPort,
       BackgroundUtils.portName,
@@ -61,6 +59,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     if (event is InitializeApp) {
       await BackgroundUtils.initBg();
+      try {
+        _logger.info(runtimeType, 'Deleting old logs...');
+        await AppPathUtils.deleteOlLogs();
+      } catch (e, s) {
+        _logger.error(runtimeType, 'Unknown error while deleting old logs', e, s);
+      }
+
       if (!_settingsService.isRecurringTransTaskRegistered) {
         _logger.info(
           runtimeType,

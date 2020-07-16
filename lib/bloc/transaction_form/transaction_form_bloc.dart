@@ -24,25 +24,16 @@ import '../../services/settings_service.dart';
 part 'transaction_form_event.dart';
 part 'transaction_form_state.dart';
 
-class TransactionFormBloc
-    extends Bloc<TransactionFormEvent, TransactionFormState> {
+class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormState> {
   final LoggingService _logger;
   final TransactionsDao _transactionsDao;
   final UsersDao _usersDao;
   final SettingsService _settingsService;
 
-  TransactionFormBloc(
-    this._logger,
-    this._transactionsDao,
-    this._usersDao,
-    this._settingsService,
-  );
+  TransactionFormBloc(this._logger, this._transactionsDao, this._usersDao, this._settingsService)
+      : super(TransactionInitialState());
 
-  TransactionFormLoadedState get currentState =>
-      state as TransactionFormLoadedState;
-
-  @override
-  TransactionFormState get initialState => TransactionInitialState();
+  TransactionFormLoadedState get currentState => state as TransactionFormLoadedState;
 
   @override
   Stream<TransactionFormState> mapEventToState(
@@ -74,8 +65,7 @@ class TransactionFormBloc
         transaction.transactionDate,
       );
 
-      yield TransactionFormLoadedState.initial(_settingsService.language)
-          .copyWith(
+      yield TransactionFormLoadedState.initial(_settingsService.language).copyWith(
         id: transaction.id,
         amount: transaction.amount,
         isAmountValid: true,
@@ -377,9 +367,8 @@ class TransactionFormBloc
     final tomorrow = now.add(const Duration(days: 1));
     final inFifteenDate = DateUtils.getNextBiweeklyDate(now);
 
-    final transactionDate = cycle == RepetitionCycleType.none
-        ? now
-        : cycle == RepetitionCycleType.biweekly ? inFifteenDate : tomorrow;
+    final transactionDate =
+        cycle == RepetitionCycleType.none ? now : cycle == RepetitionCycleType.biweekly ? inFifteenDate : tomorrow;
 
     return transactionDate;
   }

@@ -30,10 +30,7 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
     this._transactionsDao,
     this._usersDao,
     this._secureStorageService,
-  );
-
-  @override
-  UserAccountsState get initialState => UserAccountsState.initial();
+  ) : super(UserAccountsState.initial());
 
   @override
   Stream<UserAccountsState> mapEventToState(
@@ -77,7 +74,7 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
 
       _logger.info(runtimeType, '_deleteUser: Deleting userId = $id');
       await _usersDao.deleteUser(id);
-      
+
       final userImgPath = await AppPathUtils.getUserImgPath(id);
       final dir = Directory(userImgPath);
       if (await dir.exists()) {

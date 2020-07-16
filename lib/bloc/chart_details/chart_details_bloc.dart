@@ -14,16 +14,14 @@ part 'chart_details_event.dart';
 part 'chart_details_state.dart';
 
 class ChartDetailsBloc extends Bloc<ChartDetailsEvent, ChartDetailsState> {
-  @override
-  ChartDetailsState get initialState => ChartDetailsState.initial();
+  ChartDetailsBloc() : super(ChartDetailsState.initial());
 
   @override
   Stream<ChartDetailsState> mapEventToState(
     ChartDetailsEvent event,
   ) async* {
     if (event is Initialize) {
-      yield ChartDetailsState.initial()
-          .copyWith(transactions: event.transactions);
+      yield ChartDetailsState.initial().copyWith(transactions: event.transactions);
     }
 
     if (event is FilterChanged) {
@@ -62,29 +60,23 @@ class ChartDetailsBloc extends Bloc<ChartDetailsEvent, ChartDetailsState> {
     switch (filter) {
       case ChartDetailsFilterType.name:
         if (sortDirection == SortDirectionType.asc) {
-          transactions
-              .sort((t1, t2) => t1.description.compareTo(t2.description));
+          transactions.sort((t1, t2) => t1.description.compareTo(t2.description));
         } else {
-          transactions
-              .sort((t1, t2) => t2.description.compareTo(t1.description));
+          transactions.sort((t1, t2) => t2.description.compareTo(t1.description));
         }
         break;
       case ChartDetailsFilterType.amount:
         if (sortDirection == SortDirectionType.asc) {
-          transactions
-              .sort((t1, t2) => t1.amount.abs().compareTo(t2.amount.abs()));
+          transactions.sort((t1, t2) => t1.amount.abs().compareTo(t2.amount.abs()));
         } else {
-          transactions
-              .sort((t1, t2) => t2.amount.abs().compareTo(t1.amount.abs()));
+          transactions.sort((t1, t2) => t2.amount.abs().compareTo(t1.amount.abs()));
         }
         break;
       case ChartDetailsFilterType.date:
         if (sortDirection == SortDirectionType.asc) {
-          transactions.sort(
-              (t1, t2) => t1.transactionDate.compareTo(t2.transactionDate));
+          transactions.sort((t1, t2) => t1.transactionDate.compareTo(t2.transactionDate));
         } else {
-          transactions.sort(
-              (t1, t2) => t2.transactionDate.compareTo(t1.transactionDate));
+          transactions.sort((t1, t2) => t2.transactionDate.compareTo(t1.transactionDate));
         }
         break;
       case ChartDetailsFilterType.category:

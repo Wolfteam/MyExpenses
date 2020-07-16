@@ -32,10 +32,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
     this._transactionsDao,
     this._usersDao,
     this._currencyBloc,
-  );
-
-  @override
-  ReportState get initialState => ReportSheetState.initial();
+  ) : super(ReportSheetState.initial());
 
   ReportSheetState get currentState => state as ReportSheetState;
 
@@ -128,10 +125,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
               DateUtils.monthDayAndYearFormat,
             ),
             t.category.name,
-            if (t.category.isAnIncome)
-              event.i18n.income
-            else
-              event.i18n.expense,
+            if (t.category.isAnIncome) event.i18n.income else event.i18n.expense,
           ]),
     ];
 

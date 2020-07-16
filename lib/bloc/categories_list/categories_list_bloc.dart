@@ -12,16 +12,12 @@ import '../../services/logging_service.dart';
 part 'categories_list_event.dart';
 part 'categories_list_state.dart';
 
-abstract class _CategoriesListBloc
-    extends Bloc<CategoriesListEvent, CategoriesListState> {
+abstract class _CategoriesListBloc extends Bloc<CategoriesListEvent, CategoriesListState> {
   final LoggingService _logger;
   final CategoriesDao _categoriesDao;
   final UsersDao _usersDao;
 
-  _CategoriesListBloc(this._logger, this._categoriesDao, this._usersDao);
-
-  @override
-  CategoriesListState get initialState => CategoriesLoadingState();
+  _CategoriesListBloc(this._logger, this._categoriesDao, this._usersDao) : super(CategoriesLoadingState());
 
   CategoriesLoadedState get currentState => state as CategoriesLoadedState;
 
@@ -57,8 +53,7 @@ abstract class _CategoriesListBloc
         currentUser?.id,
       );
 
-      if (event.selectedCategory != null &&
-          categories.any((t) => t.id == event.selectedCategory.id)) {
+      if (event.selectedCategory != null && categories.any((t) => t.id == event.selectedCategory.id)) {
         _setSelectedItem(event.selectedCategory.id, categories);
       }
       yield buildCategoriesLoadedState(categories);
@@ -86,8 +81,7 @@ abstract class _CategoriesListBloc
   }
 
   List<CategoryItem> _changeSelectedState(bool isSelected) {
-    final categories =
-        List<CategoryItem>.generate(currentState.categories.length, (i) {
+    final categories = List<CategoryItem>.generate(currentState.categories.length, (i) {
       return currentState.categories[i].copyWith(isSeleted: false);
     });
 
@@ -95,8 +89,7 @@ abstract class _CategoriesListBloc
   }
 
   void _setSelectedItem(int selectedId, List<CategoryItem> categories) {
-    _logger.info(runtimeType,
-        '_setSelectedItem: Setting the selected categoryId = $selectedId');
+    _logger.info(runtimeType, '_setSelectedItem: Setting the selected categoryId = $selectedId');
 
     final int index = categories.indexWhere((t) => t.id == selectedId);
     final cat = categories.elementAt(index).copyWith(isSeleted: true);

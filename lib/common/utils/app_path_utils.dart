@@ -41,8 +41,7 @@ class AppPathUtils {
   //root/data/data/com.miraisoft.my_expenses/app_flutter/images
   static Future<String> getUserImgPath(int userId) async {
     final dir = await getApplicationDocumentsDirectory();
-    final dirPath =
-        userId == null ? '${dir.path}/Images' : '${dir.path}/Images_$userId';
+    final dirPath = userId == null ? '${dir.path}/Images' : '${dir.path}/Images_$userId';
     await _generateDirectoryIfItDoesntExist(dirPath);
     return dirPath;
   }
@@ -57,6 +56,23 @@ class AppPathUtils {
   static Future<String> buildUserImgPath(String filename, int userId) async {
     final baseImgPath = await getUserImgPath(userId);
     return join(baseImgPath, filename);
+  }
+
+  static Future<void> deleteOlLogs() async {
+    final maxDate = DateTime.now().subtract(const Duration(days: 3));
+    final path = await logsPath;
+    final dir = Directory(path);
+    final files = dir.listSync();
+    final filesToDelete = <FileSystemEntity>[];
+    for (final file in files) {
+      final stat = await file.stat();
+      if (stat.modified.isBefore(maxDate)) {
+        filesToDelete.add(file);
+      }
+    }
+    if (filesToDelete.isNotEmpty) {
+      await Future.wait(filesToDelete.map((f) => f.delete()).toList());
+    }
   }
 
   static Future<void> _generateDirectoryIfItDoesntExist(String path) async {

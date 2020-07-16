@@ -30,12 +30,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     this._settingsService,
     this._secureStorageService,
     this._usersDao,
-  );
+  ) : super(const SettingsLoadingState());
 
   SettingsInitialState get currentState => state as SettingsInitialState;
-
-  @override
-  SettingsState get initialState => const SettingsLoadingState();
 
   @override
   Stream<SettingsState> mapEventToState(
@@ -57,8 +54,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
     if (event is AppLanguageChanged) {
       _settingsService.language = event.selectedLanguage;
-      final locale =
-          I18n.delegate.supportedLocales[event.selectedLanguage.index];
+      final locale = I18n.delegate.supportedLocales[event.selectedLanguage.index];
       I18n.onLocaleChanged(locale);
       yield currentState.copyWith(appLanguage: event.selectedLanguage);
     }
@@ -143,8 +139,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       syncInterval: appSettings.syncInterval,
       showNotifAfterFullSync: appSettings.showNotifAfterFullSync,
       askForPassword: appSettings.askForPassword,
-      canUseFingerPrint:
-          availableBiometrics.contains(BiometricType.fingerprint),
+      canUseFingerPrint: availableBiometrics.contains(BiometricType.fingerprint),
       askForFingerPrint: appSettings.askForFingerPrint,
       appName: packageInfo.appName,
       appVersion: packageInfo.version,

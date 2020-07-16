@@ -18,11 +18,8 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
   final UsersDao _usersDao;
   final CategoriesDao _categoriesDao;
 
-  @override
-  DrawerState get initialState =>
-      DrawerState.initial(AppDrawerItemType.transactions);
-
-  DrawerBloc(this._logger, this._usersDao, this._categoriesDao);
+  DrawerBloc(this._logger, this._usersDao, this._categoriesDao)
+      : super(DrawerState.initial(AppDrawerItemType.transactions));
 
   @override
   Stream<DrawerState> mapEventToState(
