@@ -25,7 +25,6 @@ import '../../models/transaction_item.dart';
 import '../../models/user_item.dart';
 import 'base_entity.dart';
 
-
 part '../../daos/categories_dao_impl.dart';
 part '../../daos/transactions_dao_impl.dart';
 part '../../daos/users_dao_impl.dart';
@@ -84,7 +83,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -97,6 +96,12 @@ class AppDatabase extends _$AppDatabase {
             await batch((b) {
               b.insertAll(categories, defaultCats);
             });
+          }
+        },
+        onUpgrade: (Migrator m, int from, int to) async {
+          if (from == 1) {
+            //long description was added in v2
+            await m.addColumn(transactions, transactions.longDescription);
           }
         },
       );

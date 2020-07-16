@@ -25,6 +25,7 @@ TransactionItem _$TransactionItemFromJson(Map<String, dynamic> json) {
     category: json['category'] == null
         ? null
         : CategoryItem.fromJson(json['category'] as Map<String, dynamic>),
+    longDescription: json['longDescription'] as String,
   );
 }
 
@@ -40,6 +41,7 @@ Map<String, dynamic> _$TransactionItemToJson(TransactionItem instance) =>
       'nextRecurringDate': instance.nextRecurringDate?.toIso8601String(),
       'imagePath': instance.imagePath,
       'category': instance.category,
+      'longDescription': instance.longDescription,
     };
 
 T _$enumDecode<T>(

@@ -22,6 +22,7 @@ class Transaction extends Equatable {
   final String createdHash;
   final DateTime updatedAt;
   final String updatedBy;
+  final String longDescription;
 
   @override
   List<Object> get props => [
@@ -39,6 +40,7 @@ class Transaction extends Equatable {
         createdHash,
         updatedAt,
         updatedBy,
+        longDescription,
       ];
 
   const Transaction({
@@ -56,9 +58,9 @@ class Transaction extends Equatable {
     @required this.createdHash,
     @required this.updatedAt,
     @required this.updatedBy,
+    this.longDescription,
   });
 
-  factory Transaction.fromJson(Map<String, dynamic> json) =>
-      _$TransactionFromJson(json);
+  factory Transaction.fromJson(Map<String, dynamic> json) => _$TransactionFromJson(json);
   Map<String, dynamic> toJson() => _$TransactionToJson(this);
 }

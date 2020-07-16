@@ -88,6 +88,7 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
         imageExists: imageExists,
         isRecurringTransactionRunning: transaction.nextRecurringDate != null,
         nextRecurringDate: transaction.nextRecurringDate,
+        longDescription: transaction.longDescription,
       );
     }
 
@@ -103,6 +104,14 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
       yield currentState.copyWith(
         description: event.description,
         isDescriptionValid: _isDescriptionValid(event.description),
+        isDescriptionDirty: true,
+      );
+    }
+
+    if (event is LongDescriptionChanged) {
+      yield currentState.copyWith(
+        longDescription: event.longDescription,
+        isDescriptionValid: _isLongDescriptionValid(event.longDescription),
         isDescriptionDirty: true,
       );
     }
@@ -168,10 +177,10 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
 
   bool _isAmountValid(double amount) => amount != 0;
 
-  bool _isDescriptionValid(String description) => !description.isNullOrEmpty(
-        minLength: 1,
-        maxLength: 255,
-      );
+  bool _isDescriptionValid(String description) => !description.isNullOrEmpty(minLength: 1, maxLength: 255);
+
+  bool _isLongDescriptionValid(String description) =>
+      description.isNullEmptyOrWhitespace || !description.isNullOrEmpty(minLength: 1, maxLength: 500);
 
   bool _isTransactionDateValid(DateTime date, RepetitionCycleType cycle) {
     if (cycle == RepetitionCycleType.none) return true;

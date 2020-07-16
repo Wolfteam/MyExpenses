@@ -34,9 +34,11 @@ class AddEditTransactionPage extends StatefulWidget {
 class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   TextEditingController _amountController;
   TextEditingController _descriptionController;
+  TextEditingController _longDescriptionController;
 
   final FocusNode _amountFocus = FocusNode();
   final FocusNode _descriptionFocus = FocusNode();
+  final FocusNode _longDescriptionFocus = FocusNode();
   final FocusNode _repetitionsFocus = FocusNode();
 
   final _formKey = GlobalKey<FormState>();
@@ -57,9 +59,11 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
 
     _amountController = TextEditingController(text: '$amount');
     _descriptionController = TextEditingController(text: description);
+    _longDescriptionController = TextEditingController(text: widget.item?.longDescription ?? '');
 
     _amountController.addListener(_amountChanged);
     _descriptionController.addListener(_descriptionChanged);
+    _longDescriptionController.addListener(_longDescriptionChanged);
     super.initState();
   }
 
@@ -102,9 +106,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               : i18n.transactionsWasSuccessfullyDeleted;
           showSucceedToast(msg);
 
-          ctx
-              .bloc<TransactionsBloc>()
-              .add(GetTransactions(inThisDate: state.transactionDate));
+          ctx.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: state.transactionDate));
           ctx.bloc<ChartsBloc>().add(LoadChart(state.transactionDate));
 
           Navigator.of(ctx).pop();
@@ -120,6 +122,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   void dispose() {
     _amountController.dispose();
     _descriptionController.dispose();
+    _longDescriptionController.dispose();
     super.dispose();
   }
 
@@ -170,8 +173,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
             if (state.isChildTransaction)
               Text(
                 i18n.childTransactionCantBeDeleted,
-                style: theme.textTheme.caption
-                    .copyWith(color: theme.primaryColorDark),
+                style: theme.textTheme.caption.copyWith(color: theme.primaryColorDark),
               ),
             _buildForm(context, state),
           ],
@@ -212,14 +214,13 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     const cornerRadius = Radius.circular(20);
     final theme = Theme.of(context);
     final i18n = I18n.of(context);
-    final dateString = state.isParentTransaction &&
-            state.nextRecurringDate != null &&
-            state.isRecurringTransactionRunning
-        ? i18n.nextDateOn(DateUtils.formatDateWithoutLocale(
-            state.nextRecurringDate,
-            DateUtils.monthDayAndYearFormat,
-          ))
-        : '${i18n.date}: ${state.transactionDateString}';
+    final dateString =
+        state.isParentTransaction && state.nextRecurringDate != null && state.isRecurringTransactionRunning
+            ? i18n.nextDateOn(DateUtils.formatDateWithoutLocale(
+                state.nextRecurringDate,
+                DateUtils.monthDayAndYearFormat,
+              ))
+            : '${i18n.date}: ${state.transactionDateString}';
 
     return Container(
       height: 260.0,
@@ -288,9 +289,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                         Expanded(
                           child: ListTile(
                             title: Text(
-                              state.category.isAnIncome
-                                  ? i18n.income
-                                  : i18n.expense,
+                              state.category.isAnIncome ? i18n.income : i18n.expense,
                               textAlign: TextAlign.center,
                               overflow: TextOverflow.ellipsis,
                               style: theme.textTheme.headline6,
@@ -371,10 +370,10 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            if (state.isParentTransaction)
-              _buildRecurringSwitch(context, state),
+            if (state.isParentTransaction) _buildRecurringSwitch(context, state),
             _buildAmountInput(context, state),
             _buildDescriptionInput(state),
+            _buildLongDescriptionInput(state),
             _buildTransactionDateButton(context, state),
             _buildRepetitionCyclesDropDown(state),
             ..._buildPickImageButtons(context, state),
@@ -403,9 +402,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               state.isRecurringTransactionRunning ? i18n.running : i18n.stopped,
             ),
             secondary: Icon(
-              state.isRecurringTransactionRunning
-                  ? Icons.play_arrow
-                  : Icons.stop,
+              state.isRecurringTransactionRunning ? Icons.play_arrow : Icons.stop,
               size: 30,
             ),
             subtitle: Text(
@@ -491,7 +488,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
             enabled: !state.isChildTransaction,
             controller: _descriptionController,
             keyboardType: TextInputType.text,
-            maxLines: 2,
+            maxLines: 1,
             minLines: 1,
             maxLength: 255,
             focusNode: _descriptionFocus,
@@ -503,15 +500,50 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               hintText: i18n.descriptionOfThisTransaction,
             ),
             autovalidate: state.isDescriptionDirty,
-            onFieldSubmitted: (_) {
-              _fieldFocusChange(
-                context,
-                _descriptionFocus,
-                _repetitionsFocus,
-              );
-            },
-            validator: (_) =>
-                state.isDescriptionValid ? null : i18n.invalidDescription,
+            onFieldSubmitted: (_) => _fieldFocusChange(context, _descriptionFocus, _longDescriptionFocus),
+            validator: (_) => state.isDescriptionValid ? null : i18n.invalidDescription,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLongDescriptionInput(final TransactionFormLoadedState state) {
+    final suffixIcon = _buildSuffixIconButton(
+      _longDescriptionController,
+      _longDescriptionFocus,
+    );
+    final i18n = I18n.of(context);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        Container(
+          margin: const EdgeInsets.only(right: 10),
+          child: Icon(
+            Icons.note,
+            size: 30,
+          ),
+        ),
+        Expanded(
+          child: TextFormField(
+            enabled: !state.isChildTransaction,
+            controller: _longDescriptionController,
+            keyboardType: TextInputType.text,
+            maxLines: 5,
+            minLines: 1,
+            maxLength: 500,
+            focusNode: _longDescriptionFocus,
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(
+              suffixIcon: suffixIcon,
+              alignLabelWithHint: true,
+              labelText: i18n.longDescription,
+              hintText: i18n.descriptionOfThisTransaction,
+            ),
+            autovalidate: state.isLongDescriptionDirty,
+            onFieldSubmitted: (_) => _fieldFocusChange(context, _longDescriptionFocus, _repetitionsFocus),
+            validator: (_) => state.isLongDescriptionValid ? null : i18n.invalidDescription,
           ),
         ),
       ],
@@ -535,9 +567,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
             ),
             Expanded(
               child: FlatButton(
-                onPressed: !state.isChildTransaction
-                    ? () => _transactionDateClicked(state)
-                    : null,
+                onPressed: !state.isChildTransaction ? () => _transactionDateClicked(state) : null,
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Text(state.transactionDateString),
@@ -554,8 +584,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
             child: Text(
               i18n.recurringDateMustStartFromTomorrow,
               textAlign: TextAlign.center,
-              style: theme.textTheme.caption
-                  .copyWith(color: theme.primaryColorDark),
+              style: theme.textTheme.caption.copyWith(color: theme.primaryColorDark),
             ),
           ),
       ],
@@ -571,8 +600,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     //This is to avoid loosing the isParentTransaction property and
     //to avoid a potential bug
     final repetitionCyclesToUse = state.isParentTransaction
-        ? _repetitionCycles
-            .where((c) => c.index != RepetitionCycleType.none.index)
+        ? _repetitionCycles.where((c) => c.index != RepetitionCycleType.none.index)
         : _repetitionCycles;
 
     return Container(
@@ -604,11 +632,8 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                       height: 0,
                       color: Colors.transparent,
                     ),
-                    onChanged: !state.isChildTransaction
-                        ? _repetitionCycleChanged
-                        : null,
-                    items: repetitionCyclesToUse
-                        .map<DropdownMenuItem<RepetitionCycleType>>((value) {
+                    onChanged: !state.isChildTransaction ? _repetitionCycleChanged : null,
+                    items: repetitionCyclesToUse.map<DropdownMenuItem<RepetitionCycleType>>((value) {
                       return DropdownMenuItem<RepetitionCycleType>(
                         value: value,
                         child: Text(
@@ -621,8 +646,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               ),
             ],
           ),
-          if (!state.isChildTransaction &&
-              state.repetitionCycle != RepetitionCycleType.none)
+          if (!state.isChildTransaction && state.repetitionCycle != RepetitionCycleType.none)
             Padding(
               padding: const EdgeInsets.only(bottom: 5, left: 8, right: 8),
               child: Text(
@@ -632,13 +656,10 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                     state.language,
                     DateUtils.monthDayAndYearFormat,
                   ),
-                  i18n
-                      .translateRepetitionCycleType(state.repetitionCycle)
-                      .toLowerCase(),
+                  i18n.translateRepetitionCycleType(state.repetitionCycle).toLowerCase(),
                 ),
                 textAlign: TextAlign.center,
-                style: theme.textTheme.caption
-                    .copyWith(color: theme.primaryColorDark),
+                style: theme.textTheme.caption.copyWith(color: theme.primaryColorDark),
               ),
             ),
         ],
@@ -650,16 +671,13 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     TextEditingController controller,
     FocusNode focusNode,
   ) {
-    final suffixIcon =
-        !controller.text.isNullEmptyOrWhitespace && focusNode.hasFocus
-            ? IconButton(
-                alignment: Alignment.bottomCenter,
-                icon: Icon(Icons.close),
-                onPressed: () =>
-                    //For some reason an exception is thrown https://github.com/flutter/flutter/issues/35848
-                    Future.microtask(() => controller.clear()),
-              )
-            : null;
+    final suffixIcon = !controller.text.isNullEmptyOrWhitespace && focusNode.hasFocus
+        ? IconButton(
+            alignment: Alignment.bottomCenter,
+            icon: Icon(Icons.close),
+            onPressed: () => controller.clear(),
+          )
+        : null;
 
     return suffixIcon;
   }
@@ -682,17 +700,13 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         children: <Widget>[
           FlatButton.icon(
             textColor: theme.primaryColor,
-            onPressed: !state.isChildTransaction
-                ? () => _pickPicture(true, i18n)
-                : null,
+            onPressed: !state.isChildTransaction ? () => _pickPicture(true, i18n) : null,
             icon: Icon(Icons.photo_library),
             label: Text(i18n.fromGallery),
           ),
           FlatButton.icon(
             textColor: theme.primaryColor,
-            onPressed: !state.isChildTransaction
-                ? () => _pickPicture(false, i18n)
-                : null,
+            onPressed: !state.isChildTransaction ? () => _pickPicture(false, i18n) : null,
             icon: Icon(Icons.camera_enhance),
             label: Text(i18n.fromCamera),
           ),
@@ -732,10 +746,11 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   }
 
   void _descriptionChanged() {
-    context
-        .bloc<TransactionFormBloc>()
-        .add(DescriptionChanged(_descriptionController.text));
+    context.bloc<TransactionFormBloc>().add(DescriptionChanged(_descriptionController.text));
   }
+
+  void _longDescriptionChanged() =>
+      context.bloc<TransactionFormBloc>().add(LongDescriptionChanged(_longDescriptionController.text));
 
   void _repetitionCycleChanged(RepetitionCycleType newValue) {
     context.bloc<TransactionFormBloc>().add(RepetitionCycleChanged(newValue));
@@ -772,9 +787,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     }
 
     if (selectedDate == null) return;
-    context
-        .bloc<TransactionFormBloc>()
-        .add(TransactionDateChanged(selectedDate));
+    context.bloc<TransactionFormBloc>().add(TransactionDateChanged(selectedDate));
   }
 
   void _fieldFocusChange(
@@ -846,9 +859,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               if (state.isParentTransaction) {
                 _showDeleteChildsConfirmationDialog();
               } else {
-                context
-                    .bloc<TransactionFormBloc>()
-                    .add(const DeleteTransaction());
+                context.bloc<TransactionFormBloc>().add(const DeleteTransaction());
               }
             },
             child: Text(i18n.yes),
@@ -869,9 +880,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
           OutlineButton(
             textColor: Theme.of(context).primaryColor,
             onPressed: () {
-              context
-                  .bloc<TransactionFormBloc>()
-                  .add(const DeleteTransaction(keepChilds: true));
+              context.bloc<TransactionFormBloc>().add(const DeleteTransaction(keepChilds: true));
               Navigator.of(ctx).pop();
             },
             child: Text(i18n.no),
@@ -879,9 +888,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
           RaisedButton(
             color: Theme.of(ctx).primaryColor,
             onPressed: () {
-              context
-                  .bloc<TransactionFormBloc>()
-                  .add(const DeleteTransaction(keepChilds: false));
+              context.bloc<TransactionFormBloc>().add(const DeleteTransaction(keepChilds: false));
               Navigator.of(ctx).pop();
             },
             child: Text(i18n.yes),
@@ -909,9 +916,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
           RaisedButton(
             color: Theme.of(ctx).primaryColor,
             onPressed: () {
-              context
-                  .bloc<TransactionFormBloc>()
-                  .add(const ImageChanged(path: '', imageExists: false));
+              context.bloc<TransactionFormBloc>().add(const ImageChanged(path: '', imageExists: false));
               Navigator.of(ctx).pop();
             },
             child: Text(i18n.yes),
@@ -929,15 +934,12 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         maxWidth: 600,
       );
       if (image == null) return;
-      context
-          .bloc<TransactionFormBloc>()
-          .add(ImageChanged(path: image.path, imageExists: true));
+      context.bloc<TransactionFormBloc>().add(ImageChanged(path: image.path, imageExists: true));
     } catch (e) {
       showWarningToast(i18n.acceptPermissionsToUseThisFeature);
     }
   }
 
-  void _isRunningChanged(bool newValue) => context
-      .bloc<TransactionFormBloc>()
-      .add(IsRunningChanged(isRunning: newValue));
+  void _isRunningChanged(bool newValue) =>
+      context.bloc<TransactionFormBloc>().add(IsRunningChanged(isRunning: newValue));
 }

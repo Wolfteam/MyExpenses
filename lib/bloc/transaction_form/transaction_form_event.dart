@@ -35,6 +35,14 @@ class DescriptionChanged extends TransactionFormEvent {
   List<Object> get props => [description];
 }
 
+class LongDescriptionChanged extends TransactionFormEvent {
+  final String longDescription;
+  const LongDescriptionChanged(this.longDescription);
+
+  @override
+  List<Object> get props => [longDescription];
+}
+
 class TransactionDateChanged extends TransactionFormEvent {
   final DateTime transactionDate;
   const TransactionDateChanged(this.transactionDate);

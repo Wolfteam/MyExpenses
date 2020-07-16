@@ -32,6 +32,7 @@ Transaction _$TransactionFromJson(Map<String, dynamic> json) {
         ? null
         : DateTime.parse(json['updatedAt'] as String),
     updatedBy: json['updatedBy'] as String,
+    longDescription: json['longDescription'] as String,
   );
 }
 
@@ -51,6 +52,7 @@ Map<String, dynamic> _$TransactionToJson(Transaction instance) =>
       'createdHash': instance.createdHash,
       'updatedAt': instance.updatedAt?.toIso8601String(),
       'updatedBy': instance.updatedBy,
+      'longDescription': instance.longDescription,
     };
 
 T _$enumDecode<T>(

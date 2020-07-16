@@ -21,6 +21,10 @@ class TransactionFormLoadedState extends TransactionFormState {
   final bool isDescriptionValid;
   final bool isDescriptionDirty;
 
+  final String longDescription;
+  final bool isLongDescriptionValid;
+  final bool isLongDescriptionDirty;
+
   final DateTime transactionDate;
   final bool isTransactionDateValid;
   final String transactionDateString;
@@ -50,14 +54,9 @@ class TransactionFormLoadedState extends TransactionFormState {
 
   bool get isNewTransaction => id == null || id <= 0;
 
-  bool get isChildTransaction =>
-      !isParentTransaction && parentTransactionId != null;
+  bool get isChildTransaction => !isParentTransaction && parentTransactionId != null;
 
-  bool get isFormValid =>
-      isAmountValid &&
-      isDescriptionValid &&
-      isTransactionDateValid &&
-      isCategoryValid;
+  bool get isFormValid => isAmountValid && isDescriptionValid && isTransactionDateValid && isCategoryValid;
 
   @override
   List<Object> get props => [
@@ -86,6 +85,9 @@ class TransactionFormLoadedState extends TransactionFormState {
         isRecurringTransactionRunning,
         nextRecurringDate,
         nextRecurringDateWasUpdated,
+        longDescription,
+        isLongDescriptionValid,
+        isLongDescriptionDirty,
       ];
 
   const TransactionFormLoadedState({
@@ -105,6 +107,9 @@ class TransactionFormLoadedState extends TransactionFormState {
     @required this.category,
     @required this.isCategoryValid,
     @required this.language,
+    @required this.longDescription,
+    @required this.isLongDescriptionValid,
+    @required this.isLongDescriptionDirty,
     this.errorOccurred = false,
     this.parentTransactionId,
     this.isParentTransaction = false,
@@ -150,6 +155,9 @@ class TransactionFormLoadedState extends TransactionFormState {
       isCategoryValid: false,
       language: language,
       errorOccurred: false,
+      isLongDescriptionDirty: false,
+      isLongDescriptionValid: true,
+      longDescription: '',
     );
   }
 
@@ -177,6 +185,9 @@ class TransactionFormLoadedState extends TransactionFormState {
     bool isRecurringTransactionRunning,
     DateTime nextRecurringDate,
     bool nextRecurringDateWasUpdated,
+    String longDescription,
+    bool isLongDescriptionValid,
+    bool isLongDescriptionDirty,
   }) {
     final date = transactionDate ?? this.transactionDate;
     final transactionDateString = DateUtils.formatAppDate(
@@ -194,8 +205,7 @@ class TransactionFormLoadedState extends TransactionFormState {
       isDescriptionValid: isDescriptionValid ?? this.isDescriptionValid,
       isDescriptionDirty: isDescriptionDirty ?? this.isDescriptionDirty,
       transactionDate: transactionDate ?? this.transactionDate,
-      isTransactionDateValid:
-          isTransactionDateValid ?? this.isTransactionDateValid,
+      isTransactionDateValid: isTransactionDateValid ?? this.isTransactionDateValid,
       transactionDateString: transactionDateString,
       firstDate: firstDate ?? this.firstDate,
       lastDate: lastDate,
@@ -209,18 +219,18 @@ class TransactionFormLoadedState extends TransactionFormState {
       imagePath: imagePath ?? this.imagePath,
       imageExists: imageExists ?? this.imageExists,
       isSavingForm: isSavingForm ?? this.isSavingForm,
-      isRecurringTransactionRunning:
-          isRecurringTransactionRunning ?? this.isRecurringTransactionRunning,
+      isRecurringTransactionRunning: isRecurringTransactionRunning ?? this.isRecurringTransactionRunning,
       nextRecurringDate: nextRecurringDate ?? this.nextRecurringDate,
-      nextRecurringDateWasUpdated:
-          nextRecurringDateWasUpdated ?? this.nextRecurringDateWasUpdated,
+      nextRecurringDateWasUpdated: nextRecurringDateWasUpdated ?? this.nextRecurringDateWasUpdated,
+      isLongDescriptionDirty: isLongDescriptionDirty ?? this.isLongDescriptionDirty,
+      isLongDescriptionValid: isLongDescriptionValid ?? this.isLongDescriptionValid,
+      longDescription: longDescription ?? this.longDescription,
     );
   }
 
   TransactionItem buildTransactionItem(String imgFilename) {
     final amountToSave = amount.abs();
-    DateTime nextecurringDate =
-        repetitionCycle == RepetitionCycleType.none ? null : transactionDate;
+    DateTime nextecurringDate = repetitionCycle == RepetitionCycleType.none ? null : transactionDate;
     final isParentTransaction = nextecurringDate != null;
 
     if (!isRecurringTransactionRunning) {
@@ -238,6 +248,7 @@ class TransactionFormLoadedState extends TransactionFormState {
       parentTransactionId: parentTransactionId,
       nextRecurringDate: nextecurringDate,
       imagePath: imgFilename,
+      longDescription: longDescription,
     );
   }
 }
@@ -255,24 +266,21 @@ class TransactionChangedState extends TransactionFormState {
     this.transactionDate,
   });
 
-  factory TransactionChangedState.created(DateTime transactionDate) =>
-      TransactionChangedState(
+  factory TransactionChangedState.created(DateTime transactionDate) => TransactionChangedState(
         wasCreated: true,
         wasDeleted: false,
         wasUpdated: false,
         transactionDate: transactionDate,
       );
 
-  factory TransactionChangedState.updated(DateTime transactionDate) =>
-      TransactionChangedState(
+  factory TransactionChangedState.updated(DateTime transactionDate) => TransactionChangedState(
         wasCreated: false,
         wasDeleted: false,
         wasUpdated: true,
         transactionDate: transactionDate,
       );
 
-  factory TransactionChangedState.deleted(DateTime transactionDate) =>
-      TransactionChangedState(
+  factory TransactionChangedState.deleted(DateTime transactionDate) => TransactionChangedState(
         wasCreated: false,
         wasDeleted: true,
         wasUpdated: false,

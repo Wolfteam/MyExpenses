@@ -673,6 +673,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   final String updatedBy;
   final double amount;
   final String description;
+  final String longDescription;
   final DateTime transactionDate;
   final RepetitionCycleType repetitionCycle;
   final int parentTransactionId;
@@ -690,6 +691,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       this.updatedBy,
       @required this.amount,
       @required this.description,
+      this.longDescription,
       @required this.transactionDate,
       @required this.repetitionCycle,
       this.parentTransactionId,
@@ -723,6 +725,8 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           doubleType.mapFromDatabaseResponse(data['${effectivePrefix}amount']),
       description: stringType
           .mapFromDatabaseResponse(data['${effectivePrefix}description']),
+      longDescription: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}long_description']),
       transactionDate: dateTimeType
           .mapFromDatabaseResponse(data['${effectivePrefix}transaction_date']),
       repetitionCycle: $TransactionsTable.$converter1.mapToDart(intType
@@ -769,6 +773,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     }
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
+    }
+    if (!nullToAbsent || longDescription != null) {
+      map['long_description'] = Variable<String>(longDescription);
     }
     if (!nullToAbsent || transactionDate != null) {
       map['transaction_date'] = Variable<DateTime>(transactionDate);
@@ -822,6 +829,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
+      longDescription: longDescription == null && nullToAbsent
+          ? const Value.absent()
+          : Value(longDescription),
       transactionDate: transactionDate == null && nullToAbsent
           ? const Value.absent()
           : Value(transactionDate),
@@ -859,6 +869,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       updatedBy: serializer.fromJson<String>(json['updatedBy']),
       amount: serializer.fromJson<double>(json['amount']),
       description: serializer.fromJson<String>(json['description']),
+      longDescription: serializer.fromJson<String>(json['longDescription']),
       transactionDate: serializer.fromJson<DateTime>(json['transactionDate']),
       repetitionCycle:
           serializer.fromJson<RepetitionCycleType>(json['repetitionCycle']),
@@ -885,6 +896,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       'updatedBy': serializer.toJson<String>(updatedBy),
       'amount': serializer.toJson<double>(amount),
       'description': serializer.toJson<String>(description),
+      'longDescription': serializer.toJson<String>(longDescription),
       'transactionDate': serializer.toJson<DateTime>(transactionDate),
       'repetitionCycle':
           serializer.toJson<RepetitionCycleType>(repetitionCycle),
@@ -906,6 +918,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           String updatedBy,
           double amount,
           String description,
+          String longDescription,
           DateTime transactionDate,
           RepetitionCycleType repetitionCycle,
           int parentTransactionId,
@@ -923,6 +936,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
         updatedBy: updatedBy ?? this.updatedBy,
         amount: amount ?? this.amount,
         description: description ?? this.description,
+        longDescription: longDescription ?? this.longDescription,
         transactionDate: transactionDate ?? this.transactionDate,
         repetitionCycle: repetitionCycle ?? this.repetitionCycle,
         parentTransactionId: parentTransactionId ?? this.parentTransactionId,
@@ -943,6 +957,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           ..write('updatedBy: $updatedBy, ')
           ..write('amount: $amount, ')
           ..write('description: $description, ')
+          ..write('longDescription: $longDescription, ')
           ..write('transactionDate: $transactionDate, ')
           ..write('repetitionCycle: $repetitionCycle, ')
           ..write('parentTransactionId: $parentTransactionId, ')
@@ -974,22 +989,25 @@ class Transaction extends DataClass implements Insertable<Transaction> {
                                   $mrjc(
                                       description.hashCode,
                                       $mrjc(
-                                          transactionDate.hashCode,
+                                          longDescription.hashCode,
                                           $mrjc(
-                                              repetitionCycle.hashCode,
+                                              transactionDate.hashCode,
                                               $mrjc(
-                                                  parentTransactionId.hashCode,
+                                                  repetitionCycle.hashCode,
                                                   $mrjc(
-                                                      isParentTransaction
+                                                      parentTransactionId
                                                           .hashCode,
                                                       $mrjc(
-                                                          nextRecurringDate
+                                                          isParentTransaction
                                                               .hashCode,
                                                           $mrjc(
-                                                              imagePath
+                                                              nextRecurringDate
                                                                   .hashCode,
-                                                              categoryId
-                                                                  .hashCode))))))))))))))));
+                                                              $mrjc(
+                                                                  imagePath
+                                                                      .hashCode,
+                                                                  categoryId
+                                                                      .hashCode)))))))))))))))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
@@ -1003,6 +1021,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           other.updatedBy == this.updatedBy &&
           other.amount == this.amount &&
           other.description == this.description &&
+          other.longDescription == this.longDescription &&
           other.transactionDate == this.transactionDate &&
           other.repetitionCycle == this.repetitionCycle &&
           other.parentTransactionId == this.parentTransactionId &&
@@ -1022,6 +1041,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
   final Value<String> updatedBy;
   final Value<double> amount;
   final Value<String> description;
+  final Value<String> longDescription;
   final Value<DateTime> transactionDate;
   final Value<RepetitionCycleType> repetitionCycle;
   final Value<int> parentTransactionId;
@@ -1039,6 +1059,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.updatedBy = const Value.absent(),
     this.amount = const Value.absent(),
     this.description = const Value.absent(),
+    this.longDescription = const Value.absent(),
     this.transactionDate = const Value.absent(),
     this.repetitionCycle = const Value.absent(),
     this.parentTransactionId = const Value.absent(),
@@ -1057,6 +1078,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     this.updatedBy = const Value.absent(),
     @required double amount,
     @required String description,
+    this.longDescription = const Value.absent(),
     @required DateTime transactionDate,
     @required RepetitionCycleType repetitionCycle,
     this.parentTransactionId = const Value.absent(),
@@ -1084,6 +1106,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     Expression<String> updatedBy,
     Expression<double> amount,
     Expression<String> description,
+    Expression<String> longDescription,
     Expression<DateTime> transactionDate,
     Expression<int> repetitionCycle,
     Expression<int> parentTransactionId,
@@ -1102,6 +1125,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       if (updatedBy != null) 'updated_by': updatedBy,
       if (amount != null) 'amount': amount,
       if (description != null) 'description': description,
+      if (longDescription != null) 'long_description': longDescription,
       if (transactionDate != null) 'transaction_date': transactionDate,
       if (repetitionCycle != null) 'repetition_cycle': repetitionCycle,
       if (parentTransactionId != null)
@@ -1124,6 +1148,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       Value<String> updatedBy,
       Value<double> amount,
       Value<String> description,
+      Value<String> longDescription,
       Value<DateTime> transactionDate,
       Value<RepetitionCycleType> repetitionCycle,
       Value<int> parentTransactionId,
@@ -1141,6 +1166,7 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
       updatedBy: updatedBy ?? this.updatedBy,
       amount: amount ?? this.amount,
       description: description ?? this.description,
+      longDescription: longDescription ?? this.longDescription,
       transactionDate: transactionDate ?? this.transactionDate,
       repetitionCycle: repetitionCycle ?? this.repetitionCycle,
       parentTransactionId: parentTransactionId ?? this.parentTransactionId,
@@ -1182,6 +1208,9 @@ class TransactionsCompanion extends UpdateCompanion<Transaction> {
     }
     if (description.present) {
       map['description'] = Variable<String>(description.value);
+    }
+    if (longDescription.present) {
+      map['long_description'] = Variable<String>(longDescription.value);
     }
     if (transactionDate.present) {
       map['transaction_date'] = Variable<DateTime>(transactionDate.value);
@@ -1317,6 +1346,20 @@ class $TransactionsTable extends Transactions
         minTextLength: 0, maxTextLength: 255);
   }
 
+  final VerificationMeta _longDescriptionMeta =
+      const VerificationMeta('longDescription');
+  GeneratedTextColumn _longDescription;
+  @override
+  GeneratedTextColumn get longDescription =>
+      _longDescription ??= _constructLongDescription();
+  GeneratedTextColumn _constructLongDescription() {
+    return GeneratedTextColumn(
+      'long_description',
+      $tableName,
+      true,
+    );
+  }
+
   final VerificationMeta _transactionDateMeta =
       const VerificationMeta('transactionDate');
   GeneratedDateTimeColumn _transactionDate;
@@ -1419,6 +1462,7 @@ class $TransactionsTable extends Transactions
         updatedBy,
         amount,
         description,
+        longDescription,
         transactionDate,
         repetitionCycle,
         parentTransactionId,
@@ -1483,6 +1527,12 @@ class $TransactionsTable extends Transactions
               data['description'], _descriptionMeta));
     } else if (isInserting) {
       context.missing(_descriptionMeta);
+    }
+    if (data.containsKey('long_description')) {
+      context.handle(
+          _longDescriptionMeta,
+          longDescription.isAcceptableOrUnknown(
+              data['long_description'], _longDescriptionMeta));
     }
     if (data.containsKey('transaction_date')) {
       context.handle(
