@@ -33,7 +33,7 @@ class LoggingServiceImpl implements LoggingService {
     assert(type != null && !msg.isNullEmptyOrWhitespace);
     final tag = type.toString();
     _logger.warning(tag, _formatEx(msg, ex), ex, trace);
-    _trackError(tag, msg, ex, trace);
+    _trackWarning(tag, msg, ex, trace);
   }
 
   @override
@@ -57,6 +57,15 @@ class LoggingServiceImpl implements LoggingService {
       'msg': _formatEx(msg, ex),
       'trace': trace?.toString() ?? 'No trace available',
     };
-    trackEventAsync('Error', map);
+    trackEventAsync('Error - ${DateTime.now()}', map);
+  }
+
+  void _trackWarning(String tag, String msg, [dynamic ex, StackTrace trace]) {
+    final map = {
+      'tag': tag,
+      'msg': _formatEx(msg, ex),
+      'trace': trace?.toString() ?? 'No trace available',
+    };
+    trackEventAsync('Warning - ${DateTime.now()}', map);
   }
 }

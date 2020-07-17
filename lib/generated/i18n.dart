@@ -294,6 +294,14 @@ class I18n implements WidgetsLocalizations {
   String executesInXDays(String x) => "Executes in ${x} day(s)";
   /// "Long description"
   String get longDescription => "Long description";
+  /// "Estimates"
+  String get estimates => "Estimates";
+  /// "Until date"
+  String get untilDate => "Until date";
+  /// "All"
+  String get all => "All";
+  /// "Calculate"
+  String get calculate => "Calculate";
   /// "Each week"
   String get repetitionCycleEachWeek => "Each week";
   /// "Each month"
@@ -787,6 +795,18 @@ class _I18n_es_VE extends I18n {
   /// "Descripcion larga"
   @override
   String get longDescription => "Descripcion larga";
+  /// "Estimados"
+  @override
+  String get estimates => "Estimados";
+  /// "Hasta la fecha"
+  @override
+  String get untilDate => "Hasta la fecha";
+  /// "Todos"
+  @override
+  String get all => "Todos";
+  /// "Calcular"
+  @override
+  String get calculate => "Calcular";
   /// "Cada semana"
   @override
   String get repetitionCycleEachWeek => "Cada semana";

@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:tuple/tuple.dart';
+
 import '../../daos/transactions_dao.dart';
 import '../../daos/users_dao.dart';
 import '../../models/transaction_item.dart';
@@ -19,9 +21,7 @@ class TransactionUtils {
   }
 
   static double getTotalTransactionAmount(List<TransactionItem> transactions) =>
-      transactions
-          .map((t) => t.amount)
-          .fold(0, (t1, t2) => roundDouble(t1 + t2));
+      transactions.map((t) => t.amount).fold(0, (t1, t2) => roundDouble(t1 + t2));
 
   static DateTime getNextRecurringDate(
     RepetitionCycleType cycle,
@@ -71,22 +71,13 @@ class TransactionUtils {
   ) async {
     final createdChilds = <TransactionItem>[];
     try {
-      logger.info(
-        TransactionUtils,
-        'checkRecurringTransactions: Getting all parent transactions...',
-      );
+      logger.info(TransactionUtils, 'checkRecurringTransactions: Getting all parent transactions...');
       final until = DateTime(now.year, now.month, now.day, 23, 59, 59);
       final currentUser = await usersDao.getActiveUser();
-      final parents = await _transactionsDao.getAllParentTransactionsUntil(
-        currentUser?.id,
-        until,
-      );
+      final parents = await _transactionsDao.getAllParentTransactionsUntil(currentUser?.id, until);
 
       if (parents.isEmpty) {
-        logger.info(
-          TransactionUtils,
-          'checkRecurringTransactions: There are no parent transactions...',
-        );
+        logger.info(TransactionUtils, 'checkRecurringTransactions: There are no parent transactions...');
         return createdChilds;
       }
 
@@ -106,44 +97,43 @@ class TransactionUtils {
               'and next recurring date is = ${parent.nextRecurringDate}',
         );
 
-        bool allCompleted = false;
-        var currentRecurringDate = parent.nextRecurringDate;
-        final periods = <DateTime>[];
-        while (!allCompleted) {
-          if (currentRecurringDate.isAfter(now)) {
-            allCompleted = true;
-            break;
-          }
-          periods.add(currentRecurringDate);
-
-          currentRecurringDate = getNextRecurringDate(
-            parent.repetitionCycle,
-            currentRecurringDate,
-          );
-        }
+        final tuple = getRecurringTransactionPeriods(parent.repetitionCycle, parent.nextRecurringDate, now);
+        final nextRecurringDate = tuple.item1;
+        final periods = tuple.item2;
 
         logger.info(
           TransactionUtils,
           'checkRecurringTransactions: Saving ${periods.length} periods for parent transaction id = ${parent.id}',
         );
 
-        final childs = await _transactionsDao.checkAndSaveRecurringTransactions(
-          parent,
-          currentRecurringDate,
-          periods,
-        );
+        final childs = await _transactionsDao.checkAndSaveRecurringTransactions(parent, nextRecurringDate, periods);
 
         createdChilds.addAll(childs);
       }
     } catch (e, s) {
-      logger.error(
-        TransactionUtils,
-        'checkRecurringTransactions: Unknown error occurred',
-        e,
-        s,
-      );
+      logger.error(TransactionUtils, 'checkRecurringTransactions: Unknown error occurred', e, s);
     }
 
     return createdChilds;
+  }
+
+  static Tuple2<DateTime, List<DateTime>> getRecurringTransactionPeriods(
+    RepetitionCycleType cycle,
+    DateTime nextRecurringDate,
+    DateTime untilDate,
+  ) {
+    bool allCompleted = false;
+    var currentRecurringDate = nextRecurringDate;
+    final periods = <DateTime>[];
+    while (!allCompleted) {
+      if (currentRecurringDate.isAfter(untilDate)) {
+        allCompleted = true;
+        break;
+      }
+      periods.add(currentRecurringDate);
+
+      currentRecurringDate = getNextRecurringDate(cycle, currentRecurringDate);
+    }
+    return Tuple2<DateTime, List<DateTime>>(currentRecurringDate, periods);
   }
 }
