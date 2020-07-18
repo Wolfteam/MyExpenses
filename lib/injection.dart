@@ -49,6 +49,4 @@ void initInjection() {
     getIt<GoogleService>(),
     getIt<SecureStorageService>(),
   ));
-
-  $initGetIt(getIt);
 }
