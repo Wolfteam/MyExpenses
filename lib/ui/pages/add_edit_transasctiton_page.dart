@@ -407,7 +407,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
             ),
             subtitle: Text(
               state.isRecurringTransactionRunning
-                  ? '${i18n.recurringTransactionIsNowRunning}'
+                  ? i18n.recurringTransactionIsNowRunning
                   : i18n.recurringTransactionIsNowStopped,
             ),
             onChanged: _isRunningChanged,

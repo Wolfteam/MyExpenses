@@ -154,7 +154,6 @@ class TransactionFormLoadedState extends TransactionFormState {
       category: category,
       isCategoryValid: false,
       language: language,
-      errorOccurred: false,
       isLongDescriptionDirty: false,
       isLongDescriptionValid: true,
       longDescription: '',

@@ -34,7 +34,7 @@ class AppPathUtils {
   static Future<String> generateReportFilePath({bool isPdf = true}) async {
     final now = DateTime.now();
     final path = await reportsPath;
-    final filename = '${isPdf ? '$now.pdf' : '$now.csv'}';
+    final filename = isPdf ? '$now.pdf' : '$now.csv';
     return join(path, filename);
   }
 

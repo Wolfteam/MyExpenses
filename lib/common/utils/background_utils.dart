@@ -14,6 +14,7 @@ import '../../daos/users_dao.dart';
 import '../../injection.dart';
 import '../../logger.dart';
 import '../../models/app_notification.dart';
+import '../../models/entities/database.dart';
 import '../../services/logging_service.dart';
 import '../../services/network_service.dart';
 import '../../services/settings_service.dart';
@@ -83,12 +84,14 @@ class BackgroundUtils {
       constraints: Constraints(
         networkType: NetworkType.connected,
         requiresBatteryNotLow: true,
+        requiresDeviceIdle: true,
       ),
     );
   }
 
   static Future<void> registerRecurringTransactionsTask() {
-    const duration = Duration(hours: 8);
+    //The minutes part is to avoid an overlap with the sync task
+    const duration = Duration(hours: 8, minutes: 20);
     if (!Platform.isAndroid) {
       return Future.value();
     }
@@ -100,6 +103,7 @@ class BackgroundUtils {
       constraints: Constraints(
         networkType: NetworkType.not_required,
         requiresBatteryNotLow: true,
+        requiresDeviceIdle: true,
       ),
     );
   }
@@ -128,7 +132,7 @@ class BackgroundUtils {
             runtimeType,
             'bgSync: Checking if internet is available...',
           );
-          await runSyncTask(
+          await _runSyncTask(
             logger,
             getIt<NetworkService>(),
             getIt<SyncService>(),
@@ -137,7 +141,7 @@ class BackgroundUtils {
           sendPort?.send([false]);
           break;
         case _recurringTransName:
-          await runRecurringTransTask(
+          await _runRecurringTransTask(
             logger,
             getIt<TransactionsDao>(),
             getIt<UsersDao>(),
@@ -157,6 +161,10 @@ class BackgroundUtils {
           jsonEncode(AppNotification.nothing()),
         );
       }
+    } finally {
+      logger.info(runtimeType, 'bgSync: Closing db connection...');
+      await getIt<AppDatabase>().close();
+      logger.info(runtimeType, 'bgSync: Db connection was succesfully closed');
     }
 
     logger.info(
@@ -165,7 +173,7 @@ class BackgroundUtils {
     );
   }
 
-  static Future<void> runSyncTask(
+  static Future<void> _runSyncTask(
     LoggingService logger,
     NetworkService networkService,
     SyncService syncService,
@@ -219,7 +227,7 @@ class BackgroundUtils {
     }
   }
 
-  static Future<void> runRecurringTransTask(
+  static Future<void> _runRecurringTransTask(
     LoggingService logger,
     TransactionsDao transactionsDao,
     UsersDao usersDao,

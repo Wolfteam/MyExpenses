@@ -4,6 +4,7 @@
 *.g.dart
 *.freezed.dart
 /lib/generated/i18n.dart
+/lib/injection.iconfig.dart
 
 # Miscellaneous
 *.class
