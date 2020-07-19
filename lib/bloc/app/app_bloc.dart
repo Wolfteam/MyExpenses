@@ -72,6 +72,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           'Recurring trans task is not registered, registering it...',
         );
         await BackgroundUtils.registerRecurringTransactionsTask();
+        _settingsService.isRecurringTransTaskRegistered = true;
       }
       _logger.info(
         runtimeType,
