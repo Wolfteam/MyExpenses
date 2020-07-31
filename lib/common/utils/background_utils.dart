@@ -84,7 +84,7 @@ class BackgroundUtils {
       constraints: Constraints(
         networkType: NetworkType.connected,
         requiresBatteryNotLow: true,
-        requiresDeviceIdle: true,
+        requiresDeviceIdle: false,
       ),
     );
   }
@@ -103,7 +103,7 @@ class BackgroundUtils {
       constraints: Constraints(
         networkType: NetworkType.not_required,
         requiresBatteryNotLow: true,
-        requiresDeviceIdle: true,
+        requiresDeviceIdle: false,
       ),
     );
   }

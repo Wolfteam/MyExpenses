@@ -30,29 +30,45 @@ class EstimatesBloc extends Bloc<EstimatesEvent, EstimatesState> {
     EstimatesEvent event,
   ) async* {
     final s = event.map(
-      load: (_) async => _calculateAmounts(0, DateTime.now()),
+      load: (_) async => _calculateAmounts(
+        0,
+        DateUtils.getFirstDayDateOfTheMonth(DateTime.now()),
+        DateUtils.getLastDayDateOfTheMonth(DateTime.now()),
+      ),
       transactionTypeChanged: (e) async => currentState.copyWith.call(selectedTransactionType: e.newValue),
-      untilDateChanged: (e) async {
-        final dateString = DateUtils.formatAppDate(e.newDate, _settings.language, DateUtils.monthDayAndYearFormat);
-        return currentState.copyWith.call(untilDate: e.newDate, untilDateString: dateString);
+      fromDateChanged: (e) async {
+        final from = e.newDate;
+        var until = currentState.untilDate;
+        if (from.isAfter(until)) {
+          until = from;
+        }
+        return _datesChanged(from, until);
       },
-      calculate: (e) => _calculateAmounts(currentState.selectedTransactionType, currentState.untilDate),
+      untilDateChanged: (e) async {
+        var from = currentState.fromDate;
+        if (e.newDate.isBefore(from)) {
+          from = e.newDate.add(const Duration(days: -1));
+        }
+        return _datesChanged(from, e.newDate);
+      },
+      calculate: (e) => _calculateAmounts(
+        currentState.selectedTransactionType,
+        currentState.fromDate,
+        currentState.untilDate,
+      ),
     );
 
     yield await s;
   }
 
-  Future<EstimatesState> _calculateAmounts(int transactionType, DateTime until) async {
-    final now = DateTime.now();
-    final firstDate = DateUtils.getFirstDayDateOfTheMonth(now);
-    final firstDateString = DateUtils.formatAppDate(firstDate, _settings.language, DateUtils.monthDayAndYearFormat);
-    final lastDate = DateUtils.getLastDayDateOfTheMonth(until);
-    final lastDateString = DateUtils.formatAppDate(lastDate, _settings.language, DateUtils.monthDayAndYearFormat);
+  Future<EstimatesState> _calculateAmounts(int transactionType, DateTime from, DateTime until) async {
+    final fromDateString = DateUtils.formatAppDate(from, _settings.language, DateUtils.monthDayAndYearFormat);
+    final untilDateString = DateUtils.formatAppDate(until, _settings.language, DateUtils.monthDayAndYearFormat);
     try {
       final currentUser = await _usersDao.getActiveUser();
-      final transactions = await _transactionsDao.getAllTransactions(currentUser?.id, firstDate, now);
+      final transactions = await _transactionsDao.getAllTransactions(currentUser?.id, from, until);
       final parentTransactions = await _transactionsDao.getAllParentTransactions(currentUser?.id);
-      final filteredParents = _generateNextTransactions(parentTransactions, lastDate);
+      final filteredParents = _generateNextTransactions(parentTransactions, until);
       transactions.addAll(filteredParents);
 
       final incomes = TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: true);
@@ -60,10 +76,10 @@ class EstimatesBloc extends Bloc<EstimatesEvent, EstimatesState> {
       final balance = TransactionUtils.roundDouble(incomes + expenses);
       return EstimatesState.loaded(
         selectedTransactionType: transactionType,
-        fromDate: firstDate,
-        fromDateString: firstDateString,
-        untilDate: lastDate,
-        untilDateString: lastDateString,
+        fromDate: from,
+        fromDateString: fromDateString,
+        untilDate: until,
+        untilDateString: untilDateString,
         currentLanguage: _settings.language,
         expenseAmount: expenses,
         incomeAmount: incomes,
@@ -73,10 +89,10 @@ class EstimatesBloc extends Bloc<EstimatesEvent, EstimatesState> {
       _logger.error(runtimeType, '_calculateAmounts: Unknown error', e, s);
       return EstimatesState.loaded(
         selectedTransactionType: transactionType,
-        fromDate: firstDate,
-        fromDateString: firstDateString,
+        fromDate: from,
+        fromDateString: fromDateString,
         untilDate: until,
-        untilDateString: lastDateString,
+        untilDateString: untilDateString,
         currentLanguage: _settings.language,
       );
     }
@@ -102,5 +118,16 @@ class EstimatesBloc extends Bloc<EstimatesEvent, EstimatesState> {
     }
 
     return transactions;
+  }
+
+  EstimatesState _datesChanged(DateTime from, DateTime until) {
+    final fromDateString = DateUtils.formatAppDate(from, _settings.language, DateUtils.monthDayAndYearFormat);
+    final untilDateString = DateUtils.formatAppDate(until, _settings.language, DateUtils.monthDayAndYearFormat);
+    return currentState.copyWith.call(
+      fromDate: from,
+      fromDateString: fromDateString,
+      untilDate: until,
+      untilDateString: untilDateString,
+    );
   }
 }

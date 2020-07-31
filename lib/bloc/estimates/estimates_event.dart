@@ -6,6 +6,8 @@ abstract class EstimatesEvent implements _$EstimatesEvent {
 
   factory EstimatesEvent.transactionTypeChanged({@required int newValue}) = EstimatesTransactionTypeChangedEvent;
 
+  factory EstimatesEvent.fromDateChanged({@required DateTime newDate}) = EstimatesFromDateChangedEvent;
+
   factory EstimatesEvent.untilDateChanged({@required DateTime newDate}) = EstimatesUntilDateChangedEvent;
 
   factory EstimatesEvent.calculate() = EstimatesCalculateEvent;

@@ -44,10 +44,16 @@ class EstimateBottomSheetDialog extends StatelessWidget {
           style: theme.textTheme.headline6,
         ),
         _buildToggleButtons(context, s.selectedTransactionType),
+        Text('${i18n.startDate}:'),
+        FlatButton(
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          onPressed: () => _changeDate(context, s.fromDate, s.currentLanguage, true),
+          child: Align(alignment: Alignment.centerLeft, child: Text(s.fromDateString)),
+        ),
         Text('${i18n.untilDate}:'),
         FlatButton(
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          onPressed: () => _changeCurrentDate(context, s.fromDate, s.untilDate, s.currentLanguage),
+          onPressed: () => _changeDate(context, s.untilDate, s.currentLanguage, false),
           child: Align(alignment: Alignment.centerLeft, child: Text(s.untilDateString)),
         ),
         Divider(color: theme.accentColor),
@@ -116,30 +122,76 @@ class EstimateBottomSheetDialog extends StatelessWidget {
     final showTotal = selectedButtons.first;
     final showIncomes = showTotal || selectedButtons[1];
     final showExpenses = showTotal || selectedButtons[2];
+
+    final textStyle = theme.textTheme.subtitle2;
+    final expenseTextStyle = textStyle.copyWith(color: Colors.red);
+    final incomeTextStyle = textStyle.copyWith(color: Colors.green);
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          if (showIncomes)
-            Text(
-              '${i18n.incomes}: ${currencyBloc.format(income)}',
-              textAlign: TextAlign.end,
-              style: theme.textTheme.subtitle2.copyWith(color: Colors.green),
+          Flexible(
+            flex: 70,
+            fit: FlexFit.tight,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                if (showIncomes)
+                  Text(
+                    '${i18n.incomes}:',
+                    textAlign: TextAlign.end,
+                    overflow: TextOverflow.ellipsis,
+                    style: incomeTextStyle,
+                  ),
+                if (showExpenses)
+                  Text(
+                    '${i18n.expenses}:',
+                    textAlign: TextAlign.end,
+                    overflow: TextOverflow.ellipsis,
+                    style: expenseTextStyle,
+                  ),
+                if (showTotal)
+                  Text(
+                    '${i18n.total}:',
+                    textAlign: TextAlign.end,
+                    style: total >= 0 ? incomeTextStyle : expenseTextStyle,
+                  ),
+              ],
             ),
-          if (showExpenses)
-            Text(
-              '${i18n.expenses}: ${currencyBloc.format(expenses)}',
-              textAlign: TextAlign.end,
-              style: theme.textTheme.subtitle2.copyWith(color: Colors.red),
+          ),
+          Flexible(
+            flex: 30,
+            fit: FlexFit.tight,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                if (showIncomes)
+                  Text(
+                    currencyBloc.format(income),
+                    textAlign: TextAlign.end,
+                    overflow: TextOverflow.ellipsis,
+                    style: incomeTextStyle,
+                  ),
+                if (showExpenses)
+                  Text(
+                    currencyBloc.format(expenses),
+                    textAlign: TextAlign.end,
+                    overflow: TextOverflow.ellipsis,
+                    style: expenseTextStyle,
+                  ),
+                if (showTotal)
+                  Text(
+                    currencyBloc.format(total),
+                    textAlign: TextAlign.end,
+                    overflow: TextOverflow.ellipsis,
+                    style: total >= 0 ? incomeTextStyle : expenseTextStyle,
+                  ),
+              ],
             ),
-          if (showTotal)
-            Text(
-              '${i18n.total}: ${currencyBloc.format(total)}',
-              textAlign: TextAlign.end,
-              style: theme.textTheme.subtitle2.copyWith(color: Colors.green),
-            ),
+          ),
         ],
       ),
     );
@@ -160,24 +212,29 @@ class EstimateBottomSheetDialog extends StatelessWidget {
     );
   }
 
-  Future<void> _changeCurrentDate(
+  Future<void> _changeDate(
     BuildContext context,
     DateTime initialDate,
-    DateTime untilDate,
     AppLanguageType language,
+    bool isFromDate,
   ) async {
+    final now = DateTime.now();
     final selectedDate = await showDatePicker(
       context: context,
-      initialDate: untilDate,
-      firstDate: DateTime.now(),
       locale: currentLocale(language),
-      lastDate: DateTime(initialDate.year + 1, initialDate.month, initialDate.day),
+      firstDate: DateTime(now.year - 1),
+      initialDate: initialDate,
+      lastDate: DateTime(now.year + 1),
     );
 
     if (selectedDate == null) {
       return;
     }
-    context.bloc<EstimatesBloc>().add(EstimatesEvent.untilDateChanged(newDate: selectedDate));
+    if (isFromDate) {
+      context.bloc<EstimatesBloc>().add(EstimatesEvent.fromDateChanged(newDate: selectedDate));
+    } else {
+      context.bloc<EstimatesBloc>().add(EstimatesEvent.untilDateChanged(newDate: selectedDate));
+    }
     context.bloc<EstimatesBloc>().add(EstimatesEvent.calculate());
   }
 

@@ -5,8 +5,8 @@ import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:moor/ffi.dart';
 import 'package:moor/moor.dart';
-import 'package:moor_ffi/moor_ffi.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -30,9 +30,9 @@ part '../../daos/transactions_dao_impl.dart';
 part '../../daos/users_dao_impl.dart';
 part 'categories.dart';
 part 'database.g.dart';
+part 'running_tasks.dart';
 part 'transactions.dart';
 part 'users.dart';
-part 'running_tasks.dart';
 
 const createdBy = 'system';
 
