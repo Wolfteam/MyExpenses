@@ -329,6 +329,120 @@
       "css": "battery",
       "code": 59419,
       "src": "entypo"
+    },
+    {
+      "uid": "032bd8bbd70adf90ead98b6813bfe446",
+      "css": "newspaper",
+      "code": 61930,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "8c3edd01b20065188120cbd76803cf6d",
+      "css": "glass_cheers",
+      "code": 63391,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "f5007b1fc91ce048d15da9ecbb45a9bb",
+      "css": "truck",
+      "code": 61649,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "1c84e3e6e855070297da0371c1e87ff1",
+      "css": "github",
+      "code": 61595,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "3f735371e15300262895e9c90dbfa3fb",
+      "css": "apple",
+      "code": 61817,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "01dc74e3aee59e69a8b75c6edb87060e",
+      "css": "windows",
+      "code": 61818,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "92a09f0c91f1cfa9b98829c4b30068d6",
+      "css": "android",
+      "code": 61819,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "cba82fa662e7f85d34a5fb102040c2c7",
+      "css": "wheelchair",
+      "code": 61843,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "fe117d6ac5580ba799b2301053a8581d",
+      "css": "google",
+      "code": 61856,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "9f0a0661e7ccf61f9cca7b0e301e2e9b",
+      "css": "google_play",
+      "code": 62379,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "30dedab0909f0cb62d30161bcaaceae2",
+      "css": "whatsapp-1",
+      "code": 59420,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "a55fa31eee1ffae4153428162fa3fff2",
+      "css": "warehouse",
+      "code": 62612,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "1116843f2cd5c6ebb79898fd9ac039f6",
+      "css": "church",
+      "code": 62749,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "39298202f2d29751e3691b61ff5090ff",
+      "css": "helicopter",
+      "code": 62771,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "ad407cd2fa15675943c32ece57ea05b5",
+      "css": "ruler",
+      "code": 62789,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "4d7dfcd1c0e6e7712ac4a1bb3ca83dc2",
+      "css": "school",
+      "code": 62793,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "e17f8e2410fadfe08d775ceded1db314",
+      "css": "drafting_compass",
+      "code": 62824,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "d6c37ff60e02f259af1970f97c9ce537",
+      "css": "fish",
+      "code": 62840,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "431225404705c838635b9686c35a2e1c",
+      "css": "bread_slice",
+      "code": 63468,
+      "src": "fontawesome5"
     }
   ]
 }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 
@@ -726,7 +727,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                 child: const Center(child: CircularProgressIndicator()),
               ),
               GestureDetector(
-                onTap: _showDeleteImageDialog,
+                onTap: () => _showImageDialog(state.imagePath),
                 child: FadeInImage(
                   fit: BoxFit.fill,
                   fadeInDuration: const Duration(seconds: 1),
@@ -898,6 +899,39 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     );
   }
 
+  void _showImageDialog(String imagePath) {
+    showDialog(
+      barrierDismissible: true,
+      context: context,
+      child: Material(
+        child: Stack(
+          fit: StackFit.expand,
+          children: <Widget>[
+            PhotoView(imageProvider: FileImage(File(imagePath))),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  IconButton(
+                    color: Colors.white,
+                    icon: Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  IconButton(
+                    color: Theme.of(context).primaryColor,
+                    icon: Icon(Icons.delete),
+                    onPressed: _showDeleteImageDialog,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showDeleteImageDialog() {
     final i18n = I18n.of(context);
     showDialog(
@@ -917,6 +951,8 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
             color: Theme.of(ctx).primaryColor,
             onPressed: () {
               context.bloc<TransactionFormBloc>().add(const ImageChanged(path: '', imageExists: false));
+              //One for this dialog and the other for the preview
+              Navigator.of(ctx).pop();
               Navigator.of(ctx).pop();
             },
             child: Text(i18n.yes),

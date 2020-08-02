@@ -11,12 +11,12 @@
 ///      fonts:
 ///       - asset: fonts/CustomIcons.ttf
 ///
-/// 
+///
 /// * Typicons, (c) Stephen Hutchings 2012
 ///         Author:    Stephen Hutchings
 ///         License:   SIL (http://scripts.sil.org/OFL)
 ///         Homepage:  http://typicons.com/
-/// * Font Awesome, Copyright (C) 2016 by Dave Gandy
+/// * Font Awesome 4, Copyright (C) 2016 by Dave Gandy
 ///         Author:    Dave Gandy
 ///         License:   SIL ()
 ///         Homepage:  http://fortawesome.github.com/Font-Awesome/
@@ -48,6 +48,10 @@
 ///         Author:    Daniel Bruce
 ///         License:   SIL (http://scripts.sil.org/OFL)
 ///         Homepage:  http://www.entypo.com
+/// * Font Awesome 5, Copyright (C) 2016 by Dave Gandy
+///         Author:    Dave Gandy
+///         License:   SIL (https://github.com/FortAwesome/Font-Awesome/blob/master/LICENSE.txt)
+///         Homepage:  http://fortawesome.github.com/Font-Awesome/
 /// * Maki, Copyright (C) Mapbox, LCC
 ///         Author:    Mapbox
 ///         License:   BSD (https://github.com/mapbox/maki/blob/gh-pages/LICENSE.txt)
@@ -60,58 +64,77 @@ class CustomIcons {
 
   static const _kFontFam = 'CustomIcons';
 
-  static const IconData flow_split = const IconData(0xe800, fontFamily: _kFontFam);
-  static const IconData help_circled = const IconData(0xe801, fontFamily: _kFontFam);
-  static const IconData card_giftcard = const IconData(0xe802, fontFamily: _kFontFam);
-  static const IconData hotel = const IconData(0xe803, fontFamily: _kFontFam);
-  static const IconData landscape = const IconData(0xe804, fontFamily: _kFontFam);
-  static const IconData local_atm = const IconData(0xe805, fontFamily: _kFontFam);
-  static const IconData music_note = const IconData(0xe806, fontFamily: _kFontFam);
-  static const IconData record_voice_over = const IconData(0xe807, fontFamily: _kFontFam);
-  static const IconData weekend = const IconData(0xe808, fontFamily: _kFontFam);
-  static const IconData heart = const IconData(0xe809, fontFamily: _kFontFam);
-  static const IconData credit_card = const IconData(0xe80a, fontFamily: _kFontFam);
-  static const IconData cloud_sun = const IconData(0xe80b, fontFamily: _kFontFam);
-  static const IconData sun_filled = const IconData(0xe80c, fontFamily: _kFontFam);
-  static const IconData dollar = const IconData(0xe80d, fontFamily: _kFontFam);
-  static const IconData na = const IconData(0xe80e, fontFamily: _kFontFam);
-  static const IconData photo = const IconData(0xe80f, fontFamily: _kFontFam);
-  static const IconData food = const IconData(0xe810, fontFamily: _kFontFam);
-  static const IconData diamond = const IconData(0xe811, fontFamily: _kFontFam);
-  static const IconData t_shirt = const IconData(0xe812, fontFamily: _kFontFam);
-  static const IconData shop = const IconData(0xe813, fontFamily: _kFontFam);
-  static const IconData picture = const IconData(0xe814, fontFamily: _kFontFam);
-  static const IconData archive = const IconData(0xe815, fontFamily: _kFontFam);
-  static const IconData drop = const IconData(0xe816, fontFamily: _kFontFam);
-  static const IconData lighter = const IconData(0xe817, fontFamily: _kFontFam);
-  static const IconData poop = const IconData(0xe818, fontFamily: _kFontFam);
-  static const IconData tools = const IconData(0xe819, fontFamily: _kFontFam);
-  static const IconData healing = const IconData(0xe81a, fontFamily: _kFontFam);
-  static const IconData battery = const IconData(0xe81b, fontFamily: _kFontFam);
-  static const IconData picture_1 = const IconData(0xe827, fontFamily: _kFontFam);
-  static const IconData book = const IconData(0xe828, fontFamily: _kFontFam);
-  static const IconData pharmacy = const IconData(0xe829, fontFamily: _kFontFam);
-  static const IconData religious_christian = const IconData(0xe82f, fontFamily: _kFontFam);
-  static const IconData tree_1 = const IconData(0xe83e, fontFamily: _kFontFam);
-  static const IconData gift = const IconData(0xe844, fontFamily: _kFontFam);
-  static const IconData money = const IconData(0xf0d6, fontFamily: _kFontFam);
-  static const IconData youtube_play = const IconData(0xf16a, fontFamily: _kFontFam);
-  static const IconData skype = const IconData(0xf17e, fontFamily: _kFontFam);
-  static const IconData steam_squared = const IconData(0xf1b7, fontFamily: _kFontFam);
-  static const IconData spotify = const IconData(0xf1bc, fontFamily: _kFontFam);
-  static const IconData soundcloud = const IconData(0xf1be, fontFamily: _kFontFam);
-  static const IconData soccer_ball = const IconData(0xf1e3, fontFamily: _kFontFam);
-  static const IconData gwallet = const IconData(0xf1ee, fontFamily: _kFontFam);
-  static const IconData cc_visa = const IconData(0xf1f0, fontFamily: _kFontFam);
-  static const IconData cc_mastercard = const IconData(0xf1f1, fontFamily: _kFontFam);
-  static const IconData cc_discover = const IconData(0xf1f2, fontFamily: _kFontFam);
-  static const IconData cc_amex = const IconData(0xf1f3, fontFamily: _kFontFam);
-  static const IconData cc_paypal = const IconData(0xf1f4, fontFamily: _kFontFam);
-  static const IconData cc_stripe = const IconData(0xf1f5, fontFamily: _kFontFam);
-  static const IconData chart_area = const IconData(0xf1fe, fontFamily: _kFontFam);
-  static const IconData facebook_official = const IconData(0xf230, fontFamily: _kFontFam);
-  static const IconData internet_explorer = const IconData(0xf26b, fontFamily: _kFontFam);
-  static const IconData amazon = const IconData(0xf270, fontFamily: _kFontFam);
-  static const IconData shopping_bag = const IconData(0xf290, fontFamily: _kFontFam);
-  static const IconData shopping_basket = const IconData(0xf291, fontFamily: _kFontFam);
+  static const IconData flow_split = IconData(0xe800, fontFamily: _kFontFam);
+  static const IconData help_circled = IconData(0xe801, fontFamily: _kFontFam);
+  static const IconData card_giftcard = IconData(0xe802, fontFamily: _kFontFam);
+  static const IconData hotel = IconData(0xe803, fontFamily: _kFontFam);
+  static const IconData landscape = IconData(0xe804, fontFamily: _kFontFam);
+  static const IconData local_atm = IconData(0xe805, fontFamily: _kFontFam);
+  static const IconData music_note = IconData(0xe806, fontFamily: _kFontFam);
+  static const IconData record_voice_over = IconData(0xe807, fontFamily: _kFontFam);
+  static const IconData weekend = IconData(0xe808, fontFamily: _kFontFam);
+  static const IconData heart = IconData(0xe809, fontFamily: _kFontFam);
+  static const IconData credit_card = IconData(0xe80a, fontFamily: _kFontFam);
+  static const IconData cloud_sun = IconData(0xe80b, fontFamily: _kFontFam);
+  static const IconData sun_filled = IconData(0xe80c, fontFamily: _kFontFam);
+  static const IconData dollar = IconData(0xe80d, fontFamily: _kFontFam);
+  static const IconData na = IconData(0xe80e, fontFamily: _kFontFam);
+  static const IconData photo = IconData(0xe80f, fontFamily: _kFontFam);
+  static const IconData food = IconData(0xe810, fontFamily: _kFontFam);
+  static const IconData diamond = IconData(0xe811, fontFamily: _kFontFam);
+  static const IconData t_shirt = IconData(0xe812, fontFamily: _kFontFam);
+  static const IconData shop = IconData(0xe813, fontFamily: _kFontFam);
+  static const IconData picture = IconData(0xe814, fontFamily: _kFontFam);
+  static const IconData archive = IconData(0xe815, fontFamily: _kFontFam);
+  static const IconData drop = IconData(0xe816, fontFamily: _kFontFam);
+  static const IconData lighter = IconData(0xe817, fontFamily: _kFontFam);
+  static const IconData poop = IconData(0xe818, fontFamily: _kFontFam);
+  static const IconData tools = IconData(0xe819, fontFamily: _kFontFam);
+  static const IconData healing = IconData(0xe81a, fontFamily: _kFontFam);
+  static const IconData battery = IconData(0xe81b, fontFamily: _kFontFam);
+  static const IconData whatsapp_1 = IconData(0xe81c, fontFamily: _kFontFam);
+  static const IconData picture_1 = IconData(0xe827, fontFamily: _kFontFam);
+  static const IconData book = IconData(0xe828, fontFamily: _kFontFam);
+  static const IconData pharmacy = IconData(0xe829, fontFamily: _kFontFam);
+  static const IconData religious_christian = IconData(0xe82f, fontFamily: _kFontFam);
+  static const IconData tree_1 = IconData(0xe83e, fontFamily: _kFontFam);
+  static const IconData gift = IconData(0xe844, fontFamily: _kFontFam);
+  static const IconData github = IconData(0xf09b, fontFamily: _kFontFam);
+  static const IconData truck = IconData(0xf0d1, fontFamily: _kFontFam);
+  static const IconData money = IconData(0xf0d6, fontFamily: _kFontFam);
+  static const IconData youtube_play = IconData(0xf16a, fontFamily: _kFontFam);
+  static const IconData apple = IconData(0xf179, fontFamily: _kFontFam);
+  static const IconData windows = IconData(0xf17a, fontFamily: _kFontFam);
+  static const IconData android = IconData(0xf17b, fontFamily: _kFontFam);
+  static const IconData skype = IconData(0xf17e, fontFamily: _kFontFam);
+  static const IconData wheelchair = IconData(0xf193, fontFamily: _kFontFam);
+  static const IconData google = IconData(0xf1a0, fontFamily: _kFontFam);
+  static const IconData steam_squared = IconData(0xf1b7, fontFamily: _kFontFam);
+  static const IconData spotify = IconData(0xf1bc, fontFamily: _kFontFam);
+  static const IconData soundcloud = IconData(0xf1be, fontFamily: _kFontFam);
+  static const IconData soccer_ball = IconData(0xf1e3, fontFamily: _kFontFam);
+  static const IconData newspaper = IconData(0xf1ea, fontFamily: _kFontFam);
+  static const IconData gwallet = IconData(0xf1ee, fontFamily: _kFontFam);
+  static const IconData cc_visa = IconData(0xf1f0, fontFamily: _kFontFam);
+  static const IconData cc_mastercard = IconData(0xf1f1, fontFamily: _kFontFam);
+  static const IconData cc_discover = IconData(0xf1f2, fontFamily: _kFontFam);
+  static const IconData cc_amex = IconData(0xf1f3, fontFamily: _kFontFam);
+  static const IconData cc_paypal = IconData(0xf1f4, fontFamily: _kFontFam);
+  static const IconData cc_stripe = IconData(0xf1f5, fontFamily: _kFontFam);
+  static const IconData chart_area = IconData(0xf1fe, fontFamily: _kFontFam);
+  static const IconData facebook_official = IconData(0xf230, fontFamily: _kFontFam);
+  static const IconData internet_explorer = IconData(0xf26b, fontFamily: _kFontFam);
+  static const IconData amazon = IconData(0xf270, fontFamily: _kFontFam);
+  static const IconData shopping_bag = IconData(0xf290, fontFamily: _kFontFam);
+  static const IconData shopping_basket = IconData(0xf291, fontFamily: _kFontFam);
+  static const IconData google_play = IconData(0xf3ab, fontFamily: _kFontFam);
+  static const IconData warehouse = IconData(0xf494, fontFamily: _kFontFam);
+  static const IconData church = IconData(0xf51d, fontFamily: _kFontFam);
+  static const IconData helicopter = IconData(0xf533, fontFamily: _kFontFam);
+  static const IconData ruler = IconData(0xf545, fontFamily: _kFontFam);
+  static const IconData school = IconData(0xf549, fontFamily: _kFontFam);
+  static const IconData drafting_compass = IconData(0xf568, fontFamily: _kFontFam);
+  static const IconData fish = IconData(0xf578, fontFamily: _kFontFam);
+  static const IconData glass_cheers = IconData(0xf79f, fontFamily: _kFontFam);
+  static const IconData bread_slice = IconData(0xf7ec, fontFamily: _kFontFam);
 }
