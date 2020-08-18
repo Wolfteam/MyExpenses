@@ -24,15 +24,12 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
   final UsersDao _usersDao;
   final SettingsService _settingsService;
 
-  @override
-  ChartsState get initialState => LoadingState();
-
   ChartsBloc(
     this._logger,
     this._transactionsDao,
     this._usersDao,
     this._settingsService,
-  );
+  ) : super(LoadingState());
 
   @override
   Stream<ChartsState> mapEventToState(
@@ -65,8 +62,7 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
         from,
         to,
       );
-      transactions
-          .sort((t1, t2) => t1.transactionDate.compareTo(t2.transactionDate));
+      transactions.sort((t1, t2) => t1.transactionDate.compareTo(t2.transactionDate));
 
       _logger.info(
         runtimeType,
@@ -107,11 +103,8 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
       final next = _getNextDate(first);
       final last = DateTime(next.year, next.month, next.day, 23, 59, 59);
 
-      final amount = TransactionUtils.getTotalTransactionAmount(transactions
-          .where((t) =>
-              t.transactionDate.isAfter(first) &&
-              t.transactionDate.isBefore(last))
-          .toList());
+      final amount = TransactionUtils.getTotalTransactionAmount(
+          transactions.where((t) => t.transactionDate.isAfter(first) && t.transactionDate.isBefore(last)).toList());
 
       final start = DateUtils.formatAppDate(
         first,

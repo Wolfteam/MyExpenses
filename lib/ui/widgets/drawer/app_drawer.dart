@@ -5,12 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../bloc/drawer/drawer_bloc.dart';
+import '../../../bloc/estimates/estimates_bloc.dart';
 import '../../../bloc/reports/reports_bloc.dart';
 import '../../../bloc/users_accounts/user_accounts_bloc.dart';
 import '../../../common/enums/app_drawer_item_type.dart';
 import '../../../common/presentation/custom_assets.dart';
 import '../../../common/utils/bloc_utils.dart';
 import '../../../generated/i18n.dart';
+import '../estimates/estimate_bottom_sheet_dialog.dart';
 import '../reports/reports_bottom_sheet_dialog.dart';
 import 'user_accounts_bottom_sheet_dialog.dart';
 
@@ -29,56 +31,15 @@ class AppDrawer extends StatelessWidget {
             padding: EdgeInsets.zero,
             children: <Widget>[
               _buildHeader(ctx, state),
-              _buildItem(
-                AppDrawerItemType.transactions,
-                context,
-                state,
-                (item, ctx) => _onSelectedItem(
-                  item,
-                  ctx,
-                ),
-              ),
-              _buildItem(
-                AppDrawerItemType.reports,
-                context,
-                state,
-                (item, ctx) => _showReportSheet(ctx),
-              ),
-              _buildItem(
-                AppDrawerItemType.charts,
-                context,
-                state,
-                (item, ctx) => _onSelectedItem(
-                  item,
-                  ctx,
-                ),
-              ),
-              _buildItem(
-                AppDrawerItemType.categories,
-                context,
-                state,
-                (item, ctx) => _onSelectedItem(
-                  item,
-                  ctx,
-                ),
-              ),
+              _buildItem(AppDrawerItemType.transactions, context, state, (item, ctx) => _onSelectedItem(item, ctx)),
+              _buildItem(AppDrawerItemType.reports, context, state, (item, ctx) => _showReportSheet(ctx)),
+              _buildItem(AppDrawerItemType.charts, context, state, (item, ctx) => _onSelectedItem(item, ctx)),
+              _buildItem(AppDrawerItemType.categories, context, state, (item, ctx) => _onSelectedItem(item, ctx)),
+              _buildItem(AppDrawerItemType.estimates, context, state, (item, ctx) => _showEstimatesBottomSheet(ctx)),
               const Divider(),
-              _buildItem(
-                AppDrawerItemType.settings,
-                context,
-                state,
-                (item, ctx) => _onSelectedItem(
-                  item,
-                  ctx,
-                ),
-              ),
+              _buildItem(AppDrawerItemType.settings, context, state, (item, ctx) => _onSelectedItem(item, ctx)),
               if (state.isUserSignedIn)
-                _buildItem(
-                  AppDrawerItemType.logout,
-                  context,
-                  state,
-                  (item, ctx) => _showSignOutDialog(ctx),
-                ),
+                _buildItem(AppDrawerItemType.logout, context, state, (item, ctx) => _showSignOutDialog(ctx)),
             ],
           ),
         );
@@ -182,6 +143,10 @@ class AppDrawer extends StatelessWidget {
         icon = Icon(Icons.arrow_back);
         text = i18n.logout;
         break;
+      case AppDrawerItemType.estimates:
+        icon = Icon(Icons.attach_money);
+        text = i18n.estimates;
+        break;
       default:
         throw Exception('Invalid drawer item = $item');
     }
@@ -207,7 +172,7 @@ class AppDrawer extends StatelessWidget {
     Navigator.pop(context);
   }
 
-  Future _showReportSheet(BuildContext context) async {
+  Future<void> _showReportSheet(BuildContext context) async {
     Navigator.pop(context);
     context.bloc<ReportsBloc>().add(const ResetReportSheet());
     //TODO: IF THE CONTENT IS TO LARGE, WE CANT CLOSE THE SHEET
@@ -222,6 +187,23 @@ class AppDrawer extends StatelessWidget {
       isScrollControlled: true,
       context: context,
       builder: (ctx) => ReportsBottomSheetDialog(),
+    );
+  }
+
+  void _showEstimatesBottomSheet(BuildContext context) {
+    Navigator.pop(context);
+    context.bloc<EstimatesBloc>().add(EstimatesEvent.load());
+    showModalBottomSheet(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(35),
+          topLeft: Radius.circular(35),
+        ),
+      ),
+      isDismissible: true,
+      isScrollControlled: true,
+      context: context,
+      builder: (ctx) => EstimateBottomSheetDialog(),
     );
   }
 

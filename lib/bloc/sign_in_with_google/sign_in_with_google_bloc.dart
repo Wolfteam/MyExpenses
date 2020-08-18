@@ -17,17 +17,13 @@ import '../../services/sync_service.dart';
 part 'sign_in_with_google_event.dart';
 part 'sign_in_with_google_state.dart';
 
-class SignInWithGoogleBloc
-    extends Bloc<SignInWithGoogleEvent, SignInWithGoogleState> {
+class SignInWithGoogleBloc extends Bloc<SignInWithGoogleEvent, SignInWithGoogleState> {
   final LoggingService _logger;
   final UsersDao _usersDao;
   final GoogleService _googleService;
   final NetworkService _networkService;
   final SecureStorageService _secureStorageService;
   final SyncService _syncService;
-
-  @override
-  SignInWithGoogleState get initialState => UnninitializedState();
 
   InitializedState get currentState => state as InitializedState;
 
@@ -38,7 +34,7 @@ class SignInWithGoogleBloc
     this._networkService,
     this._secureStorageService,
     this._syncService,
-  );
+  ) : super(UnninitializedState());
 
   @override
   Stream<SignInWithGoogleState> mapEventToState(
@@ -69,8 +65,7 @@ class SignInWithGoogleBloc
     yield currentState.copyWith(codeGranted: true);
 
     try {
-      final isSignedIn =
-          await _googleService.exchangeAuthCodeAndSaveCredentials(authCode);
+      final isSignedIn = await _googleService.exchangeAuthCodeAndSaveCredentials(authCode);
       if (!isSignedIn) {
         _logger.info(
           runtimeType,
@@ -87,8 +82,7 @@ class SignInWithGoogleBloc
         return;
       }
 
-      _logger.info(
-          runtimeType, '_signIn: Saving logged user into secure storage...');
+      _logger.info(runtimeType, '_signIn: Saving logged user into secure storage...');
 
       //This needs to be saved here before making any authenticated request
       await Future.wait([

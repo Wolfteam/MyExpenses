@@ -20,10 +20,7 @@ class CategoryFormBloc extends Bloc<CategoryFormEvent, CategoryState> {
   final CategoriesDao _categoriesDao;
   final UsersDao _usersDao;
 
-  CategoryFormBloc(this._logger, this._categoriesDao, this._usersDao);
-
-  @override
-  CategoryState get initialState => CategoryFormState.initial();
+  CategoryFormBloc(this._logger, this._categoriesDao, this._usersDao) : super(CategoryFormState.initial());
 
   CategoryFormState get currentState => state as CategoryFormState;
 
@@ -40,9 +37,7 @@ class CategoryFormBloc extends Bloc<CategoryFormEvent, CategoryState> {
         id: event.category.id,
         name: event.category.name,
         isNameValid: true,
-        type: event.category.isAnIncome
-            ? TransactionType.incomes
-            : TransactionType.expenses,
+        type: event.category.isAnIncome ? TransactionType.incomes : TransactionType.expenses,
         isTypeValid: true,
         icon: event.category.icon,
         isIconValid: true,

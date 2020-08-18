@@ -129,6 +129,11 @@
     "restartTheAppToApplyChanges": "You may need to restart the app for the changes to take effect",
     "tomorrow": "Tomorrow",
     "executesInXDays": "Executes in {x} day(s)",
+    "longDescription": "Long description",
+    "estimates": "Estimates",
+    "untilDate": "Until date",
+    "all": "All",
+    "calculate": "Calculate",
     "repetitionCycle": {
         "eachWeek": "Each week",
         "eachMonth": "Each month",

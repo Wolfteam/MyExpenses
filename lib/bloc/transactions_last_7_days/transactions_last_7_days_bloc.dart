@@ -9,11 +9,8 @@ import '../../common/enums/transaction_type.dart';
 part 'transactions_last_7_days_event.dart';
 part 'transactions_last_7_days_state.dart';
 
-class TransactionsLast7DaysBloc
-    extends Bloc<TransactionsLast7DaysEvent, TransactionsLast7DaysState> {
-  @override
-  TransactionsLast7DaysInitialState get initialState =>
-      const TransactionsLast7DaysInitialState();
+class TransactionsLast7DaysBloc extends Bloc<TransactionsLast7DaysEvent, TransactionsLast7DaysState> {
+  TransactionsLast7DaysBloc() : super(const TransactionsLast7DaysInitialState());
 
   @override
   Stream<TransactionsLast7DaysState> mapEventToState(

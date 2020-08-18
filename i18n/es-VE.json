@@ -129,6 +129,11 @@
     "restartTheAppToApplyChanges": "Puede que tengas que reinicar la aplicación, para que los cambios sean aplicados",
     "tomorrow": "Mañana",
     "executesInXDays": "Se ejecuta en {x} dia(s)",
+    "longDescription": "Descripcion larga",
+    "estimates": "Estimados",
+    "untilDate": "Hasta la fecha",
+    "all": "Todos",
+    "calculate": "Calcular",
     "repetitionCycle": {
         "eachWeek": "Cada semana",
         "eachMonth": "Cada mes",

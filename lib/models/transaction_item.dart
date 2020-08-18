@@ -19,6 +19,7 @@ class TransactionItem extends Equatable {
   final DateTime nextRecurringDate;
   final String imagePath;
   final CategoryItem category;
+  final String longDescription;
 
   bool get isChildTransaction => parentTransactionId != null;
 
@@ -34,6 +35,7 @@ class TransactionItem extends Equatable {
         nextRecurringDate,
         imagePath,
         category,
+        longDescription,
       ];
 
   const TransactionItem({
@@ -47,9 +49,9 @@ class TransactionItem extends Equatable {
     @required this.nextRecurringDate,
     @required this.imagePath,
     @required this.category,
+    this.longDescription,
   });
 
-  factory TransactionItem.fromJson(Map<String, dynamic> json) =>
-      _$TransactionItemFromJson(json);
+  factory TransactionItem.fromJson(Map<String, dynamic> json) => _$TransactionItemFromJson(json);
   Map<String, dynamic> toJson() => _$TransactionItemToJson(this);
 }

@@ -24,10 +24,7 @@ class TransactionsCardContainer extends StatelessWidget {
       child: Column(
         children: <Widget>[
           _buildHeader(context),
-          Divider(
-            color: Colors.grey,
-            height: 1,
-          ),
+          Divider(color: Colors.grey, height: 1),
           ListView.builder(
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
@@ -49,41 +46,32 @@ class TransactionsCardContainer extends StatelessWidget {
     final currencyBloc = context.bloc<CurrencyBloc>();
 
     return Padding(
-      padding: const EdgeInsets.only(
-        top: 8,
-        left: 16,
-        right: 16,
-        bottom: 5,
-      ),
+      padding: const EdgeInsets.only(top: 8, left: 10, right: 10, bottom: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Text(
-            model.dateString,
-            style: TextStyle(
-              color: Colors.grey,
-              fontSize: 12,
+          Flexible(
+            flex: 35,
+            child: Text(
+              model.dateString,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: Colors.grey, fontSize: 12),
             ),
           ),
-          RichText(
-            text: TextSpan(
-              // Note: Styles for TextSpans must be explicitly defined.
-              // Child text spans will inherit styles from parent
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
+          Flexible(
+            flex: 65,
+            child: RichText(
+              overflow: TextOverflow.ellipsis,
+              text: TextSpan(
+                // Note: Styles for TextSpans must be explicitly defined.
+                // Child text spans will inherit styles from parent
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+                children: <TextSpan>[
+                  TextSpan(text: '${i18n.expenses}: ${currencyBloc.format(model.dayExpenses)}'),
+                  const TextSpan(text: '  '),
+                  TextSpan(text: '${i18n.incomes}: ${currencyBloc.format(model.dayIncomes)}'),
+                ],
               ),
-              children: <TextSpan>[
-                TextSpan(
-                  text:
-                      '${i18n.expenses}: ${currencyBloc.format(model.dayExpenses)}',
-                ),
-                const TextSpan(text: '  '),
-                TextSpan(
-                  text:
-                      '${i18n.incomes}: ${currencyBloc.format(model.dayIncomes)}',
-                ),
-              ],
             ),
           ),
         ],

@@ -10,6 +10,8 @@ class CategoryUtils {
   //Education
   static const school = 'School';
   static const pallete = 'Pallete';
+  static const compass = 'Compass';
+  static const ruler = 'Ruler';
 
   //Electronics
   static const headset = 'Headset';
@@ -31,6 +33,7 @@ class CategoryUtils {
   static const hospital = 'Hospital';
   static const pharmacy = 'Pharmacy';
   static const gift = 'Gift';
+  static const wheelchair = 'Wheelchair';
 
   //Food icons
   static const fastFood = 'Fast Food';
@@ -40,12 +43,16 @@ class CategoryUtils {
   static const cafe = 'Cafe';
   static const pizza = 'Pizza';
   static const restaurant = 'Restaurant';
+  static const fish = 'Fish';
+  static const glass = 'Glass';
+  static const bread = 'Bread';
 
   //Furniture
   static const seat = 'Seat';
   static const weekend = 'Weekend';
   static const archive = 'Archive';
   static const bed = 'Bed';
+  static const warehouse = 'Warehouse';
 
   //Income
   static const money = 'Money';
@@ -76,7 +83,6 @@ class CategoryUtils {
   static const bike = 'Bike';
   static const run = 'Run';
   static const movies = 'Movies';
-  static const hotel = 'Hotel';
   static const map = 'Map';
   static const book = 'Book';
   static const pool = 'Pool';
@@ -96,6 +102,13 @@ class CategoryUtils {
   static const skype = 'Skype';
   static const youtube = 'Youtube';
   static const soccerBall = 'Sports';
+  static const android = 'Android';
+  static const apple = 'Apple';
+  static const windows = 'Windows';
+  static const google = 'Google';
+  static const github = 'Github';
+  static const whatsapp = 'Whatsapp';
+  static const googlePlay = 'Google Play';
 
   //Personal
   static const home = 'Home';
@@ -111,6 +124,9 @@ class CategoryUtils {
   static const chartArea = 'ChartArea';
   static const tools = 'Tools';
   static const healing = 'Healing';
+  static const newspaper = 'Newspaper';
+  static const smoke = 'Smoke';
+  static const parking = 'Parking';
 
   //Shopping
   static const shoppingCart = 'ShoppingCart';
@@ -120,6 +136,8 @@ class CategoryUtils {
   static const mall = 'Mall';
   static const shoppingBag = 'ShoppingBag';
   static const shoopingBasket = 'ShoppingBasket';
+  static const storeA = 'StoreA';
+  static const storeB = 'StoreB';
 
   //Transportation
   static const boat = 'Boat';
@@ -128,6 +146,9 @@ class CategoryUtils {
   static const subway = 'Subway';
   static const airplane = 'Airplane';
   static const taxi = 'Taxi';
+  static const motorcycle = 'Motorcycle';
+  static const truck = 'Truck';
+  static const helicopter = 'Helicopter';
 
   //Others
   static const na = 'NA';
@@ -144,6 +165,16 @@ class CategoryUtils {
     CategoryIcon(
       icon: Icon(Icons.palette),
       name: pallete,
+      type: CategoryIconType.education,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.drafting_compass),
+      name: compass,
+      type: CategoryIconType.education,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.ruler),
+      name: ruler,
       type: CategoryIconType.education,
     ),
   ];
@@ -237,6 +268,11 @@ class CategoryUtils {
       name: gift,
       type: CategoryIconType.family,
     ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.wheelchair),
+      name: wheelchair,
+      type: CategoryIconType.family,
+    )
   ];
 
   static final List<CategoryIcon> foodIcons = <CategoryIcon>[
@@ -275,6 +311,21 @@ class CategoryUtils {
       name: restaurant,
       type: CategoryIconType.food,
     ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.fish),
+      name: fish,
+      type: CategoryIconType.food,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.glass_cheers),
+      name: glass,
+      type: CategoryIconType.food,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.bread_slice),
+      name: bread,
+      type: CategoryIconType.food,
+    ),
   ];
 
   static final List<CategoryIcon> furnitureIcons = <CategoryIcon>[
@@ -296,6 +347,11 @@ class CategoryUtils {
     CategoryIcon(
       icon: Icon(CustomIcons.hotel),
       name: bed,
+      type: CategoryIconType.furniture,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.warehouse),
+      name: warehouse,
       type: CategoryIconType.furniture,
     ),
   ];
@@ -430,11 +486,6 @@ class CategoryUtils {
       type: CategoryIconType.life,
     ),
     CategoryIcon(
-      icon: Icon(Icons.local_hotel),
-      name: hotel,
-      type: CategoryIconType.life,
-    ),
-    CategoryIcon(
       icon: Icon(Icons.map),
       name: map,
       type: CategoryIconType.life,
@@ -534,6 +585,41 @@ class CategoryUtils {
       name: internet,
       type: CategoryIconType.life,
     ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.android),
+      name: android,
+      type: CategoryIconType.life,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.windows),
+      name: windows,
+      type: CategoryIconType.life,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.apple),
+      name: apple,
+      type: CategoryIconType.life,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.google),
+      name: google,
+      type: CategoryIconType.life,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.github),
+      name: github,
+      type: CategoryIconType.life,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.whatsapp_1),
+      name: whatsapp,
+      type: CategoryIconType.life,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.google_play),
+      name: googlePlay,
+      type: CategoryIconType.life,
+    ),
   ];
 
   static final List<CategoryIcon> personalIcons = <CategoryIcon>[
@@ -602,6 +688,21 @@ class CategoryUtils {
       name: healing,
       type: CategoryIconType.personal,
     ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.newspaper),
+      name: newspaper,
+      type: CategoryIconType.personal,
+    ),
+    CategoryIcon(
+      icon: Icon(Icons.smoking_rooms),
+      name: smoke,
+      type: CategoryIconType.personal,
+    ),
+    CategoryIcon(
+      icon: Icon(Icons.local_parking),
+      name: parking,
+      type: CategoryIconType.personal,
+    ),
   ];
 
   static final List<CategoryIcon> shoppingIcons = <CategoryIcon>[
@@ -640,6 +741,16 @@ class CategoryUtils {
       name: shoopingBasket,
       type: CategoryIconType.shopping,
     ),
+    CategoryIcon(
+      icon: Icon(Icons.store),
+      name: storeA,
+      type: CategoryIconType.shopping,
+    ),
+    CategoryIcon(
+      icon: Icon(Icons.local_convenience_store),
+      name: storeB,
+      type: CategoryIconType.shopping,
+    ),
   ];
 
   static final List<CategoryIcon> transportationIcon = <CategoryIcon>[
@@ -671,6 +782,21 @@ class CategoryUtils {
     CategoryIcon(
       icon: Icon(Icons.local_taxi),
       name: taxi,
+      type: CategoryIconType.transportation,
+    ),
+    CategoryIcon(
+      icon: Icon(Icons.motorcycle),
+      name: motorcycle,
+      type: CategoryIconType.transportation,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.truck),
+      name: truck,
+      type: CategoryIconType.transportation,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.helicopter),
+      name: helicopter,
       type: CategoryIconType.transportation,
     ),
   ];
@@ -713,13 +839,10 @@ class CategoryUtils {
     return icons;
   }
 
-  static CategoryIcon getByName(String name) =>
-      getAllCategoryIcons().firstWhere((c) => c.name == name);
+  static CategoryIcon getByName(String name) => getAllCategoryIcons().firstWhere((c) => c.name == name);
 
   static CategoryIcon getByNameAndType(String name, CategoryIconType type) =>
-      getAllCategoryIcons()
-          .where((i) => i.type == type)
-          .firstWhere((c) => c.name == name);
+      getAllCategoryIcons().where((i) => i.type == type).firstWhere((c) => c.name == name);
 
   static CategoryIcon getByIconData(IconData iconData) =>
       getAllCategoryIcons().firstWhere((c) => c.icon.icon == iconData);

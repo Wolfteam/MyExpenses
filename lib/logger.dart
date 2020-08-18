@@ -12,7 +12,7 @@ Future setupLogging() async {
         'type': 'CONSOLE',
         'dateFormat': 'yyyy-MM-dd HH:mm:ss',
         'format': '%d %i %t %l %m',
-        'level': 'INFO'
+        'level': 'INFO',
       },
       {
         'type': 'FILE',

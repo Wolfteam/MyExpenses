@@ -1,11 +1,9 @@
 import 'package:get_it/get_it.dart';
-import 'package:injectable/injectable.dart';
 import 'package:log_4_dart_2/log_4_dart_2.dart';
 
 import 'daos/categories_dao.dart';
 import 'daos/transactions_dao.dart';
 import 'daos/users_dao.dart';
-import 'injection.iconfig.dart';
 import 'models/entities/database.dart';
 import 'services/google_service.dart';
 import 'services/logging_service.dart';
@@ -16,7 +14,6 @@ import 'services/sync_service.dart';
 
 final GetIt getIt = GetIt.instance;
 
-@injectableInit
 void initInjection() {
   getIt.registerSingleton(Logger());
   getIt.registerSingleton<LoggingService>(LoggingServiceImpl(getIt<Logger>()));
@@ -49,6 +46,4 @@ void initInjection() {
     getIt<GoogleService>(),
     getIt<SecureStorageService>(),
   ));
-
-  $initGetIt(getIt);
 }

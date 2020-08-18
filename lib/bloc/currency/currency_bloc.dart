@@ -11,10 +11,8 @@ part 'currency_state.dart';
 
 class CurrencyBloc extends Bloc<CurrencyEvent, CurrencyState> {
   final SettingsService _settingsService;
-  @override
-  CurrencyState get initialState => CurrencyInitial();
 
-  CurrencyBloc(this._settingsService);
+  CurrencyBloc(this._settingsService) : super(CurrencyInitial());
 
   @override
   Stream<CurrencyState> mapEventToState(

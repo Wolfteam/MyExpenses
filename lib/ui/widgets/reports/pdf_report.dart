@@ -19,7 +19,6 @@ Future<Document> buildPdf(
   DateTime from,
   DateTime to,
 ) async {
-  
   final packageInfo = await PackageInfo.fromPlatform();
   final pdf = Document(
     author: packageInfo.appName,
@@ -36,8 +35,7 @@ Future<Document> buildPdf(
       italic: Font.ttf(
         await rootBundle.load(CustomAssets.fontOpenSansItalic),
       ),
-      boldItalic:
-          Font.ttf(await rootBundle.load(CustomAssets.fontOpenSansBoldItalic)),
+      boldItalic: Font.ttf(await rootBundle.load(CustomAssets.fontOpenSansBoldItalic)),
     ),
   );
 
@@ -195,7 +193,7 @@ List<Widget> _buildPdfBody(
               ),
             ),
             Text(
-              '${i18n.appVersion(packageInfo.version)}',
+              i18n.appVersion(packageInfo.version),
               style: TextStyle(
                 color: PdfColors.grey,
                 fontWeight: FontWeight.bold,
@@ -232,8 +230,7 @@ List<Widget> _buildPdfBody(
   );
 
   final transactionsMap = _buildTransactionsPerMonth(transactions);
-  final tables = transactionsMap.entries
-      .map((kvp) => _buildTable(kvp.key, kvp.value, i18n, formatter));
+  final tables = transactionsMap.entries.map((kvp) => _buildTable(kvp.key, kvp.value, i18n, formatter));
   if (tables.isEmpty) {
     return [
       Align(

@@ -24,25 +24,16 @@ import '../../services/settings_service.dart';
 part 'transaction_form_event.dart';
 part 'transaction_form_state.dart';
 
-class TransactionFormBloc
-    extends Bloc<TransactionFormEvent, TransactionFormState> {
+class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormState> {
   final LoggingService _logger;
   final TransactionsDao _transactionsDao;
   final UsersDao _usersDao;
   final SettingsService _settingsService;
 
-  TransactionFormBloc(
-    this._logger,
-    this._transactionsDao,
-    this._usersDao,
-    this._settingsService,
-  );
+  TransactionFormBloc(this._logger, this._transactionsDao, this._usersDao, this._settingsService)
+      : super(TransactionInitialState());
 
-  TransactionFormLoadedState get currentState =>
-      state as TransactionFormLoadedState;
-
-  @override
-  TransactionFormState get initialState => TransactionInitialState();
+  TransactionFormLoadedState get currentState => state as TransactionFormLoadedState;
 
   @override
   Stream<TransactionFormState> mapEventToState(
@@ -74,8 +65,7 @@ class TransactionFormBloc
         transaction.transactionDate,
       );
 
-      yield TransactionFormLoadedState.initial(_settingsService.language)
-          .copyWith(
+      yield TransactionFormLoadedState.initial(_settingsService.language).copyWith(
         id: transaction.id,
         amount: transaction.amount,
         isAmountValid: true,
@@ -98,6 +88,7 @@ class TransactionFormBloc
         imageExists: imageExists,
         isRecurringTransactionRunning: transaction.nextRecurringDate != null,
         nextRecurringDate: transaction.nextRecurringDate,
+        longDescription: transaction.longDescription,
       );
     }
 
@@ -113,6 +104,14 @@ class TransactionFormBloc
       yield currentState.copyWith(
         description: event.description,
         isDescriptionValid: _isDescriptionValid(event.description),
+        isDescriptionDirty: true,
+      );
+    }
+
+    if (event is LongDescriptionChanged) {
+      yield currentState.copyWith(
+        longDescription: event.longDescription,
+        isDescriptionValid: _isLongDescriptionValid(event.longDescription),
         isDescriptionDirty: true,
       );
     }
@@ -178,10 +177,10 @@ class TransactionFormBloc
 
   bool _isAmountValid(double amount) => amount != 0;
 
-  bool _isDescriptionValid(String description) => !description.isNullOrEmpty(
-        minLength: 1,
-        maxLength: 255,
-      );
+  bool _isDescriptionValid(String description) => !description.isNullOrEmpty(minLength: 1, maxLength: 255);
+
+  bool _isLongDescriptionValid(String description) =>
+      description.isNullEmptyOrWhitespace || !description.isNullOrEmpty(minLength: 1, maxLength: 500);
 
   bool _isTransactionDateValid(DateTime date, RepetitionCycleType cycle) {
     if (cycle == RepetitionCycleType.none) return true;
@@ -377,9 +376,8 @@ class TransactionFormBloc
     final tomorrow = now.add(const Duration(days: 1));
     final inFifteenDate = DateUtils.getNextBiweeklyDate(now);
 
-    final transactionDate = cycle == RepetitionCycleType.none
-        ? now
-        : cycle == RepetitionCycleType.biweekly ? inFifteenDate : tomorrow;
+    final transactionDate =
+        cycle == RepetitionCycleType.none ? now : cycle == RepetitionCycleType.biweekly ? inFifteenDate : tomorrow;
 
     return transactionDate;
   }

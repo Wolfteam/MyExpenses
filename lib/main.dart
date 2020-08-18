@@ -18,6 +18,7 @@ import 'bloc/chart_details/chart_details_bloc.dart';
 import 'bloc/charts/charts_bloc.dart';
 import 'bloc/currency/currency_bloc.dart';
 import 'bloc/drawer/drawer_bloc.dart';
+import 'bloc/estimates/estimates_bloc.dart';
 import 'bloc/password_dialog/password_dialog_bloc.dart';
 import 'bloc/reports/reports_bloc.dart';
 import 'bloc/settings/settings_bloc.dart';
@@ -215,6 +216,13 @@ class _MyAppState extends State<MyApp> {
               secureStorage,
               syncService,
             );
+          }),
+          BlocProvider(create: (ctx) {
+            final logger = getIt<LoggingService>();
+            final settingsService = getIt<SettingsService>();
+            final usersDao = getIt<UsersDao>();
+            final transactionsDao = getIt<TransactionsDao>();
+            return EstimatesBloc(logger, settingsService, usersDao, transactionsDao);
           }),
         ],
         child: BlocConsumer<app_bloc.AppBloc, app_bloc.AppState>(

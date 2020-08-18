@@ -13,15 +13,11 @@ import '../../services/secure_storage_service.dart';
 part 'password_dialog_event.dart';
 part 'password_dialog_state.dart';
 
-class PasswordDialogBloc
-    extends Bloc<PasswordDialogEvent, PasswordDialogState> {
+class PasswordDialogBloc extends Bloc<PasswordDialogEvent, PasswordDialogState> {
   final LoggingService _logger;
   final SecureStorageService _secureStorageService;
 
-  PasswordDialogBloc(this._logger, this._secureStorageService);
-
-  @override
-  PasswordDialogState get initialState => PasswordDialogState.initial();
+  PasswordDialogBloc(this._logger, this._secureStorageService) : super(PasswordDialogState.initial());
 
   @override
   Stream<PasswordDialogState> mapEventToState(
@@ -84,13 +80,10 @@ class PasswordDialogBloc
     }
   }
 
-  bool _isPasswordValid(String password) =>
-      !password.isNullOrEmpty(minLength: 3, maxLength: 10);
+  bool _isPasswordValid(String password) => !password.isNullOrEmpty(minLength: 3, maxLength: 10);
 
   bool _passwordMatches(String password, String confirmPassword) =>
-      _isPasswordValid(password) &&
-      _isPasswordValid(confirmPassword) &&
-      password == confirmPassword;
+      _isPasswordValid(password) && _isPasswordValid(confirmPassword) && password == confirmPassword;
 
   String _getHashedPassword(String pass) {
     final algorithm = PBKDF2(iterationCount: 100);
