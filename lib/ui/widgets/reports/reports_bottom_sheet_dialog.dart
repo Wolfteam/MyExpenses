@@ -11,6 +11,7 @@ import '../../../common/utils/toast_utils.dart';
 import '../../../generated/i18n.dart';
 import '../../../models/app_notification.dart';
 import '../modal_sheet_separator.dart';
+import '../modal_sheet_title.dart';
 
 class ReportsBottomSheetDialog extends StatelessWidget {
   @override
@@ -74,16 +75,8 @@ class ReportsBottomSheetDialog extends StatelessWidget {
 
       return [
         ModalSheetSeparator(),
-        Text(
-          i18n.exportFrom,
-          style: Theme.of(context).textTheme.headline6,
-        ),
-        Padding(
-          padding: const EdgeInsets.only(
-            top: 20,
-          ),
-          child: Text('${i18n.startDate}:'),
-        ),
+        ModalSheetTitle(title: i18n.exportFrom),
+        Text('${i18n.startDate}:'),
         FlatButton(
             onPressed: () => _showDatePicker(context, state.from, true),
             child: Align(

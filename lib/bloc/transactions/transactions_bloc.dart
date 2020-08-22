@@ -8,7 +8,6 @@ import 'package:meta/meta.dart';
 
 import '../../common/enums/app_language_type.dart';
 import '../../common/utils/date_utils.dart';
-import '../../common/utils/i18n_utils.dart';
 import '../../common/utils/transaction_utils.dart';
 import '../../daos/transactions_dao.dart';
 import '../../daos/users_dao.dart';
@@ -102,7 +101,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         '_buildInitialState: Generating transactions per month..',
       );
 
-      final transPerMonth = _buildTransactionsPerMonth(transactions);
+      final transPerMonth = TransactionUtils.buildTransactionsPerMonth(_settingsService.language, transactions);
 
       yield TransactionsLoadedState(
         month: month,
@@ -129,7 +128,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         monthBalance: _buildMonthBalance(0, 0, []),
         incomeTransactionsPerWeek: const [],
         expenseTransactionsPerWeek: const [],
-        transactionsPerMonth: _buildTransactionsPerMonth([]),
+        transactionsPerMonth: TransactionUtils.buildTransactionsPerMonth(_settingsService.language, []),
         language: _settingsService.language,
       );
     }
@@ -145,7 +144,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
       final transactions = await _transactionsDao.getAllParentTransactions(
         currentUser?.id,
       );
-      final transPerMonth = _buildTransactionsPerMonth(transactions);
+      final transPerMonth = TransactionUtils.buildTransactionsPerMonth(_settingsService.language, transactions);
       yield currentState.copyWith(
         showParentTransactions: true,
         transactionsPerMonth: transPerMonth,
@@ -258,57 +257,5 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
       );
       return [];
     }
-  }
-
-  List<TransactionCardItems> _buildTransactionsPerMonth(
-    List<TransactionItem> transactions,
-  ) {
-    final transPerMonth = <DateTime, List<TransactionItem>>{};
-
-    for (final transaction in transactions) {
-      final date = DateTime(
-        transaction.transactionDate.year,
-        transaction.transactionDate.month,
-        transaction.transactionDate.day,
-      );
-
-      if (transPerMonth.keys.any((key) => key == date)) {
-        transPerMonth[date].add(transaction);
-      } else {
-        transPerMonth.addAll({
-          date: [transaction]
-        });
-      }
-    }
-
-    final models = <TransactionCardItems>[];
-
-    for (final kvp in transPerMonth.entries) {
-      final dateString = DateUtils.formatAppDate(
-        kvp.key,
-        _settingsService.language,
-        DateUtils.dayAndMonthFormat,
-      );
-
-      final dayString = DateUtils.formatAppDate(
-        kvp.key,
-        _settingsService.language,
-        DateUtils.dayStringFormat,
-      );
-
-      final locale = currentLocaleString(_settingsService.language);
-
-      final dateSummary = '$dateString ${toBeginningOfSentenceCase(dayString, locale)}';
-
-      models.add(TransactionCardItems(
-        date: kvp.key,
-        dateString: dateSummary,
-        transactions: kvp.value,
-      ));
-    }
-
-    models.sort((t1, t2) => t2.date.compareTo(t1.date));
-
-    return models;
   }
 }

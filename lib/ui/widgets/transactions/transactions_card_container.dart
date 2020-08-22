@@ -24,11 +24,10 @@ class TransactionsCardContainer extends StatelessWidget {
       child: Column(
         children: <Widget>[
           _buildHeader(context),
-          Divider(color: Colors.grey, height: 1),
+          const Divider(color: Colors.grey, height: 1),
           ListView.builder(
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
-            scrollDirection: Axis.vertical,
             itemCount: model.transactions.length,
             itemBuilder: (context, index) {
               return transaction.TransactionItem(
@@ -55,7 +54,7 @@ class TransactionsCardContainer extends StatelessWidget {
             child: Text(
               model.dateString,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(color: Colors.grey, fontSize: 12),
+              style: const TextStyle(color: Colors.grey, fontSize: 12),
             ),
           ),
           Flexible(
@@ -65,7 +64,7 @@ class TransactionsCardContainer extends StatelessWidget {
               text: TextSpan(
                 // Note: Styles for TextSpans must be explicitly defined.
                 // Child text spans will inherit styles from parent
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
                 children: <TextSpan>[
                   TextSpan(text: '${i18n.expenses}: ${currencyBloc.format(model.dayExpenses)}'),
                   const TextSpan(text: '  '),

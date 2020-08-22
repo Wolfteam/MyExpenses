@@ -1,4 +1,8 @@
+import '../common/enums/comparer_type.dart';
 import '../common/enums/local_status_type.dart';
+import '../common/enums/sort_direction_type.dart';
+import '../common/enums/transaction_filter_type.dart';
+import '../common/enums/transaction_type.dart';
 import '../models/drive/transaction.dart' as sync_trans;
 import '../models/transaction_item.dart';
 
@@ -67,4 +71,17 @@ abstract class TransactionsDao {
   );
 
   Future<void> updateAllLocalStatus(LocalStatusType newValue);
+
+  Future<List<TransactionItem>> getAllTransactionsForSearch(
+    int userId,
+    DateTime from,
+    DateTime to,
+    String description,
+    double amount,
+    ComparerType comparerType,
+    int categoryId,
+    TransactionType transactionType,
+    TransactionFilterType transactionFilterType,
+    SortDirectionType sortDirectionType,
+  );
 }

@@ -14,7 +14,7 @@ class Initialize extends ChartDetailsEvent {
 }
 
 class FilterChanged extends ChartDetailsEvent {
-  final ChartDetailsFilterType selectedFilter;
+  final TransactionFilterType selectedFilter;
   @override
   List<Object> get props => [];
 

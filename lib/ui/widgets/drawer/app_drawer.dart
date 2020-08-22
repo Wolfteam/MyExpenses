@@ -7,11 +7,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../bloc/drawer/drawer_bloc.dart';
 import '../../../bloc/estimates/estimates_bloc.dart';
 import '../../../bloc/reports/reports_bloc.dart';
+import '../../../bloc/search/search_bloc.dart';
 import '../../../bloc/users_accounts/user_accounts_bloc.dart';
 import '../../../common/enums/app_drawer_item_type.dart';
 import '../../../common/presentation/custom_assets.dart';
+import '../../../common/styles.dart';
 import '../../../common/utils/bloc_utils.dart';
 import '../../../generated/i18n.dart';
+import '../../pages/search_page.dart';
 import '../estimates/estimate_bottom_sheet_dialog.dart';
 import '../reports/reports_bottom_sheet_dialog.dart';
 import 'user_accounts_bottom_sheet_dialog.dart';
@@ -36,6 +39,7 @@ class AppDrawer extends StatelessWidget {
               _buildItem(AppDrawerItemType.charts, context, state, (item, ctx) => _onSelectedItem(item, ctx)),
               _buildItem(AppDrawerItemType.categories, context, state, (item, ctx) => _onSelectedItem(item, ctx)),
               _buildItem(AppDrawerItemType.estimates, context, state, (item, ctx) => _showEstimatesBottomSheet(ctx)),
+              _buildItem(AppDrawerItemType.search, context, state, (item, ctx) => _showSearchPage(ctx)),
               const Divider(),
               _buildItem(AppDrawerItemType.settings, context, state, (item, ctx) => _onSelectedItem(item, ctx)),
               if (state.isUserSignedIn)
@@ -120,32 +124,36 @@ class AppDrawer extends StatelessWidget {
 
     switch (item) {
       case AppDrawerItemType.transactions:
-        icon = Icon(Icons.account_balance);
+        icon = const Icon(Icons.account_balance);
         text = i18n.transactions;
         break;
       case AppDrawerItemType.reports:
-        icon = Icon(Icons.insert_drive_file);
+        icon = const Icon(Icons.insert_drive_file);
         text = i18n.reports;
         break;
       case AppDrawerItemType.charts:
-        icon = Icon(Icons.pie_chart);
+        icon = const Icon(Icons.pie_chart);
         text = i18n.charts;
         break;
       case AppDrawerItemType.categories:
-        icon = Icon(Icons.settings);
+        icon = const Icon(Icons.settings);
         text = i18n.categories;
         break;
       case AppDrawerItemType.settings:
-        icon = Icon(Icons.settings);
+        icon = const Icon(Icons.settings);
         text = i18n.config;
         break;
       case AppDrawerItemType.logout:
-        icon = Icon(Icons.arrow_back);
+        icon = const Icon(Icons.arrow_back);
         text = i18n.logout;
         break;
       case AppDrawerItemType.estimates:
-        icon = Icon(Icons.attach_money);
+        icon = const Icon(Icons.attach_money);
         text = i18n.estimates;
+        break;
+      case AppDrawerItemType.search:
+        icon = const Icon(Icons.search);
+        text = i18n.search;
         break;
       default:
         throw Exception('Invalid drawer item = $item');
@@ -193,13 +201,9 @@ class AppDrawer extends StatelessWidget {
   void _showEstimatesBottomSheet(BuildContext context) {
     Navigator.pop(context);
     context.bloc<EstimatesBloc>().add(EstimatesEvent.load());
+
     showModalBottomSheet(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(35),
-          topLeft: Radius.circular(35),
-        ),
-      ),
+      shape: Styles.modalBottomSheetShape,
       isDismissible: true,
       isScrollControlled: true,
       context: context,
@@ -261,5 +265,11 @@ class AppDrawer extends StatelessWidget {
       context: context,
       builder: (ctx) => UserAccountsBottomSheetDialog(),
     );
+  }
+
+  Future<void> _showSearchPage(BuildContext context) async {
+    Navigator.pop(context);
+    await context.bloc<SearchBloc>().init();
+    Navigator.push(context, SearchPage.route());
   }
 }

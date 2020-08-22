@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../bloc/transactions/transactions_bloc.dart';
+import '../../common/extensions/scroll_controller_extensions.dart';
 import '../../common/utils/i18n_utils.dart';
 import '../../generated/i18n.dart';
 import '../widgets/nothing_found.dart';
@@ -34,7 +35,7 @@ class _TransactionsPageState extends State<TransactionsPage>
       duration: kThemeAnimationDuration,
       value: 1, // initially visible
     );
-    _scrollController.addListener(_onScroll);
+    _scrollController.addListener(() => _scrollController.handleScrollForFab(_hideFabAnimController));
   }
 
   @override
@@ -79,9 +80,8 @@ class _TransactionsPageState extends State<TransactionsPage>
           child: BlocBuilder<TransactionsBloc, TransactionsState>(
             builder: (ctx, state) {
               return Column(
-                mainAxisAlignment: state is TransactionsInitialState
-                    ? MainAxisAlignment.center
-                    : MainAxisAlignment.start,
+                mainAxisAlignment:
+                    state is TransactionsInitialState ? MainAxisAlignment.center : MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: _buildPage(state),
               );
@@ -97,25 +97,6 @@ class _TransactionsPageState extends State<TransactionsPage>
     _scrollController.dispose();
     _hideFabAnimController.dispose();
     super.dispose();
-  }
-
-  void _onScroll() {
-    switch (_scrollController.position.userScrollDirection) {
-      case ScrollDirection.idle:
-        break;
-      case ScrollDirection.forward:
-        _hideFabAnimController.forward();
-        break;
-      case ScrollDirection.reverse:
-        _hideFabAnimController.reverse();
-        break;
-    }
-
-    if (_scrollController.position.pixels == 0 &&
-        _scrollController.position.atEdge) {
-      //User is at the top, so lets hide the fab
-      _hideFabAnimController.reverse();
-    }
   }
 
   List<Widget> _buildPage(TransactionsState state) {
@@ -150,9 +131,7 @@ class _TransactionsPageState extends State<TransactionsPage>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               Text(
-                state.showParentTransactions
-                    ? i18n.recurringTransactions
-                    : i18n.transactions,
+                state.showParentTransactions ? i18n.recurringTransactions : i18n.transactions,
                 textAlign: TextAlign.start,
                 style: Theme.of(context).textTheme.headline6,
               ),
@@ -187,9 +166,7 @@ class _TransactionsPageState extends State<TransactionsPage>
     }
 
     return NothingFound(
-      msg: state.showParentTransactions
-          ? i18n.noRecurringTransactionsWereFound
-          : i18n.noTransactionsForThisPeriod,
+      msg: state.showParentTransactions ? i18n.noRecurringTransactionsWereFound : i18n.noTransactionsForThisPeriod,
     );
   }
 
@@ -200,9 +177,7 @@ class _TransactionsPageState extends State<TransactionsPage>
     if (!state.showParentTransactions) {
       context.bloc<TransactionsBloc>().add(const GetAllParentTransactions());
     } else {
-      context
-          .bloc<TransactionsBloc>()
-          .add(GetTransactions(inThisDate: state.currentDate));
+      context.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: state.currentDate));
     }
   }
 }

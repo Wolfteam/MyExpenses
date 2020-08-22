@@ -21,6 +21,7 @@ import 'bloc/drawer/drawer_bloc.dart';
 import 'bloc/estimates/estimates_bloc.dart';
 import 'bloc/password_dialog/password_dialog_bloc.dart';
 import 'bloc/reports/reports_bloc.dart';
+import 'bloc/search/search_bloc.dart';
 import 'bloc/settings/settings_bloc.dart';
 import 'bloc/sign_in_with_google/sign_in_with_google_bloc.dart';
 import 'bloc/transaction_form/transaction_form_bloc.dart';
@@ -223,6 +224,13 @@ class _MyAppState extends State<MyApp> {
             final usersDao = getIt<UsersDao>();
             final transactionsDao = getIt<TransactionsDao>();
             return EstimatesBloc(logger, settingsService, usersDao, transactionsDao);
+          }),
+          BlocProvider(create: (ctx) {
+            final logger = getIt<LoggingService>();
+            final settingsService = getIt<SettingsService>();
+            final usersDao = getIt<UsersDao>();
+            final transactionsDao = getIt<TransactionsDao>();
+            return SearchBloc(logger, transactionsDao, usersDao, settingsService);
           }),
         ],
         child: BlocConsumer<app_bloc.AppBloc, app_bloc.AppState>(
