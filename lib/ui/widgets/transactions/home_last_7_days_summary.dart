@@ -30,8 +30,7 @@ class HomeLast7DaysSummary extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(15),
-        child:
-            BlocBuilder<TransactionsLast7DaysBloc, TransactionsLast7DaysState>(
+        child: BlocBuilder<TransactionsLast7DaysBloc, TransactionsLast7DaysState>(
           builder: (ctx, state) => Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -82,10 +81,7 @@ class HomeLast7DaysSummary extends StatelessWidget {
         id: 'HomeLast7DaysSummary',
         data: data,
         colorFn: (item, __) => charts.ColorUtil.fromDartColor(item.color),
-        domainFn: (item, _) => DateUtils.formatDateWithoutLocale(
-          item.date,
-          DateUtils.dayAndMonthFormat,
-        ),
+        domainFn: (item, _) => DateUtils.formatDateWithoutLocale(item.date),
         measureFn: (item, _) => item.totalDayAmount,
         insideLabelStyleAccessorFn: (item, index) => labelStyle,
         outsideLabelStyleAccessorFn: (item, index) => labelStyle,
@@ -101,7 +97,6 @@ class HomeLast7DaysSummary extends StatelessWidget {
     final i18n = I18n.of(context);
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         Padding(
@@ -113,13 +108,9 @@ class HomeLast7DaysSummary extends StatelessWidget {
         ),
         PopupMenuButton(
           padding: const EdgeInsets.all(0),
-          initialValue: incomesIsChecked
-              ? TransactionType.incomes
-              : TransactionType.expenses,
+          initialValue: incomesIsChecked ? TransactionType.incomes : TransactionType.expenses,
           onSelected: (TransactionType newValue) {
-            context
-                .bloc<TransactionsLast7DaysBloc>()
-                .add(Last7DaysTransactionTypeChanged(selectedType: newValue));
+            context.bloc<TransactionsLast7DaysBloc>().add(Last7DaysTransactionTypeChanged(selectedType: newValue));
           },
           itemBuilder: (context) => <PopupMenuItem<TransactionType>>[
             CheckedPopupMenuItem<TransactionType>(
@@ -143,14 +134,12 @@ class HomeLast7DaysSummary extends StatelessWidget {
     BuildContext context,
   ) {
     final theme = Theme.of(context);
-    final lineColor =
-        theme.brightness == Brightness.dark ? Colors.white : Colors.black;
+    final lineColor = theme.brightness == Brightness.dark ? Colors.white : Colors.black;
     return Container(
       height: 180,
       child: charts.BarChart(
         _createSampleData(incomesIsChecked ? incomes : expenses, context),
         animate: true,
-        vertical: true,
         barRendererDecorator: charts.BarLabelDecorator<String>(),
         domainAxis: charts.OrdinalAxisSpec(
           showAxisLine: false,

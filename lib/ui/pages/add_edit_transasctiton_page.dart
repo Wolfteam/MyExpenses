@@ -138,14 +138,14 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         actions: [
           if (!state.isChildTransaction)
             IconButton(
-              icon: Icon(
+              icon: const Icon(
                 Icons.save,
               ),
               onPressed: state.isFormValid ? _saveTransaction : null,
             ),
           if (!state.isNewTransaction && !state.isChildTransaction)
             IconButton(
-              icon: Icon(Icons.delete),
+              icon: const Icon(Icons.delete),
               onPressed: () => _showDeleteConfirmationDialog(state),
             ),
         ],
@@ -334,7 +334,6 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                 Material(
                   elevation: 10,
                   color: theme.cardColor.withOpacity(0.8),
-                  borderOnForeground: true,
                   type: MaterialType.circle,
                   child: Padding(
                     padding: const EdgeInsets.all(10),
@@ -429,11 +428,10 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     final i18n = I18n.of(context);
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         Container(
           margin: const EdgeInsets.only(right: 10),
-          child: Icon(
+          child: const Icon(
             Icons.attach_money,
             size: 30,
           ),
@@ -442,7 +440,6 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
           child: TextFormField(
             enabled: !state.isChildTransaction,
             controller: _amountController,
-            maxLines: 1,
             minLines: 1,
             maxLength: 255,
             focusNode: _amountFocus,
@@ -475,11 +472,10 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     final i18n = I18n.of(context);
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         Container(
           margin: const EdgeInsets.only(right: 10),
-          child: Icon(
+          child: const Icon(
             Icons.note,
             size: 30,
           ),
@@ -489,7 +485,6 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
             enabled: !state.isChildTransaction,
             controller: _descriptionController,
             keyboardType: TextInputType.text,
-            maxLines: 1,
             minLines: 1,
             maxLength: 255,
             focusNode: _descriptionFocus,
@@ -517,11 +512,10 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     final i18n = I18n.of(context);
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         Container(
           margin: const EdgeInsets.only(right: 10),
-          child: Icon(
+          child: const Icon(
             Icons.note,
             size: 30,
           ),
@@ -560,12 +554,8 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     return Column(
       children: <Widget>[
         Row(
-          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Icon(
-              Icons.calendar_today,
-              size: 30,
-            ),
+            const Icon(Icons.calendar_today, size: 30),
             Expanded(
               child: FlatButton(
                 onPressed: !state.isChildTransaction ? () => _transactionDateClicked(state) : null,
@@ -610,12 +600,8 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Row(
-            mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              Icon(
-                Icons.repeat,
-                size: 30,
-              ),
+              const Icon(Icons.repeat, size: 30),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(
@@ -628,7 +614,6 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                       i18n.translateRepetitionCycleType(state.repetitionCycle),
                     ),
                     value: state.repetitionCycle,
-                    iconSize: 24,
                     underline: Container(
                       height: 0,
                       color: Colors.transparent,
@@ -675,7 +660,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     final suffixIcon = !controller.text.isNullEmptyOrWhitespace && focusNode.hasFocus
         ? IconButton(
             alignment: Alignment.bottomCenter,
-            icon: Icon(Icons.close),
+            icon: const Icon(Icons.close),
             onPressed: () => controller.clear(),
           )
         : null;
@@ -694,7 +679,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
       Text(
         i18n.addPicture,
         textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
       ),
       ButtonBar(
         alignment: MainAxisAlignment.center,
@@ -702,13 +687,13 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
           FlatButton.icon(
             textColor: theme.primaryColor,
             onPressed: !state.isChildTransaction ? () => _pickPicture(true, i18n) : null,
-            icon: Icon(Icons.photo_library),
+            icon: const Icon(Icons.photo_library),
             label: Text(i18n.fromGallery),
           ),
           FlatButton.icon(
             textColor: theme.primaryColor,
             onPressed: !state.isChildTransaction ? () => _pickPicture(false, i18n) : null,
-            icon: Icon(Icons.camera_enhance),
+            icon: const Icon(Icons.camera_enhance),
             label: Text(i18n.fromCamera),
           ),
         ],
@@ -889,7 +874,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
           RaisedButton(
             color: Theme.of(ctx).primaryColor,
             onPressed: () {
-              context.bloc<TransactionFormBloc>().add(const DeleteTransaction(keepChilds: false));
+              context.bloc<TransactionFormBloc>().add(const DeleteTransaction());
               Navigator.of(ctx).pop();
             },
             child: Text(i18n.yes),
@@ -915,12 +900,12 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                 children: <Widget>[
                   IconButton(
                     color: Colors.white,
-                    icon: Icon(Icons.close),
+                    icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context),
                   ),
                   IconButton(
                     color: Theme.of(context).primaryColor,
-                    icon: Icon(Icons.delete),
+                    icon: const Icon(Icons.delete),
                     onPressed: _showDeleteImageDialog,
                   ),
                 ],

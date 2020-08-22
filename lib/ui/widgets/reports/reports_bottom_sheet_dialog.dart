@@ -100,11 +100,7 @@ class ReportsBottomSheetDialog extends StatelessWidget {
           child: DropdownButton<ReportFileType>(
             isExpanded: true,
             hint: Text(i18n.selectFormat),
-            iconSize: 24,
-            underline: Container(
-              height: 0,
-              color: Colors.transparent,
-            ),
+            underline: Container(height: 0, color: Colors.transparent),
             value: state.selectedFileType,
             items: _buildDropdownItems(context),
             onChanged: (newValue) => _reportFileTypeChanged(context, newValue),

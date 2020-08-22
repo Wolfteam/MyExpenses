@@ -54,11 +54,8 @@ class PieChartTransactionsPerMonths extends StatelessWidget {
         domainFn: (item, _) => item.order,
         //The values here must be positives and the sum of them must be equal to 100%
         measureFn: (item, _) => item.value.abs(),
-        colorFn: (item, _) => charts.ColorUtil.fromDartColor(
-            item.categoryColor ?? item.transactionColor),
-        labelAccessorFn: (item, _) => item.dummyItem
-            ? currencyBloc.format(0)
-            : currencyBloc.format(item.value),
+        colorFn: (item, _) => charts.ColorUtil.fromDartColor(item.categoryColor ?? item.transactionColor),
+        labelAccessorFn: (item, _) => item.dummyItem ? currencyBloc.format(0) : currencyBloc.format(item.value),
         insideLabelStyleAccessorFn: (item, _) => labelsStyle,
         outsideLabelStyleAccessorFn: (item, _) => labelsStyle,
       )
@@ -75,12 +72,7 @@ class PieChartTransactionsPerMonths extends StatelessWidget {
         defaultRenderer: CustomArcRendererConfig(
           arcRatio: arcRatio,
           strokeWidthPx: 0.0,
-          arcRendererDecorators: [
-            charts.ArcLabelDecorator(
-              showLeaderLines: true,
-              labelPosition: charts.ArcLabelPosition.auto,
-            )
-          ],
+          arcRendererDecorators: [charts.ArcLabelDecorator()],
         ),
       ),
     );

@@ -46,25 +46,16 @@ class ChartGroupedTransactionsCardContainer extends StatelessWidget {
                 Text(
                   grouped.category.name,
                   textAlign: TextAlign.start,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
                 Text(
                   '$percentageString %',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],
             ),
           ),
-          Divider(
-            color: Colors.grey,
-            height: 1,
-          ),
+          const Divider(color: Colors.grey, height: 1),
           ListView.builder(
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
@@ -83,7 +74,7 @@ class ChartGroupedTransactionsCardContainer extends StatelessWidget {
             child: Text(
               '${i18n.total}: ${currencyBloc.format(grouped.total)}',
               textAlign: TextAlign.end,
-              style: TextStyle(color: Colors.grey),
+              style: const TextStyle(color: Colors.grey),
             ),
           ),
         ],

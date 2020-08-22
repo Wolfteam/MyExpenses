@@ -40,12 +40,10 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           _buildTitle(context),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               _buildPieChart(),
               _buildSummary(context),
@@ -67,7 +65,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
             style: Theme.of(context).textTheme.headline6,
           ),
           IconButton(
-            icon: Icon(Icons.swap_horiz),
+            icon: const Icon(Icons.swap_horiz),
             onPressed: () => _changeCurrentDate(context),
           ),
         ],
@@ -192,8 +190,6 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
     );
 
     if (selectedDate == null) return;
-    context
-        .bloc<TransactionsBloc>()
-        .add(GetTransactions(inThisDate: selectedDate));
+    context.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: selectedDate));
   }
 }

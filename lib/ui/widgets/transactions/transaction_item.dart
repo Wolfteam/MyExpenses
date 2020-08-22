@@ -40,7 +40,6 @@ class TransactionItem extends StatelessWidget {
 
     final amountWidget = Row(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
         Text(
@@ -52,10 +51,7 @@ class TransactionItem extends StatelessWidget {
         if (item.isChildTransaction)
           Container(
             margin: const EdgeInsets.only(left: 5),
-            child: Icon(
-              Icons.alarm,
-              size: 20,
-            ),
+            child: const Icon(Icons.alarm, size: 20),
           ),
       ],
     );

@@ -19,26 +19,25 @@ class CategoryIconsPage extends StatelessWidget {
     final i18n = I18n.of(context);
 
     return BlocBuilder<CategoryIconBloc, CategoryIconState>(
-      builder: (ctx, state) => Scaffold(
-        appBar: AppBar(
-          title: Text(i18n.pickIcon),
-          leading: const BackButton(),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.check),
-              onPressed: () => _onIconSelected(context, state),
-            ),
-          ],
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: _buildCategoryIcons(context, state),
-          ),
-        ),
-      )
-    );
+        builder: (ctx, state) => Scaffold(
+              appBar: AppBar(
+                title: Text(i18n.pickIcon),
+                leading: const BackButton(),
+                actions: <Widget>[
+                  IconButton(
+                    icon: const Icon(Icons.check),
+                    onPressed: () => _onIconSelected(context, state),
+                  ),
+                ],
+              ),
+              body: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: _buildCategoryIcons(context, state),
+                ),
+              ),
+            ));
   }
 
   List<Widget> _buildCategoryIcons(
@@ -117,9 +116,7 @@ class CategoryIconsPage extends StatelessWidget {
     return IconButton(
       key: isSelected ? _selectedKey : null,
       iconSize: 30,
-      color: isSelected
-          ? theme.primaryColor
-          : theme.brightness == Brightness.dark ? Colors.white : Colors.black87,
+      color: isSelected ? theme.primaryColor : theme.brightness == Brightness.dark ? Colors.white : Colors.black87,
       icon: icon.icon,
       onPressed: () => _onIconClick(icon, context),
     );

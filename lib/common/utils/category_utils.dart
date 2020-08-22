@@ -156,7 +156,7 @@ class CategoryUtils {
   static const waterDrop = 'Water';
   static const question = 'Help';
 
-  static final List<CategoryIcon> educationIcons = <CategoryIcon>[
+  static const List<CategoryIcon> educationIcons = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(Icons.school),
       name: school,
@@ -179,7 +179,7 @@ class CategoryUtils {
     ),
   ];
 
-  static final List<CategoryIcon> electronicIcons = <CategoryIcon>[
+  static const List<CategoryIcon> electronicIcons = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(Icons.headset),
       name: headset,
@@ -237,7 +237,7 @@ class CategoryUtils {
     ),
   ];
 
-  static final List<CategoryIcon> familyIcons = <CategoryIcon>[
+  static const List<CategoryIcon> familyIcons = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(Icons.people),
       name: people,
@@ -275,7 +275,7 @@ class CategoryUtils {
     )
   ];
 
-  static final List<CategoryIcon> foodIcons = <CategoryIcon>[
+  static const List<CategoryIcon> foodIcons = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(Icons.fastfood),
       name: fastFood,
@@ -328,7 +328,7 @@ class CategoryUtils {
     ),
   ];
 
-  static final List<CategoryIcon> furnitureIcons = <CategoryIcon>[
+  static const List<CategoryIcon> furnitureIcons = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(Icons.event_seat),
       name: seat,
@@ -356,7 +356,7 @@ class CategoryUtils {
     ),
   ];
 
-  static final List<CategoryIcon> incomeIcons = <CategoryIcon>[
+  static const List<CategoryIcon> incomeIcons = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(CustomIcons.money),
       name: money2,
@@ -429,7 +429,7 @@ class CategoryUtils {
     ),
   ];
 
-  static final List<CategoryIcon> lifeIcons = <CategoryIcon>[
+  static const List<CategoryIcon> lifeIcons = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(Icons.movie),
       name: movie,
@@ -622,7 +622,7 @@ class CategoryUtils {
     ),
   ];
 
-  static final List<CategoryIcon> personalIcons = <CategoryIcon>[
+  static const List<CategoryIcon> personalIcons = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(Icons.home),
       name: home,
@@ -705,7 +705,7 @@ class CategoryUtils {
     ),
   ];
 
-  static final List<CategoryIcon> shoppingIcons = <CategoryIcon>[
+  static const List<CategoryIcon> shoppingIcons = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(Icons.add_shopping_cart),
       name: shoppingCart,
@@ -753,7 +753,7 @@ class CategoryUtils {
     ),
   ];
 
-  static final List<CategoryIcon> transportationIcon = <CategoryIcon>[
+  static const List<CategoryIcon> transportationIcon = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(Icons.directions_boat),
       name: boat,
@@ -801,7 +801,7 @@ class CategoryUtils {
     ),
   ];
 
-  static final List<CategoryIcon> otherIcons = <CategoryIcon>[
+  static const List<CategoryIcon> otherIcons = <CategoryIcon>[
     CategoryIcon(
       icon: Icon(CustomIcons.na),
       name: na,

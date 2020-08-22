@@ -46,7 +46,7 @@ class DateUtils {
     return formatted;
   }
 
-  static DateTime getFirstDayDateOfTheMonth(DateTime from) => DateTime(from.year, from.month, 1);
+  static DateTime getFirstDayDateOfTheMonth(DateTime from) => DateTime(from.year, from.month);
 
   static DateTime getLastDayDateOfTheMonth(DateTime from) => (from.month < 12)
       ? DateTime(from.year, from.month + 1, 0, 23, 59, 59)

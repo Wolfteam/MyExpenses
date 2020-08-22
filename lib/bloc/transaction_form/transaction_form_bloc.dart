@@ -177,7 +177,7 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
 
   bool _isAmountValid(double amount) => amount != 0;
 
-  bool _isDescriptionValid(String description) => !description.isNullOrEmpty(minLength: 1, maxLength: 255);
+  bool _isDescriptionValid(String description) => !description.isNullOrEmpty(minLength: 1);
 
   bool _isLongDescriptionValid(String description) =>
       description.isNullEmptyOrWhitespace || !description.isNullOrEmpty(minLength: 1, maxLength: 500);

@@ -39,18 +39,12 @@ class UserAccountItem extends StatelessWidget {
         children: <Widget>[
           if (!isActive)
             IconButton(
-              icon: Icon(
-                Icons.check_circle_outline,
-                color: Colors.green,
-              ),
+              icon: const Icon(Icons.check_circle_outline, color: Colors.green),
               onPressed: () => _changeActiveAccount(context),
             ),
           if (canBeDeleted)
             IconButton(
-              icon: Icon(
-                Icons.delete_forever,
-                color: Colors.red,
-              ),
+              icon: const Icon(Icons.delete_forever, color: Colors.red),
               onPressed: () => _showDeleteDialog(context),
             ),
         ],

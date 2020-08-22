@@ -78,8 +78,7 @@ class _PasswordDialogState extends State<PasswordDialog> {
                   style: Theme.of(context).textTheme.headline6,
                 ),
                 _buildPasswordInput(i18n, state),
-                if (!widget.promptForPassword)
-                  _buildConfirmPasswordInput(i18n, state),
+                if (!widget.promptForPassword) _buildConfirmPasswordInput(i18n, state),
                 _buildButtons(theme, i18n, state),
               ],
             ),
@@ -102,7 +101,6 @@ class _PasswordDialogState extends State<PasswordDialog> {
   ) {
     return TextFormField(
       obscureText: !state.showPassword,
-      maxLines: 1,
       minLines: 1,
       maxLength: 10,
       controller: _passwordController,
@@ -137,7 +135,6 @@ class _PasswordDialogState extends State<PasswordDialog> {
   ) {
     return TextFormField(
       obscureText: !state.showConfirmPassword,
-      maxLines: 1,
       minLines: 1,
       maxLength: 10,
       controller: _confirmPasswordController,
@@ -156,8 +153,7 @@ class _PasswordDialogState extends State<PasswordDialog> {
         ),
       ),
       autovalidate: state.isConfirmPasswordDirty,
-      validator: (_) =>
-          state.isConfirmPasswordValid ? null : i18n.confirmPasswordIsNotValid,
+      validator: (_) => state.isConfirmPasswordValid ? null : i18n.confirmPasswordIsNotValid,
     );
   }
 
@@ -183,9 +179,7 @@ class _PasswordDialogState extends State<PasswordDialog> {
           color: theme.primaryColor,
           onPressed: !widget.promptForPassword && !state.isFormValid
               ? null
-              : !widget.promptForPassword
-                  ? _submitForm
-                  : !state.isPasswordValid ? null : _validatePassword,
+              : !widget.promptForPassword ? _submitForm : !state.isPasswordValid ? null : _validatePassword,
           child: Text(i18n.ok),
         ),
       ],
@@ -201,24 +195,17 @@ class _PasswordDialogState extends State<PasswordDialog> {
     FocusScope.of(context).requestFocus(nextFocus);
   }
 
-  void _passwordChanged() => context
-      .bloc<PasswordDialogBloc>()
-      .add(PasswordChanged(newValue: _passwordController.text));
+  void _passwordChanged() =>
+      context.bloc<PasswordDialogBloc>().add(PasswordChanged(newValue: _passwordController.text));
 
-  void _showPassword(bool show) =>
-      context.bloc<PasswordDialogBloc>().add(ShowPassword(show: show));
+  void _showPassword(bool show) => context.bloc<PasswordDialogBloc>().add(ShowPassword(show: show));
 
-  void _confirmPasswordChanged() => context
-      .bloc<PasswordDialogBloc>()
-      .add(ConfirmPasswordChanged(newValue: _confirmPasswordController.text));
+  void _confirmPasswordChanged() =>
+      context.bloc<PasswordDialogBloc>().add(ConfirmPasswordChanged(newValue: _confirmPasswordController.text));
 
-  void _showConfirmPassword(bool show) =>
-      context.bloc<PasswordDialogBloc>().add(ShowConfirmPassword(show: show));
+  void _showConfirmPassword(bool show) => context.bloc<PasswordDialogBloc>().add(ShowConfirmPassword(show: show));
 
-  void _submitForm() =>
-      context.bloc<PasswordDialogBloc>().add(const SubmitForm());
+  void _submitForm() => context.bloc<PasswordDialogBloc>().add(const SubmitForm());
 
-  void _validatePassword() => context
-      .bloc<PasswordDialogBloc>()
-      .add(ValidatePassword(_passwordController.text));
+  void _validatePassword() => context.bloc<PasswordDialogBloc>().add(ValidatePassword(_passwordController.text));
 }

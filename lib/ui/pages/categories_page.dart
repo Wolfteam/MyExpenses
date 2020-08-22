@@ -27,11 +27,7 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
 
   @override
   void initState() {
-    _tabController = TabController(
-      initialIndex: 0,
-      length: 2,
-      vsync: this,
-    );
+    _tabController = TabController(length: 2, vsync: this);
     super.initState();
   }
 
@@ -83,18 +79,8 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
   List<Tab> _buildTabs(BuildContext context) {
     final i18n = I18n.of(context);
     return [
-      Tab(
-        icon: Icon(
-          Icons.more,
-        ),
-        text: i18n.incomes,
-      ),
-      Tab(
-        icon: Icon(
-          Icons.pages,
-        ),
-        text: i18n.expenses,
-      ),
+      Tab(icon: const Icon(Icons.more), text: i18n.incomes),
+      Tab(icon: const Icon(Icons.pages), text: i18n.expenses),
     ];
   }
 

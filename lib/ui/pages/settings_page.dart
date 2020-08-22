@@ -13,19 +13,21 @@ import '../../common/enums/sync_intervals_type.dart';
 import '../../common/extensions/app_theme_type_extensions.dart';
 import '../../common/extensions/i18n_extensions.dart';
 import '../../common/presentation/custom_assets.dart';
+import '../../common/styles.dart';
 import '../../common/utils/bloc_utils.dart';
 import '../../common/utils/currency_utils.dart';
 import '../../common/utils/toast_utils.dart';
 import '../../generated/i18n.dart';
 import '../widgets/settings/password_dialog.dart';
+import '../widgets/settings/setting_card_subtitle_text.dart';
+import '../widgets/settings/settings_card_title_text.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage>
-    with AutomaticKeepAliveClientMixin<SettingsPage> {
+class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClientMixin<SettingsPage> {
   @override
   bool get wantKeepAlive => true;
 
@@ -74,6 +76,15 @@ class _SettingsPageState extends State<SettingsPage>
     ];
   }
 
+  Card _buildSettingsCard(Widget child) {
+    return Card(
+      shape: Styles.cardSettingsShape,
+      margin: Styles.edgeInsetAll10,
+      elevation: Styles.cardElevation,
+      child: Container(margin: Styles.edgeInsetAll10, padding: Styles.edgeInsetAll5, child: child),
+    );
+  }
+
   Widget _buildThemeSettings(
     BuildContext context,
     SettingsInitialState state,
@@ -83,7 +94,6 @@ class _SettingsPageState extends State<SettingsPage>
       isExpanded: true,
       hint: Text(i18n.settingsSelectAppTheme),
       value: state.appTheme,
-      iconSize: 24,
       underline: Container(
         height: 0,
         color: Colors.transparent,
@@ -93,65 +103,22 @@ class _SettingsPageState extends State<SettingsPage>
           .map<DropdownMenuItem<AppThemeType>>(
             (theme) => DropdownMenuItem<AppThemeType>(
               value: theme,
-              child: Text(
-                i18n.translateAppThemeType(theme),
-              ),
+              child: Text(i18n.translateAppThemeType(theme)),
             ),
           )
           .toList(),
     );
 
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      margin: const EdgeInsets.all(10),
-      elevation: 3,
-      child: Container(
-        margin: const EdgeInsets.all(10),
-        padding: const EdgeInsets.all(5),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Icon(Icons.color_lens),
-                Container(
-                  margin: const EdgeInsets.only(left: 5),
-                  child: Text(
-                    i18n.settingsTheme,
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 5),
-              child: Text(
-                i18n.settingsChooseAppTheme,
-                style: TextStyle(
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 16,
-                right: 16,
-              ),
-              child: dropdown,
-            ),
-            // SwitchListTile(
-            //   title: Text(i18n.settingsUseDarkAmoled),
-            //   // subtitle: Text("Usefull on amoled screens"),
-            //   value: true,
-            //   onChanged: (newValue) {},
-            // ),
-          ],
-        ),
-      ),
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        SettingsCardTitleText(text: i18n.settingsTheme, icon: const Icon(Icons.color_lens)),
+        SettingsCardSubtitleText(text: i18n.settingsChooseAppTheme),
+        Padding(padding: Styles.edgeInsetHorizontal16, child: dropdown),
+      ],
     );
+
+    return _buildSettingsCard(content);
   }
 
   Widget _buildAccentColorSettings(
@@ -167,65 +134,31 @@ class _SettingsPageState extends State<SettingsPage>
         child: Container(
           padding: const EdgeInsets.all(8),
           color: color,
-          child: state.accentColor == accentColor
-              ? Icon(
-                  Icons.check,
-                  color: Colors.white,
-                )
-              : null,
+          child: state.accentColor == accentColor ? const Icon(Icons.check, color: Colors.white) : null,
         ),
       );
 
       return widget;
     }).toList();
 
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      margin: const EdgeInsets.all(10),
-      elevation: 3,
-      child: Container(
-        margin: const EdgeInsets.all(10),
-        padding: const EdgeInsets.all(5),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Icon(Icons.colorize),
-                Container(
-                  margin: const EdgeInsets.only(left: 5),
-                  child: Text(
-                    i18n.settingsAccentColor,
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 5,
-              ),
-              child: Text(
-                i18n.settingsChooseAccentColor,
-                style: TextStyle(
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-            GridView.count(
-              shrinkWrap: true,
-              primary: false,
-              padding: const EdgeInsets.all(20),
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              crossAxisCount: 5,
-              children: accentColors,
-            ),
-          ],
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        SettingsCardTitleText(text: i18n.settingsAccentColor, icon: const Icon(Icons.colorize)),
+        SettingsCardSubtitleText(text: i18n.settingsChooseAccentColor),
+        GridView.count(
+          shrinkWrap: true,
+          primary: false,
+          padding: const EdgeInsets.all(20),
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          crossAxisCount: 5,
+          children: accentColors,
         ),
-      ),
+      ],
     );
+
+    return _buildSettingsCard(content);
   }
 
   Widget _buildLanguageSettings(
@@ -237,66 +170,30 @@ class _SettingsPageState extends State<SettingsPage>
         .map<DropdownMenuItem<AppLanguageType>>(
           (lang) => DropdownMenuItem<AppLanguageType>(
             value: lang,
-            child: Text(
-              i18n.translateAppLanguageType(lang),
-            ),
+            child: Text(i18n.translateAppLanguageType(lang)),
           ),
         )
         .toList();
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      margin: const EdgeInsets.all(10),
-      elevation: 3,
-      child: Container(
-        margin: const EdgeInsets.all(10),
-        padding: const EdgeInsets.all(5),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Icon(Icons.language),
-                Container(
-                  margin: const EdgeInsets.only(left: 5),
-                  child: Text(
-                    i18n.settingsLanguage,
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 5),
-              child: Text(
-                i18n.settingsChooseLanguage,
-                style: TextStyle(
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 16,
-                right: 16,
-              ),
-              child: DropdownButton<AppLanguageType>(
-                isExpanded: true,
-                hint: Text(i18n.settingsSelectLanguage),
-                value: state.appLanguage,
-                iconSize: 24,
-                underline: Container(
-                  height: 0,
-                  color: Colors.transparent,
-                ),
-                onChanged: _languageChanged,
-                items: dropdown,
-              ),
-            ),
-          ],
+
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        SettingsCardTitleText(text: i18n.settingsLanguage, icon: const Icon(Icons.language)),
+        SettingsCardSubtitleText(text: i18n.settingsChooseLanguage),
+        Padding(
+          padding: Styles.edgeInsetHorizontal16,
+          child: DropdownButton<AppLanguageType>(
+            isExpanded: true,
+            hint: Text(i18n.settingsSelectLanguage),
+            value: state.appLanguage,
+            underline: Container(height: 0, color: Colors.transparent),
+            onChanged: _languageChanged,
+            items: dropdown,
+          ),
         ),
-      ),
+      ],
     );
+    return _buildSettingsCard(content);
   }
 
   Widget _buildSyncSettings(
@@ -309,11 +206,7 @@ class _SettingsPageState extends State<SettingsPage>
       isExpanded: true,
       hint: Text(i18n.settingsSelectSyncInterval),
       value: state.syncInterval,
-      iconSize: 24,
-      underline: Container(
-        height: 0,
-        color: Colors.transparent,
-      ),
+      underline: Container(height: 0, color: Colors.transparent),
       onChanged: _syncIntervalChanged,
       items: SyncIntervalType.values
           .map<DropdownMenuItem<SyncIntervalType>>(
@@ -325,57 +218,21 @@ class _SettingsPageState extends State<SettingsPage>
           .toList(),
     );
 
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      margin: const EdgeInsets.all(10),
-      elevation: 3,
-      child: Container(
-        margin: const EdgeInsets.all(10),
-        padding: const EdgeInsets.all(5),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Icon(Icons.sync),
-                Container(
-                  margin: const EdgeInsets.only(left: 5),
-                  child: Text(i18n.settingsSync,
-                      style: Theme.of(context).textTheme.headline6),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 5,
-              ),
-              child: Text(
-                i18n.settingsChooseSyncInterval,
-                style: TextStyle(
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                left: 16,
-                right: 16,
-              ),
-              child: dropdown,
-            ),
-            SwitchListTile(
-              activeColor: theme.accentColor,
-              value: state.showNotifAfterFullSync,
-              title: Text(i18n.showNotificationAfterFullSync),
-              onChanged: _showNotifAfterFullSyncChanged,
-            ),
-          ],
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        SettingsCardTitleText(text: i18n.settingsSync, icon: const Icon(Icons.sync)),
+        SettingsCardSubtitleText(text: i18n.settingsChooseSyncInterval),
+        Padding(padding: Styles.edgeInsetHorizontal16, child: dropdown),
+        SwitchListTile(
+          activeColor: theme.accentColor,
+          value: state.showNotifAfterFullSync,
+          title: Text(i18n.showNotificationAfterFullSync),
+          onChanged: _showNotifAfterFullSyncChanged,
         ),
-      ),
+      ],
     );
+    return _buildSettingsCard(content);
   }
 
   Widget _buildOtherSettings(
@@ -398,9 +255,7 @@ class _SettingsPageState extends State<SettingsPage>
                       Text(i18n.currencySimbol),
                       Container(
                         margin: const EdgeInsets.only(right: 15),
-                        child: Text(
-                          CurrencyUtils.getCurrencySymbol(value),
-                        ),
+                        child: Text(CurrencyUtils.getCurrencySymbol(value)),
                       ),
                     ],
                   ),
@@ -408,11 +263,7 @@ class _SettingsPageState extends State<SettingsPage>
               ))
           .toList(),
       value: state.currencySymbol,
-      iconSize: 24,
-      underline: Container(
-        height: 0,
-        color: Colors.transparent,
-      ),
+      underline: Container(height: 0, color: Colors.transparent),
       onChanged: _currencyChanged,
       items: CurrencySymbolType.values
           .map<DropdownMenuItem<CurrencySymbolType>>(
@@ -423,77 +274,46 @@ class _SettingsPageState extends State<SettingsPage>
           )
           .toList(),
     );
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      margin: const EdgeInsets.all(10),
-      elevation: 3,
-      child: Container(
-        margin: const EdgeInsets.all(10),
-        padding: const EdgeInsets.all(5),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Icon(Icons.sync),
-                Container(
-                  margin: const EdgeInsets.only(left: 5),
-                  child: Text(
-                    i18n.others,
-                    style: theme.textTheme.headline6,
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 5,
-              ),
-              child: Text(
-                i18n.settingsOthersSubTitle,
-                style: TextStyle(
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.only(top: 10),
-              padding: const EdgeInsets.only(
-                left: 16,
-                right: 16,
-              ),
-              child: currencyDropDown,
-            ),
-            SwitchListTile(
-              activeColor: theme.accentColor,
-              value: state.currencyToTheRight,
-              title: Text(i18n.currencySymbolToRight),
-              onChanged: _currencyPlacementChanged,
-            ),
-            SwitchListTile(
-              activeColor: theme.accentColor,
-              value: state.askForPassword,
-              title: Text(i18n.askForPassword),
-              onChanged: _askForPasswordChanged,
-            ),
-            if (state.canUseFingerPrint)
-              SwitchListTile(
-                activeColor: theme.accentColor,
-                value: state.askForFingerPrint,
-                title: Text(i18n.askForFingerPrint),
-                onChanged: _askForFingerPrintChanged,
-              ),
-            SwitchListTile(
-              activeColor: theme.accentColor,
-              value: state.showNotifForRecurringTrans,
-              title: Text(i18n.showNotificationForRecurringTrans),
-              onChanged: _showNotifForRecurringTransChanged,
-            ),
-          ],
+
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        SettingsCardTitleText(text: i18n.others, icon: const Icon(Icons.sync)),
+        SettingsCardSubtitleText(text: i18n.settingsOthersSubTitle),
+        Container(
+          margin: const EdgeInsets.only(top: 10),
+          padding: Styles.edgeInsetHorizontal16,
+          child: currencyDropDown,
         ),
-      ),
+        SwitchListTile(
+          activeColor: theme.accentColor,
+          value: state.currencyToTheRight,
+          title: Text(i18n.currencySymbolToRight),
+          onChanged: _currencyPlacementChanged,
+        ),
+        SwitchListTile(
+          activeColor: theme.accentColor,
+          value: state.askForPassword,
+          title: Text(i18n.askForPassword),
+          onChanged: _askForPasswordChanged,
+        ),
+        if (state.canUseFingerPrint)
+          SwitchListTile(
+            activeColor: theme.accentColor,
+            value: state.askForFingerPrint,
+            title: Text(i18n.askForFingerPrint),
+            onChanged: _askForFingerPrintChanged,
+          ),
+        SwitchListTile(
+          activeColor: theme.accentColor,
+          value: state.showNotifForRecurringTrans,
+          title: Text(i18n.showNotificationForRecurringTrans),
+          onChanged: _showNotifForRecurringTransChanged,
+        ),
+      ],
     );
+
+    return _buildSettingsCard(content);
   }
 
   Widget _buildAboutSettings(
@@ -502,122 +322,65 @@ class _SettingsPageState extends State<SettingsPage>
     I18n i18n,
   ) {
     final textTheme = Theme.of(context).textTheme;
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      margin: const EdgeInsets.all(10),
-      elevation: 3,
-      child: Container(
-        margin: const EdgeInsets.all(10),
-        padding: const EdgeInsets.all(5),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Icon(Icons.info_outline),
-                Container(
-                  margin: const EdgeInsets.only(left: 5),
-                  child: Text(
-                    i18n.settingsAbout,
-                    style: textTheme.headline6,
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 5,
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        SettingsCardTitleText(text: i18n.settingsAbout, icon: const Icon(Icons.info_outline)),
+        SettingsCardSubtitleText(text: i18n.settingsAboutSubTitle),
+        Container(
+          margin: Styles.edgeInsetHorizontal16,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 10),
+                child: Image.asset(CustomAssets.appIcon, width: 70, height: 70),
               ),
-              child: Text(
-                i18n.settingsAboutSubTitle,
-                style: TextStyle(
-                  color: Colors.grey,
-                ),
+              Text(i18n.appName, textAlign: TextAlign.center, style: textTheme.subtitle2),
+              Text(i18n.appVersion(state.appVersion), textAlign: TextAlign.center, style: textTheme.subtitle2),
+              Text(i18n.settingsAboutSummary, textAlign: TextAlign.center),
+              Container(
+                margin: const EdgeInsets.only(top: 10),
+                child: Text(i18n.settingsDonations, style: textTheme.subtitle1.copyWith(fontWeight: FontWeight.bold)),
               ),
-            ),
-            Container(
-              margin: const EdgeInsets.only(left: 16, right: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Container(
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-                    child: Image.asset(
-                      CustomAssets.appIcon,
-                      width: 70,
-                      height: 70,
-                    ),
-                  ),
-                  Text(
-                    i18n.appName,
-                    textAlign: TextAlign.center,
-                    style: textTheme.subtitle2,
-                  ),
-                  Text(
-                    i18n.appVersion(state.appVersion),
-                    textAlign: TextAlign.center,
-                    style: textTheme.subtitle2,
-                  ),
-                  Text(
-                    i18n.settingsAboutSummary,
-                    textAlign: TextAlign.center,
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(top: 10),
-                    child: Text(
-                      i18n.settingsDonations,
-                      style: textTheme.subtitle1
-                          .copyWith(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Text(
-                    i18n.settingsDonationsMsg,
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(top: 10),
-                    child: Text(
-                      i18n.settingsSupport,
-                      style: textTheme.subtitle1
-                          .copyWith(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(top: 5),
-                    child: Text(
-                      i18n.settingsDonationSupport,
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(top: 5),
-                    child: RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: 'Github Issue Page',
-                            style: TextStyle(
-                              color: Colors.blue,
-                              decoration: TextDecoration.underline,
-                              decorationColor: Colors.blue,
-                            ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                _lauchUrl(
-                                    'https://github.com/Wolfteam/MyExpenses/Issues');
-                              },
-                          ),
-                        ],
+              Text(i18n.settingsDonationsMsg),
+              Container(
+                margin: const EdgeInsets.only(top: 10),
+                child: Text(i18n.settingsSupport, style: textTheme.subtitle1.copyWith(fontWeight: FontWeight.bold)),
+              ),
+              Container(
+                margin: const EdgeInsets.only(top: 5),
+                child: Text(i18n.settingsDonationSupport),
+              ),
+              Container(
+                margin: const EdgeInsets.only(top: 5),
+                child: RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'Github Issue Page',
+                        style: const TextStyle(
+                          color: Colors.blue,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colors.blue,
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            _lauchUrl('https://github.com/Wolfteam/MyExpenses/Issues');
+                          },
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
+      ],
     );
+
+    return _buildSettingsCard(content);
   }
 
   Future _lauchUrl(String url) async {
@@ -635,9 +398,7 @@ class _SettingsPageState extends State<SettingsPage>
 
   void _accentColorChanged(AppAccentColorType newValue) {
     context.bloc<SettingsBloc>().add(AppAccentColorChanged(newValue));
-    context
-        .bloc<app_bloc.AppBloc>()
-        .add(app_bloc.AppAccentColorChanged(newValue));
+    context.bloc<app_bloc.AppBloc>().add(app_bloc.AppAccentColorChanged(newValue));
   }
 
   void _syncIntervalChanged(SyncIntervalType newValue) =>
@@ -649,8 +410,7 @@ class _SettingsPageState extends State<SettingsPage>
     context.bloc<SettingsBloc>().add(AppLanguageChanged(newValue));
   }
 
-  void _askForFingerPrintChanged(bool ask) =>
-      context.bloc<SettingsBloc>().add(AskForFingerPrintChanged(ask: ask));
+  void _askForFingerPrintChanged(bool ask) => context.bloc<SettingsBloc>().add(AskForFingerPrintChanged(ask: ask));
 
   Future<void> _askForPasswordChanged(bool ask) async {
     if (!ask) {
@@ -660,12 +420,7 @@ class _SettingsPageState extends State<SettingsPage>
 
     final result = await showModalBottomSheet<bool>(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(35),
-          topLeft: Radius.circular(35),
-        ),
-      ),
+      shape: Styles.modalBottomSheetShape,
       isDismissible: true,
       isScrollControlled: true,
       builder: (ctx) => const PasswordDialog(),
@@ -678,29 +433,17 @@ class _SettingsPageState extends State<SettingsPage>
 
   void _currencyChanged(CurrencySymbolType newValue) {
     context.bloc<SettingsBloc>().add(CurrencyChanged(newValue));
-    BlocUtils.raiseCommonBlocEvents(
-      context,
-      reloadCharts: true,
-      reloadTransactions: true,
-    );
+    BlocUtils.raiseCommonBlocEvents(context, reloadCharts: true, reloadTransactions: true);
   }
 
   void _currencyPlacementChanged(bool newValue) {
-    context
-        .bloc<SettingsBloc>()
-        .add(CurrencyPlacementChanged(placeToTheRight: newValue));
-    BlocUtils.raiseCommonBlocEvents(
-      context,
-      reloadTransactions: true,
-      reloadCharts: true,
-    );
+    context.bloc<SettingsBloc>().add(CurrencyPlacementChanged(placeToTheRight: newValue));
+    BlocUtils.raiseCommonBlocEvents(context, reloadTransactions: true, reloadCharts: true);
   }
 
-  void _showNotifAfterFullSyncChanged(bool newValue) => context
-      .bloc<SettingsBloc>()
-      .add(ShowNotifAfterFullSyncChanged(show: newValue));
+  void _showNotifAfterFullSyncChanged(bool newValue) =>
+      context.bloc<SettingsBloc>().add(ShowNotifAfterFullSyncChanged(show: newValue));
 
-  void _showNotifForRecurringTransChanged(bool newValue) => context
-      .bloc<SettingsBloc>()
-      .add(ShowNotifForRecurringTransChanged(show: newValue));
+  void _showNotifForRecurringTransChanged(bool newValue) =>
+      context.bloc<SettingsBloc>().add(ShowNotifForRecurringTransChanged(show: newValue));
 }

@@ -108,7 +108,7 @@ class _TransactionsPageState extends State<TransactionsPage>
                   style: Theme.of(context).textTheme.headline6,
                 ),
                 IconButton(
-                  icon: Icon(Icons.swap_horiz),
+                  icon: const Icon(Icons.swap_horiz),
                   onPressed: () => _switchTransactionList(context, state),
                 ),
               ],
@@ -145,9 +145,7 @@ class _TransactionsPageState extends State<TransactionsPage>
       SliverFillRemaining(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircularProgressIndicator(),
-          ],
+          children: const [CircularProgressIndicator()],
         ),
       )
     ];

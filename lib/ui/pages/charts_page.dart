@@ -18,8 +18,7 @@ class ChartsPage extends StatefulWidget {
   _ChartsPageState createState() => _ChartsPageState();
 }
 
-class _ChartsPageState extends State<ChartsPage>
-    with AutomaticKeepAliveClientMixin<ChartsPage> {
+class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMixin<ChartsPage> {
   bool _didChangeDependencies = false;
 
   @override
@@ -67,7 +66,7 @@ class _ChartsPageState extends State<ChartsPage>
           alignment: Alignment.centerLeft,
           child: FlatButton.icon(
             onPressed: () => _changeCurrentDate(state),
-            icon: Icon(Icons.calendar_today),
+            icon: const Icon(Icons.calendar_today),
             label: Text(state.currentDateString),
           ),
         ),
@@ -91,8 +90,7 @@ class _ChartsPageState extends State<ChartsPage>
     LoadedState state,
   ) {
     final theme = Theme.of(context);
-    final lineColor =
-        theme.brightness == Brightness.dark ? Colors.white : Colors.black;
+    final lineColor = theme.brightness == Brightness.dark ? Colors.white : Colors.black;
 
     return Container(
       height: 180,
@@ -100,7 +98,6 @@ class _ChartsPageState extends State<ChartsPage>
       child: charts.BarChart(
         _createSampleDataForBarChart(context, state),
         animate: true,
-        vertical: true,
         barRendererDecorator: charts.BarLabelDecorator<String>(),
         domainAxis: charts.OrdinalAxisSpec(
           showAxisLine: false,
@@ -134,8 +131,7 @@ class _ChartsPageState extends State<ChartsPage>
     );
   }
 
-  List<charts.Series<TransactionsSummaryPerDate, String>>
-      _createSampleDataForBarChart(
+  List<charts.Series<TransactionsSummaryPerDate, String>> _createSampleDataForBarChart(
     BuildContext context,
     LoadedState state,
   ) {
@@ -155,9 +151,7 @@ class _ChartsPageState extends State<ChartsPage>
         data: state.transactionsPerDate,
         colorFn: (item, _) => item.totalAmount == 0
             ? charts.MaterialPalette.white
-            : item.isAnIncome
-                ? charts.MaterialPalette.green.shadeDefault
-                : charts.MaterialPalette.red.shadeDefault,
+            : item.isAnIncome ? charts.MaterialPalette.green.shadeDefault : charts.MaterialPalette.red.shadeDefault,
         domainFn: (item, _) => item.dateRangeString,
         measureFn: (item, _) => item.totalAmount,
         insideLabelStyleAccessorFn: (item, index) => labelStyle,
@@ -197,9 +191,7 @@ class _ChartsPageState extends State<ChartsPage>
     final isDarkTheme = theme.brightness == Brightness.dark;
     final titleStyle = theme.textTheme.subtitle2;
     final textStyle = theme.textTheme.headline6;
-    final dataToUse = incomes
-        ? state.incomeChartTransactions
-        : state.expenseChartTransactions;
+    final dataToUse = incomes ? state.incomeChartTransactions : state.expenseChartTransactions;
 
     final currencyBloc = context.bloc<CurrencyBloc>();
 
@@ -208,9 +200,7 @@ class _ChartsPageState extends State<ChartsPage>
       children: <Widget>[
         FlatButton(
           padding: const EdgeInsets.all(0),
-          onPressed: () => dataToUse.isNotEmpty
-              ? _goToDetailsPage(context, state, incomes)
-              : null,
+          onPressed: () => dataToUse.isNotEmpty ? _goToDetailsPage(context, state, incomes) : null,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
@@ -228,9 +218,7 @@ class _ChartsPageState extends State<ChartsPage>
                     margin: const EdgeInsets.only(left: 20),
                     child: Text(
                       currencyBloc.format(
-                        incomes
-                            ? state.totalIncomeAmount
-                            : state.totalExpenseAmount,
+                        incomes ? state.totalIncomeAmount : state.totalExpenseAmount,
                       ),
                       overflow: TextOverflow.ellipsis,
                       style: textStyle.copyWith(
@@ -257,9 +245,7 @@ class _ChartsPageState extends State<ChartsPage>
     LoadedState state,
     bool onlyIncomes,
   ) {
-    final transactions = state.transactions
-        .where((t) => t.category.isAnIncome == onlyIncomes)
-        .toList();
+    final transactions = state.transactions.where((t) => t.category.isAnIncome == onlyIncomes).toList();
 
     context.bloc<ChartDetailsBloc>().add(Initialize(transactions));
 
@@ -267,9 +253,7 @@ class _ChartsPageState extends State<ChartsPage>
       fullscreenDialog: true,
       builder: (ctx) => ChartDetailsPage(
         onlyIncomes: onlyIncomes,
-        chartData: onlyIncomes
-            ? state.incomeChartTransactions
-            : state.expenseChartTransactions,
+        chartData: onlyIncomes ? state.incomeChartTransactions : state.expenseChartTransactions,
       ),
     );
 
@@ -279,12 +263,11 @@ class _ChartsPageState extends State<ChartsPage>
   Future _changeCurrentDate(LoadedState state) async {
     final now = DateTime.now();
     final selectedDate = await showMonthPicker(
-      context: context,
-      initialDate: state.currentDate,
-      // firstDate: state.currentDate,
-      lastDate: DateTime(now.year + 1),
-      locale: currentLocale(state.language)
-    );
+        context: context,
+        initialDate: state.currentDate,
+        // firstDate: state.currentDate,
+        lastDate: DateTime(now.year + 1),
+        locale: currentLocale(state.language));
 
     if (selectedDate == null) return;
     context.bloc<ChartsBloc>().add(LoadChart(selectedDate));

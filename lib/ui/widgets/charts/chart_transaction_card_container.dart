@@ -47,25 +47,16 @@ class ChartTransactionCardContainer extends StatelessWidget {
                 Text(
                   dateString,
                   textAlign: TextAlign.start,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
                 Text(
                   '$percentageString %',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],
             ),
           ),
-          Divider(
-            color: Colors.grey,
-            height: 1,
-          ),
+          const Divider(color: Colors.grey, height: 1),
           trans_item.TransactionItem(item: item),
         ],
       ),

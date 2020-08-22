@@ -80,10 +80,7 @@ class CategoryFormBloc extends Bloc<CategoryFormEvent, CategoryState> {
     }
   }
 
-  bool isNameValid(String name) => !name.isNullOrEmpty(
-        minLength: 1,
-        maxLength: 255,
-      );
+  bool isNameValid(String name) => !name.isNullOrEmpty(minLength: 1);
 
   Stream<CategoryState> _saveCategory(CategoryItem category) async* {
     try {
