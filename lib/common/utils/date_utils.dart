@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:tuple/tuple.dart';
 
 import '../enums/app_language_type.dart';
 import 'i18n_utils.dart';
@@ -25,6 +26,9 @@ class DateUtils {
     String locale, [
     String format = dayAndMonthFormat,
   ]) {
+    if (date == null) {
+      return '';
+    }
     final formatter = DateFormat(format, locale);
     final formatted = formatter.format(date);
     return formatted;
@@ -34,13 +38,15 @@ class DateUtils {
     DateTime date, [
     String format = dayAndMonthFormat,
   ]) {
+    if (date == null) {
+      return '';
+    }
     final formatter = DateFormat(format);
     final formatted = formatter.format(date);
     return formatted;
   }
 
-  static DateTime getFirstDayDateOfTheMonth(DateTime from) =>
-      DateTime(from.year, from.month, 1);
+  static DateTime getFirstDayDateOfTheMonth(DateTime from) => DateTime(from.year, from.month, 1);
 
   static DateTime getLastDayDateOfTheMonth(DateTime from) => (from.month < 12)
       ? DateTime(from.year, from.month + 1, 0, 23, 59, 59)
@@ -70,9 +76,7 @@ class DateUtils {
     final lastDateOfTheMonth = getLastDayDateOfTheMonth(from);
 
     if (from.day == fifteen) {
-      return from
-          .subtract(const Duration(days: fifteen))
-          .add(Duration(days: lastDateOfTheMonth.day));
+      return from.subtract(const Duration(days: fifteen)).add(Duration(days: lastDateOfTheMonth.day));
     } else if (from.day < fifteen) {
       return DateTime(from.year, from.month, fifteen);
     } else {
@@ -82,5 +86,29 @@ class DateUtils {
         return lastDateOfTheMonth;
       }
     }
+  }
+
+  static Tuple2<DateTime, DateTime> correctDates(
+    DateTime from,
+    DateTime to, {
+    bool fromHasPriority = true,
+  }) {
+    var start = from;
+    var until = to;
+
+    if (from == null || to == null) {
+      return Tuple2(start, until);
+    }
+
+    if (fromHasPriority) {
+      if (from.isAfter(to)) {
+        until = from;
+      }
+    } else {
+      if (to.isBefore(from)) {
+        start = to.add(const Duration(days: -1));
+      }
+    }
+    return Tuple2(start, until);
   }
 }

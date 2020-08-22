@@ -1,13 +1,17 @@
 import 'dart:math';
 
+import 'package:intl/intl.dart';
 import 'package:tuple/tuple.dart';
 
 import '../../daos/transactions_dao.dart';
 import '../../daos/users_dao.dart';
+import '../../models/transaction_card_items.dart';
 import '../../models/transaction_item.dart';
 import '../../services/logging_service.dart';
+import '../enums/app_language_type.dart';
 import '../enums/repetition_cycle_type.dart';
 import 'date_utils.dart';
+import 'i18n_utils.dart';
 
 class TransactionUtils {
   static double getTotalTransactionAmounts(
@@ -135,5 +139,48 @@ class TransactionUtils {
       currentRecurringDate = getNextRecurringDate(cycle, currentRecurringDate);
     }
     return Tuple2<DateTime, List<DateTime>>(currentRecurringDate, periods);
+  }
+
+  static List<TransactionCardItems> buildTransactionsPerMonth(
+    AppLanguageType language,
+    List<TransactionItem> transactions,
+  ) {
+    final transPerMonth = <DateTime, List<TransactionItem>>{};
+
+    for (final transaction in transactions) {
+      final date = DateTime(
+        transaction.transactionDate.year,
+        transaction.transactionDate.month,
+        transaction.transactionDate.day,
+      );
+
+      if (transPerMonth.keys.any((key) => key == date)) {
+        transPerMonth[date].add(transaction);
+      } else {
+        transPerMonth.addAll({
+          date: [transaction]
+        });
+      }
+    }
+
+    final models = <TransactionCardItems>[];
+
+    for (final kvp in transPerMonth.entries) {
+      final dateString = DateUtils.formatAppDate(kvp.key, language);
+
+      final dayString = DateUtils.formatAppDate(kvp.key, language, DateUtils.dayStringFormat);
+
+      final locale = currentLocaleString(language);
+
+      final dateSummary = '$dateString ${toBeginningOfSentenceCase(dayString, locale)}';
+
+      models.add(TransactionCardItems(
+        date: kvp.key,
+        dateString: dateSummary,
+        transactions: kvp.value,
+      ));
+    }
+
+    return models;
   }
 }

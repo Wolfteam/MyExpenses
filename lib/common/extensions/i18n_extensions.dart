@@ -1,13 +1,14 @@
 import '../../common/enums/app_language_type.dart';
 import '../../common/enums/app_theme_type.dart';
 import '../../common/enums/category_icon_type.dart';
-import '../../common/enums/chart_details_filter_type.dart';
 import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/enums/report_file_type.dart';
 import '../../common/enums/sort_direction_type.dart';
 import '../../common/enums/sync_intervals_type.dart';
 import '../../common/enums/transaction_type.dart';
 import '../../generated/i18n.dart';
+import '../enums/comparer_type.dart';
+import '../enums/transaction_filter_type.dart';
 
 extension I18nExtensions on I18n {
   String translateAppThemeType(AppThemeType theme) {
@@ -110,18 +111,18 @@ extension I18nExtensions on I18n {
     }
   }
 
-  String getChartDetailsFilterName(ChartDetailsFilterType filter) {
+  String getTransactionFilterTypeName(TransactionFilterType filter) {
     switch (filter) {
-      case ChartDetailsFilterType.name:
-        return name;
-      case ChartDetailsFilterType.amount:
+      case TransactionFilterType.description:
+        return description;
+      case TransactionFilterType.amount:
         return amount;
-      case ChartDetailsFilterType.date:
+      case TransactionFilterType.date:
         return date;
-      case ChartDetailsFilterType.category:
+      case TransactionFilterType.category:
         return category;
       default:
-        throw Exception('Invalid chart details filter');
+        throw Exception('Invalid transaction filter');
     }
   }
 
@@ -144,6 +145,19 @@ extension I18nExtensions on I18n {
         return pdf;
       default:
         throw Exception('Invalid file type');
+    }
+  }
+
+  String getComparerTypeName(ComparerType comparerType) {
+    switch (comparerType) {
+      case ComparerType.equal:
+        return equal;
+      case ComparerType.greaterOrEqualThan:
+        return greaterOrEqual;
+      case ComparerType.lessOrEqualThan:
+        return lessOrEqual;
+      default:
+        throw Exception('Invalid comparer type');
     }
   }
 }
