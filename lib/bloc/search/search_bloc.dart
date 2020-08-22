@@ -18,7 +18,7 @@ part 'search_bloc.freezed.dart';
 part 'search_state.dart';
 
 class SearchBloc extends Cubit<SearchState> {
-  final LoggingService _loggingService;
+  final LoggingService _logger;
   final TransactionsDao _transactionsDao;
   final UsersDao _usersDao;
   final SettingsService _settingsService;
@@ -26,18 +26,37 @@ class SearchBloc extends Cubit<SearchState> {
   SearchInitialState get currentState => state as SearchInitialState;
 
   SearchBloc(
-    this._loggingService,
+    this._logger,
     this._transactionsDao,
     this._usersDao,
     this._settingsService,
   ) : super(SearchState.loading());
 
   Future<void> init() async {
+    emit(SearchState.loading());
     final now = DateTime.now();
     final from = DateUtils.getFirstDayDateOfTheMonth(now);
     final to = DateUtils.getLastDayDateOfTheMonth(now);
 
     return _buildInitialState(_settingsService.language, from: from, to: to);
+  }
+
+  Future<void> loadMore() async {
+    final s = currentState;
+    await Future.delayed(const Duration(milliseconds: 250));
+    await _buildInitialState(
+      s.currentLanguage,
+      page: s.page + 1,
+      from: s.from,
+      to: s.until,
+      description: s.description,
+      amount: s.amount,
+      comparerType: s.comparerType,
+      category: s.category,
+      transactionType: s.transactionType,
+      transactionFilterType: s.transactionFilterType,
+      sortDirectionType: s.sortDirectionType,
+    );
   }
 
   Future<void> descriptionChanged(String newValue) {
@@ -187,6 +206,8 @@ class SearchBloc extends Cubit<SearchState> {
 
   Future<void> _buildInitialState(
     AppLanguageType languageType, {
+    int take = 10,
+    int page = 1,
     DateTime from,
     DateTime to,
     String description,
@@ -197,23 +218,59 @@ class SearchBloc extends Cubit<SearchState> {
     TransactionFilterType transactionFilterType = TransactionFilterType.date,
     SortDirectionType sortDirectionType = SortDirectionType.desc,
   }) async {
-    final currentUser = await _usersDao.getActiveUser();
-    final transactions = await _transactionsDao.getAllTransactionsForSearch(
-      currentUser?.id,
-      from,
-      to,
-      description,
-      amount,
-      comparerType,
-      category?.id,
-      transactionType,
-      transactionFilterType,
-      sortDirectionType,
-    );
+    final skip = take * (page - 1);
+    try {
+      final currentUser = await _usersDao.getActiveUser();
+      final transactions = await _transactionsDao.getAllTransactionsForSearch(
+        currentUser?.id,
+        from,
+        to,
+        description,
+        amount,
+        comparerType,
+        category?.id,
+        transactionType,
+        transactionFilterType,
+        sortDirectionType,
+        take,
+        skip,
+      );
+      final hasReachedMax = transactions.isEmpty || transactions.length < take;
 
-    if (state is! SearchInitialState) {
-      final s = SearchState.initial(
-        currentLanguage: languageType,
+      if (state is! SearchInitialState) {
+        final s = SearchState.initial(
+          currentLanguage: languageType,
+          hasReachedMax: hasReachedMax,
+          page: page,
+          from: from,
+          until: to,
+          description: description,
+          amount: amount,
+          tempAmount: amount,
+          comparerType: comparerType,
+          tempComparerType: comparerType,
+          category: category,
+          transactionType: transactionType,
+          transactionFilterType: transactionFilterType,
+          sortDirectionType: sortDirectionType,
+          transactions: transactions,
+          tempFrom: from,
+          tempUntil: to,
+          fromString: DateUtils.formatAppDate(from, languageType, DateUtils.monthDayAndYearFormat),
+          untilString: DateUtils.formatAppDate(to, languageType, DateUtils.monthDayAndYearFormat),
+        );
+        emit(s);
+        return;
+      }
+
+      //If we can't load more results, avoid generating a new state
+      if (currentState.hasReachedMax && page > 1) {
+        return;
+      }
+
+      final s = currentState.copyWith.call(
+        hasReachedMax: hasReachedMax,
+        page: page,
         from: from,
         until: to,
         description: description,
@@ -225,35 +282,16 @@ class SearchBloc extends Cubit<SearchState> {
         transactionType: transactionType,
         transactionFilterType: transactionFilterType,
         sortDirectionType: sortDirectionType,
-        transactions: transactions,
+        transactions: page == 1 ? transactions : currentState.transactions + transactions,
         tempFrom: from,
         tempUntil: to,
         fromString: DateUtils.formatAppDate(from, languageType, DateUtils.monthDayAndYearFormat),
         untilString: DateUtils.formatAppDate(to, languageType, DateUtils.monthDayAndYearFormat),
       );
       emit(s);
-      return;
+    } catch (e, s) {
+      _logger.error(runtimeType, '_buildInitialState: Unknown error occurred', e, s);
     }
-
-    final s = currentState.copyWith.call(
-      from: from,
-      until: to,
-      description: description,
-      amount: amount,
-      tempAmount: amount,
-      comparerType: comparerType,
-      tempComparerType: comparerType,
-      category: category,
-      transactionType: transactionType,
-      transactionFilterType: transactionFilterType,
-      sortDirectionType: sortDirectionType,
-      transactions: transactions,
-      tempFrom: from,
-      tempUntil: to,
-      fromString: DateUtils.formatAppDate(from, languageType, DateUtils.monthDayAndYearFormat),
-      untilString: DateUtils.formatAppDate(to, languageType, DateUtils.monthDayAndYearFormat),
-    );
-    emit(s);
   }
 
   void _tempDatesChanged(DateTime from, DateTime to) {

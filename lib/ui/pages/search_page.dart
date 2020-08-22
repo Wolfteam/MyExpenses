@@ -13,7 +13,6 @@ import '../../common/styles.dart';
 import '../../generated/i18n.dart';
 import '../../models/category_item.dart';
 import '../../models/current_selected_category.dart';
-import '../../models/transaction_item.dart';
 import '../widgets/nothing_found.dart';
 import '../widgets/search/search_amount_filter_bottom_sheet_dialog.dart';
 import '../widgets/search/search_date_filter_bottom_sheet_dialog.dart';
@@ -41,6 +40,13 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
   ScrollController _scrollController;
   TextEditingController _searchBoxTextController;
   AnimationController _hideFabAnimController;
+  bool _isLoadingMore = false;
+
+  bool get _isBottom {
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    return currentScroll >= (maxScroll * 0.9);
+  }
 
   @override
   void initState() {
@@ -53,27 +59,18 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
       value: 1, // initially visible
     );
     _scrollController.addListener(() => _scrollController.handleScrollForFab(_hideFabAnimController));
+    _scrollController.addListener(_onScroll);
     _searchBoxTextController.addListener(_onSearchTextChanged);
   }
 
   @override
   Widget build(BuildContext context) {
-    final i18n = I18n.of(context);
-    final scaffold = Scaffold(
-      appBar: AppBar(title: Text(i18n.search)),
-      body: SingleChildScrollView(
-        controller: _scrollController,
-        child: BlocBuilder<SearchBloc, SearchState>(
-          builder: (context, state) => Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [..._buildPage(state)],
-          ),
-        ),
+    return Scaffold(
+      body: BlocBuilder<SearchBloc, SearchState>(
+        builder: (c, s) => CustomScrollView(controller: _scrollController, slivers: _buildPage(s)),
       ),
       floatingActionButton: _buildFab(),
     );
-
-    return scaffold;
   }
 
   @override
@@ -85,17 +82,76 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
   }
 
   List<Widget> _buildPage(SearchState state) {
+    final double statusBarHeight = MediaQuery.of(context).padding.top;
     final i18n = I18n.of(context);
     return state.map(
-      loading: (_) => [const Center(child: CircularProgressIndicator())],
+      loading: (_) => [
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [CircularProgressIndicator()],
+          ),
+        )
+      ],
       initial: (s) => [
-        _buildSearchBox(!s.description.isNullEmptyOrWhitespace, i18n),
-        _buildFilterBar(s.amount, s.category, s.transactionFilterType, s.sortDirectionType, s.transactionType),
-        Padding(
-          padding: Styles.edgeInsetAll10,
-          child: Text(i18n.transactions, textAlign: TextAlign.start, style: Theme.of(context).textTheme.headline6),
+        SliverAppBar(
+          title: Text(i18n.search),
+          floating: true,
+          flexibleSpace: FlexibleSpaceBar(
+            background: Container(
+              padding: EdgeInsets.only(top: statusBarHeight, bottom: 10),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  _buildSearchBox(!s.description.isNullEmptyOrWhitespace, i18n),
+                  _buildFilterBar(
+                    s.amount,
+                    s.category,
+                    s.transactionFilterType,
+                    s.sortDirectionType,
+                    s.transactionType,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          expandedHeight: 170,
+          pinned: true,
+          snap: true,
         ),
-        _buildTransactionCards(s.transactions, i18n)
+        if (s.transactions.isNotEmpty)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: Styles.edgeInsetAll10,
+              child: Text(i18n.transactions, textAlign: TextAlign.start, style: Theme.of(context).textTheme.headline6),
+            ),
+          ),
+        if (s.transactions.isNotEmpty)
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) => index >= s.transactions.length
+                  ? const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10),
+                      child: Center(
+                        child: CircularProgressIndicator(strokeWidth: 1.5),
+                      ),
+                    )
+                  : TransactionItemCardContainer(
+                      key: Key('transaction_item_${s.transactions[index].id}'),
+                      item: s.transactions[index],
+                    ),
+              childCount: s.hasReachedMax ? s.transactions.length : s.transactions.length + 1,
+            ),
+          ),
+        if (s.transactions.isEmpty)
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [NothingFound(msg: i18n.noTransactionsForThisPeriod)],
+            ),
+          )
       ],
     );
   }
@@ -104,7 +160,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
     final theme = Theme.of(context);
 
     return Card(
-      elevation: 10,
+      elevation: Styles.cardElevation,
       margin: Styles.edgeInsetAll10,
       shape: Styles.floatingCardShape,
       child: Row(
@@ -207,24 +263,6 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildTransactionCards(
-    List<TransactionItem> transactions,
-    I18n i18n,
-  ) {
-    if (transactions.isNotEmpty) {
-      return ListView.builder(
-        physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: transactions.length,
-        itemBuilder: (context, index) => TransactionItemCardContainer(item: transactions[index]),
-      );
-    }
-//TODO: CHANGE THE MSG
-    return NothingFound(
-      msg: i18n.noTransactionsForThisPeriod,
-    );
-  }
-
   Widget _buildFab() {
     return FadeTransition(
       opacity: _hideFabAnimController,
@@ -232,17 +270,22 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
         scale: _hideFabAnimController,
         child: FloatingActionButton(
           backgroundColor: Theme.of(context).primaryColor,
-          onPressed: _goToTheTop,
+          onPressed: () => _scrollController.goToTheTop(),
           child: const Icon(Icons.arrow_upward),
         ),
       ),
     );
   }
 
-  void _goToTheTop() =>
-      _scrollController.animateTo(0, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+  Future<void> _onScroll() async {
+    if (_isBottom && !_isLoadingMore) {
+      _isLoadingMore = true;
+      await context.bloc<SearchBloc>().loadMore();
+      _isLoadingMore = false;
+    }
+    return Future.value();
+  }
 
-//TODO: I THINK THE CATEGORIES FILTER SHOULD ONLY VE VISIBLE WHEN A USER IS LOGGED IN
   Future<void> _onSearchTextChanged() => context.bloc<SearchBloc>().descriptionChanged(_searchBoxTextController.text);
 
   void _cleanSearchText() {
@@ -281,10 +324,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
 
   Future<void> _showCategoriesPage(CategoryItem category) async {
     _removeSearchFocus();
-    final selectedCatProvider = Provider.of<CurrentSelectedCategory>(
-      context,
-      listen: false,
-    );
+    final selectedCatProvider = Provider.of<CurrentSelectedCategory>(context, listen: false);
 
     if (category != null && category.id > 0) {
       selectedCatProvider.currentSelectedItem = category;
@@ -293,11 +333,9 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
     final route = MaterialPageRoute<CategoryItem>(
       builder: (ctx) => CategoriesPage(isInSelectionMode: true, showDeselectButton: true, selectedCategory: category),
     );
-    final selectedCat = await Navigator.of(context).push(route);
+    await Navigator.of(context).push(route);
 
-    selectedCatProvider.currentSelectedItem = null;
-
-    await context.bloc<SearchBloc>().categoryChanged(selectedCat);
+    await context.bloc<SearchBloc>().categoryChanged(selectedCatProvider.currentSelectedItem);
   }
 
   Future<void> _transactionFilterTypeChanged(TransactionFilterType newValue) {

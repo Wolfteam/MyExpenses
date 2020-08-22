@@ -10,6 +10,7 @@ import '../../models/transaction_item.dart';
 import '../../services/logging_service.dart';
 import '../enums/app_language_type.dart';
 import '../enums/repetition_cycle_type.dart';
+import '../enums/sort_direction_type.dart';
 import 'date_utils.dart';
 import 'i18n_utils.dart';
 
@@ -143,8 +144,9 @@ class TransactionUtils {
 
   static List<TransactionCardItems> buildTransactionsPerMonth(
     AppLanguageType language,
-    List<TransactionItem> transactions,
-  ) {
+    List<TransactionItem> transactions, {
+    SortDirectionType sortType = SortDirectionType.desc,
+  }) {
     final transPerMonth = <DateTime, List<TransactionItem>>{};
 
     for (final transaction in transactions) {
@@ -179,6 +181,12 @@ class TransactionUtils {
         dateString: dateSummary,
         transactions: kvp.value,
       ));
+    }
+
+    if (sortType == SortDirectionType.asc) {
+      models.sort((t1, t2) => t1.date.compareTo(t2.date));
+    } else {
+      models.sort((t1, t2) => t2.date.compareTo(t1.date));
     }
 
     return models;

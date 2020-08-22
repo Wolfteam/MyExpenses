@@ -623,6 +623,8 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
     TransactionType transactionType,
     TransactionFilterType transactionFilterType,
     SortDirectionType sortDirectionType,
+    int take,
+    int skip,
   ) {
     var query = (select(transactions)
           ..where(
@@ -698,7 +700,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
       query = query..orderBy([orderingTerm]);
     }
 
-    return query.map(_mapToTransactionItem).get();
+    return (query..limit(take, offset: skip)).map(_mapToTransactionItem).get();
   }
 
   List<Transaction> _buildChildTransactions(

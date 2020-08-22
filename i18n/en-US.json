@@ -145,6 +145,7 @@
     "transactionDate": "Transaction date",
     "transactionType": "Transaction type",
     "clear": "Clear",
+    "noTransactionsWereFound": "No transactions were found",
     "repetitionCycle": {
         "eachWeek": "Each week",
         "eachMonth": "Each month",

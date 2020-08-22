@@ -83,5 +83,7 @@ abstract class TransactionsDao {
     TransactionType transactionType,
     TransactionFilterType transactionFilterType,
     SortDirectionType sortDirectionType,
+    int take,
+    int skip,
   );
 }

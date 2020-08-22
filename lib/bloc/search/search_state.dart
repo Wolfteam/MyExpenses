@@ -6,6 +6,8 @@ abstract class SearchState implements _$SearchState {
   factory SearchState.initial({
     @required AppLanguageType currentLanguage,
     @required List<TransactionItem> transactions,
+    @required int page,
+    @required bool hasReachedMax,
     DateTime from,
     DateTime until,
     DateTime tempFrom,
