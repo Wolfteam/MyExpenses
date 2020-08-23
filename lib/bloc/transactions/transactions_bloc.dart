@@ -1,12 +1,13 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 
 import '../../common/enums/app_language_type.dart';
+import '../../common/enums/transaction_type.dart';
 import '../../common/utils/date_utils.dart';
 import '../../common/utils/transaction_utils.dart';
 import '../../daos/transactions_dao.dart';
@@ -17,140 +18,118 @@ import '../../models/transactions_summary_per_day.dart';
 import '../../models/transactions_summary_per_month.dart';
 import '../../services/logging_service.dart';
 import '../../services/settings_service.dart';
+import '../transactions_last_7_days/transactions_last_7_days_bloc.dart';
+import '../transactions_per_month/transactions_per_month_bloc.dart';
 
-part 'transactions_event.dart';
+part 'transactions_bloc.freezed.dart';
 part 'transactions_state.dart';
 
-class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
+class TransactionsBloc extends Cubit<TransactionsState> {
   final LoggingService _logger;
   final TransactionsDao _transactionsDao;
   final UsersDao _usersDao;
   final SettingsService _settingsService;
 
-  TransactionsBloc(this._logger, this._transactionsDao, this._usersDao, this._settingsService)
-      : super(TransactionsInitialState());
+  final TransactionsPerMonthBloc _transactionsPerMonthBloc;
+  final TransactionsLast7DaysBloc _transactionsLast7DaysBloc;
+
+  TransactionsBloc(
+    this._logger,
+    this._transactionsDao,
+    this._usersDao,
+    this._settingsService,
+    this._transactionsPerMonthBloc,
+    this._transactionsLast7DaysBloc,
+  ) : super(TransactionsState.initial());
 
   TransactionsLoadedState get currentState => state as TransactionsLoadedState;
 
-  @override
-  Stream<TransactionsState> mapEventToState(
-    TransactionsEvent event,
-  ) async* {
-    if (event is GetTransactions) {
-      yield* _buildInitialState(event);
-    }
-
-    if (event is GetAllParentTransactions) {
-      yield* _buildRecurringState();
-    }
-  }
-
-  Stream<TransactionsLoadedState> _buildInitialState(
-    GetTransactions event,
-  ) async* {
+  Future<void> loadTransactions(DateTime inThisDate) async {
     final month = toBeginningOfSentenceCase(DateUtils.formatAppDate(
-      event.inThisDate,
+      inThisDate,
       _settingsService.language,
       DateUtils.fullMonthFormat,
     ));
     final now = DateTime.now();
-    final from = DateUtils.getFirstDayDateOfTheMonth(event.inThisDate);
+    final from = DateUtils.getFirstDayDateOfTheMonth(inThisDate);
     final to = DateUtils.getLastDayDateOfTheMonth(from);
 
     try {
       if (from.isBefore(now) || from.isAtSameMomentAs(now)) {
-        await TransactionUtils.checkRecurringTransactions(
-          now,
-          _logger,
-          _transactionsDao,
-          _usersDao,
-        );
+        await TransactionUtils.checkRecurringTransactions(now, _logger, _transactionsDao, _usersDao);
       }
 
-      _logger.info(
-        runtimeType,
-        '_buildInitialState: Getting all the transactions from = $from to = $to',
-      );
+      _logger.info(runtimeType, '_buildInitialState: Getting all the transactions from = $from to = $to');
       final currentUser = await _usersDao.getActiveUser();
-      final transactions = await _transactionsDao.getAllTransactions(
-        currentUser?.id,
-        from,
-        to,
-      );
+      final transactions = await _transactionsDao.getAllTransactions(currentUser?.id, from, to);
 
       final incomes = _getTotalIncomes(transactions);
       final expenses = _getTotalExpenses(transactions);
       final balance = TransactionUtils.roundDouble(incomes + expenses);
 
-      _logger.info(
-        runtimeType,
-        '_buildInitialState: Generating month balance...',
-      );
+      _logger.info(runtimeType, '_buildInitialState: Generating month balance...');
       final monthBalance = _buildMonthBalance(incomes, expenses, transactions);
 
-      _logger.info(
-        runtimeType,
-        '_buildInitialState: Generating incomes / expenses transactions per week...',
-      );
+      _logger.info(runtimeType, '_buildInitialState: Generating incomes / expenses transactions per week...');
 
       final incomeTransPerWeek = await _buildTransactionSummaryPerDay(onlyIncomes: true);
       final expenseTransPerWeek = await _buildTransactionSummaryPerDay(onlyIncomes: false);
 
-      _logger.info(
-        runtimeType,
-        '_buildInitialState: Generating transactions per month..',
-      );
+      _logger.info(runtimeType, '_buildInitialState: Generating transactions per month..');
 
       final transPerMonth = TransactionUtils.buildTransactionsPerMonth(_settingsService.language, transactions);
 
-      yield TransactionsLoadedState(
-        month: month,
-        incomeAmount: incomes,
-        expenseAmount: expenses,
-        balanceAmount: balance,
-        currentDate: event.inThisDate,
-        showLast7Days: DateTime.now().month == event.inThisDate.month,
-        monthBalance: monthBalance,
-        incomeTransactionsPerWeek: incomeTransPerWeek,
-        expenseTransactionsPerWeek: expenseTransPerWeek,
+      _transactionsPerMonthBloc.transactionsLoaded(incomes, expenses, balance, month, monthBalance, inThisDate);
+
+      final showLast7Days = DateTime.now().month == inThisDate.month;
+      if (state is! TransactionsLoadedState) {
+        _transactionsLast7DaysBloc.transactionsLoaded(
+          selectedType: TransactionType.incomes,
+          incomes: incomeTransPerWeek,
+          expenses: expenseTransPerWeek,
+          showLast7Days: showLast7Days,
+        );
+
+        emit(TransactionsState.loaded(
+          currentDate: inThisDate,
+          transactionsPerMonth: transPerMonth,
+          language: _settingsService.language,
+        ));
+        return;
+      }
+      _transactionsLast7DaysBloc.transactionsLoaded(
+        incomes: incomeTransPerWeek,
+        expenses: expenseTransPerWeek,
+        showLast7Days: showLast7Days,
+      );
+
+      emit(currentState.copyWith.call(
+        currentDate: inThisDate,
         transactionsPerMonth: transPerMonth,
         language: _settingsService.language,
-      );
+        showParentTransactions: false,
+      ));
     } catch (e, s) {
       _logger.error(runtimeType, '_buildInitialState: An unknown error occurred', e, s);
-      yield TransactionsLoadedState(
-        month: month,
-        incomeAmount: 0,
-        expenseAmount: 0,
-        balanceAmount: 0,
-        currentDate: event.inThisDate,
-        showLast7Days: DateTime.now().month == event.inThisDate.month,
-        monthBalance: _buildMonthBalance(0, 0, []),
-        incomeTransactionsPerWeek: const [],
-        expenseTransactionsPerWeek: const [],
-        transactionsPerMonth: TransactionUtils.buildTransactionsPerMonth(_settingsService.language, []),
+      emit(TransactionsState.loaded(
+        currentDate: inThisDate,
+        transactionsPerMonth: [],
         language: _settingsService.language,
-      );
+      ));
     }
   }
 
-  Stream<TransactionsLoadedState> _buildRecurringState() async* {
+  Future<void> loadRecurringTransactions() async {
     try {
-      _logger.info(
-        runtimeType,
-        '_buildRecurringState: Getting all parent transactions...',
-      );
+      _logger.info(runtimeType, '_buildRecurringState: Getting all parent transactions...');
       final currentUser = await _usersDao.getActiveUser();
-      final transactions = await _transactionsDao.getAllParentTransactions(
-        currentUser?.id,
-      );
+      final transactions = await _transactionsDao.getAllParentTransactions(currentUser?.id);
       final transPerMonth = TransactionUtils.buildTransactionsPerMonth(_settingsService.language, transactions);
-      yield currentState.copyWith(
-        showParentTransactions: true,
-        transactionsPerMonth: transPerMonth,
-      );
+
+      emit(currentState.copyWith(showParentTransactions: true, transactionsPerMonth: transPerMonth));
     } catch (e, s) {
       _logger.error(runtimeType, '_buildRecurringState: Unknown error', e, s);
+      emit(currentState.copyWith(showParentTransactions: true, transactionsPerMonth: []));
     }
   }
 

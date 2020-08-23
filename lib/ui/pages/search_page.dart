@@ -19,6 +19,7 @@ import '../widgets/search/search_date_filter_bottom_sheet_dialog.dart';
 import '../widgets/sort_direction_popupmenu_filter.dart';
 import '../widgets/transactions/transaction_item_card_container.dart';
 import '../widgets/transactions/transaction_popupmenu_filter.dart';
+import '../widgets/transactions/transaction_popupmenu_type_filter.dart';
 import 'categories_page.dart';
 
 class SearchPage extends StatefulWidget {
@@ -230,35 +231,11 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
           selectedSortDirection: sortDirectionType,
           onSelected: _sortDirectionChanged,
         ),
-        _buildTransactionTypePopupNenu(transactionType),
-      ],
-    );
-  }
-
-  Widget _buildTransactionTypePopupNenu(TransactionType transactionType) {
-    final i18n = I18n.of(context);
-    const nothingSelected = -1;
-    return PopupMenuButton<int>(
-      padding: Styles.edgeInsetAll0,
-      tooltip: i18n.transactionType,
-      initialValue: transactionType == null ? nothingSelected : transactionType.index,
-      onSelected: _transactionTypeChanged,
-      itemBuilder: (context) => <PopupMenuEntry<int>>[
-        CheckedPopupMenuItem<int>(
-          checked: transactionType == null,
-          value: nothingSelected,
-          child: Text(i18n.na),
+        TransactionPopupMenuTypeFilter(
+          selectedValue: transactionType,
+          onSelectedValue: _transactionTypeChanged,
+          showNa: true,
         ),
-        CheckedPopupMenuItem<int>(
-          checked: transactionType == TransactionType.incomes,
-          value: TransactionType.incomes.index,
-          child: Text(i18n.incomes),
-        ),
-        CheckedPopupMenuItem<int>(
-          checked: transactionType == TransactionType.expenses,
-          value: TransactionType.expenses.index,
-          child: Text(i18n.expenses),
-        )
       ],
     );
   }

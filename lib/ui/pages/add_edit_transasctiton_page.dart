@@ -107,7 +107,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               : i18n.transactionsWasSuccessfullyDeleted;
           showSucceedToast(msg);
 
-          ctx.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: state.transactionDate));
+          await ctx.bloc<TransactionsBloc>().loadTransactions(state.transactionDate);
           ctx.bloc<ChartsBloc>().add(LoadChart(state.transactionDate));
 
           Navigator.of(ctx).pop();

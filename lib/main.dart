@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:my_expenses/models/transactions_summary_per_month.dart';
 import 'package:open_file/open_file.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +27,7 @@ import 'bloc/settings/settings_bloc.dart';
 import 'bloc/sign_in_with_google/sign_in_with_google_bloc.dart';
 import 'bloc/transaction_form/transaction_form_bloc.dart';
 import 'bloc/transactions/transactions_bloc.dart';
+import 'bloc/transactions_per_month/transactions_per_month_bloc.dart';
 import 'bloc/transactions_last_7_days/transactions_last_7_days_bloc.dart';
 import 'bloc/users_accounts/user_accounts_bloc.dart';
 import 'common/enums/notification_type.dart';
@@ -104,6 +106,8 @@ class _MyAppState extends State<MyApp> {
               return ExpensesCategoriesBloc(logger, categoriesDao, usersDao);
             },
           ),
+          BlocProvider(create: (ctx) => TransactionsLast7DaysBloc()),
+          BlocProvider(create: (ctx) => TransactionsPerMonthBloc(getIt<SettingsService>())),
           BlocProvider(
             create: (ctx) {
               final logger = getIt<LoggingService>();
@@ -115,6 +119,8 @@ class _MyAppState extends State<MyApp> {
                 transactionsDao,
                 usersDao,
                 settingsService,
+                ctx.bloc<TransactionsPerMonthBloc>(),
+                ctx.bloc<TransactionsLast7DaysBloc>(),
               );
             },
           ),
@@ -130,7 +136,6 @@ class _MyAppState extends State<MyApp> {
               settingsService,
             );
           }),
-          BlocProvider(create: (ctx) => TransactionsLast7DaysBloc()),
           BlocProvider(create: (ctx) {
             final settingsService = getIt<SettingsService>();
             final secureStorage = getIt<SecureStorageService>();

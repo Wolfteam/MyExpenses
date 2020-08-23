@@ -190,6 +190,6 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
     );
 
     if (selectedDate == null) return;
-    context.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: selectedDate));
+    await context.bloc<TransactionsBloc>().loadTransactions(selectedDate);
   }
 }

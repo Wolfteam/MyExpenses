@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../bloc/currency/currency_bloc.dart';
+import '../../../common/styles.dart';
 import '../../../generated/i18n.dart';
 import '../../../models/transaction_card_items.dart';
 import '../../widgets/transactions/transaction_item.dart' as transaction;
@@ -51,11 +52,7 @@ class TransactionsCardContainer extends StatelessWidget {
         children: <Widget>[
           Flexible(
             flex: 35,
-            child: Text(
-              model.dateString,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Colors.grey, fontSize: 12),
-            ),
+            child: Text(model.dateString, overflow: TextOverflow.ellipsis, style: Styles.textStyleGrey12),
           ),
           Flexible(
             flex: 65,
@@ -64,7 +61,7 @@ class TransactionsCardContainer extends StatelessWidget {
               text: TextSpan(
                 // Note: Styles for TextSpans must be explicitly defined.
                 // Child text spans will inherit styles from parent
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                style: Styles.textStyleGrey12,
                 children: <TextSpan>[
                   TextSpan(text: '${i18n.expenses}: ${currencyBloc.format(model.dayExpenses)}'),
                   const TextSpan(text: '  '),

@@ -30,11 +30,7 @@ class TransactionItemCardContainer extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text(
-                  dateString,
-                  textAlign: TextAlign.start,
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
+                Text(dateString, textAlign: TextAlign.start, style: Styles.textStyleGrey12),
                 // Text(
                 //   '$percentageString %',
                 //   style: TextStyle(

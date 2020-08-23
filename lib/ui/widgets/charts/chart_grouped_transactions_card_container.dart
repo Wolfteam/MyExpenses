@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../bloc/currency/currency_bloc.dart';
+import '../../../common/styles.dart';
 import '../../../generated/i18n.dart';
 import '../../../models/chart_grouped_transactions_by_category.dart';
 import '../transactions/transaction_item.dart' as trans_item;
@@ -43,15 +44,8 @@ class ChartGroupedTransactionsCardContainer extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text(
-                  grouped.category.name,
-                  textAlign: TextAlign.start,
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-                Text(
-                  '$percentageString %',
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
+                Text(grouped.category.name, textAlign: TextAlign.start, style: Styles.textStyleGrey12),
+                Text('$percentageString %', style: Styles.textStyleGrey12),
               ],
             ),
           ),

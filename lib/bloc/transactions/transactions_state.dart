@@ -1,80 +1,48 @@
 part of 'transactions_bloc.dart';
 
-@immutable
-abstract class TransactionsState extends Equatable {
-  const TransactionsState();
-
-  @override
-  List<Object> get props => [];
+@freezed
+abstract class TransactionsState implements _$TransactionsState {
+  factory TransactionsState.initial() = TransactionsInitialState;
+  factory TransactionsState.loaded({
+    @required DateTime currentDate,
+    @required List<TransactionCardItems> transactionsPerMonth,
+    @required AppLanguageType language,
+    @Default(false) bool showParentTransactions,
+  }) = TransactionsLoadedState;
 }
 
-class TransactionsInitialState extends TransactionsState {}
+// class TransactionsInitialState extends TransactionsState {}
 
-class TransactionsLoadedState extends TransactionsState {
-  final String month;
-  final double incomeAmount;
-  final double expenseAmount;
-  final double balanceAmount;
-  final DateTime currentDate;
-  final bool showLast7Days;
+// class TransactionsLoadedState extends TransactionsState {
+//   final DateTime currentDate;
+//   final List<TransactionCardItems> transactionsPerMonth;
+//   final bool showParentTransactions;
+//   final AppLanguageType language;
 
-  final List<TransactionsSummaryPerMonth> monthBalance;
-  final List<TransactionCardItems> transactionsPerMonth;
-  final List<TransactionsSummaryPerDay> incomeTransactionsPerWeek;
-  final List<TransactionsSummaryPerDay> expenseTransactionsPerWeek;
+//   @override
+//   List<Object> get props => [
+//         currentDate,
+//         transactionsPerMonth,
+//         showParentTransactions,
+//         language,
+//       ];
 
-  final bool showParentTransactions;
-  final AppLanguageType language;
+//   const TransactionsLoadedState({
+//     @required this.currentDate,
+//     @required this.transactionsPerMonth,
+//     @required this.language,
+//     this.showParentTransactions = false,
+//   });
 
-  @override
-  List<Object> get props => [
-        month,
-        incomeAmount,
-        expenseAmount,
-        balanceAmount,
-        currentDate,
-        showLast7Days,
-        monthBalance,
-        transactionsPerMonth,
-        incomeTransactionsPerWeek,
-        expenseTransactionsPerWeek,
-        showParentTransactions,
-        language,
-      ];
-
-  const TransactionsLoadedState({
-    @required this.month,
-    @required this.incomeAmount,
-    @required this.expenseAmount,
-    @required this.balanceAmount,
-    @required this.currentDate,
-    @required this.showLast7Days,
-    @required this.monthBalance,
-    @required this.transactionsPerMonth,
-    @required this.incomeTransactionsPerWeek,
-    @required this.expenseTransactionsPerWeek,
-    @required this.language,
-    this.showParentTransactions = false,
-  });
-
-  TransactionsLoadedState copyWith({
-    List<TransactionCardItems> transactionsPerMonth,
-    bool showParentTransactions,
-  }) {
-    return TransactionsLoadedState(
-      month: month,
-      incomeAmount: incomeAmount,
-      expenseAmount: expenseAmount,
-      balanceAmount: balanceAmount,
-      currentDate: currentDate,
-      showLast7Days: showLast7Days,
-      monthBalance: monthBalance,
-      transactionsPerMonth: transactionsPerMonth ?? this.transactionsPerMonth,
-      incomeTransactionsPerWeek: incomeTransactionsPerWeek,
-      expenseTransactionsPerWeek: expenseTransactionsPerWeek,
-      showParentTransactions:
-          showParentTransactions ?? this.showParentTransactions,
-      language: language,
-    );
-  }
-}
+//   TransactionsLoadedState copyWith({
+//     List<TransactionCardItems> transactionsPerMonth,
+//     bool showParentTransactions,
+//   }) {
+//     return TransactionsLoadedState(
+//       currentDate: currentDate,
+//       transactionsPerMonth: transactionsPerMonth ?? this.transactionsPerMonth,
+//       showParentTransactions: showParentTransactions ?? this.showParentTransactions,
+//       language: language,
+//     );
+//   }
+// }

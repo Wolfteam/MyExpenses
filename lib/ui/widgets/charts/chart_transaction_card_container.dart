@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../common/styles.dart';
 import '../../../common/utils/date_utils.dart';
 import '../../../generated/i18n.dart';
 import '../../../models/transaction_item.dart';
@@ -44,15 +45,8 @@ class ChartTransactionCardContainer extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text(
-                  dateString,
-                  textAlign: TextAlign.start,
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-                Text(
-                  '$percentageString %',
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
+                Text(dateString, textAlign: TextAlign.start, style: Styles.textStyleGrey12),
+                Text('$percentageString %', style: Styles.textStyleGrey12),
               ],
             ),
           ),
