@@ -80,25 +80,25 @@ class EstimateBottomSheetDialog extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Icon(Icons.select_all, size: 16.0, color: Colors.blue),
+                  const Icon(Icons.select_all, size: 16.0, color: Colors.blue),
                   const SizedBox(width: 4.0),
-                  Text(i18n.all, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.blue))
+                  Text(i18n.all, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.blue))
                 ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Icon(CustomIcons.money, size: 16.0, color: Colors.green),
+                  const Icon(CustomIcons.money, size: 16.0, color: Colors.green),
                   const SizedBox(width: 4.0),
-                  Text(i18n.incomes, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.green))
+                  Text(i18n.incomes, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.green))
                 ],
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Icon(Icons.money_off, size: 16.0, color: Colors.red),
+                  const Icon(Icons.money_off, size: 16.0, color: Colors.red),
                   const SizedBox(width: 4.0),
-                  Text(i18n.expenses, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.red))
+                  Text(i18n.expenses, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.red))
                 ],
               ),
             ],

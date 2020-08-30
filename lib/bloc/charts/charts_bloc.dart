@@ -98,7 +98,7 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
 
     for (var i = 0; i < days; i++) {
       final now = from.add(Duration(days: i));
-      final first = DateTime(now.year, now.month, now.day, 0, 0, 0);
+      final first = DateTime(now.year, now.month, now.day);
 
       final next = _getNextDate(first);
       final last = DateTime(next.year, next.month, next.day, 23, 59, 59);
@@ -106,16 +106,8 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
       final amount = TransactionUtils.getTotalTransactionAmount(
           transactions.where((t) => t.transactionDate.isAfter(first) && t.transactionDate.isBefore(last)).toList());
 
-      final start = DateUtils.formatAppDate(
-        first,
-        lang,
-        DateUtils.dayAndMonthFormat,
-      );
-      final end = DateUtils.formatAppDate(
-        last,
-        lang,
-        DateUtils.dayAndMonthFormat,
-      );
+      final start = DateUtils.formatAppDate(first, lang);
+      final end = DateUtils.formatAppDate(last, lang);
 
       final dateRangeString = '$start - $end';
 

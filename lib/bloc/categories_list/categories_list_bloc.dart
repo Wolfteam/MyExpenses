@@ -82,7 +82,7 @@ abstract class _CategoriesListBloc extends Bloc<CategoriesListEvent, CategoriesL
 
   List<CategoryItem> _changeSelectedState(bool isSelected) {
     final categories = List<CategoryItem>.generate(currentState.categories.length, (i) {
-      return currentState.categories[i].copyWith(isSeleted: false);
+      return currentState.categories[i].copyWith();
     });
 
     return categories;

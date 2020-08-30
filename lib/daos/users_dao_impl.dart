@@ -1,9 +1,7 @@
 part of '../models/entities/database.dart';
 
 @UseDao(tables: [Users])
-class UsersDaoImpl extends DatabaseAccessor<AppDatabase>
-    with _$UsersDaoImplMixin
-    implements UsersDao {
+class UsersDaoImpl extends DatabaseAccessor<AppDatabase> with _$UsersDaoImplMixin implements UsersDao {
   UsersDaoImpl(AppDatabase db) : super(db);
 
   @override
@@ -13,9 +11,7 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase>
 
   @override
   Future<UserItem> getUser(String googleUserId) {
-    return (select(users)..where((u) => u.googleUserId.equals(googleUserId)))
-        .map(_mapToUserItem)
-        .getSingle();
+    return (select(users)..where((u) => u.googleUserId.equals(googleUserId))).map(_mapToUserItem).getSingle();
   }
 
   @override
@@ -26,9 +22,7 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase>
     String imgUrl,
   ) async {
     int id;
-    final existingUser = await (select(users)
-          ..where((u) => u.googleUserId.equals(googleUserId)))
-        .getSingle();
+    final existingUser = await (select(users)..where((u) => u.googleUserId.equals(googleUserId))).getSingle();
     final now = DateTime.now();
     //user exists
     if (existingUser != null) {
@@ -41,8 +35,7 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase>
         updatedAt: Value(now),
         updatedBy: const Value(createdBy),
       );
-      await (update(users)..where((u) => u.id.equals(existingUser.id)))
-          .write(updatedFields);
+      await (update(users)..where((u) => u.id.equals(existingUser.id))).write(updatedFields);
     } else {
       id = await into(users).insert(User(
         localStatus: LocalStatusType.nothing,
@@ -66,16 +59,12 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase>
     }
 
     await changeActiveUser(id);
-    return (select(users)..where((u) => u.id.equals(id)))
-        .map(_mapToUserItem)
-        .getSingle();
+    return (select(users)..where((u) => u.id.equals(id))).map(_mapToUserItem).getSingle();
   }
 
   @override
   Future<UserItem> getActiveUser() {
-    return (select(users)..where((u) => u.isActive))
-        .map(_mapToUserItem)
-        .getSingle();
+    return (select(users)..where((u) => u.isActive)).map(_mapToUserItem).getSingle();
   }
 
   @override
@@ -104,7 +93,7 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase>
     await (delete(users)..where((u) => u.id.equals(id))).go();
     final remainingUsers = await (select(users)
           ..orderBy(
-            [(u) => OrderingTerm(expression: u.id, mode: OrderingMode.asc)],
+            [(u) => OrderingTerm(expression: u.id)],
           ))
         .get();
     if (remainingUsers.isNotEmpty) {

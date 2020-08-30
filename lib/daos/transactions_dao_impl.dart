@@ -611,6 +611,98 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
     ));
   }
 
+  @override
+  Future<List<TransactionItem>> getAllTransactionsForSearch(
+    int userId,
+    DateTime from,
+    DateTime to,
+    String description,
+    double amount,
+    ComparerType comparerType,
+    int categoryId,
+    TransactionType transactionType,
+    TransactionFilterType transactionFilterType,
+    SortDirectionType sortDirectionType,
+    int take,
+    int skip,
+  ) {
+    var query = (select(transactions)
+          ..where(
+            (t) => t.localStatus.equals(LocalStatusType.deleted.index).not() & t.isParentTransaction.not(),
+          ))
+        .join([
+      innerJoin(categories, categories.id.equalsExp(transactions.categoryId)),
+    ]);
+    if (userId == null) {
+      query = query..where((isNull(categories.userId)));
+    } else {
+      query = query..where(categories.userId.equals(userId));
+    }
+
+    if (from != null) {
+      query = query..where(transactions.transactionDate.isBiggerOrEqualValue(from));
+    }
+
+    if (to != null) {
+      query = query..where(transactions.transactionDate.isSmallerOrEqualValue(to));
+    }
+
+    if (!description.isNullEmptyOrWhitespace) {
+      query = query..where(transactions.description.contains(description));
+    }
+
+    if (amount != null) {
+      switch (comparerType) {
+        case ComparerType.equal:
+          query = query..where(transactions.amount.abs().equals(amount));
+          break;
+        case ComparerType.greaterOrEqualThan:
+          query = query..where(transactions.amount.abs().isBiggerOrEqualValue(amount));
+          break;
+        case ComparerType.lessOrEqualThan:
+          query = query..where(transactions.amount.abs().isSmallerOrEqualValue(amount));
+          break;
+      }
+    }
+
+    if (categoryId != null) {
+      query = query..where(transactions.categoryId.equals(categoryId));
+    }
+
+    if (transactionType != null) {
+      query = query..where(categories.isAnIncome.equals(transactionType == TransactionType.incomes));
+    }
+
+    OrderingTerm orderingTerm;
+    switch (transactionFilterType) {
+      case TransactionFilterType.description:
+        orderingTerm = sortDirectionType == SortDirectionType.asc
+            ? OrderingTerm.asc(transactions.description)
+            : OrderingTerm.desc(transactions.description);
+        break;
+      case TransactionFilterType.amount:
+        orderingTerm = sortDirectionType == SortDirectionType.asc
+            ? OrderingTerm.asc(transactions.amount.abs())
+            : OrderingTerm.desc(transactions.amount.abs());
+        break;
+      case TransactionFilterType.date:
+        orderingTerm = sortDirectionType == SortDirectionType.asc
+            ? OrderingTerm.asc(transactions.transactionDate)
+            : OrderingTerm.desc(transactions.transactionDate);
+        break;
+      case TransactionFilterType.category:
+        orderingTerm = sortDirectionType == SortDirectionType.asc
+            ? OrderingTerm.asc(categories.name)
+            : OrderingTerm.desc(categories.name);
+        break;
+    }
+    if (orderingTerm != null) {
+      query = query..orderBy([orderingTerm]);
+    }
+
+    return (query..limit(take, offset: skip)).map(_mapToTransactionItem).get();
+  }
+
   List<Transaction> _buildChildTransactions(
     TransactionItem parent,
     List<DateTime> periods,

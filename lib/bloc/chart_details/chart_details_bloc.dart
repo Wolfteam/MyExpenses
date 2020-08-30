@@ -4,8 +4,8 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-import '../../common/enums/chart_details_filter_type.dart';
 import '../../common/enums/sort_direction_type.dart';
+import '../../common/enums/transaction_filter_type.dart';
 import '../../common/utils/transaction_utils.dart';
 import '../../models/chart_grouped_transactions_by_category.dart';
 import '../../models/transaction_item.dart';
@@ -34,11 +34,11 @@ class ChartDetailsBloc extends Bloc<ChartDetailsEvent, ChartDetailsState> {
   }
 
   Stream<ChartDetailsState> _sort(
-    ChartDetailsFilterType filter,
+    TransactionFilterType filter,
     SortDirectionType sortDirection,
   ) async* {
     final transactions = List<TransactionItem>.from(state.transactions);
-    if (filter != ChartDetailsFilterType.category) {
+    if (filter != TransactionFilterType.category) {
       _sortTransactions(transactions, filter, sortDirection);
 
       yield state.copyWith(
@@ -54,32 +54,32 @@ class ChartDetailsBloc extends Bloc<ChartDetailsEvent, ChartDetailsState> {
 
   void _sortTransactions(
     List<TransactionItem> transactions,
-    ChartDetailsFilterType filter,
+    TransactionFilterType filter,
     SortDirectionType sortDirection,
   ) {
     switch (filter) {
-      case ChartDetailsFilterType.name:
+      case TransactionFilterType.description:
         if (sortDirection == SortDirectionType.asc) {
           transactions.sort((t1, t2) => t1.description.compareTo(t2.description));
         } else {
           transactions.sort((t1, t2) => t2.description.compareTo(t1.description));
         }
         break;
-      case ChartDetailsFilterType.amount:
+      case TransactionFilterType.amount:
         if (sortDirection == SortDirectionType.asc) {
           transactions.sort((t1, t2) => t1.amount.abs().compareTo(t2.amount.abs()));
         } else {
           transactions.sort((t1, t2) => t2.amount.abs().compareTo(t1.amount.abs()));
         }
         break;
-      case ChartDetailsFilterType.date:
+      case TransactionFilterType.date:
         if (sortDirection == SortDirectionType.asc) {
           transactions.sort((t1, t2) => t1.transactionDate.compareTo(t2.transactionDate));
         } else {
           transactions.sort((t1, t2) => t2.transactionDate.compareTo(t1.transactionDate));
         }
         break;
-      case ChartDetailsFilterType.category:
+      case TransactionFilterType.category:
         break;
       default:
         throw Exception('Invalid chart details filter');
@@ -88,7 +88,7 @@ class ChartDetailsBloc extends Bloc<ChartDetailsEvent, ChartDetailsState> {
 
   Stream<ChartDetailsState> _groupByCategory(
     List<TransactionItem> transactions,
-    ChartDetailsFilterType filter,
+    TransactionFilterType filter,
     SortDirectionType sortDirection,
   ) async* {
     final categories = transactions.map((t) => t.category).toList();
@@ -100,7 +100,7 @@ class ChartDetailsBloc extends Bloc<ChartDetailsEvent, ChartDetailsState> {
 
       _sortTransactions(
         transactions,
-        ChartDetailsFilterType.amount,
+        TransactionFilterType.amount,
         sortDirection,
       );
       grouped.add(ChartGroupedTransactionsByCategory(

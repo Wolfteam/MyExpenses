@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../bloc/chart_details/chart_details_bloc.dart';
-import '../../common/enums/chart_details_filter_type.dart';
 import '../../common/enums/sort_direction_type.dart';
-import '../../common/extensions/i18n_extensions.dart';
+import '../../common/enums/transaction_filter_type.dart';
 import '../../generated/i18n.dart';
 import '../../models/chart_transaction_item.dart';
 import '../widgets/charts/chart_grouped_transactions_card_container.dart';
 import '../widgets/charts/chart_transaction_card_container.dart';
 import '../widgets/charts/pie_chart_transactions_per_month.dart';
+import '../widgets/sort_direction_popupmenu_filter.dart';
+import '../widgets/transactions/transaction_popupmenu_filter.dart';
 
 class ChartDetailsPage extends StatelessWidget {
   final bool onlyIncomes;
@@ -69,49 +70,6 @@ class ChartDetailsPage extends StatelessWidget {
     ];
   }
 
-  PopupMenuButton _buildFilters(
-    BuildContext context,
-    ChartDetailsState state,
-  ) {
-    final i18n = I18n.of(context);
-    final values = ChartDetailsFilterType.values.map((filter) {
-      return CheckedPopupMenuItem<ChartDetailsFilterType>(
-        checked: state.filter == filter,
-        value: filter,
-        child: Text(i18n.getChartDetailsFilterName(filter)),
-      );
-    }).toList();
-
-    return PopupMenuButton<ChartDetailsFilterType>(
-      padding: const EdgeInsets.all(0),
-      initialValue: state.filter,
-      icon: Icon(Icons.swap_horiz),
-      onSelected: (filter) => _filterChanged(context, filter),
-      itemBuilder: (context) => values,
-    );
-  }
-
-  PopupMenuButton _buildSortDirection(
-    BuildContext context,
-    ChartDetailsState state,
-  ) {
-    final i18n = I18n.of(context);
-    final values = SortDirectionType.values.map((direction) {
-      return CheckedPopupMenuItem<SortDirectionType>(
-        checked: state.sortDirection == direction,
-        value: direction,
-        child: Text(i18n.getSortDirectionName(direction)),
-      );
-    }).toList();
-    return PopupMenuButton<SortDirectionType>(
-      padding: const EdgeInsets.all(0),
-      initialValue: state.sortDirection,
-      icon: Icon(Icons.swap_vert),
-      onSelected: (direction) => _sortDirectionChanged(context, direction),
-      itemBuilder: (context) => values,
-    );
-  }
-
   List<Widget> _buildTransactions(
     BuildContext context,
     ChartDetailsState state,
@@ -132,8 +90,14 @@ class ChartDetailsPage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
-                _buildFilters(context, state),
-                _buildSortDirection(context, state),
+                TransactionPoupMenuFilter(
+                  selectedValue: state.filter,
+                  onSelected: (filter) => _filterChanged(context, filter),
+                ),
+                SortDirectionPopupMenuFilter(
+                  selectedSortDirection: state.sortDirection,
+                  onSelected: (newValue) => _sortDirectionChanged(context, newValue),
+                ),
               ],
             ),
           ],
@@ -142,24 +106,23 @@ class ChartDetailsPage extends StatelessWidget {
       ListView.builder(
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
-        itemCount: state.filter != ChartDetailsFilterType.category
+        itemCount: state.filter != TransactionFilterType.category
             ? state.transactions.length
             : state.groupedTransactionsByCategory.length,
-        itemBuilder: (ctx, index) =>
-            state.filter != ChartDetailsFilterType.category
-                ? ChartTransactionCardContainer(
-                    state.transactions[index],
-                    state.transactionsTotalAmount,
-                  )
-                : ChartGroupedTransactionsCardContainer(
-                    grouped: state.groupedTransactionsByCategory[index],
-                    transactionsTotalAmount: state.transactionsTotalAmount,
-                  ),
+        itemBuilder: (ctx, index) => state.filter != TransactionFilterType.category
+            ? ChartTransactionCardContainer(
+                state.transactions[index],
+                state.transactionsTotalAmount,
+              )
+            : ChartGroupedTransactionsCardContainer(
+                grouped: state.groupedTransactionsByCategory[index],
+                transactionsTotalAmount: state.transactionsTotalAmount,
+              ),
       )
     ];
   }
 
-  void _filterChanged(BuildContext context, ChartDetailsFilterType newValue) =>
+  void _filterChanged(BuildContext context, TransactionFilterType newValue) =>
       context.bloc<ChartDetailsBloc>().add(FilterChanged(newValue));
 
   void _sortDirectionChanged(

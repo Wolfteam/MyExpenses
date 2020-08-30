@@ -40,8 +40,7 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
   Widget build(BuildContext context) {
     final i18n = I18n.of(context);
 
-    return BlocConsumer<CategoryFormBloc, CategoryState>(
-        listener: (ctx, state) {
+    return BlocConsumer<CategoryFormBloc, CategoryState>(listener: (ctx, state) {
       if (state is CategoryFormState) {
         if (state.errorOccurred) {
           showWarningToast(i18n.unknownErrorOcurred);
@@ -54,9 +53,8 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
 
       if (state is CategorySavedOrDeletedState) {
         final i18n = I18n.of(ctx);
-        final msg = state is CategorySavedState
-            ? i18n.categoryWasSuccessfullySaved
-            : i18n.categoryWasSuccessfullyDeleted;
+        final msg =
+            state is CategorySavedState ? i18n.categoryWasSuccessfullySaved : i18n.categoryWasSuccessfullyDeleted;
         showSucceedToast(msg);
 
         _notifyCategorySavedOrDeleted();
@@ -73,12 +71,12 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
           leading: const BackButton(),
           actions: <Widget>[
             IconButton(
-              icon: Icon(Icons.save),
+              icon: const Icon(Icons.save),
               onPressed: state.isFormValid ? () => _saveCategory() : null,
             ),
             if (!state.newCategory)
               IconButton(
-                icon: Icon(Icons.delete),
+                icon: const Icon(Icons.delete),
                 onPressed: () => _showDeleteConfirmationDialog(state.name),
               ),
           ],
@@ -163,15 +161,10 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
                         Expanded(
                           child: ListTile(
                             title: Text(
-                              state.type == TransactionType.incomes
-                                  ? i18n.income
-                                  : i18n.expense,
+                              state.type == TransactionType.incomes ? i18n.income : i18n.expense,
                               textAlign: TextAlign.center,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                             ),
                             subtitle: Text(
                               i18n.category.toUpperCase(),
@@ -186,10 +179,7 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
                               i18n.na,
                               textAlign: TextAlign.center,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 16.0,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                             ),
                             subtitle: Text(
                               i18n.parent.toUpperCase(),
@@ -213,7 +203,6 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
                 Material(
                   elevation: 10,
                   color: theme.cardColor.withOpacity(0.8),
-                  borderOnForeground: true,
                   type: MaterialType.circle,
                   child: IconButton(
                     iconSize: 65,
@@ -262,15 +251,14 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
     TextEditingController controller,
     FocusNode focusNode,
   ) {
-    final suffixIcon =
-        !controller.text.isNullEmptyOrWhitespace && focusNode.hasFocus
-            ? IconButton(
-                alignment: Alignment.bottomCenter,
-                icon: Icon(Icons.close),
-                //For some reason an exception is thrown https://github.com/flutter/flutter/issues/35848
-                onPressed: () => Future.microtask(() => controller.clear()),
-              )
-            : null;
+    final suffixIcon = !controller.text.isNullEmptyOrWhitespace && focusNode.hasFocus
+        ? IconButton(
+            alignment: Alignment.bottomCenter,
+            icon: const Icon(Icons.close),
+            //For some reason an exception is thrown https://github.com/flutter/flutter/issues/35848
+            onPressed: () => Future.microtask(() => controller.clear()),
+          )
+        : null;
 
     return suffixIcon;
   }
@@ -295,7 +283,6 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
         ),
         Expanded(
           child: TextFormField(
-            maxLines: 1,
             minLines: 1,
             maxLength: 255,
             validator: (_) => state.isNameValid ? null : i18n.invalidName,
@@ -351,8 +338,6 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
             onColorChanged: _iconColorChanged,
             enableAlpha: false,
             displayThumbColor: true,
-            showLabel: true,
-            paletteType: PaletteType.hsv,
             pickerAreaBorderRadius: const BorderRadius.only(
               topLeft: Radius.circular(2.0),
               topRight: Radius.circular(2.0),
@@ -386,17 +371,13 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
     _iconChanged(selectedIcon.icon.icon);
   }
 
-  void _nameChanged() =>
-      context.bloc<CategoryFormBloc>().add(NameChanged(_nameController.text));
+  void _nameChanged() => context.bloc<CategoryFormBloc>().add(NameChanged(_nameController.text));
 
-  void _typeChanged(TransactionType type) =>
-      context.bloc<CategoryFormBloc>().add(TypeChanged(type));
+  void _typeChanged(TransactionType type) => context.bloc<CategoryFormBloc>().add(TypeChanged(type));
 
-  void _iconChanged(IconData icon) =>
-      context.bloc<CategoryFormBloc>().add(IconChanged(icon));
+  void _iconChanged(IconData icon) => context.bloc<CategoryFormBloc>().add(IconChanged(icon));
 
-  void _iconColorChanged(Color color) =>
-      context.bloc<CategoryFormBloc>().add(IconColorChanged(color));
+  void _iconColorChanged(Color color) => context.bloc<CategoryFormBloc>().add(IconColorChanged(color));
 
   void _saveCategory() => context.bloc<CategoryFormBloc>().add(FormSubmitted());
 
@@ -429,13 +410,9 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
   }
 
   void _notifyCategorySavedOrDeleted() {
-    context
-        .bloc<IncomesCategoriesBloc>()
-        .add(const GetCategories(loadIncomes: true));
+    context.bloc<IncomesCategoriesBloc>().add(const GetCategories(loadIncomes: true));
 
-    context
-        .bloc<ExpensesCategoriesBloc>()
-        .add(const GetCategories(loadIncomes: false));
+    context.bloc<ExpensesCategoriesBloc>().add(const GetCategories(loadIncomes: false));
 
     BlocUtils.raiseCommonBlocEvents(
       context,

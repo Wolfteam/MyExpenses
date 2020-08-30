@@ -1,13 +1,12 @@
 part of 'chart_details_bloc.dart';
 
 class ChartDetailsState extends Equatable {
-  final ChartDetailsFilterType filter;
+  final TransactionFilterType filter;
   final SortDirectionType sortDirection;
   final List<TransactionItem> transactions;
   final List<ChartGroupedTransactionsByCategory> groupedTransactionsByCategory;
 
-  double get transactionsTotalAmount =>
-      TransactionUtils.getTotalTransactionAmount(transactions);
+  double get transactionsTotalAmount => TransactionUtils.getTotalTransactionAmount(transactions);
 
   @override
   List<Object> get props => [
@@ -25,7 +24,7 @@ class ChartDetailsState extends Equatable {
 
   factory ChartDetailsState.initial() {
     return const ChartDetailsState(
-      filter: ChartDetailsFilterType.date,
+      filter: TransactionFilterType.date,
       sortDirection: SortDirectionType.asc,
       transactions: [],
       groupedTransactionsByCategory: [],
@@ -33,7 +32,7 @@ class ChartDetailsState extends Equatable {
   }
 
   ChartDetailsState copyWith({
-    ChartDetailsFilterType filter,
+    TransactionFilterType filter,
     SortDirectionType sortDirection,
     List<TransactionItem> transactions,
     List<ChartGroupedTransactionsByCategory> groupedTransactionsByCategory,
@@ -42,8 +41,7 @@ class ChartDetailsState extends Equatable {
       filter: filter ?? this.filter,
       sortDirection: sortDirection ?? this.sortDirection,
       transactions: transactions ?? this.transactions,
-      groupedTransactionsByCategory:
-          groupedTransactionsByCategory ?? this.groupedTransactionsByCategory,
+      groupedTransactionsByCategory: groupedTransactionsByCategory ?? this.groupedTransactionsByCategory,
     );
   }
 }

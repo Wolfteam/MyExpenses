@@ -119,7 +119,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
       ...transactions.map((t) => [
             t.id,
             t.description,
-            _currencyBloc.format(t.amount, showSymbol: true),
+            _currencyBloc.format(t.amount),
             DateUtils.formatDateWithoutLocale(
               t.transactionDate,
               DateUtils.monthDayAndYearFormat,
@@ -143,14 +143,14 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
     GenerateReport event,
   ) async {
     final pdf = await buildPdf(
-      (amount) => _currencyBloc.format(amount, showSymbol: true),
+      (amount) => _currencyBloc.format(amount),
       transactions,
       event.i18n,
       currentState.from,
       currentState.to,
     );
 
-    final path = await AppPathUtils.generateReportFilePath(isPdf: true);
+    final path = await AppPathUtils.generateReportFilePath();
     final file = File(path);
     await file.writeAsBytes(pdf.save());
 

@@ -16,8 +16,7 @@ class MainPage extends StatefulWidget {
   _MainPageState createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage>
-    with SingleTickerProviderStateMixin {
+class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin {
   final _pages = <Widget>[
     TransactionsPage(),
     ChartsPage(),
@@ -28,11 +27,7 @@ class _MainPageState extends State<MainPage>
 
   @override
   void initState() {
-    _tabController = TabController(
-      initialIndex: 0,
-      length: _pages.length,
-      vsync: this,
-    );
+    _tabController = TabController(length: _pages.length, vsync: this);
     super.initState();
   }
 
@@ -51,7 +46,6 @@ class _MainPageState extends State<MainPage>
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).primaryColor,
-        mini: false,
         heroTag: 'CreateTransactionFab',
         onPressed: _gotoAddTransactionPage,
         child: const Icon(Icons.add),
@@ -87,19 +81,19 @@ class _MainPageState extends State<MainPage>
     return [
       BottomNavigationBarItem(
         title: Text(i18n.transactions),
-        icon: Icon(Icons.account_balance),
+        icon: const Icon(Icons.account_balance),
       ),
       BottomNavigationBarItem(
         title: Text(i18n.charts),
-        icon: Icon(Icons.pie_chart),
+        icon: const Icon(Icons.pie_chart),
       ),
       BottomNavigationBarItem(
         title: Text(i18n.categories),
-        icon: Icon(Icons.category),
+        icon: const Icon(Icons.category),
       ),
       BottomNavigationBarItem(
         title: Text(i18n.config),
-        icon: Icon(Icons.settings),
+        icon: const Icon(Icons.settings),
       ),
     ];
   }

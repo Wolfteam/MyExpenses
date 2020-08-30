@@ -42,7 +42,7 @@ class BackgroundUtils {
   static Future<void> initBg() {
     //TODO: CHANGE THE ISINDEBUG
     if (Platform.isAndroid) {
-      return Workmanager.initialize(callbackDispatcher, isInDebugMode: false);
+      return Workmanager.initialize(callbackDispatcher);
     }
 
     return Future.value();
@@ -260,6 +260,7 @@ class BackgroundUtils {
                 i18n.recurringTransactions,
                 t.description,
                 jsonEncode(AppNotification.openTransaction(t.id)),
+                id: t.id,
               ))
           .toList();
 

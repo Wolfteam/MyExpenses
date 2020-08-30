@@ -159,14 +159,7 @@ List<Widget> _buildPdfBody(
         padding: const EdgeInsets.all(10),
         decoration: const BoxDecoration(
           borderRadius: 5,
-          shape: BoxShape.rectangle,
-          border: BoxBorder(
-            color: PdfColors.black,
-            bottom: true,
-            left: true,
-            right: true,
-            top: true,
-          ),
+          border: BoxBorder(bottom: true, left: true, right: true, top: true),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

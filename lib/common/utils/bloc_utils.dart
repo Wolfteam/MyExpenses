@@ -35,9 +35,9 @@ class BlocUtils {
     if (reloadTransactions) {
       final transBloc = ctx.bloc<TransactionsBloc>();
       if (transBloc.currentState.showParentTransactions) {
-        ctx.bloc<TransactionsBloc>().add(const GetAllParentTransactions());
+        ctx.bloc<TransactionsBloc>().loadRecurringTransactions();
       } else {
-        ctx.bloc<TransactionsBloc>().add(GetTransactions(inThisDate: now));
+        ctx.bloc<TransactionsBloc>().loadTransactions(now);
       }
     }
 
@@ -46,12 +46,8 @@ class BlocUtils {
     }
 
     if (reloadCategories) {
-      ctx
-          .bloc<IncomesCategoriesBloc>()
-          .add(const GetCategories(loadIncomes: true));
-      ctx
-          .bloc<ExpensesCategoriesBloc>()
-          .add(const GetCategories(loadIncomes: false));
+      ctx.bloc<IncomesCategoriesBloc>().add(const GetCategories(loadIncomes: true));
+      ctx.bloc<ExpensesCategoriesBloc>().add(const GetCategories(loadIncomes: false));
     }
 
     if (reloadDrawer) {

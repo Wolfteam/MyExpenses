@@ -22,30 +22,24 @@ class TransactionItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final currencyBloc = context.bloc<CurrencyBloc>();
     final i18n = I18n.of(context);
-    final dateToUse = item.isParentTransaction && item.nextRecurringDate != null
-        ? item.nextRecurringDate
-        : item.transactionDate;
+    final dateToUse =
+        item.isParentTransaction && item.nextRecurringDate != null ? item.nextRecurringDate : item.transactionDate;
     final dateString = DateUtils.formatDateWithoutLocale(
       dateToUse,
       DateUtils.monthDayAndYearFormat,
     );
-    final daysToNextRecurringDate = item.nextRecurringDate == null
-        ? 0
-        : item.nextRecurringDate.difference(DateTime.now()).inDays;
+    final daysToNextRecurringDate =
+        item.nextRecurringDate == null ? 0 : item.nextRecurringDate.difference(DateTime.now()).inDays;
 
-    final daysLeft = Text(daysToNextRecurringDate == 0
-        ? i18n.tomorrow
-        : i18n.executesInXDays('$daysToNextRecurringDate'));
+    final daysLeft =
+        Text(daysToNextRecurringDate == 0 ? i18n.tomorrow : i18n.executesInXDays('$daysToNextRecurringDate'));
 
     final subtitle = item.isParentTransaction && item.nextRecurringDate != null
         ? Text(i18n.nextDateOn(dateString))
-        : item.isParentTransaction
-            ? Text(i18n.stopped)
-            : showDate ? Text(i18n.dateOn(dateString)) : null;
+        : item.isParentTransaction ? Text(i18n.stopped) : showDate ? Text(i18n.dateOn(dateString)) : null;
 
     final amountWidget = Row(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
         Text(
@@ -57,10 +51,7 @@ class TransactionItem extends StatelessWidget {
         if (item.isChildTransaction)
           Container(
             margin: const EdgeInsets.only(left: 5),
-            child: Icon(
-              Icons.alarm,
-              size: 20,
-            ),
+            child: const Icon(Icons.alarm, size: 20),
           ),
       ],
     );
@@ -69,14 +60,7 @@ class TransactionItem extends StatelessWidget {
       customBorder: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
       ),
-      onTap: () async {
-        final route = MaterialPageRoute(
-          builder: (ctx) => AddEditTransactionPage(item: item),
-        );
-
-        await Navigator.of(context).push(route);
-        context.bloc<TransactionFormBloc>().add(FormClosed());
-      },
+      onTap: () => _goToDetails(context),
       child: ListTile(
         dense: true,
         leading: Column(
@@ -101,5 +85,15 @@ class TransactionItem extends StatelessWidget {
         trailing: amountWidget,
       ),
     );
+  }
+
+  Future<void> _goToDetails(BuildContext context) async {
+    FocusScope.of(context).unfocus();
+    final route = MaterialPageRoute(
+      builder: (ctx) => AddEditTransactionPage(item: item),
+    );
+
+    await Navigator.of(context).push(route);
+    context.bloc<TransactionFormBloc>().add(FormClosed());
   }
 }
