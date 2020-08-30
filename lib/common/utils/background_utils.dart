@@ -260,6 +260,7 @@ class BackgroundUtils {
                 i18n.recurringTransactions,
                 t.description,
                 jsonEncode(AppNotification.openTransaction(t.id)),
+                id: t.id,
               ))
           .toList();
 
