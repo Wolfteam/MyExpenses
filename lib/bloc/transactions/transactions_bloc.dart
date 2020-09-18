@@ -124,7 +124,11 @@ class TransactionsBloc extends Cubit<TransactionsState> {
       _logger.info(runtimeType, '_buildRecurringState: Getting all parent transactions...');
       final currentUser = await _usersDao.getActiveUser();
       final transactions = await _transactionsDao.getAllParentTransactions(currentUser?.id);
-      final transPerMonth = TransactionUtils.buildTransactionsPerMonth(_settingsService.language, transactions);
+      final transPerMonth = TransactionUtils.buildTransactionsPerMonth(
+        _settingsService.language,
+        transactions,
+        sortByNextRecurringDate: true,
+      );
 
       emit(currentState.copyWith(showParentTransactions: true, transactionsPerMonth: transPerMonth));
     } catch (e, s) {

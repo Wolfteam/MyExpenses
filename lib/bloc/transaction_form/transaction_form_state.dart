@@ -258,28 +258,28 @@ class TransactionChangedState extends TransactionFormState {
   final bool wasDeleted;
   final DateTime transactionDate;
 
-  const TransactionChangedState({
+  const TransactionChangedState._({
     this.wasCreated,
     this.wasUpdated,
     this.wasDeleted,
     this.transactionDate,
   });
 
-  factory TransactionChangedState.created(DateTime transactionDate) => TransactionChangedState(
+  factory TransactionChangedState.created(DateTime transactionDate) => TransactionChangedState._(
         wasCreated: true,
         wasDeleted: false,
         wasUpdated: false,
         transactionDate: transactionDate,
       );
 
-  factory TransactionChangedState.updated(DateTime transactionDate) => TransactionChangedState(
+  factory TransactionChangedState.updated(DateTime transactionDate) => TransactionChangedState._(
         wasCreated: false,
         wasDeleted: false,
         wasUpdated: true,
         transactionDate: transactionDate,
       );
 
-  factory TransactionChangedState.deleted(DateTime transactionDate) => TransactionChangedState(
+  factory TransactionChangedState.deleted(DateTime transactionDate) => TransactionChangedState._(
         wasCreated: false,
         wasDeleted: true,
         wasUpdated: false,

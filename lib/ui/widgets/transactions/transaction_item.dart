@@ -24,10 +24,7 @@ class TransactionItem extends StatelessWidget {
     final i18n = I18n.of(context);
     final dateToUse =
         item.isParentTransaction && item.nextRecurringDate != null ? item.nextRecurringDate : item.transactionDate;
-    final dateString = DateUtils.formatDateWithoutLocale(
-      dateToUse,
-      DateUtils.monthDayAndYearFormat,
-    );
+    final dateString = DateUtils.formatDateWithoutLocale(dateToUse, DateUtils.monthDayAndYearFormat);
     final daysToNextRecurringDate =
         item.nextRecurringDate == null ? 0 : item.nextRecurringDate.difference(DateTime.now()).inDays;
 

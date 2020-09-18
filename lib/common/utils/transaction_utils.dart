@@ -146,15 +146,13 @@ class TransactionUtils {
     AppLanguageType language,
     List<TransactionItem> transactions, {
     SortDirectionType sortType = SortDirectionType.desc,
+    bool sortByNextRecurringDate = false,
   }) {
     final transPerMonth = <DateTime, List<TransactionItem>>{};
 
     for (final transaction in transactions) {
-      final date = DateTime(
-        transaction.transactionDate.year,
-        transaction.transactionDate.month,
-        transaction.transactionDate.day,
-      );
+      final dateToUse = sortByNextRecurringDate ? transaction.nextRecurringDate : transaction.transactionDate;
+      final date = DateTime(dateToUse.year, dateToUse.month, dateToUse.day);
 
       if (transPerMonth.keys.any((key) => key == date)) {
         transPerMonth[date].add(transaction);

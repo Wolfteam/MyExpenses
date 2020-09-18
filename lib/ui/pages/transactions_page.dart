@@ -63,7 +63,7 @@ class _TransactionsPageState extends State<TransactionsPage>
           _buildTransSummaryPerMonth(),
           _buildLast7DaysSummary(),
           _buildTransactionTypeSwitch(),
-          _buildTransactions(),
+          SliverPadding(padding: const EdgeInsets.only(bottom: 25), sliver: _buildTransactions()),
         ],
       ),
       floatingActionButton: _buildFab(),
