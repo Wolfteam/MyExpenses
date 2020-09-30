@@ -124,8 +124,7 @@ class GoogleServiceImpl implements GoogleService {
       );
       final client = await _getAuthClient();
 
-      final response =
-          await client.get('$_baseGoogleApisUrl/oauth2/v3/userinfo');
+      final response = await client.get('$_baseGoogleApisUrl/oauth2/v3/userinfo');
       final json = jsonDecode(response.body);
 
       final user = UserItem(
@@ -367,10 +366,7 @@ class GoogleServiceImpl implements GoogleService {
       SecureResourceType.refreshToken,
       currentUser,
     );
-    if (type == null ||
-        data == null ||
-        expiricy == null ||
-        refreshToken == null) {
+    if (type == null || data == null || expiricy == null || refreshToken == null) {
       return null;
     }
 
@@ -504,13 +500,9 @@ class GoogleServiceImpl implements GoogleService {
     final transSheetProps = sheets.SheetProperties()..title = 'Transactitons';
     final categoriesSheetProps = sheets.SheetProperties()..title = 'Categories';
 
-    final transSheetRequest = sheets.Request()
-      ..addSheet = (sheets.AddSheetRequest()..properties = transSheetProps);
-    final catSheetRequest = sheets.Request()
-      ..addSheet =
-          (sheets.AddSheetRequest()..properties = categoriesSheetProps);
-    final deleteRequest = sheets.Request()
-      ..deleteSheet = (sheets.DeleteSheetRequest()..sheetId = defaultSheetId);
+    final transSheetRequest = sheets.Request()..addSheet = (sheets.AddSheetRequest()..properties = transSheetProps);
+    final catSheetRequest = sheets.Request()..addSheet = (sheets.AddSheetRequest()..properties = categoriesSheetProps);
+    final deleteRequest = sheets.Request()..deleteSheet = (sheets.DeleteSheetRequest()..sheetId = defaultSheetId);
 
     final updateRequest = sheets.BatchUpdateSpreadsheetRequest()
       ..requests = [

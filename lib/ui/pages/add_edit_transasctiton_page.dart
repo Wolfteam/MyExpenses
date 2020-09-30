@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 import '../../bloc/charts/charts_bloc.dart';
+import '../../bloc/currency/currency_bloc.dart';
 import '../../bloc/transaction_form/transaction_form_bloc.dart';
 import '../../bloc/transactions/transactions_bloc.dart';
 import '../../common/enums/repetition_cycle_type.dart';
@@ -223,6 +224,10 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               ))
             : '${i18n.date}: ${state.transactionDateString}';
 
+    final amount = context.bloc<CurrencyBloc>().format(state.amount);
+    final category = state.category.isAnIncome ? i18n.income : i18n.expense;
+    final repetitionCycle = i18n.translateRepetitionCycleType(state.repetitionCycle);
+
     return Container(
       height: 260.0,
       child: Stack(
@@ -274,11 +279,14 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                       children: <Widget>[
                         Expanded(
                           child: ListTile(
-                            title: Text(
-                              '${state.amount} \$',
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.headline6,
+                            title: Tooltip(
+                              message: amount,
+                              child: Text(
+                                amount,
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.headline6,
+                              ),
                             ),
                             subtitle: Text(
                               i18n.amount.toUpperCase(),
@@ -289,11 +297,14 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                         ),
                         Expanded(
                           child: ListTile(
-                            title: Text(
-                              state.category.isAnIncome ? i18n.income : i18n.expense,
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.headline6,
+                            title: Tooltip(
+                              message: category,
+                              child: Text(
+                                category,
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.headline6,
+                              ),
                             ),
                             subtitle: Text(
                               i18n.category.toUpperCase(),
@@ -304,13 +315,14 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                         ),
                         Expanded(
                           child: ListTile(
-                            title: Text(
-                              i18n.translateRepetitionCycleType(
-                                state.repetitionCycle,
+                            title: Tooltip(
+                              message: repetitionCycle,
+                              child: Text(
+                                repetitionCycle,
+                                textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.headline6,
                               ),
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.headline6,
                             ),
                             subtitle: Text(
                               i18n.repetitions.toUpperCase(),

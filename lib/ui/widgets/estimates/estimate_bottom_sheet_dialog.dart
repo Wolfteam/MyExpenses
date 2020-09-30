@@ -127,6 +127,10 @@ class EstimateBottomSheetDialog extends StatelessWidget {
     final expenseTextStyle = textStyle.copyWith(color: Colors.red);
     final incomeTextStyle = textStyle.copyWith(color: Colors.green);
 
+    final formattedIncomes = currencyBloc.format(income);
+    final formattedExpenses = currencyBloc.format(expenses);
+    final formattedTotal = currencyBloc.format(total);
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -169,25 +173,34 @@ class EstimateBottomSheetDialog extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 if (showIncomes)
-                  Text(
-                    currencyBloc.format(income),
-                    textAlign: TextAlign.end,
-                    overflow: TextOverflow.ellipsis,
-                    style: incomeTextStyle,
+                  Tooltip(
+                    message: formattedIncomes,
+                    child: Text(
+                      formattedIncomes,
+                      textAlign: TextAlign.end,
+                      overflow: TextOverflow.ellipsis,
+                      style: incomeTextStyle,
+                    ),
                   ),
                 if (showExpenses)
-                  Text(
-                    currencyBloc.format(expenses),
-                    textAlign: TextAlign.end,
-                    overflow: TextOverflow.ellipsis,
-                    style: expenseTextStyle,
+                  Tooltip(
+                    message: formattedExpenses,
+                    child: Text(
+                      formattedExpenses,
+                      textAlign: TextAlign.end,
+                      overflow: TextOverflow.ellipsis,
+                      style: expenseTextStyle,
+                    ),
                   ),
                 if (showTotal)
-                  Text(
-                    currencyBloc.format(total),
-                    textAlign: TextAlign.end,
-                    overflow: TextOverflow.ellipsis,
-                    style: total >= 0 ? incomeTextStyle : expenseTextStyle,
+                  Tooltip(
+                    message: formattedTotal,
+                    child: Text(
+                      formattedTotal,
+                      textAlign: TextAlign.end,
+                      overflow: TextOverflow.ellipsis,
+                      style: total >= 0 ? incomeTextStyle : expenseTextStyle,
+                    ),
                   ),
               ],
             ),

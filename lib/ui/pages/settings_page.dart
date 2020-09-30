@@ -367,7 +367,7 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            _lauchUrl('https://github.com/Wolfteam/MyExpenses/Issues');
+                            _lauchUrl('https://github.com/Wolfteam/MyExpenses/issues');
                           },
                       ),
                     ],

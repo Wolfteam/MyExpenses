@@ -16,8 +16,7 @@ class SignInWithGoogleWebView extends StatefulWidget {
   const SignInWithGoogleWebView();
 
   @override
-  _SignInWithGoogleWebViewState createState() =>
-      _SignInWithGoogleWebViewState();
+  _SignInWithGoogleWebViewState createState() => _SignInWithGoogleWebViewState();
 }
 
 class _SignInWithGoogleWebViewState extends State<SignInWithGoogleWebView> {
@@ -79,24 +78,22 @@ class _SignInWithGoogleWebViewState extends State<SignInWithGoogleWebView> {
   ) {
     final i18n = I18n.of(context);
 
-    if (state is InitializedState &&
-        !state.codeGranted &&
-        !state.flowCompleted) {
-      final userAgent =
-          FlutterUserAgent.webViewUserAgent.replaceAll(RegExp(r'wv'), '');
+    if (state is InitializedState && !state.codeGranted && !state.flowCompleted) {
+      final userAgent = FlutterUserAgent.webViewUserAgent.replaceAll(RegExp(r'wv'), '');
       return WebviewScaffold(
         url: state.authUrl,
         userAgent: userAgent,
         enableAppScheme: true,
         appCacheEnabled: false,
         clearCache: true,
-        ignoreSSLErrors: true,
+        debuggingEnabled: true,
         appBar: AppBar(
           leading: const BackButton(),
           title: Text(i18n.authenticate),
         ),
         withJavascript: true,
         withLocalStorage: true,
+        hidden: true,
         initialChild: const Center(
           child: CircularProgressIndicator(),
         ),

@@ -139,23 +139,32 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  Text(
-                    currencyBloc.format(incomes),
-                    textAlign: TextAlign.end,
-                    overflow: TextOverflow.ellipsis,
-                    style: incomeTextStyle,
+                  Tooltip(
+                    message: currencyBloc.format(incomes),
+                    child: Text(
+                      currencyBloc.format(incomes),
+                      textAlign: TextAlign.end,
+                      overflow: TextOverflow.ellipsis,
+                      style: incomeTextStyle,
+                    ),
                   ),
-                  Text(
-                    currencyBloc.format(expenses),
-                    textAlign: TextAlign.end,
-                    overflow: TextOverflow.ellipsis,
-                    style: expenseTextStyle,
+                  Tooltip(
+                    message: currencyBloc.format(expenses),
+                    child: Text(
+                      currencyBloc.format(expenses),
+                      textAlign: TextAlign.end,
+                      overflow: TextOverflow.ellipsis,
+                      style: expenseTextStyle,
+                    ),
                   ),
-                  Text(
-                    currencyBloc.format(total),
-                    textAlign: TextAlign.end,
-                    overflow: TextOverflow.ellipsis,
-                    style: total >= 0 ? incomeTextStyle : expenseTextStyle,
+                  Tooltip(
+                    message: currencyBloc.format(total),
+                    child: Text(
+                      currencyBloc.format(total),
+                      textAlign: TextAlign.end,
+                      overflow: TextOverflow.ellipsis,
+                      style: total >= 0 ? incomeTextStyle : expenseTextStyle,
+                    ),
                   ),
                 ],
               ),

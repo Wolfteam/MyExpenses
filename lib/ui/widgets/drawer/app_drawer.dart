@@ -93,16 +93,22 @@ class AppDrawer extends StatelessWidget {
               ),
             if (state.isUserSignedIn)
               Flexible(
-                child: Text(
-                  state.fullName,
-                  style: theme.textTheme.subtitle2,
+                child: Tooltip(
+                  message: state.fullName,
+                  child: Text(
+                    state.fullName,
+                    style: theme.textTheme.subtitle2,
+                  ),
                 ),
               ),
             if (state.isUserSignedIn)
               Flexible(
-                child: Text(
-                  state.email,
-                  style: theme.textTheme.caption,
+                child: Tooltip(
+                  message: state.email,
+                  child: Text(
+                    state.email,
+                    style: theme.textTheme.caption,
+                  ),
                 ),
               )
           ],

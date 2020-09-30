@@ -63,7 +63,7 @@ class _TransactionsPageState extends State<TransactionsPage>
           _buildTransSummaryPerMonth(),
           _buildLast7DaysSummary(),
           _buildTransactionTypeSwitch(),
-          SliverPadding(padding: const EdgeInsets.only(bottom: 25), sliver: _buildTransactions()),
+          _buildTransactions(),
         ],
       ),
       floatingActionButton: _buildFab(),
@@ -159,13 +159,16 @@ class _TransactionsPageState extends State<TransactionsPage>
         final i18n = I18n.of(context);
         if (state is TransactionsLoadedState) {
           if (state.transactionsPerMonth.isNotEmpty) {
-            return SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (ctx, index) => Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  child: TransactionsCardContainer(model: state.transactionsPerMonth[index]),
+            return SliverPadding(
+              padding: const EdgeInsets.only(bottom: 25),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (ctx, index) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: TransactionsCardContainer(model: state.transactionsPerMonth[index]),
+                  ),
+                  childCount: state.transactionsPerMonth.length,
                 ),
-                childCount: state.transactionsPerMonth.length,
               ),
             );
           }
