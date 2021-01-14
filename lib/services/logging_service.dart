@@ -1,3 +1,4 @@
+import 'package:dog/dog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:log_4_dart_2/log_4_dart_2.dart';
 import 'package:sprintf/sprintf.dart';
@@ -24,8 +25,10 @@ class LoggingServiceImpl implements LoggingService {
 
     if (args != null && args.isNotEmpty) {
       _logger.info(type.toString(), sprintf(msg, args));
+      dog.i('$type - ${sprintf(msg, args)}');
     } else {
       _logger.info(type.toString(), msg);
+      dog.i('$type - $msg');
     }
   }
 
@@ -34,6 +37,7 @@ class LoggingServiceImpl implements LoggingService {
     assert(type != null && !msg.isNullEmptyOrWhitespace);
     final tag = type.toString();
     _logger.warning(tag, _formatEx(msg, ex), ex, trace);
+    dog.w('$tag - ${_formatEx(msg, ex)}');
 
     if (kReleaseMode) {
       _trackWarning(tag, msg, ex, trace);
@@ -45,6 +49,7 @@ class LoggingServiceImpl implements LoggingService {
     assert(type != null && !msg.isNullEmptyOrWhitespace);
     final tag = type.toString();
     _logger.error(tag, _formatEx(msg, ex), ex, trace);
+    dog.e('$tag - ${_formatEx(msg, ex)}');
 
     if (kReleaseMode) {
       _trackError(tag, msg, ex, trace);
@@ -59,20 +64,21 @@ class LoggingServiceImpl implements LoggingService {
   }
 
   void _trackError(String tag, String msg, [dynamic ex, StackTrace trace]) {
-    final map = {
-      'tag': tag,
-      'msg': _formatEx(msg, ex),
-      'trace': trace?.toString() ?? 'No trace available',
-    };
+    final map = _buildError(tag, msg, ex, trace);
     trackEventAsync('Error - ${DateTime.now()}', map);
   }
 
   void _trackWarning(String tag, String msg, [dynamic ex, StackTrace trace]) {
-    final map = {
+    final map = _buildError(tag, msg, ex, trace);
+    trackEventAsync('Warning - ${DateTime.now()}', map);
+  }
+
+  Map<String, String> _buildError(String tag, String msg, [dynamic ex, StackTrace trace]) {
+    return {
       'tag': tag,
-      'msg': _formatEx(msg, ex),
+      'msg': msg ?? 'No message available',
+      'ex': ex?.toString() ?? 'No exception available',
       'trace': trace?.toString() ?? 'No trace available',
     };
-    trackEventAsync('Warning - ${DateTime.now()}', map);
   }
 }
