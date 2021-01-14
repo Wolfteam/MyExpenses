@@ -80,19 +80,19 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
     final i18n = I18n.of(context);
     return [
       BottomNavigationBarItem(
-        title: Text(i18n.transactions),
+        label: i18n.transactions,
         icon: const Icon(Icons.account_balance),
       ),
       BottomNavigationBarItem(
-        title: Text(i18n.charts),
+        label: i18n.charts,
         icon: const Icon(Icons.pie_chart),
       ),
       BottomNavigationBarItem(
-        title: Text(i18n.categories),
+        label: i18n.categories,
         icon: const Icon(Icons.category),
       ),
       BottomNavigationBarItem(
-        title: Text(i18n.config),
+        label: i18n.config,
         icon: const Icon(Icons.settings),
       ),
     ];
@@ -135,7 +135,7 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
 
   void _changeCurrentTab(int index) {
     final item = _getSelectedDrawerItem(index);
-    context.bloc<DrawerBloc>().add(DrawerItemSelectionChanged(item));
+    context.read<DrawerBloc>().add(DrawerItemSelectionChanged(item));
   }
 
   Future<void> _gotoAddTransactionPage() async {

@@ -38,6 +38,7 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase> with _$UsersDaoImplMixi
       await (update(users)..where((u) => u.id.equals(existingUser.id))).write(updatedFields);
     } else {
       id = await into(users).insert(User(
+        id: null,
         localStatus: LocalStatusType.nothing,
         googleUserId: googleUserId,
         isActive: false,

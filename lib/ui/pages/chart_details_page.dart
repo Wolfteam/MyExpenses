@@ -123,11 +123,11 @@ class ChartDetailsPage extends StatelessWidget {
   }
 
   void _filterChanged(BuildContext context, TransactionFilterType newValue) =>
-      context.bloc<ChartDetailsBloc>().add(FilterChanged(newValue));
+      context.read<ChartDetailsBloc>().add(FilterChanged(newValue));
 
   void _sortDirectionChanged(
     BuildContext context,
     SortDirectionType newValue,
   ) =>
-      context.bloc<ChartDetailsBloc>().add(SortDirectionChanged(newValue));
+      context.read<ChartDetailsBloc>().add(SortDirectionChanged(newValue));
 }

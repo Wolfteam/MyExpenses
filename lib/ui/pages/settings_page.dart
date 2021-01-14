@@ -14,6 +14,7 @@ import '../../common/extensions/app_theme_type_extensions.dart';
 import '../../common/extensions/i18n_extensions.dart';
 import '../../common/presentation/custom_assets.dart';
 import '../../common/styles.dart';
+import '../../common/utils/background_utils.dart';
 import '../../common/utils/bloc_utils.dart';
 import '../../common/utils/currency_utils.dart';
 import '../../common/utils/toast_utils.dart';
@@ -35,7 +36,7 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    context.bloc<SettingsBloc>().add(const LoadSettings());
+    context.read<SettingsBloc>().add(const LoadSettings());
   }
 
   @override
@@ -230,6 +231,13 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
           title: Text(i18n.showNotificationAfterFullSync),
           onChanged: _showNotifAfterFullSyncChanged,
         ),
+        FlatButton.icon(
+          icon: const Icon(Icons.sync),
+          onPressed: () {
+            BackgroundUtils.runSyncTask();
+          },
+          label: Text(i18n.settingsSyncNow),
+        )
       ],
     );
     return _buildSettingsCard(content);
@@ -392,29 +400,29 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
   void _appThemeChanged(AppThemeType newValue) {
     final i18n = I18n.of(context);
     showInfoToast(i18n.restartTheAppToApplyChanges);
-    context.bloc<SettingsBloc>().add(AppThemeChanged(newValue));
-    context.bloc<app_bloc.AppBloc>().add(app_bloc.AppThemeChanged(newValue));
+    context.read<SettingsBloc>().add(AppThemeChanged(newValue));
+    context.read<app_bloc.AppBloc>().add(app_bloc.AppThemeChanged(newValue));
   }
 
   void _accentColorChanged(AppAccentColorType newValue) {
-    context.bloc<SettingsBloc>().add(AppAccentColorChanged(newValue));
-    context.bloc<app_bloc.AppBloc>().add(app_bloc.AppAccentColorChanged(newValue));
+    context.read<SettingsBloc>().add(AppAccentColorChanged(newValue));
+    context.read<app_bloc.AppBloc>().add(app_bloc.AppAccentColorChanged(newValue));
   }
 
   void _syncIntervalChanged(SyncIntervalType newValue) =>
-      context.bloc<SettingsBloc>().add(SyncIntervalChanged(newValue));
+      context.read<SettingsBloc>().add(SyncIntervalChanged(newValue));
 
   void _languageChanged(AppLanguageType newValue) {
     final i18n = I18n.of(context);
     showInfoToast(i18n.restartTheAppToApplyChanges);
-    context.bloc<SettingsBloc>().add(AppLanguageChanged(newValue));
+    context.read<SettingsBloc>().add(AppLanguageChanged(newValue));
   }
 
-  void _askForFingerPrintChanged(bool ask) => context.bloc<SettingsBloc>().add(AskForFingerPrintChanged(ask: ask));
+  void _askForFingerPrintChanged(bool ask) => context.read<SettingsBloc>().add(AskForFingerPrintChanged(ask: ask));
 
   Future<void> _askForPasswordChanged(bool ask) async {
     if (!ask) {
-      context.bloc<SettingsBloc>().add(AskForPasswordChanged(ask: ask));
+      context.read<SettingsBloc>().add(AskForPasswordChanged(ask: ask));
       return;
     }
 
@@ -428,22 +436,22 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
 
     if (result == null) return;
 
-    context.bloc<SettingsBloc>().add(AskForPasswordChanged(ask: result));
+    context.read<SettingsBloc>().add(AskForPasswordChanged(ask: result));
   }
 
   void _currencyChanged(CurrencySymbolType newValue) {
-    context.bloc<SettingsBloc>().add(CurrencyChanged(newValue));
+    context.read<SettingsBloc>().add(CurrencyChanged(newValue));
     BlocUtils.raiseCommonBlocEvents(context, reloadCharts: true, reloadTransactions: true);
   }
 
   void _currencyPlacementChanged(bool newValue) {
-    context.bloc<SettingsBloc>().add(CurrencyPlacementChanged(placeToTheRight: newValue));
+    context.read<SettingsBloc>().add(CurrencyPlacementChanged(placeToTheRight: newValue));
     BlocUtils.raiseCommonBlocEvents(context, reloadTransactions: true, reloadCharts: true);
   }
 
   void _showNotifAfterFullSyncChanged(bool newValue) =>
-      context.bloc<SettingsBloc>().add(ShowNotifAfterFullSyncChanged(show: newValue));
+      context.read<SettingsBloc>().add(ShowNotifAfterFullSyncChanged(show: newValue));
 
   void _showNotifForRecurringTransChanged(bool newValue) =>
-      context.bloc<SettingsBloc>().add(ShowNotifForRecurringTransChanged(show: newValue));
+      context.read<SettingsBloc>().add(ShowNotifForRecurringTransChanged(show: newValue));
 }

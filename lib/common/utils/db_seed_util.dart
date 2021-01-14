@@ -242,6 +242,7 @@ Category _buildCategory(
 ]) {
   final now = DateTime.now();
   return Category(
+    id: null,
     localStatus: LocalStatusType.nothing,
     name: name,
     isAnIncome: isAnIncome,
@@ -272,6 +273,7 @@ Transaction _buildTransaction(
 }) {
   final now = DateTime.now();
   return Transaction(
+    id: null,
     localStatus: LocalStatusType.nothing,
     amount: amount,
     categoryId: categoryId,

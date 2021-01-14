@@ -180,6 +180,7 @@
         "chooseLanguage": "Choose a language",
         "selectLanguage": "Select a language",
         "sync": "Sync",
+        "syncNow": "Sync now",
         "selectSyncInterval": "Select an interval",
         "chooseSyncInterval": "Choose a sync interval",
         "about": "About",

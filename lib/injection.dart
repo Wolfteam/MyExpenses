@@ -15,35 +15,54 @@ import 'services/sync_service.dart';
 final GetIt getIt = GetIt.instance;
 
 void initInjection() {
-  getIt.registerSingleton(Logger());
-  getIt.registerSingleton<LoggingService>(LoggingServiceImpl(getIt<Logger>()));
-  getIt.registerSingleton<SettingsService>(
-    SettingsServiceImpl(getIt<LoggingService>()),
-  );
-  getIt.registerSingleton<AppDatabase>(AppDatabase());
-  getIt.registerSingleton<CategoriesDao>(
-    CategoriesDaoImpl(getIt<AppDatabase>()),
-  );
-  getIt.registerSingleton<TransactionsDao>(
-    TransactionsDaoImpl(getIt<AppDatabase>()),
-  );
-  getIt.registerSingleton<UsersDao>(UsersDaoImpl(getIt<AppDatabase>()));
+  if (!getIt.isRegistered<Logger>()) {
+    getIt.registerSingleton(Logger());
+  }
 
-  getIt.registerSingleton<SecureStorageService>(SecureStorageServiceImpl());
+  if (!getIt.isRegistered<LoggingService>()) {
+    getIt.registerSingleton<LoggingService>(LoggingServiceImpl(getIt<Logger>()));
+  }
 
-  getIt.registerSingleton<GoogleService>(GoogleServiceImpl(
-    getIt<LoggingService>(),
-    getIt<SecureStorageService>(),
-  ));
+  if (!getIt.isRegistered<SettingsService>()) {
+    getIt.registerSingleton<SettingsService>(SettingsServiceImpl(getIt<LoggingService>()));
+  }
 
-  getIt.registerSingleton<NetworkService>(NetworkServiceImpl());
+  if (!getIt.isRegistered<AppDatabase>()) {
+    getIt.registerSingleton<AppDatabase>(AppDatabase());
+  }
 
-  getIt.registerSingleton<SyncService>(SyncServiceImpl(
-    getIt<LoggingService>(),
-    getIt<TransactionsDao>(),
-    getIt<CategoriesDao>(),
-    getIt<UsersDao>(),
-    getIt<GoogleService>(),
-    getIt<SecureStorageService>(),
-  ));
+  if (!getIt.isRegistered<CategoriesDao>()) {
+    getIt.registerSingleton<CategoriesDao>(CategoriesDaoImpl(getIt<AppDatabase>()));
+  }
+
+  if (!getIt.isRegistered<TransactionsDao>()) {
+    getIt.registerSingleton<TransactionsDao>(TransactionsDaoImpl(getIt<AppDatabase>()));
+  }
+
+  if (!getIt.isRegistered<UsersDao>()) {
+    getIt.registerSingleton<UsersDao>(UsersDaoImpl(getIt<AppDatabase>()));
+  }
+
+  if (!getIt.isRegistered<SecureStorageService>()) {
+    getIt.registerSingleton<SecureStorageService>(SecureStorageServiceImpl());
+  }
+
+  if (!getIt.isRegistered<GoogleService>()) {
+    getIt.registerSingleton<GoogleService>(GoogleServiceImpl(getIt<LoggingService>(), getIt<SecureStorageService>()));
+  }
+
+  if (!getIt.isRegistered<NetworkService>()) {
+    getIt.registerSingleton<NetworkService>(NetworkServiceImpl());
+  }
+
+  if (!getIt.isRegistered<SyncService>()) {
+    getIt.registerSingleton<SyncService>(SyncServiceImpl(
+      getIt<LoggingService>(),
+      getIt<TransactionsDao>(),
+      getIt<CategoriesDao>(),
+      getIt<UsersDao>(),
+      getIt<GoogleService>(),
+      getIt<SecureStorageService>(),
+    ));
+  }
 }

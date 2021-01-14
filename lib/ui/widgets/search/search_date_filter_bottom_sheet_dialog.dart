@@ -101,9 +101,9 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
       return;
     }
     if (isFromDate) {
-      context.bloc<SearchBloc>().tempFromDateChanged(selectedDate);
+      context.read<SearchBloc>().tempFromDateChanged(selectedDate);
     } else {
-      context.bloc<SearchBloc>().tempToDateChanged(selectedDate);
+      context.read<SearchBloc>().tempToDateChanged(selectedDate);
     }
   }
 
@@ -112,12 +112,12 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
   }
 
   void _clearFilters(BuildContext context) {
-    context.bloc<SearchBloc>().tempFromDateChanged(null);
-    context.bloc<SearchBloc>().tempToDateChanged(null);
+    context.read<SearchBloc>().tempFromDateChanged(null);
+    context.read<SearchBloc>().tempToDateChanged(null);
   }
 
   Future<void> _applyDates(BuildContext context) {
     _closeModal(context);
-    return context.bloc<SearchBloc>().applyTempDates();
+    return context.read<SearchBloc>().applyTempDates();
   }
 }

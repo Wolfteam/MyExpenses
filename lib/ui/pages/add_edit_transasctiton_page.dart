@@ -75,9 +75,9 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
 
     if (_didChangeDependencies) return;
     if (widget.item != null) {
-      context.bloc<TransactionFormBloc>().add(EditTransaction(widget.item.id));
+      context.read<TransactionFormBloc>().add(EditTransaction(widget.item.id));
     } else {
-      context.bloc<TransactionFormBloc>().add(AddTransaction());
+      context.read<TransactionFormBloc>().add(AddTransaction());
     }
 
     _didChangeDependencies = true;
@@ -108,8 +108,8 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               : i18n.transactionsWasSuccessfullyDeleted;
           showSucceedToast(msg);
 
-          await ctx.bloc<TransactionsBloc>().loadTransactions(state.transactionDate);
-          ctx.bloc<ChartsBloc>().add(LoadChart(state.transactionDate));
+          await ctx.read<TransactionsBloc>().loadTransactions(state.transactionDate);
+          ctx.read<ChartsBloc>().add(LoadChart(state.transactionDate));
 
           Navigator.of(ctx).pop();
         }
@@ -224,7 +224,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               ))
             : '${i18n.date}: ${state.transactionDateString}';
 
-    final amount = context.bloc<CurrencyBloc>().format(state.amount);
+    final amount = context.watch<CurrencyBloc>().format(state.amount);
     final category = state.category.isAnIncome ? i18n.income : i18n.expense;
     final repetitionCycle = i18n.translateRepetitionCycleType(state.repetitionCycle);
 
@@ -740,18 +740,18 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
 
   void _amountChanged() {
     final amount = double.tryParse(_amountController.text) ?? 0;
-    context.bloc<TransactionFormBloc>().add(AmountChanged(amount));
+    context.read<TransactionFormBloc>().add(AmountChanged(amount));
   }
 
   void _descriptionChanged() {
-    context.bloc<TransactionFormBloc>().add(DescriptionChanged(_descriptionController.text));
+    context.read<TransactionFormBloc>().add(DescriptionChanged(_descriptionController.text));
   }
 
   void _longDescriptionChanged() =>
-      context.bloc<TransactionFormBloc>().add(LongDescriptionChanged(_longDescriptionController.text));
+      context.read<TransactionFormBloc>().add(LongDescriptionChanged(_longDescriptionController.text));
 
   void _repetitionCycleChanged(RepetitionCycleType newValue) {
-    context.bloc<TransactionFormBloc>().add(RepetitionCycleChanged(newValue));
+    context.read<TransactionFormBloc>().add(RepetitionCycleChanged(newValue));
   }
 
   Future _transactionDateClicked(TransactionFormLoadedState state) async {
@@ -785,7 +785,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     }
 
     if (selectedDate == null) return;
-    context.bloc<TransactionFormBloc>().add(TransactionDateChanged(selectedDate));
+    context.read<TransactionFormBloc>().add(TransactionDateChanged(selectedDate));
   }
 
   void _fieldFocusChange(
@@ -824,12 +824,12 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
       if (_descriptionController.text.isNullEmptyOrWhitespace) {
         _descriptionController.text = selectedCat.name;
       }
-      context.bloc<TransactionFormBloc>().add(CategoryWasUpdated(selectedCat));
+      context.read<TransactionFormBloc>().add(CategoryWasUpdated(selectedCat));
     }
   }
 
   void _saveTransaction() {
-    context.bloc<TransactionFormBloc>().add(FormSubmitted());
+    context.read<TransactionFormBloc>().add(FormSubmitted());
   }
 
   void _showDeleteConfirmationDialog(
@@ -857,7 +857,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               if (state.isParentTransaction) {
                 _showDeleteChildsConfirmationDialog();
               } else {
-                context.bloc<TransactionFormBloc>().add(const DeleteTransaction());
+                context.read<TransactionFormBloc>().add(const DeleteTransaction());
               }
             },
             child: Text(i18n.yes),
@@ -878,7 +878,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
           OutlineButton(
             textColor: Theme.of(context).primaryColor,
             onPressed: () {
-              context.bloc<TransactionFormBloc>().add(const DeleteTransaction(keepChilds: true));
+              context.read<TransactionFormBloc>().add(const DeleteTransaction(keepChilds: true));
               Navigator.of(ctx).pop();
             },
             child: Text(i18n.no),
@@ -886,7 +886,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
           RaisedButton(
             color: Theme.of(ctx).primaryColor,
             onPressed: () {
-              context.bloc<TransactionFormBloc>().add(const DeleteTransaction());
+              context.read<TransactionFormBloc>().add(const DeleteTransaction());
               Navigator.of(ctx).pop();
             },
             child: Text(i18n.yes),
@@ -947,7 +947,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
           RaisedButton(
             color: Theme.of(ctx).primaryColor,
             onPressed: () {
-              context.bloc<TransactionFormBloc>().add(const ImageChanged(path: '', imageExists: false));
+              context.read<TransactionFormBloc>().add(const ImageChanged(path: '', imageExists: false));
               //One for this dialog and the other for the preview
               Navigator.of(ctx).pop();
               Navigator.of(ctx).pop();
@@ -967,12 +967,12 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         maxWidth: 600,
       );
       if (image == null) return;
-      context.bloc<TransactionFormBloc>().add(ImageChanged(path: image.path, imageExists: true));
+      context.read<TransactionFormBloc>().add(ImageChanged(path: image.path, imageExists: true));
     } catch (e) {
       showWarningToast(i18n.acceptPermissionsToUseThisFeature);
     }
   }
 
   void _isRunningChanged(bool newValue) =>
-      context.bloc<TransactionFormBloc>().add(IsRunningChanged(isRunning: newValue));
+      context.read<TransactionFormBloc>().add(IsRunningChanged(isRunning: newValue));
 }

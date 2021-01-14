@@ -143,17 +143,17 @@ class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilter
     //TODO: CHECK NEGATIVE VALUES
     try {
       if (_amountController.text.isNullEmptyOrWhitespace) {
-        context.bloc<SearchBloc>().tempAmountChanged(null);
+        context.read<SearchBloc>().tempAmountChanged(null);
         return;
       }
       final amount = double.parse(_amountController.text);
-      context.bloc<SearchBloc>().tempAmountChanged(amount.abs());
+      context.read<SearchBloc>().tempAmountChanged(amount.abs());
     } catch (e) {
       _amountController.text = '0';
     }
   }
 
-  void _comparererChanged(ComparerType newValue) => context.bloc<SearchBloc>().tempComparerTypeChanged(newValue);
+  void _comparererChanged(ComparerType newValue) => context.read<SearchBloc>().tempComparerTypeChanged(newValue);
 
   void _cleanAmount() => _amountController.clear();
 
@@ -163,6 +163,6 @@ class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilter
 
   Future<void> _applyAmount(BuildContext context) {
     _closeModal(context);
-    return context.bloc<SearchBloc>().applyTempAmount();
+    return context.read<SearchBloc>().applyTempAmount();
   }
 }

@@ -29,7 +29,7 @@ class _SignInWithGoogleWebViewState extends State<SignInWithGoogleWebView> {
     _flutterWebviewPlugin.close();
     _onUrlChanged = _flutterWebviewPlugin.onUrlChanged.listen((url) {
       if (mounted) {
-        context.bloc<SignInWithGoogleBloc>().add(UrlChanged(url));
+        context.read<SignInWithGoogleBloc>().add(UrlChanged(url));
       }
     });
   }
@@ -38,7 +38,7 @@ class _SignInWithGoogleWebViewState extends State<SignInWithGoogleWebView> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    context.bloc<SignInWithGoogleBloc>().add(Initialize());
+    context.read<SignInWithGoogleBloc>().add(Initialize());
   }
 
   @override

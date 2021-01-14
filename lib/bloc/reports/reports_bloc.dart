@@ -152,7 +152,8 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
 
     final path = await AppPathUtils.generateReportFilePath();
     final file = File(path);
-    await file.writeAsBytes(pdf.save());
+    final bytes = await pdf.save();
+    await file.writeAsBytes(bytes);
 
     return path;
   }

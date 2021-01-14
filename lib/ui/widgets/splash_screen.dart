@@ -19,7 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     WidgetsBinding.instance.addPostFrameCallback((duration) {
-      context.bloc<AppBloc>().add(const AuthenticateUser());
+      context.read<AppBloc>().add(const AuthenticateUser());
     });
   }
 
@@ -32,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
         } else if (state is AuthenticationState && state.askForPassword) {
           await _authenticateViaPassword(ctx);
         } else if (state is! AppInitializedState) {
-          ctx.bloc<AppBloc>().add(const InitializeApp());
+          ctx.read<AppBloc>().add(const InitializeApp());
         }
       },
       builder: (ctx, state) => Container(
@@ -109,9 +109,9 @@ class _SplashScreenState extends State<SplashScreen> {
     bool isAuthenticated,
   ) {
     if (isAuthenticated) {
-      context.bloc<AppBloc>().add(const InitializeApp());
+      context.read<AppBloc>().add(const InitializeApp());
     } else {
-      context.bloc<AppBloc>().add(const AuthenticateUser());
+      context.read<AppBloc>().add(const AuthenticateUser());
     }
   }
 }

@@ -117,7 +117,7 @@ class EstimateBottomSheetDialog extends StatelessWidget {
   ) {
     final theme = Theme.of(context);
     final i18n = I18n.of(context);
-    final currencyBloc = context.bloc<CurrencyBloc>();
+    final currencyBloc = context.read<CurrencyBloc>();
     final selectedButtons = _getSelectedButtons(selectedTransactionType);
     final showTotal = selectedButtons.first;
     final showIncomes = showTotal || selectedButtons[1];
@@ -244,11 +244,11 @@ class EstimateBottomSheetDialog extends StatelessWidget {
       return;
     }
     if (isFromDate) {
-      context.bloc<EstimatesBloc>().add(EstimatesEvent.fromDateChanged(newDate: selectedDate));
+      context.read<EstimatesBloc>().add(EstimatesEvent.fromDateChanged(newDate: selectedDate));
     } else {
-      context.bloc<EstimatesBloc>().add(EstimatesEvent.untilDateChanged(newDate: selectedDate));
+      context.read<EstimatesBloc>().add(EstimatesEvent.untilDateChanged(newDate: selectedDate));
     }
-    context.bloc<EstimatesBloc>().add(EstimatesEvent.calculate());
+    context.read<EstimatesBloc>().add(EstimatesEvent.calculate());
   }
 
   List<bool> _getSelectedButtons(int selectedTransactionType) {
@@ -271,5 +271,5 @@ class EstimateBottomSheetDialog extends StatelessWidget {
   }
 
   void _transactionTypeChanged(BuildContext context, int newValue) =>
-      context.bloc<EstimatesBloc>().add(EstimatesEvent.transactionTypeChanged(newValue: newValue));
+      context.read<EstimatesBloc>().add(EstimatesEvent.transactionTypeChanged(newValue: newValue));
 }

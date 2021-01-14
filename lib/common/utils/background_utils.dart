@@ -173,6 +173,10 @@ class BackgroundUtils {
     );
   }
 
+  static Future<void> runSyncTask() {
+    return bgSync(_syncTaskName);
+  }
+
   static Future<void> _runSyncTask(
     LoggingService logger,
     NetworkService networkService,

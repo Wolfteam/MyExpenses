@@ -103,7 +103,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
     final expenseTextStyle = textStyle.copyWith(color: Colors.red);
     final incomeTextStyle = textStyle.copyWith(color: Colors.green);
 
-    final currencyBloc = context.bloc<CurrencyBloc>();
+    final currencyBloc = context.watch<CurrencyBloc>();
 
     return Expanded(
       child: Row(
@@ -199,6 +199,6 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
     );
 
     if (selectedDate == null) return;
-    await context.bloc<TransactionsBloc>().loadTransactions(selectedDate);
+    await context.read<TransactionsBloc>().loadTransactions(selectedDate);
   }
 }

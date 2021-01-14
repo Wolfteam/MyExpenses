@@ -75,7 +75,7 @@ class UserAccountItem extends StatelessWidget {
             color: theme.primaryColor,
             onPressed: () {
               Navigator.pop(ctx);
-              context.bloc<UserAccountsBloc>().add(DeleteAccount(id));
+              context.read<UserAccountsBloc>().add(DeleteAccount(id));
             },
             child: Text(i18n.yes),
           ),
@@ -85,6 +85,6 @@ class UserAccountItem extends StatelessWidget {
   }
 
   void _changeActiveAccount(BuildContext context) {
-    context.bloc<UserAccountsBloc>().add(ChangeActiveAccount(id));
+    context.read<UserAccountsBloc>().add(ChangeActiveAccount(id));
   }
 }

@@ -23,10 +23,9 @@ class CategoryItem extends StatelessWidget {
     bool isAnotherItemSelected = false;
 
     if (isInSelectionMode) {
-      final selectedCatProvider =
-          Provider.of<CurrentSelectedCategory>(context, listen: false);
-      isAnotherItemSelected = selectedCatProvider.currentSelectedItem != null &&
-          selectedCatProvider.currentSelectedItem.id != category.id;
+      final selectedCatProvider = Provider.of<CurrentSelectedCategory>(context, listen: false);
+      isAnotherItemSelected =
+          selectedCatProvider.currentSelectedItem != null && selectedCatProvider.currentSelectedItem.id != category.id;
     }
 
     final icon = IconTheme(
@@ -34,10 +33,9 @@ class CategoryItem extends StatelessWidget {
       child: Icon(category.icon),
     );
     return Container(
-      decoration:
-          isInSelectionMode && !isAnotherItemSelected && category.isSeleted
-              ? BoxDecoration(color: theme.primaryColorLight)
-              : null,
+      decoration: isInSelectionMode && !isAnotherItemSelected && category.isSeleted
+          ? BoxDecoration(color: theme.primaryColorLight)
+          : null,
       child: ListTile(
         leading: icon,
         title: Text(category.name),
@@ -55,22 +53,21 @@ class CategoryItem extends StatelessWidget {
   }
 
   void _handleItemClickOnSelectionMode(BuildContext context) {
-    final selectedCatProvider =
-        Provider.of<CurrentSelectedCategory>(context, listen: false);
+    final selectedCatProvider = Provider.of<CurrentSelectedCategory>(context, listen: false);
     selectedCatProvider.currentSelectedItem = category;
 
     if (category.isAnIncome) {
-      context.bloc<IncomesCategoriesBloc>().add(CategoryWasSelected(
+      context.read<IncomesCategoriesBloc>().add(CategoryWasSelected(
             wasSelected: true,
             selectedCategory: category,
           ));
-      context.bloc<ExpensesCategoriesBloc>().add(UnSelectAllCategories());
+      context.read<ExpensesCategoriesBloc>().add(UnSelectAllCategories());
     } else {
-      context.bloc<ExpensesCategoriesBloc>().add(CategoryWasSelected(
+      context.read<ExpensesCategoriesBloc>().add(CategoryWasSelected(
             wasSelected: true,
             selectedCategory: category,
           ));
-      context.bloc<IncomesCategoriesBloc>().add(UnSelectAllCategories());
+      context.read<IncomesCategoriesBloc>().add(UnSelectAllCategories());
     }
   }
 
@@ -79,8 +76,8 @@ class CategoryItem extends StatelessWidget {
       builder: (ctx) => AddEditCategoryPage(category),
     );
 
-    context.bloc<CategoryFormBloc>().add(EditCategory(category));
+    context.read<CategoryFormBloc>().add(EditCategory(category));
     await Navigator.of(context).push(route);
-    context.bloc<CategoryFormBloc>().add(FormClosed());
+    context.read<CategoryFormBloc>().add(FormClosed());
   }
 }

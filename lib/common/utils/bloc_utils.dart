@@ -33,29 +33,29 @@ class BlocUtils {
 
     final now = DateTime.now();
     if (reloadTransactions) {
-      final transBloc = ctx.bloc<TransactionsBloc>();
+      final transBloc = ctx.read<TransactionsBloc>();
       if (transBloc.currentState.showParentTransactions) {
-        ctx.bloc<TransactionsBloc>().loadRecurringTransactions();
+        ctx.read<TransactionsBloc>().loadRecurringTransactions();
       } else {
-        ctx.bloc<TransactionsBloc>().loadTransactions(now);
+        ctx.read<TransactionsBloc>().loadTransactions(now);
       }
     }
 
     if (reloadCharts) {
-      ctx.bloc<ChartsBloc>().add(LoadChart(now));
+      ctx.read<ChartsBloc>().add(LoadChart(now));
     }
 
     if (reloadCategories) {
-      ctx.bloc<IncomesCategoriesBloc>().add(const GetCategories(loadIncomes: true));
-      ctx.bloc<ExpensesCategoriesBloc>().add(const GetCategories(loadIncomes: false));
+      ctx.read<IncomesCategoriesBloc>().add(const GetCategories(loadIncomes: true));
+      ctx.read<ExpensesCategoriesBloc>().add(const GetCategories(loadIncomes: false));
     }
 
     if (reloadDrawer) {
-      ctx.bloc<DrawerBloc>().add(const InitializeDrawer());
+      ctx.read<DrawerBloc>().add(const InitializeDrawer());
     }
 
     if (reloadSettings) {
-      ctx.bloc<SettingsBloc>().add(const LoadSettings());
+      ctx.read<SettingsBloc>().add(const LoadSettings());
     }
   }
 }

@@ -116,7 +116,11 @@ class CategoryIconsPage extends StatelessWidget {
     return IconButton(
       key: isSelected ? _selectedKey : null,
       iconSize: 30,
-      color: isSelected ? theme.primaryColor : theme.brightness == Brightness.dark ? Colors.white : Colors.black87,
+      color: isSelected
+          ? theme.primaryColor
+          : theme.brightness == Brightness.dark
+              ? Colors.white
+              : Colors.black87,
       icon: icon.icon,
       onPressed: () => _onIconClick(icon, context),
     );
@@ -129,7 +133,7 @@ class CategoryIconsPage extends StatelessWidget {
       );
 
   void _onIconClick(CategoryIcon icon, BuildContext context) =>
-      context.bloc<CategoryIconBloc>().add(IconSelectionChanged(icon));
+      context.read<CategoryIconBloc>().add(IconSelectionChanged(icon));
 
   void _onIconSelected(BuildContext context, CategoryIconState state) =>
       Navigator.of(context).pop<CategoryIcon>(state.selectedIcon);

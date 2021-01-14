@@ -31,7 +31,7 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
 //TODO: Once this is fixed, this should not be required anymore  https://github.com/flutter/flutter/issues/39872
     if (_didChangeDependencies) return;
 
-    context.bloc<ChartsBloc>().add(LoadChart(DateTime.now()));
+    context.read<ChartsBloc>().add(LoadChart(DateTime.now()));
     _didChangeDependencies = true;
   }
 
@@ -96,7 +96,7 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
       height: 180,
       margin: const EdgeInsets.only(bottom: 30),
       child: charts.BarChart(
-        _createSampleDataForBarChart(context, state),
+        _createSampleDataForBarChart(state),
         animate: true,
         barRendererDecorator: charts.BarLabelDecorator<String>(),
         domainAxis: charts.OrdinalAxisSpec(
@@ -132,7 +132,6 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
   }
 
   List<charts.Series<TransactionsSummaryPerDate, String>> _createSampleDataForBarChart(
-    BuildContext context,
     LoadedState state,
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -143,7 +142,7 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
       ),
     );
 
-    final currency = context.bloc<CurrencyBloc>();
+    final currency = context.read<CurrencyBloc>();
 
     return [
       charts.Series<TransactionsSummaryPerDate, String>(
@@ -151,7 +150,9 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
         data: state.transactionsPerDate,
         colorFn: (item, _) => item.totalAmount == 0
             ? charts.MaterialPalette.white
-            : item.isAnIncome ? charts.MaterialPalette.green.shadeDefault : charts.MaterialPalette.red.shadeDefault,
+            : item.isAnIncome
+                ? charts.MaterialPalette.green.shadeDefault
+                : charts.MaterialPalette.red.shadeDefault,
         domainFn: (item, _) => item.dateRangeString,
         measureFn: (item, _) => item.totalAmount,
         insideLabelStyleAccessorFn: (item, index) => labelStyle,
@@ -172,17 +173,16 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
         Expanded(
-          child: _buildChart(context, state, true),
+          child: _buildChart(state, true),
         ),
         Expanded(
-          child: _buildChart(context, state, false),
+          child: _buildChart(state, false),
         ),
       ],
     );
   }
 
   Widget _buildChart(
-    BuildContext context,
     LoadedState state,
     bool incomes,
   ) {
@@ -193,7 +193,7 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
     final textStyle = theme.textTheme.headline6;
     final dataToUse = incomes ? state.incomeChartTransactions : state.expenseChartTransactions;
 
-    final currencyBloc = context.bloc<CurrencyBloc>();
+    final currencyBloc = context.read<CurrencyBloc>();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -247,7 +247,7 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
   ) {
     final transactions = state.transactions.where((t) => t.category.isAnIncome == onlyIncomes).toList();
 
-    context.bloc<ChartDetailsBloc>().add(Initialize(transactions));
+    context.read<ChartDetailsBloc>().add(Initialize(transactions));
 
     final route = MaterialPageRoute(
       fullscreenDialog: true,
@@ -270,6 +270,6 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
         locale: currentLocale(state.language));
 
     if (selectedDate == null) return;
-    context.bloc<ChartsBloc>().add(LoadChart(selectedDate));
+    context.read<ChartsBloc>().add(LoadChart(selectedDate));
   }
 }

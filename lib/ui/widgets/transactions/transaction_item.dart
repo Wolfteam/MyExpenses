@@ -20,7 +20,7 @@ class TransactionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyBloc = context.bloc<CurrencyBloc>();
+    final currencyBloc = context.watch<CurrencyBloc>();
     final i18n = I18n.of(context);
     final dateToUse =
         item.isParentTransaction && item.nextRecurringDate != null ? item.nextRecurringDate : item.transactionDate;
@@ -33,7 +33,11 @@ class TransactionItem extends StatelessWidget {
 
     final subtitle = item.isParentTransaction && item.nextRecurringDate != null
         ? Text(i18n.nextDateOn(dateString))
-        : item.isParentTransaction ? Text(i18n.stopped) : showDate ? Text(i18n.dateOn(dateString)) : null;
+        : item.isParentTransaction
+            ? Text(i18n.stopped)
+            : showDate
+                ? Text(i18n.dateOn(dateString))
+                : null;
 
     final amountWidget = Row(
       mainAxisSize: MainAxisSize.min,
@@ -91,6 +95,6 @@ class TransactionItem extends StatelessWidget {
     );
 
     await Navigator.of(context).push(route);
-    context.bloc<TransactionFormBloc>().add(FormClosed());
+    context.read<TransactionFormBloc>().add(FormClosed());
   }
 }

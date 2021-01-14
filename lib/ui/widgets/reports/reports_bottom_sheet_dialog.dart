@@ -159,9 +159,9 @@ class ReportsBottomSheetDialog extends StatelessWidget {
     if (selectedDate == null) return;
 
     if (isFromDate) {
-      context.bloc<ReportsBloc>().add(FromDateChanged(selectedDate));
+      context.read<ReportsBloc>().add(FromDateChanged(selectedDate));
     } else {
-      context.bloc<ReportsBloc>().add(ToDateChanged(selectedDate));
+      context.read<ReportsBloc>().add(ToDateChanged(selectedDate));
     }
   }
 
@@ -169,10 +169,10 @@ class ReportsBottomSheetDialog extends StatelessWidget {
     BuildContext context,
     ReportFileType newValue,
   ) =>
-      context.bloc<ReportsBloc>().add(FileTypeChanged(newValue));
+      context.read<ReportsBloc>().add(FileTypeChanged(newValue));
 
   void _generateReport(BuildContext context) {
     final i18n = I18n.of(context);
-    context.bloc<ReportsBloc>().add(GenerateReport(i18n));
+    context.read<ReportsBloc>().add(GenerateReport(i18n));
   }
 }

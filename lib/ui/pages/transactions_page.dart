@@ -9,6 +9,7 @@ import '../../common/extensions/scroll_controller_extensions.dart';
 import '../../common/utils/i18n_utils.dart';
 import '../../generated/i18n.dart';
 import '../widgets/nothing_found.dart';
+import '../widgets/sliver_loading.dart';
 import '../widgets/transactions/home_last_7_days_summary.dart';
 import '../widgets/transactions/home_transactions_summary_per_month.dart';
 import '../widgets/transactions/transactions_card_container.dart';
@@ -32,11 +33,7 @@ class _TransactionsPageState extends State<TransactionsPage>
     super.initState();
 
     _scrollController = ScrollController();
-    _hideFabAnimController = AnimationController(
-      vsync: this,
-      duration: kThemeAnimationDuration,
-      value: 1, // initially visible
-    );
+    _hideFabAnimController = AnimationController(vsync: this, duration: kThemeAnimationDuration, value: 0);
     _scrollController.addListener(() => _scrollController.handleScrollForFab(_hideFabAnimController));
   }
 
@@ -47,11 +44,12 @@ class _TransactionsPageState extends State<TransactionsPage>
 //TODO: Once this is fixed, this should not be required anymore  https://github.com/flutter/flutter/issues/39872
     if (_didChangeDependencies) return;
     final now = DateTime.now();
-    context.bloc<TransactionsBloc>().loadTransactions(now);
+    context.read<TransactionsBloc>().loadTransactions(now);
 
     _didChangeDependencies = true;
   }
 
+//TODO: https://github.com/flutter/flutter/issues/55170
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -60,6 +58,9 @@ class _TransactionsPageState extends State<TransactionsPage>
       body: CustomScrollView(
         controller: _scrollController,
         slivers: [
+          const SliverToBoxAdapter(
+            child: SizedBox(height: 1),
+          ),
           _buildTransSummaryPerMonth(),
           _buildLast7DaysSummary(),
           _buildTransactionTypeSwitch(),
@@ -77,20 +78,11 @@ class _TransactionsPageState extends State<TransactionsPage>
     super.dispose();
   }
 
-  Widget _buildLoading() {
-    return SliverFillRemaining(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [CircularProgressIndicator()],
-      ),
-    );
-  }
-
   Widget _buildTransSummaryPerMonth() {
     return BlocBuilder<TransactionsPerMonthBloc, TransactionsPerMonthState>(
       builder: (c, s) {
         return s.map(
-          initial: (_) => _buildLoading(),
+          initial: (_) => const SliverLoading(),
           loaded: (s) => SliverToBoxAdapter(
             child: HomeTransactionSummaryPerMonth(
               expenses: s.expenses,
@@ -111,7 +103,7 @@ class _TransactionsPageState extends State<TransactionsPage>
     return BlocBuilder<TransactionsLast7DaysBloc, TransactionsLast7DaysState>(
       builder: (context, state) {
         return state.map(
-          initial: (_) => _buildLoading(),
+          initial: (_) => const SliverLoading(),
           loaded: (s) => SliverToBoxAdapter(
             child: s.showLast7Days
                 ? HomeLast7DaysSummary(selectedType: s.selectedType, incomes: s.incomes, expenses: s.expenses)
@@ -126,8 +118,8 @@ class _TransactionsPageState extends State<TransactionsPage>
     return BlocBuilder<TransactionsBloc, TransactionsState>(
       builder: (context, state) {
         final i18n = I18n.of(context);
-        if (state is TransactionsLoadedState) {
-          return SliverToBoxAdapter(
+        return state.maybeMap(
+          loaded: (state) => SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(left: 15, right: 5),
               child: Row(
@@ -145,10 +137,9 @@ class _TransactionsPageState extends State<TransactionsPage>
                 ],
               ),
             ),
-          );
-        }
-
-        return _buildLoading();
+          ),
+          orElse: () => const SliverLoading(),
+        );
       },
     );
   }
@@ -157,25 +148,24 @@ class _TransactionsPageState extends State<TransactionsPage>
     return BlocBuilder<TransactionsBloc, TransactionsState>(
       builder: (context, state) {
         final i18n = I18n.of(context);
-        if (state is TransactionsLoadedState) {
-          if (state.transactionsPerMonth.isNotEmpty) {
-            return SliverPadding(
-              padding: const EdgeInsets.only(bottom: 25),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (ctx, index) => Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5),
-                    child: TransactionsCardContainer(model: state.transactionsPerMonth[index]),
+        return state.maybeMap(
+          loaded: (state) {
+            if (state.transactionsPerMonth.isNotEmpty) {
+              return SliverPadding(
+                padding: const EdgeInsets.only(bottom: 25),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (ctx, index) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                      child: TransactionsCardContainer(model: state.transactionsPerMonth[index]),
+                    ),
+                    childCount: state.transactionsPerMonth.length,
                   ),
-                  childCount: state.transactionsPerMonth.length,
                 ),
-              ),
-            );
-          }
-          return SliverFillRemaining(
-            hasScrollBody: false,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              );
+            }
+
+            return SliverLoading(
               children: [
                 NothingFound(
                   msg: state.showParentTransactions
@@ -183,11 +173,10 @@ class _TransactionsPageState extends State<TransactionsPage>
                       : i18n.noTransactionsForThisPeriod,
                 )
               ],
-            ),
-          );
-        }
-
-        return _buildLoading();
+            );
+          },
+          orElse: () => const SliverLoading(),
+        );
       },
     );
   }
@@ -212,9 +201,9 @@ class _TransactionsPageState extends State<TransactionsPage>
     TransactionsLoadedState state,
   ) {
     if (!state.showParentTransactions) {
-      context.bloc<TransactionsBloc>().loadRecurringTransactions();
+      context.read<TransactionsBloc>().loadRecurringTransactions();
     } else {
-      context.bloc<TransactionsBloc>().loadTransactions(state.currentDate);
+      context.read<TransactionsBloc>().loadTransactions(state.currentDate);
     }
   }
 }

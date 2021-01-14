@@ -839,13 +839,72 @@ class CategoryUtils {
     return icons;
   }
 
+  static List<IconData> getAllIconData() {
+    final icons = getAllCategoryIcons();
+    return icons.map((e) => e.icon.icon).toList();
+  }
+
   static CategoryIcon getByName(String name) => getAllCategoryIcons().firstWhere((c) => c.name == name);
 
   static CategoryIcon getByNameAndType(String name, CategoryIconType type) =>
       getAllCategoryIcons().where((i) => i.type == type).firstWhere((c) => c.name == name);
 
-  static CategoryIcon getByIconData(IconData iconData) =>
-      getAllCategoryIcons().firstWhere((c) => c.icon.icon == iconData);
+  static CategoryIcon getByIconData(IconData iconData) => getAllCategoryIcons()
+      .firstWhere((c) => c.icon.icon == iconData, orElse: () => getNotExistingCategoryIcon(iconData));
+
+  ///For some reason some icons are fucked in the new dart version...
+  static CategoryIcon getNotExistingCategoryIcon(IconData iconData) {
+    switch (iconData.codePoint) {
+      case 59471:
+        return getByName(bank);
+      case 58746:
+        return getByName(fastFood);
+      case 58704:
+        return getByName(pharmacy);
+      case 59530:
+        return getByName(home);
+      case 58672:
+        return getByName(bus);
+      case 58689:
+        return getByName(cafe);
+      case 58673:
+        return getByName(car);
+      case 59404:
+        return getByName(school);
+      case 58122:
+        return getByName(laptop);
+      case 58127:
+        return getByName(gamepad);
+      case 58694:
+        return getByName(gas);
+      case 59651:
+        return getByName(seat);
+      case 57425:
+        return getByName(web);
+      case 58701:
+        return getByName(movies);
+      case 58702:
+        return getByName(offer);
+      case 58148:
+        return getByName(smartphone);
+      case 58732:
+        return getByName(restaurant);
+      case 58675:
+        return getByName(na);
+      case 58937:
+        return getByName(tv);
+      case 58713:
+        return getByName(taxi);
+      default:
+        break;
+    }
+    return getByNameAndType(na, CategoryIconType.others);
+  }
+
+  static IconData getIconData(IconData search) {
+    final iconData = getAllIconData();
+    return iconData.firstWhere((i) => i == search, orElse: () => getNotExistingCategoryIcon(search).icon.icon);
+  }
 
   static String toJSONString(IconData data) {
     final map = <String, dynamic>{};
@@ -858,11 +917,15 @@ class CategoryUtils {
 
   static IconData fromJSONString(String jsonString) {
     final map = jsonDecode(jsonString);
-    return IconData(
+    final iconData = IconData(
       map['codePoint'] as int,
       fontFamily: map['fontFamily'] as String,
       fontPackage: map['fontPackage'] as String,
       matchTextDirection: map['matchTextDirection'] as bool,
     );
+
+    final category = getByIconData(iconData);
+
+    return category.icon.icon;
   }
 }

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -12,8 +15,8 @@ const _androidPlatformChannelSpecifics = AndroidNotificationDetails(
   _channelId,
   _channelName,
   _channelDescription,
-  importance: Importance.Max,
-  priority: Priority.High,
+  importance: Importance.max,
+  priority: Priority.high,
   enableLights: true,
   color: Colors.red,
   largeIcon: DrawableResourceAndroidBitmap(_largeIcon),
@@ -22,8 +25,8 @@ const _androidPlatformChannelSpecifics = AndroidNotificationDetails(
 const _iOSPlatformChannelSpecifics = IOSNotificationDetails();
 
 const _platformChannelSpecifics = NotificationDetails(
-  _androidPlatformChannelSpecifics,
-  _iOSPlatformChannelSpecifics,
+  android: _androidPlatformChannelSpecifics,
+  iOS: _iOSPlatformChannelSpecifics,
 );
 
 Future setupNotifications({
@@ -38,8 +41,8 @@ Future setupNotifications({
     onDidReceiveLocalNotification: onIosReceiveLocalNotification,
   );
   final initializationSettings = InitializationSettings(
-    initializationSettingsAndroid,
-    initializationSettingsIOS,
+    android: initializationSettingsAndroid,
+    iOS: initializationSettingsIOS,
   );
   await _flutterLocalNotificationsPlugin.initialize(
     initializationSettings,
@@ -72,8 +75,8 @@ Future<void> showNotification(
       _channelId,
       _channelName,
       _channelDescription,
-      importance: Importance.Max,
-      priority: Priority.High,
+      importance: Importance.max,
+      priority: Priority.high,
       enableLights: true,
       color: Colors.red,
       styleInformation: BigTextStyleInformation(body),
@@ -81,8 +84,8 @@ Future<void> showNotification(
     );
 
     final _platformChannelSpecifics = NotificationDetails(
-      androidPlatformChannelSpecificsBigStyle,
-      _iOSPlatformChannelSpecifics,
+      android: androidPlatformChannelSpecificsBigStyle,
+      iOS: _iOSPlatformChannelSpecifics,
     );
 
     return _flutterLocalNotificationsPlugin.show(
@@ -115,13 +118,18 @@ Future<void> scheduleNotification(
   String title,
   String body,
   DateTime deliveredOn,
-) {
-  return _flutterLocalNotificationsPlugin.schedule(
+) async {
+  final String currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
+  tz.initializeTimeZones();
+  final location = tz.getLocation(currentTimeZone);
+
+  _flutterLocalNotificationsPlugin.zonedSchedule(
     id,
     title,
     body,
-    deliveredOn,
+    tz.TZDateTime.from(deliveredOn, location),
     _platformChannelSpecifics,
+    uiLocalNotificationDateInterpretation: null,
     androidAllowWhileIdle: true,
   );
 }

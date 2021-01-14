@@ -362,7 +362,7 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
     );
 
     final currentIcon = CategoryUtils.getByIconData(state.icon);
-    context.bloc<CategoryIconBloc>().add(IconSelectionChanged(currentIcon));
+    context.read<CategoryIconBloc>().add(IconSelectionChanged(currentIcon));
 
     final selectedIcon = await Navigator.of(context).push(route);
 
@@ -371,15 +371,15 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
     _iconChanged(selectedIcon.icon.icon);
   }
 
-  void _nameChanged() => context.bloc<CategoryFormBloc>().add(NameChanged(_nameController.text));
+  void _nameChanged() => context.read<CategoryFormBloc>().add(NameChanged(_nameController.text));
 
-  void _typeChanged(TransactionType type) => context.bloc<CategoryFormBloc>().add(TypeChanged(type));
+  void _typeChanged(TransactionType type) => context.read<CategoryFormBloc>().add(TypeChanged(type));
 
-  void _iconChanged(IconData icon) => context.bloc<CategoryFormBloc>().add(IconChanged(icon));
+  void _iconChanged(IconData icon) => context.read<CategoryFormBloc>().add(IconChanged(icon));
 
-  void _iconColorChanged(Color color) => context.bloc<CategoryFormBloc>().add(IconColorChanged(color));
+  void _iconColorChanged(Color color) => context.read<CategoryFormBloc>().add(IconColorChanged(color));
 
-  void _saveCategory() => context.bloc<CategoryFormBloc>().add(FormSubmitted());
+  void _saveCategory() => context.read<CategoryFormBloc>().add(FormSubmitted());
 
   void _showDeleteConfirmationDialog(String categoryName) {
     final i18n = I18n.of(context);
@@ -399,7 +399,7 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
           RaisedButton(
             color: Theme.of(ctx).primaryColor,
             onPressed: () {
-              context.bloc<CategoryFormBloc>().add(DeleteCategory());
+              context.read<CategoryFormBloc>().add(DeleteCategory());
               Navigator.of(ctx).pop();
             },
             child: Text(i18n.yes),
@@ -410,9 +410,9 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
   }
 
   void _notifyCategorySavedOrDeleted() {
-    context.bloc<IncomesCategoriesBloc>().add(const GetCategories(loadIncomes: true));
+    context.read<IncomesCategoriesBloc>().add(const GetCategories(loadIncomes: true));
 
-    context.bloc<ExpensesCategoriesBloc>().add(const GetCategories(loadIncomes: false));
+    context.read<ExpensesCategoriesBloc>().add(const GetCategories(loadIncomes: false));
 
     BlocUtils.raiseCommonBlocEvents(
       context,

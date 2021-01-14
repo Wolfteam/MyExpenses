@@ -79,9 +79,9 @@ class _CategoriesListPageState extends State<CategoriesListPage>
       selectedCategory: widget.selectedCategory,
     );
     if (widget.loadIncomes) {
-      context.bloc<IncomesCategoriesBloc>().add(event);
+      context.read<IncomesCategoriesBloc>().add(event);
     } else {
-      context.bloc<ExpensesCategoriesBloc>().add(event);
+      context.read<ExpensesCategoriesBloc>().add(event);
     }
   }
 
@@ -90,8 +90,8 @@ class _CategoriesListPageState extends State<CategoriesListPage>
       builder: (ctx) => const AddEditCategoryPage(null),
     );
 
-    context.bloc<CategoryFormBloc>().add(AddCategory());
+    context.read<CategoryFormBloc>().add(AddCategory());
     await Navigator.of(context).push(route);
-    context.bloc<CategoryFormBloc>().add(FormClosed());
+    context.read<CategoryFormBloc>().add(FormClosed());
   }
 }

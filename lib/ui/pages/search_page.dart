@@ -54,11 +54,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
     super.initState();
     _scrollController = ScrollController();
     _searchBoxTextController = TextEditingController(text: '');
-    _hideFabAnimController = AnimationController(
-      vsync: this,
-      duration: kThemeAnimationDuration,
-      value: 1, // initially visible
-    );
+    _hideFabAnimController = AnimationController(vsync: this, duration: kThemeAnimationDuration, value: 0);
     _scrollController.addListener(() => _scrollController.handleScrollForFab(_hideFabAnimController));
     _scrollController.addListener(_onScroll);
     _searchBoxTextController.addListener(_onSearchTextChanged);
@@ -246,6 +242,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
       child: ScaleTransition(
         scale: _hideFabAnimController,
         child: FloatingActionButton(
+          mini: true,
           backgroundColor: Theme.of(context).primaryColor,
           onPressed: () => _scrollController.goToTheTop(),
           child: const Icon(Icons.arrow_upward),
@@ -257,13 +254,13 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
   Future<void> _onScroll() async {
     if (_isBottom && !_isLoadingMore) {
       _isLoadingMore = true;
-      await context.bloc<SearchBloc>().loadMore();
+      await context.read<SearchBloc>().loadMore();
       _isLoadingMore = false;
     }
     return Future.value();
   }
 
-  Future<void> _onSearchTextChanged() => context.bloc<SearchBloc>().descriptionChanged(_searchBoxTextController.text);
+  Future<void> _onSearchTextChanged() => context.read<SearchBloc>().descriptionChanged(_searchBoxTextController.text);
 
   void _cleanSearchText() {
     _searchFocusNode.requestFocus();
@@ -277,7 +274,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
 
   void _showDateFilterBottomSheet() {
     _removeSearchFocus();
-    context.bloc<SearchBloc>().resetTempDates();
+    context.read<SearchBloc>().resetTempDates();
     showModalBottomSheet(
       shape: Styles.modalBottomSheetShape,
       isDismissible: true,
@@ -289,7 +286,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
 
   void _showAmountFilterBottomSheet(double initialAmount) {
     _removeSearchFocus();
-    context.bloc<SearchBloc>().resetTempDates();
+    context.read<SearchBloc>().resetTempDates();
     showModalBottomSheet(
       shape: Styles.modalBottomSheetShape,
       isDismissible: true,
@@ -312,21 +309,21 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
     );
     await Navigator.of(context).push(route);
 
-    await context.bloc<SearchBloc>().categoryChanged(selectedCatProvider.currentSelectedItem);
+    await context.read<SearchBloc>().categoryChanged(selectedCatProvider.currentSelectedItem);
   }
 
   Future<void> _transactionFilterTypeChanged(TransactionFilterType newValue) {
     _removeSearchFocus();
-    return context.bloc<SearchBloc>().transactionFilterChanged(newValue);
+    return context.read<SearchBloc>().transactionFilterChanged(newValue);
   }
 
   Future<void> _transactionTypeChanged(int newValue) {
     _removeSearchFocus();
-    return context.bloc<SearchBloc>().transactionTypeChanged(newValue);
+    return context.read<SearchBloc>().transactionTypeChanged(newValue);
   }
 
   Future<void> _sortDirectionChanged(SortDirectionType newValue) {
     _removeSearchFocus();
-    return context.bloc<SearchBloc>().sortDirectionchanged(newValue);
+    return context.read<SearchBloc>().sortDirectionchanged(newValue);
   }
 }

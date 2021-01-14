@@ -43,7 +43,7 @@ class TransactionsCardContainer extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     final i18n = I18n.of(context);
-    final currencyBloc = context.bloc<CurrencyBloc>();
+    final currencyBloc = context.watch<CurrencyBloc>();
     final expenses = '${i18n.expenses}: ${currencyBloc.format(model.dayExpenses)}';
     final incomes = '${i18n.incomes}: ${currencyBloc.format(model.dayIncomes)}';
 

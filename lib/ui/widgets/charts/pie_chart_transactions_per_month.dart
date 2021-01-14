@@ -35,7 +35,7 @@ class PieChartTransactionsPerMonths extends StatelessWidget {
       ),
     );
 
-    final currencyBloc = context.bloc<CurrencyBloc>();
+    final currencyBloc = context.watch<CurrencyBloc>();
 
     final dataToUse = chartData.isEmpty
         ? [

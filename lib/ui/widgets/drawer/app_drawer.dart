@@ -182,13 +182,13 @@ class AppDrawer extends StatelessWidget {
   }
 
   void _onSelectedItem(AppDrawerItemType selectedPage, BuildContext context) {
-    context.bloc<DrawerBloc>().add(DrawerItemSelectionChanged(selectedPage));
+    context.read<DrawerBloc>().add(DrawerItemSelectionChanged(selectedPage));
     Navigator.pop(context);
   }
 
   Future<void> _showReportSheet(BuildContext context) async {
     Navigator.pop(context);
-    context.bloc<ReportsBloc>().add(const ResetReportSheet());
+    context.read<ReportsBloc>().add(const ResetReportSheet());
     //TODO: IF THE CONTENT IS TO LARGE, WE CANT CLOSE THE SHEET
     await showModalBottomSheet(
       shape: const RoundedRectangleBorder(
@@ -206,7 +206,7 @@ class AppDrawer extends StatelessWidget {
 
   void _showEstimatesBottomSheet(BuildContext context) {
     Navigator.pop(context);
-    context.bloc<EstimatesBloc>().add(EstimatesEvent.load());
+    context.read<EstimatesBloc>().add(EstimatesEvent.load());
 
     showModalBottomSheet(
       shape: Styles.modalBottomSheetShape,
@@ -249,7 +249,7 @@ class AppDrawer extends StatelessWidget {
 
   void _signOut(BuildContext context) {
     Navigator.pop(context);
-    context.bloc<DrawerBloc>().add(const SignOut());
+    context.read<DrawerBloc>().add(const SignOut());
   }
 
   Future<void> _signIn(
@@ -257,7 +257,7 @@ class AppDrawer extends StatelessWidget {
     DrawerState state,
   ) async {
     Navigator.pop(context);
-    context.bloc<UserAccountsBloc>().add(Initialize());
+    context.read<UserAccountsBloc>().add(Initialize());
 
     showModalBottomSheet(
       shape: const RoundedRectangleBorder(
@@ -275,7 +275,7 @@ class AppDrawer extends StatelessWidget {
 
   Future<void> _showSearchPage(BuildContext context) async {
     Navigator.pop(context);
-    await context.bloc<SearchBloc>().init();
+    await context.read<SearchBloc>().init();
     Navigator.push(context, SearchPage.route());
   }
 }

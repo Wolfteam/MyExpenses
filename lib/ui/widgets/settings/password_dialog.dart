@@ -179,7 +179,11 @@ class _PasswordDialogState extends State<PasswordDialog> {
           color: theme.primaryColor,
           onPressed: !widget.promptForPassword && !state.isFormValid
               ? null
-              : !widget.promptForPassword ? _submitForm : !state.isPasswordValid ? null : _validatePassword,
+              : !widget.promptForPassword
+                  ? _submitForm
+                  : !state.isPasswordValid
+                      ? null
+                      : _validatePassword,
           child: Text(i18n.ok),
         ),
       ],
@@ -196,16 +200,16 @@ class _PasswordDialogState extends State<PasswordDialog> {
   }
 
   void _passwordChanged() =>
-      context.bloc<PasswordDialogBloc>().add(PasswordChanged(newValue: _passwordController.text));
+      context.read<PasswordDialogBloc>().add(PasswordChanged(newValue: _passwordController.text));
 
-  void _showPassword(bool show) => context.bloc<PasswordDialogBloc>().add(ShowPassword(show: show));
+  void _showPassword(bool show) => context.read<PasswordDialogBloc>().add(ShowPassword(show: show));
 
   void _confirmPasswordChanged() =>
-      context.bloc<PasswordDialogBloc>().add(ConfirmPasswordChanged(newValue: _confirmPasswordController.text));
+      context.read<PasswordDialogBloc>().add(ConfirmPasswordChanged(newValue: _confirmPasswordController.text));
 
-  void _showConfirmPassword(bool show) => context.bloc<PasswordDialogBloc>().add(ShowConfirmPassword(show: show));
+  void _showConfirmPassword(bool show) => context.read<PasswordDialogBloc>().add(ShowConfirmPassword(show: show));
 
-  void _submitForm() => context.bloc<PasswordDialogBloc>().add(const SubmitForm());
+  void _submitForm() => context.read<PasswordDialogBloc>().add(const SubmitForm());
 
-  void _validatePassword() => context.bloc<PasswordDialogBloc>().add(ValidatePassword(_passwordController.text));
+  void _validatePassword() => context.read<PasswordDialogBloc>().add(ValidatePassword(_passwordController.text));
 }

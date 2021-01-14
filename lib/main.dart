@@ -118,8 +118,8 @@ class _MyAppState extends State<MyApp> {
                 transactionsDao,
                 usersDao,
                 settingsService,
-                ctx.bloc<TransactionsPerMonthBloc>(),
-                ctx.bloc<TransactionsLast7DaysBloc>(),
+                ctx.read<TransactionsPerMonthBloc>(),
+                ctx.read<TransactionsLast7DaysBloc>(),
               );
             },
           ),
@@ -150,7 +150,7 @@ class _MyAppState extends State<MyApp> {
           BlocProvider(create: (ctx) {
             final logger = getIt<LoggingService>();
             final settingsService = getIt<SettingsService>();
-            final drawerBloc = ctx.bloc<DrawerBloc>();
+            final drawerBloc = ctx.read<DrawerBloc>();
             return app_bloc.AppBloc(logger, settingsService, drawerBloc);
           }),
           BlocProvider(create: (ctx) {
@@ -178,7 +178,7 @@ class _MyAppState extends State<MyApp> {
               final logger = getIt<LoggingService>();
               final transactionsDao = getIt<TransactionsDao>();
               final usersDao = getIt<UsersDao>();
-              final currencyBloc = ctx.bloc<CurrencyBloc>();
+              final currencyBloc = ctx.read<CurrencyBloc>();
               return ReportsBloc(
                 logger,
                 transactionsDao,
@@ -245,7 +245,7 @@ class _MyAppState extends State<MyApp> {
                 onSelectNotification: _onSelectNotification,
               );
 
-              ctx.bloc<DrawerBloc>().add(const InitializeDrawer());
+              ctx.read<DrawerBloc>().add(const InitializeDrawer());
             }
           },
           builder: (ctx, state) => _buildApp(ctx, state),

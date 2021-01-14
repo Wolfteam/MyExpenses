@@ -35,6 +35,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
     final now = DateTime.now();
     if (transaction.id <= 0) {
       final id = await into(transactions).insert(Transaction(
+        id: null,
         localStatus: LocalStatusType.created,
         amount: transaction.amount,
         categoryId: transaction.category.id,
@@ -716,6 +717,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
   ) {
     final now = DateTime.now();
     return Transaction(
+      id: null,
       localStatus: LocalStatusType.created,
       amount: parent.amount,
       categoryId: parent.category.id,
@@ -787,6 +789,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
       parentId = parent.id;
     }
     return Transaction(
+      id: null,
       localStatus: LocalStatusType.nothing,
       amount: transaction.amount,
       categoryId: cat.id,

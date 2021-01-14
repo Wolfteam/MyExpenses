@@ -1,27 +1,20 @@
 part of '../models/entities/database.dart';
 
 @UseDao(tables: [Categories, Transactions])
-class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
-    with _$CategoriesDaoImplMixin
-    implements CategoriesDao {
+class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesDaoImplMixin implements CategoriesDao {
   CategoriesDaoImpl(AppDatabase db) : super(db);
 
   @override
   Future<List<CategoryItem>> getAll(int userId) {
-    final query = select(categories)
-      ..orderBy([(t) => OrderingTerm(expression: t.name)]);
+    final query = select(categories)..orderBy([(t) => OrderingTerm(expression: t.name)]);
 
     if (userId != null) {
       query.where(
-        (c) =>
-            c.userId.equals(userId) &
-            c.localStatus.equals(LocalStatusType.deleted.index).not(),
+        (c) => c.userId.equals(userId) & c.localStatus.equals(LocalStatusType.deleted.index).not(),
       );
     } else {
       query.where(
-        (c) =>
-            isNull(c.userId) &
-            c.localStatus.equals(LocalStatusType.deleted.index).not(),
+        (c) => isNull(c.userId) & c.localStatus.equals(LocalStatusType.deleted.index).not(),
       );
     }
 
@@ -55,22 +48,16 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
       );
     } else {
       query.where(
-        (c) =>
-            c.isAnIncome.equals(true) &
-            isNull(c.userId) &
-            c.localStatus.equals(LocalStatusType.deleted.index).not(),
+        (c) => c.isAnIncome.equals(true) & isNull(c.userId) & c.localStatus.equals(LocalStatusType.deleted.index).not(),
       );
     }
 
-    return (query..orderBy([(t) => OrderingTerm(expression: t.name)]))
-        .map(_mapToCategoryItem)
-        .get();
+    return (query..orderBy([(t) => OrderingTerm(expression: t.name)])).map(_mapToCategoryItem).get();
   }
 
   @override
   Future<List<CategoryItem>> getAllExpenses(int userId) {
-    final query = select(categories)
-      ..orderBy([(t) => OrderingTerm(expression: t.name)]);
+    final query = select(categories)..orderBy([(t) => OrderingTerm(expression: t.name)]);
 
     if (userId != null) {
       query.where(
@@ -82,9 +69,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
     } else {
       query.where(
         (c) =>
-            c.isAnIncome.equals(false) &
-            isNull(c.userId) &
-            c.localStatus.equals(LocalStatusType.deleted.index).not(),
+            c.isAnIncome.equals(false) & isNull(c.userId) & c.localStatus.equals(LocalStatusType.deleted.index).not(),
       );
     }
     return query.map(_mapToCategoryItem).get();
@@ -97,6 +82,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
     final now = DateTime.now();
     if (category.id <= 0) {
       id = await into(categories).insert(Category(
+        id: null,
         localStatus: LocalStatusType.created,
         userId: userId,
         icon: category.icon,
@@ -116,8 +102,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
       ));
     } else {
       id = category.id;
-      final currentCat =
-          await (select(categories)..where((c) => c.id.equals(id))).getSingle();
+      final currentCat = await (select(categories)..where((c) => c.id.equals(id))).getSingle();
 
       final updatedFields = CategoriesCompanion(
         icon: Value(category.icon),
@@ -132,8 +117,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
             : const Value(LocalStatusType.updated),
       );
 
-      await (update(categories)..where((t) => t.id.equals(id)))
-          .write(updatedFields);
+      await (update(categories)..where((t) => t.id.equals(id))).write(updatedFields);
     }
 
     final query = select(categories)..where((t) => t.id.equals(id));
@@ -150,8 +134,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
 
   @override
   Future<bool> deleteCategory(int id) async {
-    final cat =
-        await (select(categories)..where((c) => c.id.equals(id))).getSingle();
+    final cat = await (select(categories)..where((c) => c.id.equals(id))).getSingle();
 
     if (cat.localStatus == LocalStatusType.created) {
       await (delete(categories)..where((t) => t.id.equals(id))).go();
@@ -177,14 +160,12 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
 
   @override
   Future<void> updateUserId(int userId) {
-    return (update(categories)..where((c) => isNull(c.userId)))
-        .write(CategoriesCompanion(userId: Value(userId)));
+    return (update(categories)..where((c) => isNull(c.userId))).write(CategoriesCompanion(userId: Value(userId)));
   }
 
   @override
   Future<void> onUserSignedOut() {
-    return update(categories)
-        .write(const CategoriesCompanion(userId: Value(null)));
+    return update(categories).write(const CategoriesCompanion(userId: Value(null)));
   }
 
   @override
@@ -199,9 +180,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
   Future<List<sync_cat.Category>> getAllCategoriesToSync(int userId) {
     return (select(categories)
           ..where(
-            (c) =>
-                c.localStatus.equals(LocalStatusType.deleted.index).not() &
-                c.userId.equals(userId),
+            (c) => c.localStatus.equals(LocalStatusType.deleted.index).not() & c.userId.equals(userId),
           )
           ..orderBy(
             [(c) => OrderingTerm(expression: c.id)],
@@ -227,16 +206,11 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
   ) async {
     final catsInDb = await (select(categories)
           ..where(
-            (c) =>
-                c.userId.equals(userId) &
-                c.localStatus.equals(LocalStatusType.created.index).not(),
+            (c) => c.userId.equals(userId) & c.localStatus.equals(LocalStatusType.created.index).not(),
           ))
         .get();
     final downloadedCatsHash = existingCats.map((c) => c.createdHash).toList();
-    final catsToDelete = catsInDb
-        .where((c) => !downloadedCatsHash.contains(c.createdHash))
-        .map((t) => t.id)
-        .toList();
+    final catsToDelete = catsInDb.where((c) => !downloadedCatsHash.contains(c.createdHash)).map((t) => t.id).toList();
 
     if (catsToDelete.isEmpty) return;
 
@@ -252,9 +226,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
   Future<void> syncUpDelete(int userId) {
     return (delete(categories)
           ..where(
-            (c) =>
-                c.localStatus.equals(LocalStatusType.deleted.index) &
-                c.userId.equals(userId),
+            (c) => c.localStatus.equals(LocalStatusType.deleted.index) & c.userId.equals(userId),
           ))
         .go();
   }
@@ -264,12 +236,12 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
     int userId,
     List<sync_cat.Category> existingCats,
   ) async {
-    final catsInDb =
-        await (select(categories)..where((c) => c.userId.equals(userId))).get();
+    final catsInDb = await (select(categories)..where((c) => c.userId.equals(userId))).get();
     final localCatsHash = catsInDb.map((c) => c.createdHash).toList();
     final catsToBeCreated = existingCats
         .where((c) => !localCatsHash.contains(c.createdHash))
         .map((c) => Category(
+              id: null,
               localStatus: LocalStatusType.nothing,
               createdAt: c.createdAt,
               createdBy: c.createdBy,
@@ -296,10 +268,8 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
     int userId,
     List<sync_cat.Category> existingCats,
   ) async {
-    final existingCatsToUse =
-        existingCats.where((t) => t.updatedAt != null).toList();
-    final downloadedCatsHash =
-        existingCatsToUse.map((c) => c.createdHash).toList();
+    final existingCatsToUse = existingCats.where((t) => t.updatedAt != null).toList();
+    final downloadedCatsHash = existingCatsToUse.map((c) => c.createdHash).toList();
     final catsInDb = await (select(categories)
           ..where(
             (c) =>
@@ -311,11 +281,9 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
 
     final catsToUpdate = <Category>[];
     for (final cat in catsToUpdate) {
-      final localCat =
-          catsInDb.singleWhere((t) => t.createdHash == cat.createdHash);
+      final localCat = catsInDb.singleWhere((t) => t.createdHash == cat.createdHash);
 
-      if (localCat.updatedAt == null ||
-          localCat.updatedAt.isBefore(cat.updatedAt)) {
+      if (localCat.updatedAt == null || localCat.updatedAt.isBefore(cat.updatedAt)) {
         catsToUpdate.add(localCat);
       }
     }
@@ -324,8 +292,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase>
 
     await batch((b) {
       for (final cat in catsToUpdate) {
-        final updatedCat = existingCatsToUse
-            .singleWhere((c) => c.createdHash == cat.createdHash);
+        final updatedCat = existingCatsToUse.singleWhere((c) => c.createdHash == cat.createdHash);
 
         b.update<Categories, Category>(
           categories,

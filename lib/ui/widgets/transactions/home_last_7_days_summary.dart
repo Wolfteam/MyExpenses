@@ -61,8 +61,7 @@ class HomeLast7DaysSummary extends StatelessWidget {
         isDark ? Colors.white : Colors.black,
       ),
     );
-
-    final currencyBloc = context.bloc<CurrencyBloc>();
+    final currencyBloc = context.watch<CurrencyBloc>();
 
     return [
       charts.Series<TransactionsSummaryPerDay, String>(
@@ -150,6 +149,6 @@ class HomeLast7DaysSummary extends StatelessWidget {
   }
 
   void _onSelectedTypeChanged(BuildContext context, int newValue) => context
-      .bloc<TransactionsLast7DaysBloc>()
+      .read<TransactionsLast7DaysBloc>()
       .transactionTypeChanged(TransactionType.values.firstWhere((el) => el.index == newValue));
 }
