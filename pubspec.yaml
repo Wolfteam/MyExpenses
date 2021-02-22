@@ -11,7 +11,7 @@ description: An app that helps you to keep track of your expenses.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.3+25
+version: 1.0.3+26
 
 environment:
   sdk: ">=2.9.0 <3.0.0"
@@ -46,7 +46,7 @@ dependencies:
   image: ^2.1.12
   image_picker: ^0.6.7+8
   json_annotation: ^3.0.1
-  local_auth: ^0.6.2+3
+  local_auth: ^0.6.3+4
   log_4_dart_2: ^0.4.0
   month_picker_dialog: ^0.3.3
   moor: ^3.3.0

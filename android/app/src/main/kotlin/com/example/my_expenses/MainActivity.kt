@@ -6,18 +6,25 @@ import androidx.annotation.NonNull
 import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.crashes.Crashes
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
+import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugins.GeneratedPluginRegistrant
 
-class MainActivity : FlutterActivity() {
+//You need a FlutterFragmentActivity to use the local_auth plugin
+class MainActivity : FlutterFragmentActivity() {
     companion object {
         const val methodChannelName = "com.github.wolfteam.my_expenses"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        MethodChannel(flutterEngine!!.dartExecutor.binaryMessenger, methodChannelName).setMethodCallHandler(::onMethodCall)
+    }
+
+    override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
+        GeneratedPluginRegistrant.registerWith(flutterEngine);
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, methodChannelName).setMethodCallHandler(::onMethodCall)
     }
 
     private fun onMethodCall(@NonNull call: MethodCall, @NonNull result: MethodChannel.Result) {
@@ -25,7 +32,7 @@ class MainActivity : FlutterActivity() {
         try {
             when (call.method) {
                 "start" -> {
-                    if (activity.application == null) {
+                    if (application == null) {
                         val error = "Fail to resolve Application on registration"
                         Log.e(call.method, error)
                         result.error(call.method, error, Exception(error))
@@ -40,7 +47,7 @@ class MainActivity : FlutterActivity() {
                         return
                     }
 
-                    AppCenter.start(activity.application, appSecret, Analytics::class.java, Crashes::class.java)
+                    AppCenter.start(application, appSecret, Analytics::class.java, Crashes::class.java)
                 }
                 "trackEvent" -> {
                     val name = call.argument<String>("name")
