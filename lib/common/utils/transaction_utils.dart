@@ -36,6 +36,7 @@ class TransactionUtils {
     switch (cycle) {
       case RepetitionCycleType.eachDay:
       case RepetitionCycleType.eachWeek:
+      case RepetitionCycleType.eachYear:
         return nextRecurringDate.add(Duration(days: daysToAdd));
       case RepetitionCycleType.biweekly:
         return DateUtils.getNextBiweeklyDate(nextRecurringDate);
@@ -102,7 +103,8 @@ class TransactionUtils {
               'and next recurring date is = ${parent.nextRecurringDate}',
         );
 
-        final tuple = getRecurringTransactionPeriods(parent.repetitionCycle, parent.nextRecurringDate, now);
+        final tuple = getRecurringTransactionPeriods(
+            parent.repetitionCycle, parent.transactionDate, parent.nextRecurringDate, now);
         final nextRecurringDate = tuple.item1;
         final periods = tuple.item2;
 
@@ -124,6 +126,7 @@ class TransactionUtils {
 
   static Tuple2<DateTime, List<DateTime>> getRecurringTransactionPeriods(
     RepetitionCycleType cycle,
+    DateTime transactionDate,
     DateTime nextRecurringDate,
     DateTime untilDate,
   ) {
@@ -139,6 +142,13 @@ class TransactionUtils {
 
       currentRecurringDate = getNextRecurringDate(cycle, currentRecurringDate);
     }
+
+    if (cycle == RepetitionCycleType.eachMonth &&
+        currentRecurringDate.day != transactionDate.day &&
+        DateUtils.getLastDayDateOfTheMonth(currentRecurringDate).day == transactionDate.day) {
+      currentRecurringDate = DateTime(currentRecurringDate.year, currentRecurringDate.month, transactionDate.day);
+    }
+
     return Tuple2<DateTime, List<DateTime>>(currentRecurringDate, periods);
   }
 

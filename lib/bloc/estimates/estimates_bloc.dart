@@ -107,6 +107,7 @@ class EstimatesBloc extends Bloc<EstimatesEvent, EstimatesState> {
       }
       final tuple = TransactionUtils.getRecurringTransactionPeriods(
         parent.repetitionCycle,
+        parent.transactionDate,
         parent.nextRecurringDate,
         untilDate,
       );

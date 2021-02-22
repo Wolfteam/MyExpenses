@@ -117,7 +117,7 @@ class EstimateBottomSheetDialog extends StatelessWidget {
   ) {
     final theme = Theme.of(context);
     final i18n = I18n.of(context);
-    final currencyBloc = context.read<CurrencyBloc>();
+    final currencyBloc = context.watch<CurrencyBloc>();
     final selectedButtons = _getSelectedButtons(selectedTransactionType);
     final showTotal = selectedButtons.first;
     final showIncomes = showTotal || selectedButtons[1];

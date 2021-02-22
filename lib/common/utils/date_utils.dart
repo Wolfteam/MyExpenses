@@ -48,25 +48,30 @@ class DateUtils {
 
   static DateTime getFirstDayDateOfTheMonth(DateTime from) => DateTime(from.year, from.month);
 
-  static DateTime getLastDayDateOfTheMonth(DateTime from) => (from.month < 12)
-      ? DateTime(from.year, from.month + 1, 0, 23, 59, 59)
-      : DateTime(from.year + 1, 1, 0, 23, 59, 59);
+  static DateTime getLastDayDateOfTheMonth(DateTime from) =>
+      (from.month < 12) ? DateTime(from.year, from.month + 1, 0, 23, 59, 59) : DateTime(from.year + 1, 1, 0, 23, 59, 59);
 
   static DateTime getNextMonthDate(DateTime from) {
-    final tentantiveDate = from.add(const Duration(days: 30));
-    if (tentantiveDate.day == from.day) return tentantiveDate;
+    var tentativeDate = from.add(const Duration(days: 30));
+    final monthsDiff = tentativeDate.month - from.month;
+    if (tentativeDate.day == from.day) return tentativeDate;
 
-    final daysInNextMonth = getLastDayDateOfTheMonth(tentantiveDate).day;
+    //If monthsDiff > 1 that means that we are in february
+    if (monthsDiff > 1) {
+      tentativeDate = DateTime(from.year, from.month + 1);
+    }
+
+    final daysInNextMonth = getLastDayDateOfTheMonth(tentativeDate).day;
     if (from.day > daysInNextMonth) {
       return DateTime(
-        tentantiveDate.year,
-        tentantiveDate.month,
+        tentativeDate.year,
+        tentativeDate.month,
         daysInNextMonth,
       );
     }
     return DateTime(
-      tentantiveDate.year,
-      tentantiveDate.month,
+      tentativeDate.year,
+      tentativeDate.month,
       from.day,
     );
   }
