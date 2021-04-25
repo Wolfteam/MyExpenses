@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/generated/l10n.dart';
 
 import '../../../bloc/currency/currency_bloc.dart';
 import '../../../common/styles.dart';
-import '../../../generated/i18n.dart';
 import '../../../models/transaction_card_items.dart';
 import '../../widgets/transactions/transaction_item.dart' as transaction;
 
@@ -11,8 +11,8 @@ class TransactionsCardContainer extends StatelessWidget {
   final TransactionCardItems model;
 
   const TransactionsCardContainer({
-    Key key,
-    this.model,
+    Key? key,
+    required this.model,
   }) : super(key: key);
 
   @override
@@ -42,7 +42,7 @@ class TransactionsCardContainer extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
     final currencyBloc = context.watch<CurrencyBloc>();
     final expenses = '${i18n.expenses}: ${currencyBloc.format(model.dayExpenses)}';
     final incomes = '${i18n.incomes}: ${currencyBloc.format(model.dayIncomes)}';

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/generated/l10n.dart';
 
 import '../../bloc/drawer/drawer_bloc.dart';
 import '../../common/enums/app_drawer_item_type.dart';
-import '../../generated/i18n.dart';
 import '../pages/add_edit_transasctiton_page.dart';
 import '../pages/categories_page.dart';
 import '../pages/charts_page.dart';
@@ -23,7 +23,7 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
     const CategoriesPage(),
     SettingsPage(),
   ];
-  TabController _tabController;
+  late TabController _tabController;
 
   @override
   void initState() {
@@ -35,7 +35,7 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(I18n.of(context).appName),
+        title: Text(S.of(context).appName),
       ),
       drawer: AppDrawer(),
       body: TabBarView(
@@ -77,7 +77,7 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
   }
 
   List<BottomNavigationBarItem> _buildBottomNavBars() {
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
     return [
       BottomNavigationBarItem(
         label: i18n.transactions,
@@ -135,13 +135,12 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
 
   void _changeCurrentTab(int index) {
     final item = _getSelectedDrawerItem(index);
-    context.read<DrawerBloc>().add(DrawerItemSelectionChanged(item));
+    context.read<DrawerBloc>().add(DrawerEvent.selectedItemChanged(selectedPage: item));
   }
 
   Future<void> _gotoAddTransactionPage() async {
-    final route = MaterialPageRoute(
-      builder: (ctx) => const AddEditTransactionPage(),
-    );
+    final route = AddEditTransactionPage.addRoute(context);
     await Navigator.of(context).push(route);
+    await route.completed;
   }
 }

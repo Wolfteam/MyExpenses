@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/generated/l10n.dart';
 
 import '../../../bloc/users_accounts/user_accounts_bloc.dart';
-import '../../../generated/i18n.dart';
 
 class UserAccountItem extends StatelessWidget {
   final int id;
@@ -15,12 +15,12 @@ class UserAccountItem extends StatelessWidget {
   final bool canBeDeleted;
 
   const UserAccountItem({
-    this.id,
-    this.fullname,
-    this.email,
-    this.imgUrl,
-    this.isActive,
-    this.canBeDeleted,
+    required this.id,
+    required this.fullname,
+    required this.email,
+    required this.imgUrl,
+    required this.isActive,
+    required this.canBeDeleted,
   });
 
   @override
@@ -54,7 +54,7 @@ class UserAccountItem extends StatelessWidget {
 
   void _showDeleteDialog(BuildContext context) {
     final theme = Theme.of(context);
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
 
     showDialog(
       context: context,
@@ -75,7 +75,7 @@ class UserAccountItem extends StatelessWidget {
             color: theme.primaryColor,
             onPressed: () {
               Navigator.pop(ctx);
-              context.read<UserAccountsBloc>().add(DeleteAccount(id));
+              context.read<UserAccountsBloc>().add(UserAccountsEvent.deleteAccount(id: id));
             },
             child: Text(i18n.yes),
           ),
@@ -85,6 +85,6 @@ class UserAccountItem extends StatelessWidget {
   }
 
   void _changeActiveAccount(BuildContext context) {
-    context.read<UserAccountsBloc>().add(ChangeActiveAccount(id));
+    context.read<UserAccountsBloc>().add(UserAccountsEvent.changeActiveAccount(newActiveUserId: id));
   }
 }

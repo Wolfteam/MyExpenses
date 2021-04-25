@@ -1,17 +1,17 @@
+import 'package:my_expenses/generated/l10n.dart';
+import 'package:package_info/package_info.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
-import 'package:package_info/package_info.dart';
 
 import '../../../common/utils/date_utils.dart';
 import '../../../common/utils/transaction_utils.dart';
-import '../../../generated/i18n.dart';
 import '../../../models/transaction_item.dart';
 
 class PdfSummary extends StatelessWidget {
   final PackageInfo packageInfo;
   final PdfImage img;
   final List<TransactionItem> transactions;
-  final I18n i18n;
+  final S i18n;
   final DateTime from;
   final DateTime to;
   final String Function(double) formatter;
@@ -36,7 +36,7 @@ class PdfSummary extends StatelessWidget {
 
     final incomeAmount = TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: true);
 
-    final expenseAmount = TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: false);
+    final expenseAmount = TransactionUtils.getTotalTransactionAmounts(transactions);
 
     final balance = TransactionUtils.roundDouble(incomeAmount + expenseAmount);
 

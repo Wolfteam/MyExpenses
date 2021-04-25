@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/generated/l10n.dart';
 
 import '../../../bloc/currency/currency_bloc.dart';
 import '../../../common/styles.dart';
-import '../../../generated/i18n.dart';
 import '../../../models/chart_grouped_transactions_by_category.dart';
 import '../transactions/transaction_item.dart' as trans_item;
 
@@ -14,17 +14,17 @@ class ChartGroupedTransactionsCardContainer extends StatelessWidget {
   double get percentage => grouped.total * 100 / transactionsTotalAmount;
 
   const ChartGroupedTransactionsCardContainer({
-    Key key,
-    this.grouped,
-    this.transactionsTotalAmount,
+    Key? key,
+    required this.grouped,
+    required this.transactionsTotalAmount,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
     final percentageString = percentage.toStringAsFixed(2);
 
-    final currencyBloc = context.bloc<CurrencyBloc>();
+    final currencyBloc = context.read<CurrencyBloc>();
 
     return Card(
       shape: RoundedRectangleBorder(

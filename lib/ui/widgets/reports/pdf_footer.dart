@@ -1,10 +1,9 @@
+import 'package:my_expenses/generated/l10n.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
-import '../../../generated/i18n.dart';
-
 class PdfFooter extends StatelessWidget {
-  final I18n i18n;
+  final S i18n;
 
   PdfFooter(this.i18n);
 

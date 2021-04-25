@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/generated/l10n.dart';
 
 import '../../../bloc/search/search_bloc.dart';
 import '../../../common/enums/app_language_type.dart';
 import '../../../common/extensions/string_extensions.dart';
 import '../../../common/styles.dart';
 import '../../../common/utils/i18n_utils.dart';
-import '../../../generated/i18n.dart';
 import '../modal_sheet_separator.dart';
 import '../modal_sheet_title.dart';
 
@@ -31,7 +31,7 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
 
   List<Widget> _buildPage(BuildContext context, SearchState state) {
     final theme = Theme.of(context);
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
     final now = DateTime.now();
     return state.map(
       loading: (_) => [],
@@ -45,13 +45,13 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
           FlatButton(
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             onPressed: () => _changeDate(context, s.tempFrom ?? now, s.currentLanguage, true),
-            child: Align(alignment: Alignment.centerLeft, child: Text(startText)),
+            child: Align(alignment: Alignment.centerLeft, child: Text(startText!)),
           ),
           Text('${i18n.untilDate}:'),
           FlatButton(
             materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             onPressed: () => _changeDate(context, s.tempUntil ?? now, s.currentLanguage, false),
-            child: Align(alignment: Alignment.centerLeft, child: Text(untilText)),
+            child: Align(alignment: Alignment.centerLeft, child: Text(untilText!)),
           ),
           Divider(color: theme.accentColor),
           _buildBottomButtonBar(context),
@@ -62,7 +62,7 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
 
   Widget _buildBottomButtonBar(BuildContext context) {
     final theme = Theme.of(context);
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
     return ButtonBar(
       layoutBehavior: ButtonBarLayoutBehavior.constrained,
       children: <Widget>[
@@ -101,9 +101,9 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
       return;
     }
     if (isFromDate) {
-      context.read<SearchBloc>().tempFromDateChanged(selectedDate);
+      context.read<SearchBloc>().add(SearchEvent.tempFromDateChanged(newValue: selectedDate));
     } else {
-      context.read<SearchBloc>().tempToDateChanged(selectedDate);
+      context.read<SearchBloc>().add(SearchEvent.tempToDateChanged(newValue: selectedDate));
     }
   }
 
@@ -112,12 +112,12 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
   }
 
   void _clearFilters(BuildContext context) {
-    context.read<SearchBloc>().tempFromDateChanged(null);
-    context.read<SearchBloc>().tempToDateChanged(null);
+    context.read<SearchBloc>().add(const SearchEvent.tempFromDateChanged());
+    context.read<SearchBloc>().add(const SearchEvent.tempToDateChanged());
   }
 
-  Future<void> _applyDates(BuildContext context) {
+  void _applyDates(BuildContext context) {
     _closeModal(context);
-    return context.read<SearchBloc>().applyTempDates();
+    context.read<SearchBloc>().add(const SearchEvent.applyTempDates());
   }
 }

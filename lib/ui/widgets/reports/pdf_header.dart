@@ -1,17 +1,16 @@
+import 'package:my_expenses/generated/l10n.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
-import '../../../generated/i18n.dart';
-
 class PdfHeader extends StatelessWidget {
-  final I18n i18n;
+  final S i18n;
 
   PdfHeader(this.i18n);
 
   @override
   Widget build(Context context) {
     if (context.pageNumber == 1) {
-      return null;
+      return Container();
     }
     return Container(
       alignment: Alignment.centerRight,

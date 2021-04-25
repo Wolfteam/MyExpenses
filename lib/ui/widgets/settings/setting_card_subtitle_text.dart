@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 class SettingsCardSubtitleText extends StatelessWidget {
   final String text;
   const SettingsCardSubtitleText({
-    Key key,
-    @required this.text,
+    Key? key,
+    required this.text,
   }) : super(key: key);
 
   @override

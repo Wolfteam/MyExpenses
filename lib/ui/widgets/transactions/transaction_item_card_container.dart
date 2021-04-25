@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:my_expenses/generated/l10n.dart';
 
 import '../../../common/styles.dart';
-import '../../../common/utils/date_utils.dart';
-import '../../../generated/i18n.dart';
+import '../../../common/utils/date_utils.dart' as utils;
 import '../../../models/transaction_item.dart';
 import '../transactions/transaction_item.dart' as trans_item;
 
 class TransactionItemCardContainer extends StatelessWidget {
   final TransactionItem item;
   const TransactionItemCardContainer({
-    Key key,
-    @required this.item,
+    Key? key,
+    required this.item,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final i18n = I18n.of(context);
-    final formattedDate = DateUtils.formatDateWithoutLocale(item.transactionDate, DateUtils.monthDayAndYearFormat);
+    final i18n = S.of(context);
+    final formattedDate = utils.DateUtils.formatDateWithoutLocale(item.transactionDate, utils.DateUtils.monthDayAndYearFormat);
     final dateString = '${i18n.date}: $formattedDate';
 
     return Card(

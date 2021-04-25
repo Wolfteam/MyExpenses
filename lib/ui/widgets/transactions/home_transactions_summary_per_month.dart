@@ -1,13 +1,14 @@
-import 'package:charts_flutter/flutter.dart' as charts;
+// import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
+import 'package:my_expenses/generated/l10n.dart';
 
 import '../../../bloc/currency/currency_bloc.dart';
 import '../../../bloc/transactions/transactions_bloc.dart';
-import '../../../generated/i18n.dart';
 import '../../../models/transactions_summary_per_month.dart';
-import '../custom_arc_renderer.dart';
+// import '../custom_arc_renderer.dart';
 
 class HomeTransactionSummaryPerMonth extends StatelessWidget {
   final String month;
@@ -19,13 +20,13 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
   final Locale locale;
 
   const HomeTransactionSummaryPerMonth({
-    @required this.month,
-    @required this.expenses,
-    @required this.incomes,
-    @required this.total,
-    @required this.data,
-    @required this.currentDate,
-    @required this.locale,
+    required this.month,
+    required this.expenses,
+    required this.incomes,
+    required this.total,
+    required this.data,
+    required this.currentDate,
+    required this.locale,
   });
 
   @override
@@ -34,9 +35,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
       elevation: 3,
       margin: const EdgeInsets.all(10),
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          bottomRight: Radius.circular(60),
-        ),
+        borderRadius: BorderRadius.only(bottomRight: Radius.circular(60)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -45,7 +44,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              _buildPieChart(),
+              _buildPieChart(context),
               _buildSummary(context),
             ],
           ),
@@ -73,33 +72,55 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
     );
   }
 
-  Widget _buildPieChart() {
-    return Container(
-      // color: Colors.brown,
-      width: 150,
-      height: 150,
-      child: charts.PieChart(
-        _createSampleData(),
-        animate: true,
-        defaultRenderer: CustomArcRendererConfig(
-          arcRatio: 1,
-          strokeWidthPx: 0,
-          arcRendererDecorators: [
-            charts.ArcLabelDecorator(
-              labelPosition: charts.ArcLabelPosition.inside,
-            )
-          ],
+  Widget _buildPieChart(BuildContext context) {
+    final theme = Theme.of(context);
+    return SizedBox(
+      height: 180,
+      width: 180,
+      child: PieChart(
+        PieChartData(
+          borderData: FlBorderData(show: false),
+          sectionsSpace: 0,
+          centerSpaceRadius: 0,
+          startDegreeOffset: -90,
+          sections: data
+              .where((el) => el.percentage != 0)
+              .map(
+                (e) => PieChartSectionData(
+                  color: e.color,
+                  value: e.percentage,
+                  title: '${e.percentage} %',
+                  radius: 80,
+                  titleStyle: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: theme.brightness == Brightness.dark ? Colors.white : Colors.black,
+                  ),
+                ),
+              )
+              .toList(),
         ),
       ),
     );
   }
 
+  // List<charts.Series<TransactionsSummaryPerMonth, int>> _createSampleData() {
+  //   return [
+  //     charts.Series<TransactionsSummaryPerMonth, int>(
+  //       id: 'HomeTransactionsSummaryPerMonth',
+  //       data: data,
+  //       domainFn: (item, _) => item.order,
+  //       //The values here must be positives and the sum of them must be equal to 100%
+  //       measureFn: (item, _) => item.percentage,
+  //       colorFn: (item, _) => charts.ColorUtil.fromDartColor(item.color),
+  //       labelAccessorFn: (row, _) => '${row.percentage} %',
+  //     )
+  //   ];
+  // }
+
   Widget _buildSummary(BuildContext context) {
     final theme = Theme.of(context);
-    final i18n = I18n.of(context);
-    final textStyle = theme.textTheme.subtitle1.copyWith(
-      fontWeight: FontWeight.bold,
-    );
+    final i18n = S.of(context);
+    final textStyle = theme.textTheme.subtitle1!.copyWith(fontWeight: FontWeight.bold);
     final expenseTextStyle = textStyle.copyWith(color: Colors.red);
     final incomeTextStyle = textStyle.copyWith(color: Colors.green);
 
@@ -175,20 +196,6 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
     );
   }
 
-  List<charts.Series<TransactionsSummaryPerMonth, int>> _createSampleData() {
-    return [
-      charts.Series<TransactionsSummaryPerMonth, int>(
-        id: 'HomeTransactionsSummaryPerMonth',
-        data: data,
-        domainFn: (item, _) => item.order,
-        //The values here must be positives and the sum of them must be equal to 100%
-        measureFn: (item, _) => item.percentage,
-        colorFn: (item, _) => charts.ColorUtil.fromDartColor(item.color),
-        labelAccessorFn: (row, _) => '${row.percentage} %',
-      )
-    ];
-  }
-
   Future _changeCurrentDate(BuildContext context) async {
     final now = DateTime.now();
     final selectedDate = await showMonthPicker(
@@ -198,7 +205,9 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
       locale: locale,
     );
 
-    if (selectedDate == null) return;
-    await context.read<TransactionsBloc>().loadTransactions(selectedDate);
+    if (selectedDate == null) {
+      return;
+    }
+    context.read<TransactionsBloc>().add(TransactionsEvent.loadTransactions(inThisDate: selectedDate));
   }
 }

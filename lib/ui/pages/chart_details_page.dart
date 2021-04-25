@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/generated/l10n.dart';
 
 import '../../bloc/chart_details/chart_details_bloc.dart';
 import '../../common/enums/sort_direction_type.dart';
 import '../../common/enums/transaction_filter_type.dart';
-import '../../generated/i18n.dart';
 import '../../models/chart_transaction_item.dart';
 import '../widgets/charts/chart_grouped_transactions_card_container.dart';
 import '../widgets/charts/chart_transaction_card_container.dart';
@@ -17,13 +17,13 @@ class ChartDetailsPage extends StatelessWidget {
   final List<ChartTransactionItem> chartData;
 
   const ChartDetailsPage({
-    @required this.onlyIncomes,
-    @required this.chartData,
+    required this.onlyIncomes,
+    required this.chartData,
   });
 
   @override
   Widget build(BuildContext context) {
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -44,8 +44,9 @@ class ChartDetailsPage extends StatelessWidget {
   }
 
   List<Widget> _buildPage(BuildContext context, ChartDetailsState state) {
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
     final theme = Theme.of(context);
+    final double aspectRatio = MediaQuery.of(context).orientation == Orientation.portrait ? 3 / 2 : 3 / 1;
 
     return [
       Container(
@@ -59,22 +60,17 @@ class ChartDetailsPage extends StatelessWidget {
         margin: const EdgeInsets.only(left: 20),
         child: Text(
           '${state.transactionsTotalAmount} \$',
-          style: theme.textTheme.headline6.copyWith(
-            color: onlyIncomes ? Colors.green : Colors.red,
-          ),
+          style: theme.textTheme.headline6!.copyWith(color: onlyIncomes ? Colors.green : Colors.red),
         ),
       ),
-      PieChartTransactionsPerMonths(chartData, 300, 0.8),
+      AspectRatio(aspectRatio: aspectRatio, child: PieChartTransactionsPerMonths(chartData, 30)),
       const Divider(),
       ..._buildTransactions(context, state),
     ];
   }
 
-  List<Widget> _buildTransactions(
-    BuildContext context,
-    ChartDetailsState state,
-  ) {
-    final i18n = I18n.of(context);
+  List<Widget> _buildTransactions(BuildContext context, ChartDetailsState state) {
+    final i18n = S.of(context);
     final theme = Theme.of(context);
 
     return [
@@ -106,9 +102,7 @@ class ChartDetailsPage extends StatelessWidget {
       ListView.builder(
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
-        itemCount: state.filter != TransactionFilterType.category
-            ? state.transactions.length
-            : state.groupedTransactionsByCategory.length,
+        itemCount: state.filter != TransactionFilterType.category ? state.transactions.length : state.groupedTransactionsByCategory.length,
         itemBuilder: (ctx, index) => state.filter != TransactionFilterType.category
             ? ChartTransactionCardContainer(
                 state.transactions[index],
@@ -123,11 +117,8 @@ class ChartDetailsPage extends StatelessWidget {
   }
 
   void _filterChanged(BuildContext context, TransactionFilterType newValue) =>
-      context.read<ChartDetailsBloc>().add(FilterChanged(newValue));
+      context.read<ChartDetailsBloc>().add(ChartDetailsEvent.filterChanged(selectedFilter: newValue));
 
-  void _sortDirectionChanged(
-    BuildContext context,
-    SortDirectionType newValue,
-  ) =>
-      context.read<ChartDetailsBloc>().add(SortDirectionChanged(newValue));
+  void _sortDirectionChanged(BuildContext context, SortDirectionType newValue) =>
+      context.read<ChartDetailsBloc>().add(ChartDetailsEvent.sortDirectionChanged(selectedDirection: newValue));
 }

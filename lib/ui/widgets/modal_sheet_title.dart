@@ -4,8 +4,8 @@ class ModalSheetTitle extends StatelessWidget {
   final String title;
   final EdgeInsets padding;
   const ModalSheetTitle({
-    Key key,
-    @required this.title,
+    Key? key,
+    required this.title,
     this.padding = const EdgeInsets.only(bottom: 20),
   }) : super(key: key);
 
