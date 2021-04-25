@@ -12,7 +12,6 @@ import '../../common/utils/notification_utils.dart';
 import '../../daos/transactions_dao.dart';
 import '../../daos/users_dao.dart';
 import '../../injection.dart';
-import '../../logger.dart';
 import '../../models/app_notification.dart';
 import '../../models/entities/database.dart';
 import '../../services/logging_service.dart';
@@ -22,7 +21,7 @@ import '../../services/sync_service.dart';
 import 'transaction_utils.dart';
 
 void callbackDispatcher() {
-  Workmanager.executeTask((task, inputData) async {
+  Workmanager().executeTask((task, inputData) async {
     WidgetsFlutterBinding.ensureInitialized();
     await BackgroundUtils.bgSync(task);
     return true;
@@ -42,7 +41,7 @@ class BackgroundUtils {
   static Future<void> initBg() {
     //TODO: CHANGE THE ISINDEBUG
     if (Platform.isAndroid) {
-      return Workmanager.initialize(callbackDispatcher);
+      return Workmanager().initialize(callbackDispatcher);
     }
 
     return Future.value();
@@ -76,7 +75,7 @@ class BackgroundUtils {
         );
     }
 
-    return Workmanager.registerPeriodicTask(
+    return Workmanager().registerPeriodicTask(
       _syncTaskId,
       _syncTaskName,
       frequency: duration,
@@ -96,7 +95,7 @@ class BackgroundUtils {
       return Future.value();
     }
 
-    return Workmanager.registerPeriodicTask(
+    return Workmanager().registerPeriodicTask(
       _recurringTransId,
       _recurringTransName,
       frequency: duration,
@@ -109,12 +108,11 @@ class BackgroundUtils {
   }
 
   static Future<void> cancelSyncTask() {
-    return Workmanager.cancelByUniqueName(_syncTaskId);
+    return Workmanager().cancelByUniqueName(_syncTaskId);
   }
 
   static Future<void> bgSync(String task) async {
     initInjection();
-    await setupLogging();
     final logger = getIt<LoggingService>();
     final settingsService = getIt<SettingsService>();
     await settingsService.init();
@@ -124,7 +122,7 @@ class BackgroundUtils {
     try {
       switch (task) {
         case _syncTaskName:
-          final SendPort sendPort = IsolateNameServer.lookupPortByName(
+          final sendPort = IsolateNameServer.lookupPortByName(
             portName,
           );
           sendPort?.send([true]);

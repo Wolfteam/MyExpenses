@@ -1,4 +1,4 @@
-import 'package:data_connection_checker/data_connection_checker.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 abstract class NetworkService {
   Future<bool> isInternetAvailable();
@@ -7,7 +7,7 @@ abstract class NetworkService {
 class NetworkServiceImpl implements NetworkService {
   @override
   Future<bool> isInternetAvailable() {
-    final checker = DataConnectionChecker();
+    final checker = InternetConnectionChecker();
     return checker.hasConnection;
   }
 }

@@ -30,8 +30,8 @@ const _platformChannelSpecifics = NotificationDetails(
 );
 
 Future setupNotifications({
-  DidReceiveLocalNotificationCallback onIosReceiveLocalNotification,
-  SelectNotificationCallback onSelectNotification,
+  required DidReceiveLocalNotificationCallback onIosReceiveLocalNotification,
+  required SelectNotificationCallback onSelectNotification,
 }) async {
   const initializationSettingsAndroid = AndroidInitializationSettings('ic_notification');
   final initializationSettingsIOS = IOSInitializationSettings(
@@ -51,13 +51,12 @@ Future setupNotifications({
 }
 
 Future<bool> requestIOSPermissions() async {
-  final result = await _flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
-      ?.requestPermissions(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
+  final result =
+      await _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()?.requestPermissions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
 
   if (result == null) return false;
 
@@ -129,7 +128,7 @@ Future<void> scheduleNotification(
     body,
     tz.TZDateTime.from(deliveredOn, location),
     _platformChannelSpecifics,
-    uiLocalNotificationDateInterpretation: null,
+    uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
     androidAllowWhileIdle: true,
   );
 }

@@ -7,7 +7,7 @@ abstract class SecureStorageService {
 
   Future<void> save(SecureResourceType resource, String username, String value);
 
-  Future<String> get(SecureResourceType resource, String username);
+  Future<String?> get(SecureResourceType resource, String username);
 
   Future<void> delete(SecureResourceType resource, String username);
 
@@ -38,7 +38,7 @@ class SecureStorageServiceImpl implements SecureStorageService {
   }
 
   @override
-  Future<String> get(SecureResourceType resource, String username) {
+  Future<String?> get(SecureResourceType resource, String username) {
     final key = _buildKey(resource, username);
     return _storage.read(key: key);
   }
@@ -47,9 +47,7 @@ class SecureStorageServiceImpl implements SecureStorageService {
   Future<void> deleteAll(String username) async {
     const values = SecureResourceType.values;
     for (final item in values) {
-      final key = item == SecureResourceType.currentUser
-          ? _buildKey(item, defaultUsername)
-          : _buildKey(item, username);
+      final key = item == SecureResourceType.currentUser ? _buildKey(item, defaultUsername) : _buildKey(item, username);
       await _storage.delete(key: key);
     }
   }
@@ -70,13 +68,12 @@ class SecureStorageServiceImpl implements SecureStorageService {
     if (updateUsername) {
       final currentSecret = await get(resource, username);
       await delete(resource, username);
-      await save(resource, newValueOrOwner, currentSecret);
+      await save(resource, newValueOrOwner, currentSecret!);
       return;
     }
     await delete(resource, username);
     await save(resource, username, newValueOrOwner);
   }
 
-  String _buildKey(SecureResourceType resourceType, String username) =>
-      '${username}_$resourceType';
+  String _buildKey(SecureResourceType resourceType, String username) => '${username}_$resourceType';
 }

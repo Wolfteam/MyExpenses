@@ -841,7 +841,7 @@ class CategoryUtils {
 
   static List<IconData> getAllIconData() {
     final icons = getAllCategoryIcons();
-    return icons.map((e) => e.icon.icon).toList();
+    return icons.map((e) => e.icon.icon!).toList();
   }
 
   static CategoryIcon getByName(String name) => getAllCategoryIcons().firstWhere((c) => c.name == name);
@@ -849,8 +849,8 @@ class CategoryUtils {
   static CategoryIcon getByNameAndType(String name, CategoryIconType type) =>
       getAllCategoryIcons().where((i) => i.type == type).firstWhere((c) => c.name == name);
 
-  static CategoryIcon getByIconData(IconData iconData) => getAllCategoryIcons()
-      .firstWhere((c) => c.icon.icon == iconData, orElse: () => getNotExistingCategoryIcon(iconData));
+  static CategoryIcon getByIconData(IconData iconData) =>
+      getAllCategoryIcons().firstWhere((c) => c.icon.icon == iconData, orElse: () => getNotExistingCategoryIcon(iconData));
 
   ///For some reason some icons are fucked in the new dart version...
   static CategoryIcon getNotExistingCategoryIcon(IconData iconData) {
@@ -903,7 +903,7 @@ class CategoryUtils {
 
   static IconData getIconData(IconData search) {
     final iconData = getAllIconData();
-    return iconData.firstWhere((i) => i == search, orElse: () => getNotExistingCategoryIcon(search).icon.icon);
+    return iconData.firstWhere((i) => i == search, orElse: () => getNotExistingCategoryIcon(search).icon.icon!);
   }
 
   static String toJSONString(IconData data) {
@@ -919,13 +919,13 @@ class CategoryUtils {
     final map = jsonDecode(jsonString);
     final iconData = IconData(
       map['codePoint'] as int,
-      fontFamily: map['fontFamily'] as String,
-      fontPackage: map['fontPackage'] as String,
+      fontFamily: map['fontFamily'] as String?,
+      fontPackage: map['fontPackage'] as String?,
       matchTextDirection: map['matchTextDirection'] as bool,
     );
 
     final category = getByIconData(iconData);
 
-    return category.icon.icon;
+    return category.icon.icon!;
   }
 }
