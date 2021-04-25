@@ -23,7 +23,7 @@ class EstimatesBloc extends Bloc<EstimatesEvent, EstimatesState> {
   final TransactionsDao _transactionsDao;
   EstimatesBloc(this._logger, this._settings, this._usersDao, this._transactionsDao) : super(EstimatesState.loading());
 
-  EstimatesInitialState get currentState => state as EstimatesInitialState;
+  _EstimatesInitialState get currentState => state as _EstimatesInitialState;
 
   @override
   Stream<EstimatesState> mapEventToState(
@@ -108,7 +108,7 @@ class EstimatesBloc extends Bloc<EstimatesEvent, EstimatesState> {
       final tuple = TransactionUtils.getRecurringTransactionPeriods(
         parent.repetitionCycle,
         parent.transactionDate,
-        parent.nextRecurringDate,
+        parent.nextRecurringDate!,
         untilDate,
       );
 

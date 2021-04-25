@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:meta/meta.dart';
 
 import '../../daos/categories_dao.dart';
@@ -9,6 +9,7 @@ import '../../daos/users_dao.dart';
 import '../../models/category_item.dart';
 import '../../services/logging_service.dart';
 
+part 'categories_list_bloc.freezed.dart';
 part 'categories_list_event.dart';
 part 'categories_list_state.dart';
 
@@ -17,31 +18,27 @@ abstract class _CategoriesListBloc extends Bloc<CategoriesListEvent, CategoriesL
   final CategoriesDao _categoriesDao;
   final UsersDao _usersDao;
 
-  _CategoriesListBloc(this._logger, this._categoriesDao, this._usersDao) : super(CategoriesLoadingState());
+  _CategoriesListBloc(this._logger, this._categoriesDao, this._usersDao) : super(const CategoriesListState.loading());
 
-  CategoriesLoadedState get currentState => state as CategoriesLoadedState;
+  _LoadedState get currentState => state as _LoadedState;
 
   @override
   Stream<CategoriesListState> mapEventToState(
     CategoriesListEvent event,
   ) async* {
-    if (event is GetCategories) {
-      yield* _loadCategories(event);
-    }
+    final s = await event.map(
+      getCategories: (e) async => _loadCategories(e),
+      categoryWasSelected: (e) async => _categorySelected(e),
+      unSelectAll: (_) async {
+        final categories = _changeSelectedState(false);
+        return currentState.copyWith.call(categories: categories);
+      },
+    );
 
-    if (event is CategoryWasSelected &&
-        state is CategoriesLoadedState &&
-        currentState.categories.any((c) => c.id == event.selectedCategory.id)) {
-      yield* _categorySelected(event);
-    }
-
-    if (event is UnSelectAllCategories && state is CategoriesLoadedState) {
-      final categories = _changeSelectedState(false);
-      yield currentState.copyWith(categories: categories);
-    }
+    yield s;
   }
 
-  Stream<CategoriesLoadedState> _loadCategories(GetCategories event) async* {
+  Future<CategoriesListState> _loadCategories(_GetCategories event) async {
     try {
       _logger.info(
         runtimeType,
@@ -53,10 +50,10 @@ abstract class _CategoriesListBloc extends Bloc<CategoriesListEvent, CategoriesL
         currentUser?.id,
       );
 
-      if (event.selectedCategory != null && categories.any((t) => t.id == event.selectedCategory.id)) {
-        _setSelectedItem(event.selectedCategory.id, categories);
+      if (event.selectedCategory != null && categories.any((t) => t.id == event.selectedCategory!.id)) {
+        _setSelectedItem(event.selectedCategory!.id, categories);
       }
-      yield buildCategoriesLoadedState(categories);
+      return buildCategoriesLoadedState(categories);
     } catch (e, s) {
       _logger.error(
         runtimeType,
@@ -64,20 +61,16 @@ abstract class _CategoriesListBloc extends Bloc<CategoriesListEvent, CategoriesL
         e,
         s,
       );
-      yield buildCategoriesLoadedState([]);
+      return buildCategoriesLoadedState([]);
     }
   }
 
-  Stream<CategoriesLoadedState> _categorySelected(
-    CategoryWasSelected event,
-  ) async* {
+  CategoriesListState _categorySelected(_CategoryWasSelected event) {
     final categories = _changeSelectedState(false);
 
     _setSelectedItem(event.selectedCategory.id, categories);
 
-    yield currentState.copyWith(
-      categories: categories,
-    );
+    return currentState.copyWith(categories: categories);
   }
 
   List<CategoryItem> _changeSelectedState(bool isSelected) {
@@ -92,12 +85,12 @@ abstract class _CategoriesListBloc extends Bloc<CategoriesListEvent, CategoriesL
     _logger.info(runtimeType, '_setSelectedItem: Setting the selected categoryId = $selectedId');
 
     final int index = categories.indexWhere((t) => t.id == selectedId);
-    final cat = categories.elementAt(index).copyWith(isSeleted: true);
+    final cat = categories.elementAt(index).copyWith(isSelected: true);
     categories.insert(index, cat);
     categories.removeAt(index + 1);
   }
 
-  CategoriesLoadedState buildCategoriesLoadedState(
+  CategoriesListState buildCategoriesLoadedState(
     List<CategoryItem> categories,
   );
 }
@@ -110,13 +103,8 @@ class IncomesCategoriesBloc extends _CategoriesListBloc {
   ) : super(logger, categoriesDao, usersDao);
 
   @override
-  CategoriesLoadedState buildCategoriesLoadedState(
-    List<CategoryItem> categories,
-  ) {
-    return CategoriesLoadedState(
-      loadedIncomes: true,
-      categories: categories,
-    );
+  CategoriesListState buildCategoriesLoadedState(List<CategoryItem> categories) {
+    return CategoriesListState.loaded(loadedIncomes: true, categories: categories);
   }
 }
 
@@ -128,12 +116,7 @@ class ExpensesCategoriesBloc extends _CategoriesListBloc {
   ) : super(logger, categoriesDao, usersDao);
 
   @override
-  CategoriesLoadedState buildCategoriesLoadedState(
-    List<CategoryItem> categories,
-  ) {
-    return CategoriesLoadedState(
-      loadedIncomes: false,
-      categories: categories,
-    );
+  CategoriesListState buildCategoriesLoadedState(List<CategoryItem> categories) {
+    return CategoriesListState.loaded(loadedIncomes: false, categories: categories);
   }
 }

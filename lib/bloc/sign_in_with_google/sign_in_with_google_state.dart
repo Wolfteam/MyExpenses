@@ -1,51 +1,15 @@
 part of 'sign_in_with_google_bloc.dart';
 
-@immutable
-abstract class SignInWithGoogleState extends Equatable {
-  const SignInWithGoogleState();
-}
+@freezed
+class SignInWithGoogleState with _$SignInWithGoogleState {
+  //aka not initialized state
+  const factory SignInWithGoogleState.loading() = _LoadingState;
 
-class UnninitializedState extends SignInWithGoogleState {
-  @override
-  List<Object> get props => [];
-}
-
-class InitializedState extends SignInWithGoogleState {
-  final String authUrl;
-  final bool isNetworkAvailable;
-  final bool codeGranted;
-  final bool flowCompleted;
-  final bool anErrorOccurred;
-
-  @override
-  List<Object> get props => [
-        authUrl,
-        isNetworkAvailable,
-        codeGranted,
-        flowCompleted,
-        anErrorOccurred,
-      ];
-
-  const InitializedState({
-    @required this.authUrl,
-    @required this.isNetworkAvailable,
-    this.codeGranted = false,
-    this.flowCompleted = false,
-    this.anErrorOccurred = false,
-  });
-
-  InitializedState copyWith({
-    bool isNetworkAvailable,
-    bool codeGranted,
-    bool flowCompleted,
-    bool anErrorOccurred,
-  }) {
-    return InitializedState(
-      authUrl: authUrl,
-      isNetworkAvailable: isNetworkAvailable ?? this.isNetworkAvailable,
-      codeGranted: codeGranted ?? this.codeGranted,
-      flowCompleted: flowCompleted ?? this.flowCompleted,
-      anErrorOccurred: anErrorOccurred ?? this.anErrorOccurred,
-    );
-  }
+  const factory SignInWithGoogleState.initial({
+    required String authUrl,
+    required bool isNetworkAvailable,
+    @Default(false) bool codeGranted,
+    @Default(false) bool flowCompleted,
+    @Default(false) bool anErrorOccurred,
+  }) = _InitialState;
 }

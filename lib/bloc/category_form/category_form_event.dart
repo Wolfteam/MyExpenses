@@ -1,64 +1,32 @@
 part of 'category_form_bloc.dart';
 
-abstract class CategoryFormEvent extends Equatable {
-  @override
-  List<Object> get props => [];
+@freezed
+class CategoryFormEvent with _$CategoryFormEvent {
+  const factory CategoryFormEvent.addCategory() = _AddCategory;
 
-  const CategoryFormEvent();
+  const factory CategoryFormEvent.editCategory({
+    required CategoryItem category,
+  }) = _EditCategory;
+
+  const factory CategoryFormEvent.nameChanged({
+    required String name,
+  }) = _NameChanged;
+
+  const factory CategoryFormEvent.typeChanged({
+    required TransactionType selectedType,
+  }) = _TypeChanged;
+
+  const factory CategoryFormEvent.iconChanged({
+    required IconData selectedIcon,
+  }) = _IconChanged;
+
+  const factory CategoryFormEvent.iconColorChanged({
+    required Color iconColor,
+  }) = _IconColorChanged;
+
+  const factory CategoryFormEvent.deleteCategory() = _DeleteCategory;
+
+  const factory CategoryFormEvent.formSubmitted() = _FormSubmitted;
+
+  const factory CategoryFormEvent.formClosed() = _FormClosed;
 }
-
-class AddCategory extends CategoryFormEvent {
-  @override
-  List<Object> get props => [];
-}
-
-class EditCategory extends CategoryFormEvent {
-  final CategoryItem category;
-
-  const EditCategory(this.category);
-
-  @override
-  List<Object> get props => [category];
-}
-
-class NameChanged extends CategoryFormEvent {
-  final String name;
-
-  const NameChanged(this.name);
-
-  @override
-  List<Object> get props => [name];
-}
-
-class TypeChanged extends CategoryFormEvent {
-  final TransactionType selectedType;
-
-  const TypeChanged(this.selectedType);
-
-  @override
-  List<Object> get props => [selectedType];
-}
-
-class IconChanged extends CategoryFormEvent {
-  final IconData selectedIcon;
-
-  const IconChanged(this.selectedIcon);
-
-  @override
-  List<Object> get props => [selectedIcon];
-}
-
-class IconColorChanged extends CategoryFormEvent {
-  final Color iconColor;
-
-  const IconColorChanged(this.iconColor);
-
-  @override
-  List<Object> get props => [iconColor];
-}
-
-class DeleteCategory extends CategoryFormEvent {}
-
-class FormSubmitted extends CategoryFormEvent {}
-
-class FormClosed extends CategoryFormEvent {}

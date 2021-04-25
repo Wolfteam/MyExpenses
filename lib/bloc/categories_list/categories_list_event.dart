@@ -1,34 +1,16 @@
 part of 'categories_list_bloc.dart';
 
-@immutable
-abstract class CategoriesListEvent extends Equatable {
-  const CategoriesListEvent();
+@freezed
+class CategoriesListEvent with _$CategoriesListEvent {
+  const factory CategoriesListEvent.getCategories({
+    required bool loadIncomes,
+    CategoryItem? selectedCategory,
+  }) = _GetCategories;
 
-  @override
-  List<Object> get props => [];
+  const factory CategoriesListEvent.categoryWasSelected({
+    required bool wasSelected,
+    required CategoryItem selectedCategory,
+  }) = _CategoryWasSelected;
+
+  const factory CategoriesListEvent.unSelectAll() = _UnselectAll;
 }
-
-class GetCategories extends CategoriesListEvent {
-  final bool loadIncomes;
-  final CategoryItem selectedCategory;
-
-  const GetCategories({@required this.loadIncomes, this.selectedCategory});
-
-  @override
-  List<Object> get props => [loadIncomes, selectedCategory];
-}
-
-class CategoryWasSelected extends CategoriesListEvent {
-  final bool wasSelected;
-  final CategoryItem selectedCategory;
-
-  const CategoryWasSelected({
-    @required this.wasSelected,
-    @required this.selectedCategory,
-  });
-
-  @override
-  List<Object> get props => [wasSelected, selectedCategory];
-}
-
-class UnSelectAllCategories extends CategoriesListEvent {}

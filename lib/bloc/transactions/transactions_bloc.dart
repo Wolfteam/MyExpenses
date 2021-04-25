@@ -1,10 +1,8 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
-import 'package:meta/meta.dart';
 
 import '../../common/enums/app_language_type.dart';
 import '../../common/enums/transaction_type.dart';
@@ -22,9 +20,10 @@ import '../transactions_last_7_days/transactions_last_7_days_bloc.dart';
 import '../transactions_per_month/transactions_per_month_bloc.dart';
 
 part 'transactions_bloc.freezed.dart';
+part 'transactions_event.dart';
 part 'transactions_state.dart';
 
-class TransactionsBloc extends Cubit<TransactionsState> {
+class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
   final LoggingService _logger;
   final TransactionsDao _transactionsDao;
   final UsersDao _usersDao;
@@ -40,16 +39,22 @@ class TransactionsBloc extends Cubit<TransactionsState> {
     this._settingsService,
     this._transactionsPerMonthBloc,
     this._transactionsLast7DaysBloc,
-  ) : super(TransactionsState.initial());
+  ) : super(const TransactionsState.loading());
 
-  TransactionsLoadedState get currentState => state as TransactionsLoadedState;
+  _InitialState get currentState => state as _InitialState;
 
-  Future<void> loadTransactions(DateTime inThisDate) async {
-    final month = toBeginningOfSentenceCase(DateUtils.formatAppDate(
-      inThisDate,
-      _settingsService.language,
-      DateUtils.fullMonthFormat,
-    ));
+  @override
+  Stream<TransactionsState> mapEventToState(TransactionsEvent event) async* {
+    final s = await event.map(
+      loadTransactions: (e) => _loadTransactions(e.inThisDate),
+      loadRecurringTransactions: (_) => _loadRecurringTransactions(),
+    );
+
+    yield s;
+  }
+
+  Future<TransactionsState> _loadTransactions(DateTime inThisDate) async {
+    final month = toBeginningOfSentenceCase(DateUtils.formatAppDate(inThisDate, _settingsService.language, DateUtils.fullMonthFormat));
     final now = DateTime.now();
     final from = DateUtils.getFirstDayDateOfTheMonth(inThisDate);
     final to = DateUtils.getLastDayDateOfTheMonth(from);
@@ -72,76 +77,71 @@ class TransactionsBloc extends Cubit<TransactionsState> {
 
       _logger.info(runtimeType, '_buildInitialState: Generating incomes / expenses transactions per week...');
 
-      final incomeTransPerWeek = await _buildTransactionSummaryPerDay(onlyIncomes: true);
-      final expenseTransPerWeek = await _buildTransactionSummaryPerDay(onlyIncomes: false);
+      final incomeTransPerWeek = await _buildTransactionSummaryPerDay(true);
+      final expenseTransPerWeek = await _buildTransactionSummaryPerDay(false);
 
       _logger.info(runtimeType, '_buildInitialState: Generating transactions per month..');
 
       final transPerMonth = TransactionUtils.buildTransactionsPerMonth(_settingsService.language, transactions);
 
-      _transactionsPerMonthBloc.transactionsLoaded(incomes, expenses, balance, month, monthBalance, inThisDate);
+      _transactionsPerMonthBloc.add(
+        TransactionsPerMonthEvent.init(
+          incomes: incomes,
+          expenses: expenses,
+          total: balance,
+          month: month!,
+          transactions: monthBalance,
+          currentDate: inThisDate,
+        ),
+      );
 
       final showLast7Days = DateTime.now().month == inThisDate.month;
-      if (state is! TransactionsLoadedState) {
-        _transactionsLast7DaysBloc.transactionsLoaded(
+      if (state is! _InitialState) {
+        _transactionsLast7DaysBloc.add(TransactionsLast7DaysEvent.init(
           selectedType: TransactionType.incomes,
           incomes: incomeTransPerWeek,
           expenses: expenseTransPerWeek,
           showLast7Days: showLast7Days,
-        );
-
-        emit(TransactionsState.loaded(
-          currentDate: inThisDate,
-          transactionsPerMonth: transPerMonth,
-          language: _settingsService.language,
         ));
-        return;
+
+        return TransactionsState.initial(currentDate: inThisDate, transactionsPerMonth: transPerMonth, language: _settingsService.language);
       }
-      _transactionsLast7DaysBloc.transactionsLoaded(
+
+      _transactionsLast7DaysBloc.add(TransactionsLast7DaysEvent.init(
         incomes: incomeTransPerWeek,
         expenses: expenseTransPerWeek,
         showLast7Days: showLast7Days,
-      );
+      ));
 
-      emit(currentState.copyWith.call(
+      return currentState.copyWith.call(
         currentDate: inThisDate,
         transactionsPerMonth: transPerMonth,
         language: _settingsService.language,
         showParentTransactions: false,
-      ));
+      );
     } catch (e, s) {
       _logger.error(runtimeType, '_buildInitialState: An unknown error occurred', e, s);
-      emit(TransactionsState.loaded(
-        currentDate: inThisDate,
-        transactionsPerMonth: [],
-        language: _settingsService.language,
-      ));
+      return TransactionsState.initial(currentDate: inThisDate, transactionsPerMonth: [], language: _settingsService.language);
     }
   }
 
-  Future<void> loadRecurringTransactions() async {
+  Future<TransactionsState> _loadRecurringTransactions() async {
     try {
       _logger.info(runtimeType, '_buildRecurringState: Getting all parent transactions...');
       final currentUser = await _usersDao.getActiveUser();
       final transactions = await _transactionsDao.getAllParentTransactions(currentUser?.id);
-      final transPerMonth = TransactionUtils.buildTransactionsPerMonth(
-        _settingsService.language,
-        transactions,
-        sortByNextRecurringDate: true,
-      );
+      final transPerMonth = TransactionUtils.buildTransactionsPerMonth(_settingsService.language, transactions, sortByNextRecurringDate: true);
 
-      emit(currentState.copyWith(showParentTransactions: true, transactionsPerMonth: transPerMonth));
+      return currentState.copyWith(showParentTransactions: true, transactionsPerMonth: transPerMonth);
     } catch (e, s) {
       _logger.error(runtimeType, '_buildRecurringState: Unknown error', e, s);
-      emit(currentState.copyWith(showParentTransactions: true, transactionsPerMonth: []));
+      return currentState.copyWith(showParentTransactions: true, transactionsPerMonth: []);
     }
   }
 
-  double _getTotalExpenses(List<TransactionItem> transactions) =>
-      TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: false);
+  double _getTotalExpenses(List<TransactionItem> transactions) => TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: false);
 
-  double _getTotalIncomes(List<TransactionItem> transactions) =>
-      TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: true);
+  double _getTotalIncomes(List<TransactionItem> transactions) => TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: true);
 
   List<TransactionsSummaryPerMonth> _buildMonthBalance(
     double incomes,
@@ -176,16 +176,10 @@ class TransactionsBloc extends Cubit<TransactionsState> {
     ];
   }
 
-  Future<List<TransactionsSummaryPerDay>> _buildTransactionSummaryPerDay({
-    bool onlyIncomes,
-  }) async {
+  Future<List<TransactionsSummaryPerDay>> _buildTransactionSummaryPerDay(bool onlyIncomes) async {
     final now = DateTime.now();
     final sevenDaysAgo = now.subtract(const Duration(days: 6));
-    final from = DateTime(
-      sevenDaysAgo.year,
-      sevenDaysAgo.month,
-      sevenDaysAgo.day,
-    );
+    final from = DateTime(sevenDaysAgo.year, sevenDaysAgo.month, sevenDaysAgo.day);
 
     final to = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
@@ -196,9 +190,8 @@ class TransactionsBloc extends Cubit<TransactionsState> {
 
     try {
       final currentUser = await _usersDao.getActiveUser();
-      final transactions = (await _transactionsDao.getAllTransactions(currentUser?.id, from, to))
-          .where((t) => t.category.isAnIncome == onlyIncomes)
-          .toList();
+      final transactions =
+          (await _transactionsDao.getAllTransactions(currentUser?.id, from, to)).where((t) => t.category.isAnIncome == onlyIncomes).toList();
 
       final map = <DateTime, double>{};
       for (final transaction in transactions) {
@@ -209,7 +202,9 @@ class TransactionsBloc extends Cubit<TransactionsState> {
         );
 
         if (map.keys.any((key) => key == date)) {
-          map[date] += transaction.amount;
+          //TODO: NOT SURE IF THIS IS OK
+          map.update(date, (value) => value + transaction.amount);
+          // map[date] += transaction.amount;
         } else {
           map.addAll({date: transaction.amount});
         }
@@ -232,12 +227,7 @@ class TransactionsBloc extends Cubit<TransactionsState> {
       models.sort((t1, t2) => t1.date.compareTo(t2.date));
       return models;
     } catch (e, s) {
-      _logger.error(
-        runtimeType,
-        '_buildTransactionSummaryPerDay: Unknown error ocurred',
-        e,
-        s,
-      );
+      _logger.error(runtimeType, '_buildTransactionSummaryPerDay: Unknown error ocurred', e, s);
       return [];
     }
   }
