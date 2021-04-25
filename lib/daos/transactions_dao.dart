@@ -8,7 +8,7 @@ import '../models/transaction_item.dart';
 
 abstract class TransactionsDao {
   Future<List<TransactionItem>> getAllTransactions(
-    int userId,
+    int? userId,
     DateTime from,
     DateTime to,
   );
@@ -18,11 +18,11 @@ abstract class TransactionsDao {
   Future<bool> deleteTransaction(int id);
 
   Future<List<TransactionItem>> getAllParentTransactions(
-    int userId,
+    int? userId,
   );
 
   Future<List<TransactionItem>> getAllParentTransactionsUntil(
-    int userId,
+    int? userId,
     DateTime until,
   );
 
@@ -45,42 +45,42 @@ abstract class TransactionsDao {
     bool keepChildTransactions = false,
   });
 
-  Future<void> updateNextRecurringDate(int id, DateTime nextRecurringDate);
+  Future<void> updateNextRecurringDate(int id, DateTime? nextRecurringDate);
 
-  Future<void> deleteAll(int userId);
+  Future<void> deleteAll(int? userId);
 
   Future<List<sync_trans.Transaction>> getAllTransactionsToSync(
-    int userId,
+    int? userId,
   );
 
   Future<void> syncDownDelete(
-    int userId,
+    int? userId,
     List<sync_trans.Transaction> existingTrans,
   );
 
-  Future<void> syncUpDelete(int userId);
+  Future<void> syncUpDelete(int? userId);
 
   Future<void> syncDownCreate(
-    int userId,
+    int? userId,
     List<sync_trans.Transaction> existingTrans,
   );
 
   Future<void> syncDownUpdate(
-    int userId,
+    int? userId,
     List<sync_trans.Transaction> existingTrans,
   );
 
   Future<void> updateAllLocalStatus(LocalStatusType newValue);
 
   Future<List<TransactionItem>> getAllTransactionsForSearch(
-    int userId,
-    DateTime from,
-    DateTime to,
-    String description,
-    double amount,
+    int? userId,
+    DateTime? from,
+    DateTime? to,
+    String? description,
+    double? amount,
     ComparerType comparerType,
-    int categoryId,
-    TransactionType transactionType,
+    int? categoryId,
+    TransactionType? transactionType,
     TransactionFilterType transactionFilterType,
     SortDirectionType sortDirectionType,
     int take,
