@@ -1,4 +1,4 @@
-package com.example.my_expenses
+package com.miraisoft.my_expenses
 
 import android.os.Bundle
 import android.util.Log
