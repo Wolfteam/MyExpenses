@@ -1,5 +1,4 @@
 import 'package:get_it/get_it.dart';
-import 'package:log_4_dart_2/log_4_dart_2.dart';
 
 import 'daos/categories_dao.dart';
 import 'daos/transactions_dao.dart';
@@ -15,12 +14,8 @@ import 'services/sync_service.dart';
 final GetIt getIt = GetIt.instance;
 
 void initInjection() {
-  if (!getIt.isRegistered<Logger>()) {
-    getIt.registerSingleton(Logger());
-  }
-
   if (!getIt.isRegistered<LoggingService>()) {
-    getIt.registerSingleton<LoggingService>(LoggingServiceImpl(getIt<Logger>()));
+    getIt.registerSingleton<LoggingService>(LoggingServiceImpl());
   }
 
   if (!getIt.isRegistered<SettingsService>()) {

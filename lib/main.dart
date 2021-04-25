@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:my_expenses/generated/l10n.dart';
 import 'package:open_file/open_file.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -37,9 +38,7 @@ import 'common/utils/toast_utils.dart';
 import 'daos/categories_dao.dart';
 import 'daos/transactions_dao.dart';
 import 'daos/users_dao.dart';
-import 'generated/i18n.dart';
 import 'injection.dart';
-import 'logger.dart';
 import 'models/app_notification.dart';
 import 'models/current_selected_category.dart';
 import 'services/google_service.dart';
@@ -56,7 +55,6 @@ import 'ui/widgets/splash_screen.dart';
 
 Future main() async {
   initInjection();
-  await setupLogging();
   await initTelemetry();
   runApp(MyApp());
 }
@@ -67,12 +65,12 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final i18n = I18n.delegate;
+  final i18n = S.delegate;
 
   @override
   void initState() {
     super.initState();
-    I18n.onLocaleChanged = _onLocaleChange;
+    // S.onLocaleChanged = _onLocaleChange;
   }
 
   @override
@@ -239,14 +237,17 @@ class _MyAppState extends State<MyApp> {
         ],
         child: BlocConsumer<app_bloc.AppBloc, app_bloc.AppState>(
           listener: (ctx, state) async {
-            if (state is app_bloc.AppInitializedState) {
-              await setupNotifications(
-                onIosReceiveLocalNotification: _onDidReceiveLocalNotification,
-                onSelectNotification: _onSelectNotification,
-              );
+            await state.maybeMap(
+              loaded: (state) async {
+                await setupNotifications(
+                  onIosReceiveLocalNotification: _onDidReceiveLocalNotification,
+                  onSelectNotification: _onSelectNotification,
+                );
 
-              ctx.read<DrawerBloc>().add(const InitializeDrawer());
-            }
+                ctx.read<DrawerBloc>().add(const DrawerEvent.init());
+              },
+              orElse: () async {},
+            );
           },
           builder: (ctx, state) => _buildApp(ctx, state),
         ),
@@ -254,77 +255,64 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-//TODO: USE SUPER ENUM
   Widget _buildApp(BuildContext ctx, app_bloc.AppState state) {
     final delegates = <LocalizationsDelegate>[
-      // A class which loads the translations from JSON files
-      i18n,
-      // Built-in localization of basic text for Material widgets
+      S.delegate,
       GlobalMaterialLocalizations.delegate,
-      // Built-in localization for text direction LTR/RTL
       GlobalWidgetsLocalizations.delegate,
-      // Built-in localization of basic text for Cupertino widgets
       GlobalCupertinoLocalizations.delegate,
     ];
 
-    if (state is app_bloc.AppInitializedState) {
-      if (state.bgTaskIsRunning) {
+    //TODO: LOCALE HERE
+    return state.maybeMap(
+      loaded: (state) {
+        if (state.bgTaskIsRunning) {
+          return MaterialApp(
+            home: Loading(),
+            theme: state.theme,
+            //Without this, the lang won't be reloaded
+            locale: Locale('en', 'US'),
+            localizationsDelegates: delegates,
+            supportedLocales: S.delegate.supportedLocales,
+          );
+        }
         return MaterialApp(
-          home: Loading(),
           theme: state.theme,
+          home: MainPage(),
+          //Without this, the lang won't be reloaded
+          locale: Locale('en', 'US'),
           localizationsDelegates: delegates,
-          supportedLocales: i18n.supportedLocales,
-          localeResolutionCallback: i18n.resolution(
-            fallback: i18n.supportedLocales.first,
-          ),
+          supportedLocales: S.delegate.supportedLocales,
         );
-      }
-      return MaterialApp(
-        theme: state.theme,
-        home: MainPage(),
-        localizationsDelegates: delegates,
-        supportedLocales: i18n.supportedLocales,
-        localeResolutionCallback: i18n.resolution(
-          fallback: i18n.supportedLocales.first,
-        ),
-      );
-    }
-
-//i need to set the theme here, otherwise, the theme change will flash
-    ThemeData theme;
-    if (state is app_bloc.AuthenticationState) {
-      theme = state.theme;
-    }
-
-    return MaterialApp(
-      home: SplashScreen(),
-      theme: theme,
-      localizationsDelegates: delegates,
-      supportedLocales: i18n.supportedLocales,
-      localeResolutionCallback: i18n.resolution(
-        fallback: i18n.supportedLocales.first,
-      ),
+      },
+      orElse: () {
+        final theme = state.maybeMap(auth: (state) => state.theme, orElse: () => null);
+        return MaterialApp(
+          home: SplashScreen(),
+          theme: theme,
+          //Without this, the lang won't be reloaded
+          locale: Locale('en', 'US'),
+          localizationsDelegates: delegates,
+          supportedLocales: S.delegate.supportedLocales,
+        );
+      },
     );
   }
 
   void _onLocaleChange(Locale locale) {
-    setState(() {
-      I18n.locale = locale;
-    });
+    //TODO: LOCALE
+    // setState(() {
+    //   I18n.locale = locale;
+    // });
   }
 
-  Future _onDidReceiveLocalNotification(
-    int id,
-    String title,
-    String body,
-    String payload,
-  ) async {
-    final i18n = I18n.of(context);
-    showDialog(
+  Future<dynamic> _onDidReceiveLocalNotification(int id, String? title, String? body, String? payload) async {
+    final i18n = S.of(context);
+    return showDialog(
       context: context,
       builder: (BuildContext context) => CupertinoAlertDialog(
-        title: Text(title),
-        content: Text(body),
+        title: Text(title!),
+        content: Text(body!),
         actions: [
           CupertinoDialogAction(
             isDefaultAction: true,
@@ -338,43 +326,39 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  Future<void> _onSelectNotification(String json) async {
+  Future<void> _onSelectNotification(String? json) async {
     if (json.isNullEmptyOrWhitespace) {
       return;
     }
 
-    final notification = AppNotification.fromJson(
-      jsonDecode(json) as Map<String, dynamic>,
-    );
+    final notification = AppNotification.fromJson(jsonDecode(json!) as Map<String, dynamic>);
 
     switch (notification.type) {
       case NotificationType.openPdf:
         //open_file crashes while asking for permissions...
-        //thats why whe ask for them before openning the file
+        //that's why whe ask for them before opening the file
         final granted = await Permission.storage.isGranted;
         if (!granted) {
           final result = await Permission.storage.request();
           if (!result.isGranted) {
             final settingsService = getIt<SettingsService>();
             final i18n = await getI18n(settingsService.language);
-            showWarningToast(i18n.openFilePermissionRequestFailedMsg);
+            ToastUtils.showWarningToast(context, i18n.openFilePermissionRequestFailedMsg);
             return;
           }
         }
-        final file = File(notification.payload);
+        final file = File(notification.payload!);
         if (await file.exists()) {
           await OpenFile.open(file.path);
         }
         break;
       case NotificationType.openTransactionDetails:
         final transDao = getIt<TransactionsDao>();
-        final transaction = await transDao.getTransaction(
-          int.parse(notification.payload),
-        );
-        final route = MaterialPageRoute(
-          builder: (ctx) => AddEditTransactionPage(item: transaction),
-        );
-        Navigator.push(context, route);
+        final transaction = await transDao.getTransaction(int.parse(notification.payload!));
+        final route = AddEditTransactionPage.editRoute(transaction, context);
+        await Navigator.push(context, route);
+        await route.completed;
+        context.read<TransactionFormBloc>().add(const TransactionFormEvent.close());
         break;
       case NotificationType.msg:
         break;
