@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../common/mixins/transaction_mixin.dart';
 
-class TransactionsSummaryPerMonth extends Equatable with TransactionMixin {
-  final int order;
-  final double percentage;
-  final bool isAnIncome;
+part 'transactions_summary_per_month.freezed.dart';
 
-  @override
-  List<Object> get props => [order, percentage, isAnIncome];
-
+@freezed
+class TransactionsSummaryPerMonth with _$TransactionsSummaryPerMonth, TransactionMixin {
   Color get color => getTransactionColor(isAnIncome: isAnIncome);
 
-  TransactionsSummaryPerMonth({
-    @required this.order,
-    @required this.percentage,
-    @required this.isAnIncome,
-  });
+  const TransactionsSummaryPerMonth._();
+
+  const factory TransactionsSummaryPerMonth({
+    required int order,
+    required double percentage,
+    required bool isAnIncome,
+  }) = _TransactionsSummaryPerMonth;
 }

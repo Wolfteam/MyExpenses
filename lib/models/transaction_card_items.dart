@@ -1,29 +1,21 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:my_expenses/common/utils/transaction_utils.dart';
 
-import '../common/utils/transaction_utils.dart';
 import 'transaction_item.dart';
 
-class TransactionCardItems extends Equatable {
-  final DateTime date;
-  final String dateString;
-  final List<TransactionItem> transactions;
+part 'transaction_card_items.freezed.dart';
 
-  @override
-  List<Object> get props => [date, dateString, transactions];
+@freezed
+class TransactionCardItems with _$TransactionCardItems {
+  double get dayExpenses => TransactionUtils.getTotalTransactionAmounts(transactions);
 
-  double get dayExpenses => TransactionUtils.getTotalTransactionAmounts(
-        transactions,
-        onlyIncomes: false,
-      );
+  double get dayIncomes => TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: true);
 
-  double get dayIncomes => TransactionUtils.getTotalTransactionAmounts(
-        transactions,
-        onlyIncomes: true,
-      );
+  const TransactionCardItems._();
 
-  const TransactionCardItems({
-    this.date,
-    this.dateString,
-    this.transactions,
-  });
+  const factory TransactionCardItems({
+    required DateTime date,
+    required String dateString,
+    required List<TransactionItem> transactions,
+  }) = _TransactionCardItems;
 }

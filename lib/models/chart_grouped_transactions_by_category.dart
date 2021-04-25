@@ -1,21 +1,19 @@
-import 'package:equatable/equatable.dart';
-import 'package:flutter/widgets.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:my_expenses/common/utils/transaction_utils.dart';
 
-import '../common/utils/transaction_utils.dart';
 import 'category_item.dart';
 import 'transaction_item.dart';
 
-class ChartGroupedTransactionsByCategory extends Equatable {
-  final CategoryItem category;
-  final List<TransactionItem> transactions;
+part 'chart_grouped_transactions_by_category.freezed.dart';
 
+@freezed
+class ChartGroupedTransactionsByCategory with _$ChartGroupedTransactionsByCategory {
   double get total => TransactionUtils.getTotalTransactionAmount(transactions);
 
-  @override
-  List<Object> get props => [category, transactions];
+  const ChartGroupedTransactionsByCategory._();
 
-  const ChartGroupedTransactionsByCategory({
-    @required this.category,
-    @required this.transactions,
-  });
+  const factory ChartGroupedTransactionsByCategory({
+    required CategoryItem category,
+    required List<TransactionItem> transactions,
+  }) = _ChartGroupedTransactionsByCategory;
 }

@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../common/mixins/transaction_mixin.dart';
 
-class TransactionsSummaryPerDay extends Equatable with TransactionMixin {
-  final DateTime date;
-  final double totalDayAmount;
+part 'transactions_summary_per_day.freezed.dart';
 
-  @override
-  List<Object> get props => [date, totalDayAmount];
-
+@freezed
+class TransactionsSummaryPerDay with _$TransactionsSummaryPerDay, TransactionMixin {
   Color get color => getTransactionColor(
         isAnIncome: isTransactionAnIncome(totalDayAmount),
       );
 
-  TransactionsSummaryPerDay({
-    @required this.date,
-    @required this.totalDayAmount,
-  });
+  const TransactionsSummaryPerDay._();
+
+  const factory TransactionsSummaryPerDay({
+    required DateTime date,
+    required double totalDayAmount,
+  }) = _TransactionsSummaryPerDay;
 }
