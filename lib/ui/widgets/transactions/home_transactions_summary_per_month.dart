@@ -1,4 +1,3 @@
-// import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,7 +7,6 @@ import 'package:my_expenses/generated/l10n.dart';
 import '../../../bloc/currency/currency_bloc.dart';
 import '../../../bloc/transactions/transactions_bloc.dart';
 import '../../../models/transactions_summary_per_month.dart';
-// import '../custom_arc_renderer.dart';
 
 class HomeTransactionSummaryPerMonth extends StatelessWidget {
   final String month;
@@ -73,7 +71,6 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
   }
 
   Widget _buildPieChart(BuildContext context) {
-    final theme = Theme.of(context);
     return SizedBox(
       height: 180,
       width: 180,
@@ -91,9 +88,9 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
                   value: e.percentage,
                   title: '${e.percentage} %',
                   radius: 80,
-                  titleStyle: TextStyle(
+                  titleStyle: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: theme.brightness == Brightness.dark ? Colors.white : Colors.black,
+                    color: Colors.white,
                   ),
                 ),
               )
@@ -102,20 +99,6 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
       ),
     );
   }
-
-  // List<charts.Series<TransactionsSummaryPerMonth, int>> _createSampleData() {
-  //   return [
-  //     charts.Series<TransactionsSummaryPerMonth, int>(
-  //       id: 'HomeTransactionsSummaryPerMonth',
-  //       data: data,
-  //       domainFn: (item, _) => item.order,
-  //       //The values here must be positives and the sum of them must be equal to 100%
-  //       measureFn: (item, _) => item.percentage,
-  //       colorFn: (item, _) => charts.ColorUtil.fromDartColor(item.color),
-  //       labelAccessorFn: (row, _) => '${row.percentage} %',
-  //     )
-  //   ];
-  // }
 
   Widget _buildSummary(BuildContext context) {
     final theme = Theme.of(context);

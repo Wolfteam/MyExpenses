@@ -19,7 +19,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
       innerJoin(categories, categories.id.equalsExp(transactions.categoryId)),
     ]);
     if (userId == null) {
-      return (query..where((isNull(categories.userId)))).map(_mapToTransactionItem).get();
+      return (query..where((categories.userId.isNull()))).map(_mapToTransactionItem).get();
     }
     return (query..where(categories.userId.equals(userId))).map(_mapToTransactionItem).get();
   }
@@ -83,7 +83,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
       final isNoLongerAParent = currentTrans.isParentTransaction && !transaction.isParentTransaction;
 
       if (isNoLongerAParent) {
-        final childTransactions = await _getChildTransactions(transaction.id);
+        final childTransactions = await _getChildrenTransactions(transaction.id);
         await batch((b) {
           for (final child in childTransactions) {
             final updatedFields = TransactionsCompanion(
@@ -157,7 +157,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
     ]);
 
     if (userId == null) {
-      return (query..where((isNull(categories.userId)))).map(_mapToTransactionItem).get();
+      return (query..where((categories.userId.isNull()))).map(_mapToTransactionItem).get();
     }
 
     return (query..where(categories.userId.equals(userId))).map(_mapToTransactionItem).get();
@@ -173,7 +173,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
             (t) =>
                 t.localStatus.equals(LocalStatusType.deleted.index).not() &
                 t.repetitionCycle.equals(RepetitionCycleType.none.index).not() &
-                isNotNull(t.nextRecurringDate) &
+                t.nextRecurringDate.isNotNull() &
                 t.nextRecurringDate.isSmallerOrEqualValue(until) &
                 t.isParentTransaction,
           ))
@@ -185,7 +185,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
     ]);
 
     if (userId == null) {
-      return (query..where((isNull(categories.userId)))).map(_mapToTransactionItem).get();
+      return (query..where((categories.userId.isNull()))).map(_mapToTransactionItem).get();
     }
 
     return (query..where(categories.userId.equals(userId))).map(_mapToTransactionItem).get();
@@ -255,7 +255,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
 
     return (select(transactions)
           ..where(
-            (t) => isNotNull(t.parentTransactionId) & t.parentTransactionId.equals(parent.id) & t.transactionDate.isIn(periods),
+            (t) => t.parentTransactionId.isNotNull() & t.parentTransactionId.equals(parent.id) & t.transactionDate.isIn(periods),
           ))
         .join([
           innerJoin(
@@ -283,12 +283,12 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
   }) async {
     final parentTrans = await (select(transactions)..where((c) => c.id.equals(id))).getSingle();
 
-    final childs = await _getChildTransactions(id);
+    final children = await _getChildrenTransactions(id);
 
     if (keepChildTransactions) {
-      await _deleteParentTransaction(parentTrans, childs);
+      await _deleteParentTransaction(parentTrans, children);
     } else {
-      await _deleteParentAndChildTransactions(parentTrans, childs);
+      await _deleteParentAndChildTransactions(parentTrans, children);
     }
     return true;
   }
@@ -315,7 +315,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
     final joinStatement = select(transactions).join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))]);
 
     if (userId == null) {
-      joinStatement.where(isNull(categories.userId));
+      joinStatement.where(categories.userId.isNull());
     } else {
       joinStatement.where(categories.userId.equals(userId));
     }
@@ -347,7 +347,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
           ))
         .join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))]);
     if (userId == null) {
-      joinStatement.where(isNull(categories.userId));
+      joinStatement.where(categories.userId.isNull());
     } else {
       joinStatement.where(categories.userId.equals(userId));
     }
@@ -366,7 +366,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
           ))
         .join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))]);
     if (userId == null) {
-      joinStatement.where(isNull(categories.userId));
+      joinStatement.where(categories.userId.isNull());
     } else {
       joinStatement.where(categories.userId.equals(userId));
     }
@@ -413,19 +413,19 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
   Future<void> syncUpDelete(int? userId) async {
     final childsQuery = (select(transactions)
           ..where(
-            (t) => t.localStatus.equals(LocalStatusType.deleted.index) & isNotNull(t.parentTransactionId),
+            (t) => t.localStatus.equals(LocalStatusType.deleted.index) & t.parentTransactionId.isNotNull(),
           ))
         .join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))]);
 
     final parentsQuery = (select(transactions)
           ..where(
-            (t) => t.localStatus.equals(LocalStatusType.deleted.index) & isNull(t.parentTransactionId),
+            (t) => t.localStatus.equals(LocalStatusType.deleted.index) & t.parentTransactionId.isNull(),
           ))
         .join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))]);
 
     if (userId == null) {
-      childsQuery.where(isNull(categories.userId));
-      parentsQuery.where(isNull(categories.userId));
+      childsQuery.where(categories.userId.isNull());
+      parentsQuery.where(categories.userId.isNull());
     } else {
       childsQuery.where(categories.userId.equals(userId));
       parentsQuery.where(categories.userId.equals(userId));
@@ -441,7 +441,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
       return trans.id;
     }).get();
 
-    //first we delete the childs...
+    //first we delete the children...
     await (delete(transactions)..where((t) => t.id.isIn(childIds))).go();
 
     //and then the parents
@@ -455,7 +455,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
   ) async {
     final joinStatement = select(transactions).join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))]);
     if (userId == null) {
-      joinStatement.where(isNull(categories.userId));
+      joinStatement.where(categories.userId.isNull());
     } else {
       joinStatement.where(categories.userId.equals(userId));
     }
@@ -491,12 +491,12 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
       }
     });
 
-    //Childs must be inserted after inserting their parents
-    final childs = await Stream.fromIterable(childTrans).asyncMap((item) => _mapToTransaction(item)).toList();
+    //Children must be inserted after inserting their parents
+    final children = await Stream.fromIterable(childTrans).asyncMap((item) => _mapToTransaction(item)).toList();
 
     await batch((b) {
-      if (childs.isNotEmpty) {
-        b.insertAll(transactions, childs);
+      if (children.isNotEmpty) {
+        b.insertAll(transactions, children);
       }
     });
   }
@@ -515,7 +515,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
         .join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))]);
 
     if (userId == null) {
-      joinStatement.where(isNull(categories.userId));
+      joinStatement.where(categories.userId.isNull());
     } else {
       joinStatement.where(categories.userId.equals(userId));
     }
@@ -610,7 +610,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
       innerJoin(categories, categories.id.equalsExp(transactions.categoryId)),
     ]);
     if (userId == null) {
-      query = query..where((isNull(categories.userId)));
+      query = query..where((categories.userId.isNull()));
     } else {
       query = query..where(categories.userId.equals(userId));
     }
@@ -668,9 +668,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
         orderingTerm = sortDirectionType == SortDirectionType.asc ? OrderingTerm.asc(categories.name) : OrderingTerm.desc(categories.name);
         break;
     }
-    if (orderingTerm != null) {
-      query = query..orderBy([orderingTerm]);
-    }
+    query = query..orderBy([orderingTerm]);
 
     return (query..limit(take, offset: skip)).map(_mapToTransactionItem).get();
   }
@@ -738,7 +736,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
     );
   }
 
-  Future<List<Transaction>> _getChildTransactions(int parentId) {
+  Future<List<Transaction>> _getChildrenTransactions(int parentId) {
     return (select(transactions)..where((t) => t.parentTransactionId.equals(parentId))).get();
   }
 

@@ -128,11 +128,11 @@ class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilter
       layoutBehavior: ButtonBarLayoutBehavior.constrained,
       buttonPadding: const EdgeInsets.symmetric(horizontal: 20),
       children: <Widget>[
-        OutlineButton(
+        OutlinedButton(
           onPressed: () => _closeModal(context),
           child: Text(i18n.close, style: TextStyle(color: theme.primaryColor)),
         ),
-        RaisedButton(
+        ElevatedButton(
           onPressed: () => _applyAmount(context),
           child: Text(i18n.apply),
         ),

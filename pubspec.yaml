@@ -23,16 +23,16 @@ environment:
 dependencies:
   csv: ^5.0.0
   darq: ^1.1.1
-  fl_chart: ^0.35.0
+  fl_chart: ^0.36.0
   flutter:
     sdk: flutter
   flutter_bloc: ^7.0.0
   flutter_colorpicker: ^0.4.0
-  flutter_local_notifications: ^5.0.0+1
+  flutter_local_notifications: ^5.0.0+3
   flutter_localizations:
     sdk: flutter
   flutter_native_timezone: ^1.0.10
-  flutter_secure_storage: ^4.1.0
+  flutter_secure_storage: ^4.2.0
   flutter_user_agentx: ^1.2.4
   flutter_webview_plugin:
     git:
@@ -40,7 +40,7 @@ dependencies:
       ref: master
   fluttertoast: ^8.0.6
   freezed_annotation: ^0.14.1
-  get_it: ^6.1.1
+  get_it: ^7.0.0
   googleapis: ^2.0.0
   googleapis_auth: ^1.1.0
   image_picker: ^0.7.4
@@ -50,11 +50,12 @@ dependencies:
   logger: ^1.0.0
   month_picker_dialog: ^0.4.0
   moor: ^4.2.1
+  nil: ^1.1.1
   open_file: ^3.2.0
   package_info: ^2.0.0
   path: ^1.8.0
   path_provider: ^2.0.1
-  pdf: ^3.2.0
+  pdf: ^3.3.0
   permission_handler: ^6.1.3
   photo_view: ^0.11.1
   shared_preferences: ^2.0.5

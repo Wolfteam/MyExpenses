@@ -77,11 +77,19 @@ class CategoryFormBloc extends Bloc<CategoryFormEvent, CategoryState> {
       );
 
       yield s;
-      yield currentState.copyWith(categoryCantBeDeleted: false);
+      if (s is _DeletedState) {
+        yield _initialState();
+      }
+
+      if (state is _InitialState) {
+        yield currentState.copyWith.call(categoryCantBeDeleted: false);
+      }
     } catch (e, s) {
       _logger.error(runtimeType, 'An unknown error occurred', e, s);
-      yield currentState.copyWith(errorOccurred: true);
-      yield currentState.copyWith(errorOccurred: false);
+      if (state is _InitialState) {
+        yield currentState.copyWith.call(errorOccurred: true);
+        yield currentState.copyWith.call(errorOccurred: false, categoryCantBeDeleted: false);
+      }
     }
   }
 

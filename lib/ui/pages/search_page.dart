@@ -218,7 +218,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
           onPressed: () => _showCategoriesPage(category),
           tooltip: i18n.category,
         ),
-        TransactionPoupMenuFilter(
+        TransactionPopupMenuFilter(
           selectedValue: transactionFilterType,
           onSelected: _transactionFilterTypeChanged,
           exclude: const [TransactionFilterType.category],
@@ -229,7 +229,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
         ),
         TransactionPopupMenuTypeFilter(
           selectedValue: transactionType,
-          onSelectedValue: (v) => _transactionTypeChanged(TransactionType.values[v]),
+          onSelectedValue: (v) => _transactionTypeChanged(v == nothingSelected ? null : TransactionType.values[v]),
           showNa: true,
         ),
       ],
@@ -309,7 +309,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
     );
     await Navigator.of(context).push(route);
 
-    context.read<SearchBloc>().add(SearchEvent.categoryChanged(newValue: selectedCatProvider.currentSelectedItem!));
+    context.read<SearchBloc>().add(SearchEvent.categoryChanged(newValue: selectedCatProvider.currentSelectedItem));
   }
 
   void _transactionFilterTypeChanged(TransactionFilterType newValue) {
@@ -317,7 +317,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
     context.read<SearchBloc>().add(SearchEvent.transactionFilterChanged(newValue: newValue));
   }
 
-  void _transactionTypeChanged(TransactionType newValue) {
+  void _transactionTypeChanged(TransactionType? newValue) {
     _removeSearchFocus();
     context.read<SearchBloc>().add(SearchEvent.transactionTypeChanged(newValue: newValue));
   }

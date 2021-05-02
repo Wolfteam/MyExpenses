@@ -45,14 +45,14 @@ class EstimateBottomSheetDialog extends StatelessWidget {
         ),
         _buildToggleButtons(context, s.selectedTransactionType),
         Text('${i18n.startDate}:'),
-        FlatButton(
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        TextButton(
+          style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
           onPressed: () => _changeDate(context, s.fromDate, s.currentLanguage, true),
           child: Align(alignment: Alignment.centerLeft, child: Text(s.fromDateString)),
         ),
         Text('${i18n.untilDate}:'),
-        FlatButton(
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        TextButton(
+          style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
           onPressed: () => _changeDate(context, s.untilDate, s.currentLanguage, false),
           child: Align(alignment: Alignment.centerLeft, child: Text(s.untilDateString)),
         ),
@@ -217,7 +217,7 @@ class EstimateBottomSheetDialog extends StatelessWidget {
       layoutBehavior: ButtonBarLayoutBehavior.constrained,
       buttonPadding: const EdgeInsets.symmetric(horizontal: 20),
       children: <Widget>[
-        OutlineButton(
+        OutlinedButton(
           onPressed: () => Navigator.pop(context),
           child: Text(i18n.close, style: TextStyle(color: theme.primaryColor)),
         ),

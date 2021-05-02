@@ -22,7 +22,7 @@ class TransactionItem extends StatelessWidget {
     final currencyBloc = context.watch<CurrencyBloc>();
     final i18n = S.of(context);
     final dateToUse = item.isParentTransaction && item.nextRecurringDate != null ? item.nextRecurringDate : item.transactionDate;
-    final dateString = utils.DateUtils.formatDateWithoutLocale(dateToUse!, utils.DateUtils.monthDayAndYearFormat);
+    final dateString = utils.DateUtils.formatDateWithoutLocale(dateToUse, utils.DateUtils.monthDayAndYearFormat);
     final daysToNextRecurringDate = item.nextRecurringDate == null ? 0 : item.nextRecurringDate!.difference(DateTime.now()).inDays;
 
     final daysLeft = Text(daysToNextRecurringDate == 0 ? i18n.tomorrow : i18n.executesInXDays('$daysToNextRecurringDate'));

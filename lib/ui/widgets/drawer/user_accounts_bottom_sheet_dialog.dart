@@ -74,7 +74,7 @@ class UserAccountsBottomSheetDialog extends StatelessWidget {
         ButtonBar(
           buttonPadding: const EdgeInsets.symmetric(horizontal: 20),
           children: <Widget>[
-            OutlineButton(
+            OutlinedButton(
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -83,8 +83,7 @@ class UserAccountsBottomSheetDialog extends StatelessWidget {
                 style: TextStyle(color: theme.primaryColor),
               ),
             ),
-            RaisedButton(
-              color: theme.primaryColor,
+            ElevatedButton(
               onPressed: () => _addAccount(context),
               child: Text(i18n.add),
             ),

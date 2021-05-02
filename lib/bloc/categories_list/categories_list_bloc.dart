@@ -30,6 +30,9 @@ abstract class _CategoriesListBloc extends Bloc<CategoriesListEvent, CategoriesL
       getCategories: (e) async => _loadCategories(e),
       categoryWasSelected: (e) async => _categorySelected(e),
       unSelectAll: (_) async {
+        if (state is! _LoadedState) {
+          return state;
+        }
         final categories = _changeSelectedState(false);
         return currentState.copyWith.call(categories: categories);
       },
@@ -66,6 +69,10 @@ abstract class _CategoriesListBloc extends Bloc<CategoriesListEvent, CategoriesL
   }
 
   CategoriesListState _categorySelected(_CategoryWasSelected event) {
+    if (state is! _LoadedState || !currentState.categories.any((c) => c.id == event.selectedCategory.id)) {
+      return state;
+    }
+
     final categories = _changeSelectedState(false);
 
     _setSelectedItem(event.selectedCategory.id, categories);
@@ -75,7 +82,7 @@ abstract class _CategoriesListBloc extends Bloc<CategoriesListEvent, CategoriesL
 
   List<CategoryItem> _changeSelectedState(bool isSelected) {
     final categories = List<CategoryItem>.generate(currentState.categories.length, (i) {
-      return currentState.categories[i].copyWith();
+      return currentState.categories[i].copyWith.call(isSelected: isSelected);
     });
 
     return categories;
@@ -85,14 +92,12 @@ abstract class _CategoriesListBloc extends Bloc<CategoriesListEvent, CategoriesL
     _logger.info(runtimeType, '_setSelectedItem: Setting the selected categoryId = $selectedId');
 
     final int index = categories.indexWhere((t) => t.id == selectedId);
-    final cat = categories.elementAt(index).copyWith(isSelected: true);
+    final cat = categories.elementAt(index).copyWith.call(isSelected: true);
     categories.insert(index, cat);
     categories.removeAt(index + 1);
   }
 
-  CategoriesListState buildCategoriesLoadedState(
-    List<CategoryItem> categories,
-  );
+  CategoriesListState buildCategoriesLoadedState(List<CategoryItem> categories);
 }
 
 class IncomesCategoriesBloc extends _CategoriesListBloc {

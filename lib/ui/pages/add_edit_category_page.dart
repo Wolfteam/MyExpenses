@@ -114,15 +114,13 @@ class AddEditCategoryPage extends StatelessWidget {
         title: Text(i18n.deleteX(categoryName)),
         content: Text(i18n.confirmDeleteCategory),
         actions: <Widget>[
-          OutlineButton(
-            textColor: Theme.of(context).primaryColor,
+          OutlinedButton(
             onPressed: () {
               Navigator.of(ctx).pop();
             },
             child: Text(i18n.close),
           ),
-          RaisedButton(
-            color: Theme.of(ctx).primaryColor,
+          ElevatedButton(
             onPressed: () {
               context.read<CategoryFormBloc>().add(const CategoryFormEvent.deleteCategory());
               Navigator.of(ctx).pop();
@@ -430,7 +428,7 @@ class _CategoryFormState extends State<CategoryForm> {
           ),
         ),
         actions: <Widget>[
-          FlatButton(
+          TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },

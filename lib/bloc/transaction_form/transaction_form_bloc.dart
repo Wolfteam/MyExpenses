@@ -108,11 +108,7 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
     );
     final language = _settingsService.language;
     final now = DateTime.now();
-    final transactionDateString = DateUtils.formatAppDate(
-      now,
-      language,
-      DateUtils.monthDayAndYearFormat,
-    );
+    final transactionDateString = DateUtils.formatAppDate(now, language, DateUtils.monthDayAndYearFormat);
 
     return TransactionFormState.initial(
       id: 0,
@@ -154,9 +150,10 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
       }
     }
 
+    final initialState = _initialState();
     final firstDate = _getFirstDateToUse(transaction.repetitionCycle, transaction.transactionDate);
-
-    return _initialState().copyWith(
+    final transactionDateString = DateUtils.formatAppDate(transaction.transactionDate, initialState.language, DateUtils.monthDayAndYearFormat);
+    return initialState.copyWith(
       id: transaction.id,
       amount: transaction.amount,
       isAmountValid: true,
@@ -168,6 +165,7 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
       isDescriptionDirty: true,
       repetitionCycle: transaction.repetitionCycle,
       transactionDate: transaction.transactionDate,
+      transactionDateString: transactionDateString,
       isTransactionDateValid: _isTransactionDateValid(transaction.transactionDate, transaction.repetitionCycle),
       isParentTransaction: transaction.isParentTransaction,
       parentTransactionId: transaction.parentTransactionId,

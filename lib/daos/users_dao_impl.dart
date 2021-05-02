@@ -40,7 +40,7 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase> with _$UsersDaoImplMixi
       id = await into(users).insert(UsersCompanion.insert(
         localStatus: LocalStatusType.nothing,
         googleUserId: googleUserId,
-        isActive: Value(false),
+        isActive: const Value(false),
         name: fullName,
         email: email,
         pictureUrl: Value(imgUrl),

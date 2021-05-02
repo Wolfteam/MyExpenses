@@ -166,7 +166,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     );
   }
 
-  Future<SearchState> _categoryChanged(CategoryItem newValue) {
+  Future<SearchState> _categoryChanged(CategoryItem? newValue) {
     final s = currentState;
     return _buildInitialState(
       s.currentLanguage,

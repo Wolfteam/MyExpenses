@@ -42,14 +42,14 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
           ModalSheetSeparator(),
           ModalSheetTitle(title: i18n.filterByX(i18n.date.toLowerCase())),
           Text('${i18n.startDate}:'),
-          FlatButton(
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          TextButton(
+            style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
             onPressed: () => _changeDate(context, s.tempFrom ?? now, s.currentLanguage, true),
             child: Align(alignment: Alignment.centerLeft, child: Text(startText!)),
           ),
           Text('${i18n.untilDate}:'),
-          FlatButton(
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          TextButton(
+            style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
             onPressed: () => _changeDate(context, s.tempUntil ?? now, s.currentLanguage, false),
             child: Align(alignment: Alignment.centerLeft, child: Text(untilText!)),
           ),
@@ -66,15 +66,15 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
     return ButtonBar(
       layoutBehavior: ButtonBarLayoutBehavior.constrained,
       children: <Widget>[
-        OutlineButton(
+        OutlinedButton(
           onPressed: () => _closeModal(context),
           child: Text(i18n.close, style: TextStyle(color: theme.primaryColor)),
         ),
-        OutlineButton(
+        OutlinedButton(
           onPressed: () => _clearFilters(context),
           child: Text(i18n.clear, style: TextStyle(color: theme.primaryColor)),
         ),
-        RaisedButton(
+        ElevatedButton(
           onPressed: () => _applyDates(context),
           child: Text(i18n.apply),
         ),

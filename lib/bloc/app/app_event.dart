@@ -19,4 +19,8 @@ class AppEvent with _$AppEvent {
   const factory AppEvent.bgTaskIsRunning({
     required bool isRunning,
   }) = _BgTaskIsRunning;
+
+  const factory AppEvent.languageChanged({
+    required AppLanguageType newValue,
+  }) = _LanguageChanged;
 }

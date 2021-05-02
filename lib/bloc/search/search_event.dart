@@ -37,7 +37,7 @@ class SearchEvent with _$SearchEvent {
   }) = _ComparerTypeChanged;
 
   const factory SearchEvent.categoryChanged({
-    required CategoryItem newValue,
+    CategoryItem? newValue,
   }) = _CategoryChanged;
 
   const factory SearchEvent.transactionFilterChanged({

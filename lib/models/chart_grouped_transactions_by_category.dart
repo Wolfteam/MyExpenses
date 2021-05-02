@@ -10,10 +10,10 @@ part 'chart_grouped_transactions_by_category.freezed.dart';
 class ChartGroupedTransactionsByCategory with _$ChartGroupedTransactionsByCategory {
   double get total => TransactionUtils.getTotalTransactionAmount(transactions);
 
-  const ChartGroupedTransactionsByCategory._();
-
   const factory ChartGroupedTransactionsByCategory({
     required CategoryItem category,
     required List<TransactionItem> transactions,
   }) = _ChartGroupedTransactionsByCategory;
+
+  const ChartGroupedTransactionsByCategory._();
 }

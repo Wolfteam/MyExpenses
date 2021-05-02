@@ -11,11 +11,11 @@ class TransactionCardItems with _$TransactionCardItems {
 
   double get dayIncomes => TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: true);
 
-  const TransactionCardItems._();
-
   const factory TransactionCardItems({
     required DateTime date,
     required String dateString,
     required List<TransactionItem> transactions,
   }) = _TransactionCardItems;
+
+  const TransactionCardItems._();
 }

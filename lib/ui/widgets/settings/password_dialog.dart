@@ -118,7 +118,7 @@ class _PasswordDialogState extends State<PasswordDialog> {
       onFieldSubmitted: (_) {
         _fieldFocusChange(context, _passwordFocus, _confirmPasswordFocus);
       },
-      autovalidate: state.isPasswordDirty,
+      autovalidateMode: state.isPasswordDirty ? AutovalidateMode.always : null,
       validator: (_) => (!widget.promptForPassword && !state.isPasswordValid) || (widget.promptForPassword && state.userIsValid == false)
           ? i18n.passwordIsNotValid
           : null,
@@ -145,7 +145,7 @@ class _PasswordDialogState extends State<PasswordDialog> {
           onPressed: () => _showConfirmPassword(!state.showConfirmPassword),
         ),
       ),
-      autovalidate: state.isConfirmPasswordDirty,
+      autovalidateMode: state.isConfirmPasswordDirty ? AutovalidateMode.always : null,
       validator: (_) => state.isConfirmPasswordValid ? null : i18n.confirmPasswordIsNotValid,
     );
   }
@@ -155,7 +155,7 @@ class _PasswordDialogState extends State<PasswordDialog> {
       buttonPadding: const EdgeInsets.symmetric(horizontal: 20),
       children: <Widget>[
         if (!widget.promptForPassword)
-          OutlineButton(
+          OutlinedButton(
             onPressed: () {
               Navigator.pop(context);
             },
@@ -164,8 +164,7 @@ class _PasswordDialogState extends State<PasswordDialog> {
               style: TextStyle(color: theme.primaryColor),
             ),
           ),
-        RaisedButton(
-          color: theme.primaryColor,
+        ElevatedButton(
           onPressed: !widget.promptForPassword && !state.isFormValid
               ? null
               : !widget.promptForPassword

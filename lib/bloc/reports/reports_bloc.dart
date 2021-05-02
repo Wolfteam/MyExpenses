@@ -7,6 +7,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:my_expenses/common/utils/app_path_utils.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/models/transaction_item.dart';
+import 'package:my_expenses/ui/widgets/reports/pdf_report.dart';
 import 'package:path/path.dart';
 
 import '../../common/enums/report_file_type.dart';
@@ -14,7 +15,6 @@ import '../../common/utils/date_utils.dart';
 import '../../daos/transactions_dao.dart';
 import '../../daos/users_dao.dart';
 import '../../services/logging_service.dart';
-// import '../../ui/widgets/reports/pdf_report.dart';
 import '../currency/currency_bloc.dart';
 
 part 'reports_bloc.freezed.dart';
@@ -46,7 +46,6 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
   Stream<ReportState> mapEventToState(
     ReportsEvent event,
   ) async* {
-    yield currentState.copyWith(generatingReport: true);
     try {
       final s = await event.map(
         resetReportSheet: (_) async => _initialState,
@@ -69,6 +68,10 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
         fileTypeChanged: (e) async => currentState.copyWith(selectedFileType: e.selectedFileType),
         generateReport: (e) async => _buildReport(e.i18n),
       );
+
+      if (event is _GenerateReport) {
+        yield currentState.copyWith(generatingReport: true);
+      }
 
       yield s;
     } catch (e, s) {
@@ -125,25 +128,20 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
     return path;
   }
 
-  Future<String> _buildPdfReport(
-    List<TransactionItem> transactions,
-    S i18n,
-  ) async {
-    //TODO: USE THE WIDGET HERE
-    return '';
-    // final pdf = await buildPdf(
-    //   (amount) => _currencyBloc.format(amount),
-    //   transactions,
-    //   i18n,
-    //   currentState.from,
-    //   currentState.to,
-    // );
-    //
-    // final path = await AppPathUtils.generateReportFilePath();
-    // final file = File(path);
-    // final bytes = await pdf.save();
-    // await file.writeAsBytes(bytes);
-    //
-    // return path;
+  Future<String> _buildPdfReport(List<TransactionItem> transactions, S i18n) async {
+    final pdf = await buildPdf(
+      (amount) => _currencyBloc.format(amount),
+      transactions,
+      i18n,
+      currentState.from,
+      currentState.to,
+    );
+
+    final path = await AppPathUtils.generateReportFilePath();
+    final file = File(path);
+    final bytes = await pdf.save();
+    await file.writeAsBytes(bytes);
+
+    return path;
   }
 }

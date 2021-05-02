@@ -139,7 +139,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     }
   }
 
-  double _getTotalExpenses(List<TransactionItem> transactions) => TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: false);
+  double _getTotalExpenses(List<TransactionItem> transactions) => TransactionUtils.getTotalTransactionAmounts(transactions);
 
   double _getTotalIncomes(List<TransactionItem> transactions) => TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: true);
 
@@ -168,7 +168,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     }
 
     return [
-      TransactionsSummaryPerMonth(
+      const TransactionsSummaryPerMonth(
         order: 1,
         percentage: 100,
         isAnIncome: true,
@@ -202,9 +202,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         );
 
         if (map.keys.any((key) => key == date)) {
-          //TODO: NOT SURE IF THIS IS OK
-          map.update(date, (value) => value + transaction.amount);
-          // map[date] += transaction.amount;
+          map[date] = transaction.amount + map[date]!;
         } else {
           map.addAll({date: transaction.amount});
         }

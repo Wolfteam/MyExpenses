@@ -23,7 +23,7 @@ class PdfTransactionTable extends StatelessWidget {
     final lastFormattedDate = DateUtils.formatDateWithoutLocale(lastDate, DateUtils.monthDayAndYearFormat);
 
     final incomeAmount = TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: true);
-    final expenseAmount = TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: false);
+    final expenseAmount = TransactionUtils.getTotalTransactionAmounts(transactions);
     final balance = TransactionUtils.roundDouble(incomeAmount + expenseAmount);
 
     final rows = <TableRow>[

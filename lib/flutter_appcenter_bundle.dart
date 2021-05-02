@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -61,7 +60,7 @@ class AppCenter {
   }
 
   /// Enable or disable analytics
-  static Future configureAnalyticsAsync({@required enabled}) async {
+  static Future configureAnalyticsAsync({required bool enabled}) async {
     await _methodChannel.invokeMethod('configureAnalytics', enabled);
   }
 
@@ -71,7 +70,7 @@ class AppCenter {
   }
 
   /// Enable or disable appcenter crash reports
-  static Future configureCrashesAsync({@required enabled}) async {
+  static Future configureCrashesAsync({required bool enabled}) async {
     await _methodChannel.invokeMethod('configureCrashes', enabled);
   }
 }

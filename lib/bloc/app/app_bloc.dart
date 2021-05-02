@@ -5,7 +5,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:my_expenses/common/utils/app_path_utils.dart';
-import 'package:my_expenses/generated/l10n.dart';
+import 'package:my_expenses/models/language_model.dart';
 
 import '../../common/enums/app_accent_color_type.dart';
 import '../../common/enums/app_drawer_item_type.dart';
@@ -20,6 +20,11 @@ import '../drawer/drawer_bloc.dart';
 part 'app_bloc.freezed.dart';
 part 'app_event.dart';
 part 'app_state.dart';
+
+const _languagesMap = {
+  AppLanguageType.english: LanguageModel('en', 'US'),
+  AppLanguageType.spanish: LanguageModel('es', 'ES'),
+};
 
 class AppBloc extends Bloc<AppEvent, AppState> {
   final LoggingService _logger;
@@ -77,22 +82,14 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
         await Future.delayed(const Duration(milliseconds: 500));
 
-        return _loadThemeData(
-          _settingsService.appTheme,
-          _settingsService.accentColor,
-          _settingsService.language,
-        );
+        return _loadThemeData(_settingsService.appTheme, _settingsService.accentColor, _settingsService.language);
       },
       themeChanged: (e) async {
         _logger.info(
           runtimeType,
           'App theme changed, the selected theme is: ${e.theme}',
         );
-        return _loadThemeData(
-          e.theme,
-          _settingsService.accentColor,
-          _settingsService.language,
-        );
+        return _loadThemeData(e.theme, _settingsService.accentColor, _settingsService.language);
       },
       accentColorChanged: (e) async {
         _logger.info(
@@ -100,11 +97,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           'App accent color changed, the selected color is: ${e.accentColor}',
         );
 
-        return _loadThemeData(
-          _settingsService.appTheme,
-          e.accentColor,
-          _settingsService.language,
-        );
+        return _loadThemeData(_settingsService.appTheme, e.accentColor, _settingsService.language);
       },
       authenticateUser: (e) async => _authenticateUser(e),
       bgTaskIsRunning: (e) async => _loadThemeData(
@@ -113,6 +106,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         _settingsService.language,
         bgTaskIsRunning: e.isRunning,
       ),
+      languageChanged: (e) async => _loadThemeData(_settingsService.appTheme, _settingsService.accentColor, e.newValue),
     );
 
     yield s;
@@ -133,21 +127,18 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     bool bgTaskIsRunning = false,
   }) {
     final themeData = accentColor.getThemeData(theme);
-    _setLocale(language);
-    return AppState.loaded(isInitialized: isInitialized, theme: themeData, bgTaskIsRunning: bgTaskIsRunning);
-  }
-
-  void _setLocale(AppLanguageType language) {
-    final locale = S.delegate.supportedLocales[language.index];
-    //TODO: THIS
-    // S.onLocaleChanged(locale);
+    return AppState.loaded(
+      isInitialized: isInitialized,
+      theme: themeData,
+      bgTaskIsRunning: bgTaskIsRunning,
+      language: _getCurrentLanguage(language),
+    );
   }
 
   Future<AppState> _authenticateUser(_AuthenticateUser event) async {
     final themeData = _settingsService.accentColor.getThemeData(_settingsService.appTheme);
     final currentState = state;
     int retries = 0;
-    _setLocale(_settingsService.language);
 
     if (currentState is _AuthState) {
       retries = currentState.retries + 1;
@@ -158,6 +149,11 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       askForPassword: _settingsService.askForPassword,
       askForFingerPrint: _settingsService.askForFingerPrint,
       theme: themeData,
+      language: _getCurrentLanguage(_settingsService.language),
     );
+  }
+
+  LanguageModel _getCurrentLanguage(AppLanguageType language) {
+    return _languagesMap.entries.firstWhere((kvp) => kvp.key == language).value;
   }
 }

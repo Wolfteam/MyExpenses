@@ -80,14 +80,14 @@ class ReportsBottomSheetDialog extends StatelessWidget {
           ModalSheetSeparator(),
           ModalSheetTitle(title: i18n.exportFrom),
           Text('${i18n.startDate}:'),
-          FlatButton(
+          TextButton(
               onPressed: () => _showDatePicker(context, state.from, true),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(fromDateString),
               )),
           Text('${i18n.endDate}:'),
-          FlatButton(
+          TextButton(
             onPressed: () => _showDatePicker(context, state.to, false),
             child: Align(
               alignment: Alignment.centerLeft,
@@ -112,7 +112,7 @@ class ReportsBottomSheetDialog extends StatelessWidget {
           ButtonBar(
             buttonPadding: const EdgeInsets.symmetric(horizontal: 20),
             children: <Widget>[
-              OutlineButton(
+              OutlinedButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -121,8 +121,7 @@ class ReportsBottomSheetDialog extends StatelessWidget {
                   style: TextStyle(color: theme.primaryColor),
                 ),
               ),
-              RaisedButton(
-                color: theme.primaryColor,
+              ElevatedButton(
                 onPressed: () => _generateReport(context),
                 child: Text(i18n.generate),
               ),

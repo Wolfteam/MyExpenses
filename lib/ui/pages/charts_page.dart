@@ -66,7 +66,7 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
         ),
         Align(
           alignment: Alignment.centerLeft,
-          child: FlatButton.icon(
+          child: TextButton.icon(
             onPressed: () => _changeCurrentDate(state),
             icon: const Icon(Icons.calendar_today),
             label: Text(state.currentDateString),
@@ -148,57 +148,9 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
         ),
       ),
     );
-
-    return Container(
-      height: 180,
-      margin: const EdgeInsets.only(bottom: 30),
-      // child: charts.BarChart(
-      //   _createSampleDataForBarChart(state),
-      //   animate: true,
-      //   barRendererDecorator: charts.BarLabelDecorator<String>(),
-      //   domainAxis: charts.OrdinalAxisSpec(
-      //     showAxisLine: false,
-      //     renderSpec: charts.SmallTickRendererSpec(
-      //       labelRotation: 45,
-      //       axisLineStyle: charts.LineStyleSpec(
-      //         color: charts.ColorUtil.fromDartColor(lineColor),
-      //         thickness: 5,
-      //       ),
-      //       labelStyle: charts.TextStyleSpec(
-      //         color: charts.ColorUtil.fromDartColor(lineColor),
-      //         fontSize: 11,
-      //       ),
-      //     ),
-      //   ),
-      //   primaryMeasureAxis: charts.NumericAxisSpec(
-      //     showAxisLine: false,
-      //     renderSpec: charts.GridlineRendererSpec(
-      //       axisLineStyle: charts.LineStyleSpec(
-      //         color: charts.ColorUtil.fromDartColor(lineColor),
-      //       ),
-      //       labelStyle: charts.TextStyleSpec(
-      //         color: charts.ColorUtil.fromDartColor(lineColor),
-      //       ),
-      //       lineStyle: charts.LineStyleSpec(
-      //         color: charts.ColorUtil.fromDartColor(lineColor),
-      //       ),
-      //     ),
-      //   ),
-      // ),
-    );
   }
 
   List<BarChartGroupData> _buildData(ChartsState state) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    // final labelStyle = charts.TextStyleSpec(
-    //   color: charts.ColorUtil.fromDartColor(
-    //     isDark ? Colors.white : Colors.black,
-    //   ),
-    // );
-
-    final currency = context.read<CurrencyBloc>();
-
     return state.transactionsPerDate
         .mapIndex(
           (e, i) => BarChartGroupData(
@@ -217,61 +169,7 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
           ),
         )
         .toList();
-
-    // return [
-    //   charts.Series<TransactionsSummaryPerDate, String>(
-    //     id: 'BarChartMonthSummary',
-    //     data: state.transactionsPerDate,
-    //     colorFn: (item, _) => item.totalAmount == 0
-    //         ? charts.MaterialPalette.white
-    //         : item.isAnIncome
-    //             ? charts.MaterialPalette.green.shadeDefault
-    //             : charts.MaterialPalette.red.shadeDefault,
-    //     domainFn: (item, _) => item.dateRangeString,
-    //     measureFn: (item, _) => item.totalAmount,
-    //     insideLabelStyleAccessorFn: (item, index) => labelStyle,
-    //     outsideLabelStyleAccessorFn: (item, index) => labelStyle,
-    //     labelAccessorFn: (item, _) => currency.format(
-    //       item.totalAmount,
-    //       showSymbol: false,
-    //     ),
-    //   ),
-    // ];
   }
-
-  // List<charts.Series<TransactionsSummaryPerDate, String>> _createSampleDataForBarChart(
-  //   LoadedState state,
-  // ) {
-  //   final isDark = Theme.of(context).brightness == Brightness.dark;
-  //
-  //   final labelStyle = charts.TextStyleSpec(
-  //     color: charts.ColorUtil.fromDartColor(
-  //       isDark ? Colors.white : Colors.black,
-  //     ),
-  //   );
-  //
-  //   final currency = context.read<CurrencyBloc>();
-  //
-  //   return [
-  //     charts.Series<TransactionsSummaryPerDate, String>(
-  //       id: 'BarChartMonthSummary',
-  //       data: state.transactionsPerDate,
-  //       colorFn: (item, _) => item.totalAmount == 0
-  //           ? charts.MaterialPalette.white
-  //           : item.isAnIncome
-  //               ? charts.MaterialPalette.green.shadeDefault
-  //               : charts.MaterialPalette.red.shadeDefault,
-  //       domainFn: (item, _) => item.dateRangeString,
-  //       measureFn: (item, _) => item.totalAmount,
-  //       insideLabelStyleAccessorFn: (item, index) => labelStyle,
-  //       outsideLabelStyleAccessorFn: (item, index) => labelStyle,
-  //       labelAccessorFn: (item, _) => currency.format(
-  //         item.totalAmount,
-  //         showSymbol: false,
-  //       ),
-  //     ),
-  //   ];
-  // }
 
   Widget _buildIncomesAndExpensesCharts(BuildContext context, ChartsState state) {
     return Row(
@@ -297,8 +195,8 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        FlatButton(
-          padding: const EdgeInsets.all(0),
+        TextButton(
+          style: TextButton.styleFrom(padding: const EdgeInsets.all(0)),
           onPressed: () => dataToUse.isNotEmpty ? _goToDetailsPage(context, state, incomes) : null,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,

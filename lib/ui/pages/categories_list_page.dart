@@ -82,6 +82,7 @@ class _CategoriesListPageState extends State<CategoriesListPage> with AutomaticK
     final route = MaterialPageRoute(builder: (ctx) => AddEditCategoryPage());
     context.read<CategoryFormBloc>().add(const CategoryFormEvent.addCategory());
     await Navigator.of(context).push(route);
+    await route.completed;
     context.read<CategoryFormBloc>().add(const CategoryFormEvent.formClosed());
   }
 }

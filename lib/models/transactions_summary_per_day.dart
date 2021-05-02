@@ -7,14 +7,12 @@ part 'transactions_summary_per_day.freezed.dart';
 
 @freezed
 class TransactionsSummaryPerDay with _$TransactionsSummaryPerDay, TransactionMixin {
-  Color get color => getTransactionColor(
-        isAnIncome: isTransactionAnIncome(totalDayAmount),
-      );
-
-  const TransactionsSummaryPerDay._();
+  Color get color => getTransactionColor(isAnIncome: isTransactionAnIncome(totalDayAmount));
 
   const factory TransactionsSummaryPerDay({
     required DateTime date,
     required double totalDayAmount,
   }) = _TransactionsSummaryPerDay;
+
+  const TransactionsSummaryPerDay._();
 }

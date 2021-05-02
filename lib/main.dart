@@ -134,12 +134,6 @@ class _MyAppState extends State<MyApp> {
             );
           }),
           BlocProvider(create: (ctx) {
-            final settingsService = getIt<SettingsService>();
-            final secureStorage = getIt<SecureStorageService>();
-            final usersDao = getIt<UsersDao>();
-            return SettingsBloc(settingsService, secureStorage, usersDao);
-          }),
-          BlocProvider(create: (ctx) {
             final logger = getIt<LoggingService>();
             final usersDao = getIt<UsersDao>();
             final categoriesDao = getIt<CategoriesDao>();
@@ -150,6 +144,12 @@ class _MyAppState extends State<MyApp> {
             final settingsService = getIt<SettingsService>();
             final drawerBloc = ctx.read<DrawerBloc>();
             return app_bloc.AppBloc(logger, settingsService, drawerBloc);
+          }),
+          BlocProvider(create: (ctx) {
+            final settingsService = getIt<SettingsService>();
+            final secureStorage = getIt<SecureStorageService>();
+            final usersDao = getIt<UsersDao>();
+            return SettingsBloc(settingsService, secureStorage, usersDao, ctx.read<app_bloc.AppBloc>());
           }),
           BlocProvider(create: (ctx) {
             final logger = getIt<LoggingService>();
@@ -263,15 +263,15 @@ class _MyAppState extends State<MyApp> {
       GlobalCupertinoLocalizations.delegate,
     ];
 
-    //TODO: LOCALE HERE
-    return state.maybeMap(
+    return state.map(
       loaded: (state) {
+        final locale = Locale(state.language.code, state.language.countryCode);
         if (state.bgTaskIsRunning) {
           return MaterialApp(
             home: Loading(),
             theme: state.theme,
             //Without this, the lang won't be reloaded
-            locale: Locale('en', 'US'),
+            locale: locale,
             localizationsDelegates: delegates,
             supportedLocales: S.delegate.supportedLocales,
           );
@@ -280,30 +280,33 @@ class _MyAppState extends State<MyApp> {
           theme: state.theme,
           home: MainPage(),
           //Without this, the lang won't be reloaded
-          locale: Locale('en', 'US'),
+          locale: locale,
           localizationsDelegates: delegates,
           supportedLocales: S.delegate.supportedLocales,
         );
       },
-      orElse: () {
+      auth: (state) {
+        final locale = Locale(state.language.code, state.language.countryCode);
         final theme = state.maybeMap(auth: (state) => state.theme, orElse: () => null);
         return MaterialApp(
           home: SplashScreen(),
           theme: theme,
           //Without this, the lang won't be reloaded
-          locale: Locale('en', 'US'),
+          locale: locale,
+          localizationsDelegates: delegates,
+          supportedLocales: S.delegate.supportedLocales,
+        );
+      },
+      loading: (state) {
+        final theme = state.maybeMap(auth: (state) => state.theme, orElse: () => null);
+        return MaterialApp(
+          home: SplashScreen(),
+          theme: theme,
           localizationsDelegates: delegates,
           supportedLocales: S.delegate.supportedLocales,
         );
       },
     );
-  }
-
-  void _onLocaleChange(Locale locale) {
-    //TODO: LOCALE
-    // setState(() {
-    //   I18n.locale = locale;
-    // });
   }
 
   Future<dynamic> _onDidReceiveLocalNotification(int id, String? title, String? body, String? payload) async {

@@ -4,13 +4,13 @@ import 'package:my_expenses/generated/l10n.dart';
 import '../../../common/enums/transaction_filter_type.dart';
 import '../../../common/extensions/i18n_extensions.dart';
 
-class TransactionPoupMenuFilter extends StatelessWidget {
+class TransactionPopupMenuFilter extends StatelessWidget {
   // final TransactionFilterType initialValue;
   final TransactionFilterType selectedValue;
   final Function(TransactionFilterType) onSelected;
   final List<TransactionFilterType>? exclude;
 
-  const TransactionPoupMenuFilter({
+  const TransactionPopupMenuFilter({
     Key? key,
     required this.selectedValue,
     required this.onSelected,

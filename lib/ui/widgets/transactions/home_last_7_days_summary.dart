@@ -47,38 +47,6 @@ class HomeLast7DaysSummary extends StatelessWidget {
     );
   }
 
-  // List<charts.Series<TransactionsSummaryPerDay, String>> _createSampleData(
-  //   List<TransactionsSummaryPerDay> data,
-  //   BuildContext context,
-  // ) {
-  //   final isDark = Theme.of(context).brightness == Brightness.dark;
-  //
-  //   final labelStyle = charts.TextStyleSpec(
-  //     fontSize: 10,
-  //     lineHeight: 1.0,
-  //     color: charts.ColorUtil.fromDartColor(
-  //       isDark ? Colors.white : Colors.black,
-  //     ),
-  //   );
-  //   final currencyBloc = context.watch<CurrencyBloc>();
-  //
-  //   return [
-  //     charts.Series<TransactionsSummaryPerDay, String>(
-  //       id: 'HomeLast7DaysSummary',
-  //       data: data,
-  //       colorFn: (item, __) => charts.ColorUtil.fromDartColor(item.color),
-  //       domainFn: (item, _) => utils.DateUtils.formatDateWithoutLocale(item.date),
-  //       measureFn: (item, _) => item.totalDayAmount,
-  //       insideLabelStyleAccessorFn: (item, index) => labelStyle,
-  //       outsideLabelStyleAccessorFn: (item, index) => labelStyle,
-  //       labelAccessorFn: (item, _) => currencyBloc.format(
-  //         item.totalDayAmount,
-  //         showSymbol: false,
-  //       ),
-  //     ),
-  //   ];
-  // }
-
   Widget _buildTitle(bool incomesIsChecked, BuildContext context) {
     final i18n = S.of(context);
 

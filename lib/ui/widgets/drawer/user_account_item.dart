@@ -62,7 +62,7 @@ class UserAccountItem extends StatelessWidget {
         title: Text(i18n.confirmation),
         content: Text(i18n.deleteX(fullname)),
         actions: <Widget>[
-          OutlineButton(
+          OutlinedButton(
             onPressed: () {
               Navigator.pop(ctx);
             },
@@ -71,8 +71,7 @@ class UserAccountItem extends StatelessWidget {
               style: TextStyle(color: theme.primaryColor),
             ),
           ),
-          RaisedButton(
-            color: theme.primaryColor,
+          ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
               context.read<UserAccountsBloc>().add(UserAccountsEvent.deleteAccount(id: id));

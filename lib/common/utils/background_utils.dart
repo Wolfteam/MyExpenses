@@ -122,29 +122,14 @@ class BackgroundUtils {
     try {
       switch (task) {
         case _syncTaskName:
-          final sendPort = IsolateNameServer.lookupPortByName(
-            portName,
-          );
+          final sendPort = IsolateNameServer.lookupPortByName(portName);
           sendPort?.send([true]);
-          logger.info(
-            runtimeType,
-            'bgSync: Checking if internet is available...',
-          );
-          await _runSyncTask(
-            logger,
-            getIt<NetworkService>(),
-            getIt<SyncService>(),
-            settingsService,
-          );
+          logger.info(runtimeType, 'bgSync: Checking if internet is available...');
+          await _runSyncTask(logger, getIt<NetworkService>(), getIt<SyncService>(), settingsService);
           sendPort?.send([false]);
           break;
         case _recurringTransName:
-          await _runRecurringTransTask(
-            logger,
-            getIt<TransactionsDao>(),
-            getIt<UsersDao>(),
-            settingsService,
-          );
+          await _runRecurringTransTask(logger, getIt<TransactionsDao>(), getIt<UsersDao>(), settingsService);
           break;
         default:
           logger.warning(runtimeType, 'bgSync: Task = $task is not valid');
@@ -162,13 +147,10 @@ class BackgroundUtils {
     } finally {
       logger.info(runtimeType, 'bgSync: Closing db connection...');
       await getIt<AppDatabase>().close();
-      logger.info(runtimeType, 'bgSync: Db connection was succesfully closed');
+      logger.info(runtimeType, 'bgSync: Db connection was successfully closed');
     }
 
-    logger.info(
-      runtimeType,
-      'bgSync: Process completed',
-    );
+    logger.info(runtimeType, 'bgSync: Process completed');
   }
 
   static Future<void> runSyncTask() {
@@ -188,29 +170,17 @@ class BackgroundUtils {
         'runBgSyncTask: Sync task is starting. Sync interval = ${settingsService.syncInterval}',
       );
       final i18n = await getI18n(settingsService.language);
-      logger.info(
-        runtimeType,
-        'runBgSyncTask: Checking if internet is available...',
-      );
+      logger.info(runtimeType, 'runBgSyncTask: Checking if internet is available...');
       final isNetworkAvailable = await networkService.isInternetAvailable();
       if (!isNetworkAvailable) {
-        logger.info(
-          runtimeType,
-          'runBgSyncTask: Internet is not available :C',
-        );
+        logger.info(runtimeType, 'runBgSyncTask: Internet is not available :C');
         return;
       }
 
-      logger.info(
-        runtimeType,
-        'runBgSyncTask: Downloading and updating files...',
-      );
+      logger.info(runtimeType, 'runBgSyncTask: Downloading and updating files...');
       await syncService.downloadAndUpdateFile();
 
-      logger.info(
-        runtimeType,
-        'runBgSyncTask: Sync was successfully performed',
-      );
+      logger.info(runtimeType, 'runBgSyncTask: Sync was successfully performed');
       if (settingsService.showNotifAfterFullSync) {
         await showNotification(
           i18n.automaticSync,
@@ -219,12 +189,7 @@ class BackgroundUtils {
         );
       }
     } catch (e, s) {
-      logger.error(
-        runtimeType,
-        'runBgSyncTask: Unknown error occurred',
-        e,
-        s,
-      );
+      logger.error(runtimeType, 'runBgSyncTask: Unknown error occurred', e, s);
       rethrow;
     }
   }
@@ -239,25 +204,19 @@ class BackgroundUtils {
     try {
       final i18n = await getI18n(settingsService.language);
       final now = DateTime.now();
-      logger.info(
-        runtimeType,
-        'runBgRecurringTransTask: Checking recurring transactions for date = $now',
-      );
-      final childs = await TransactionUtils.checkRecurringTransactions(
+      logger.info(runtimeType, 'runBgRecurringTransTask: Checking recurring transactions for date = $now');
+      final children = await TransactionUtils.checkRecurringTransactions(
         now,
         logger,
         transactionsDao,
         usersDao,
       );
 
-      if (childs.isEmpty || !settingsService.showNotifForRecurringTrans) return;
+      if (children.isEmpty || !settingsService.showNotifForRecurringTrans) return;
 
-      logger.info(
-        runtimeType,
-        'runBgRecurringTransTask: Show ${childs.length} child notifications...',
-      );
+      logger.info(runtimeType, 'runBgRecurringTransTask: Show ${children.length} child notifications...');
 
-      final futures = childs
+      final futures = children
           .map((t) => showNotification(
                 i18n.recurringTransactions,
                 t.description,
@@ -268,12 +227,7 @@ class BackgroundUtils {
 
       await Future.wait(futures);
     } catch (e, s) {
-      logger.error(
-        runtimeType,
-        'runBgRecurringTransTask: Unknown error occurred',
-        e,
-        s,
-      );
+      logger.error(runtimeType, 'runBgRecurringTransTask: Unknown error occurred', e, s);
       rethrow;
     }
   }

@@ -27,29 +27,4 @@ class CategoryState with _$CategoryState {
   const factory CategoryState.deleted({
     required CategoryItem category,
   }) = _DeletedState;
-
-// factory CategoryFormState.initial() {
-//   final cat = CategoryUtils.getByName(CategoryUtils.question);
-//   return CategoryFormState(
-//     id: 0,
-//     name: '',
-//     isNameValid: false,
-//     isNameDirty: false,
-//     type: TransactionType.incomes,
-//     isTypeValid: true,
-//     icon: cat.icon.icon,
-//     isIconValid: true,
-//     iconColor: Colors.white,
-//   );
-// }
-
-// CategoryItem buildCategoryItem() {
-//   return CategoryItem(
-//     icon: icon,
-//     iconColor: iconColor,
-//     id: id,
-//     isAnIncome: type == TransactionType.incomes,
-//     name: name.trim(),
-//   );
-// }
 }

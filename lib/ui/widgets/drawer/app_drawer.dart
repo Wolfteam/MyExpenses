@@ -227,7 +227,7 @@ class AppDrawer extends StatelessWidget {
         title: Text(i18n.logout),
         content: Text(i18n.confirmSignOut),
         actions: <Widget>[
-          OutlineButton(
+          OutlinedButton(
             onPressed: () {
               Navigator.pop(ctx);
             },
@@ -236,8 +236,7 @@ class AppDrawer extends StatelessWidget {
               style: TextStyle(color: theme.primaryColor),
             ),
           ),
-          RaisedButton(
-            color: theme.primaryColor,
+          ElevatedButton(
             onPressed: () => _signOut(ctx),
             child: Text(i18n.yes),
           ),
@@ -251,10 +250,7 @@ class AppDrawer extends StatelessWidget {
     context.read<DrawerBloc>().add(const DrawerEvent.signOut());
   }
 
-  Future<void> _signIn(
-    BuildContext context,
-    DrawerState state,
-  ) async {
+  Future<void> _signIn(BuildContext context, DrawerState state) async {
     Navigator.pop(context);
     context.read<UserAccountsBloc>().add(const UserAccountsEvent.init());
 

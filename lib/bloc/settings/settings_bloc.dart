@@ -4,7 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:my_expenses/generated/l10n.dart';
+import 'package:my_expenses/bloc/app/app_bloc.dart';
 import 'package:package_info/package_info.dart';
 
 import '../../common/enums/app_accent_color_type.dart';
@@ -27,10 +27,13 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final SecureStorageService _secureStorageService;
   final UsersDao _usersDao;
 
+  final AppBloc _appBloc;
+
   SettingsBloc(
     this._settingsService,
     this._secureStorageService,
     this._usersDao,
+    this._appBloc,
   ) : super(const SettingsState.loading());
 
   _InitialState get currentState => state as _InitialState;
@@ -51,9 +54,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       },
       appLanguageChanged: (e) async {
         _settingsService.language = e.selectedLanguage;
-        //TODO: THIS
-        final locale = S.delegate.supportedLocales[e.selectedLanguage.index];
-        // I18n.onLocaleChanged(locale);
+        _appBloc.add(AppEvent.languageChanged(newValue: e.selectedLanguage));
         return currentState.copyWith(appLanguage: e.selectedLanguage);
       },
       syncIntervalChanged: (e) async {

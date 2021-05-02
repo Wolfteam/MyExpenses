@@ -72,7 +72,7 @@ class EstimatesBloc extends Bloc<EstimatesEvent, EstimatesState> {
       transactions.addAll(filteredParents);
 
       final incomes = TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: true);
-      final expenses = TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: false);
+      final expenses = TransactionUtils.getTotalTransactionAmounts(transactions);
       final balance = TransactionUtils.roundDouble(incomes + expenses);
       return EstimatesState.loaded(
         selectedTransactionType: transactionType,

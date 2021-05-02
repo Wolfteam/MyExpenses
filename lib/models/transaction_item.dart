@@ -11,8 +11,6 @@ part 'transaction_item.g.dart';
 class TransactionItem with _$TransactionItem {
   bool get isChildTransaction => parentTransactionId != null;
 
-  const TransactionItem._();
-
   const factory TransactionItem({
     required int id,
     required double amount,
@@ -26,6 +24,8 @@ class TransactionItem with _$TransactionItem {
     required CategoryItem category,
     String? longDescription,
   }) = _TransactionItem;
+
+  const TransactionItem._();
 
   factory TransactionItem.fromJson(Map<String, dynamic> json) => _$TransactionItemFromJson(json);
 }

@@ -86,7 +86,7 @@ class ChartDetailsPage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
-                TransactionPoupMenuFilter(
+                TransactionPopupMenuFilter(
                   selectedValue: state.filter,
                   onSelected: (filter) => _filterChanged(context, filter),
                 ),

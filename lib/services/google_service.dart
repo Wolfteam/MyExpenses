@@ -81,7 +81,7 @@ class GoogleServiceImpl implements GoogleService {
       );
       final response = await http.post(Uri.parse(_tokenUrl), body: {
         'client_id': Secrets.googleClientId,
-        'redirect_uri': '$_redirectUrl',
+        'redirect_uri': _redirectUrl,
         'grant_type': 'authorization_code',
         'code': code,
       });

@@ -14,7 +14,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
       );
     } else {
       query.where(
-        (c) => isNull(c.userId) & c.localStatus.equals(LocalStatusType.deleted.index).not(),
+        (c) => c.userId.isNull() & c.localStatus.equals(LocalStatusType.deleted.index).not(),
       );
     }
 
@@ -45,7 +45,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
       );
     } else {
       query.where(
-        (c) => c.isAnIncome.equals(true) & isNull(c.userId) & c.localStatus.equals(LocalStatusType.deleted.index).not(),
+        (c) => c.isAnIncome.equals(true) & c.userId.isNull() & c.localStatus.equals(LocalStatusType.deleted.index).not(),
       );
     }
 
@@ -62,7 +62,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
       );
     } else {
       query.where(
-        (c) => c.isAnIncome.equals(false) & isNull(c.userId) & c.localStatus.equals(LocalStatusType.deleted.index).not(),
+        (c) => c.isAnIncome.equals(false) & c.userId.isNull() & c.localStatus.equals(LocalStatusType.deleted.index).not(),
       );
     }
     return query.map(_mapToCategoryItem).get();
@@ -150,7 +150,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
 
   @override
   Future<void> updateUserId(int userId) {
-    return (update(categories)..where((c) => isNull(c.userId))).write(CategoriesCompanion(userId: Value(userId)));
+    return (update(categories)..where((c) => c.userId.isNull())).write(CategoriesCompanion(userId: Value(userId)));
   }
 
   @override
@@ -161,7 +161,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
   @override
   Future<void> deleteAll(int? userId) {
     if (userId == null) {
-      return (delete(categories)..where((c) => isNull(c.userId))).go();
+      return (delete(categories)..where((c) => c.userId.isNull())).go();
     }
     return (delete(categories)..where((c) => c.userId.equals(userId))).go();
   }
