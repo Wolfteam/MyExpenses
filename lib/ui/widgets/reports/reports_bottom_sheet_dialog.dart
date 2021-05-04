@@ -19,11 +19,7 @@ class ReportsBottomSheetDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Container(
-        margin: const EdgeInsets.only(
-          left: 10,
-          right: 10,
-          bottom: 10,
-        ),
+        margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
         padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
         child: BlocConsumer<ReportsBloc, ReportState>(
           listener: (ctx, state) async {
@@ -60,7 +56,7 @@ class ReportsBottomSheetDialog extends StatelessWidget {
   List<Widget> _buildPage(BuildContext context, ReportState state) {
     final theme = Theme.of(context);
     final i18n = S.of(context);
-
+    final textColor = theme.brightness == Brightness.dark ? Colors.white : Colors.black;
     return state.map(
       initial: (state) {
         if (state.generatingReport) {
@@ -81,13 +77,16 @@ class ReportsBottomSheetDialog extends StatelessWidget {
           ModalSheetTitle(title: i18n.exportFrom),
           Text('${i18n.startDate}:'),
           TextButton(
-              onPressed: () => _showDatePicker(context, state.from, true),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(fromDateString),
-              )),
+            style: TextButton.styleFrom(primary: textColor),
+            onPressed: () => _showDatePicker(context, state.from, true),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(fromDateString),
+            ),
+          ),
           Text('${i18n.endDate}:'),
           TextButton(
+            style: TextButton.styleFrom(primary: textColor),
             onPressed: () => _showDatePicker(context, state.to, false),
             child: Align(
               alignment: Alignment.centerLeft,
@@ -96,10 +95,7 @@ class ReportsBottomSheetDialog extends StatelessWidget {
           ),
           Text(i18n.reportFormat),
           Padding(
-            padding: const EdgeInsets.only(
-              left: 16,
-              right: 16,
-            ),
+            padding: const EdgeInsets.only(left: 16, right: 16),
             child: DropdownButton<ReportFileType>(
               isExpanded: true,
               hint: Text(i18n.selectFormat),

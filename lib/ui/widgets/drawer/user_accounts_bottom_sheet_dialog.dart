@@ -18,11 +18,7 @@ class UserAccountsBottomSheetDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Container(
-        margin: const EdgeInsets.only(
-          left: 10,
-          right: 10,
-          bottom: 10,
-        ),
+        margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
         padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
         child: BlocConsumer<UserAccountsBloc, UserAccountsState>(
           listener: (ctx, state) {

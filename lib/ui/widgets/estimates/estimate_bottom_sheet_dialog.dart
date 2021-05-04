@@ -13,13 +13,8 @@ class EstimateBottomSheetDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Container(
-        margin: const EdgeInsets.only(
-          left: 10,
-          right: 10,
-          bottom: 10,
-        ),
+        margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
         padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
         child: BlocBuilder<EstimatesBloc, EstimatesState>(
           builder: (ctx, state) => Column(
@@ -35,6 +30,7 @@ class EstimateBottomSheetDialog extends StatelessWidget {
   List<Widget> _buildPage(BuildContext context, EstimatesState state) {
     final theme = Theme.of(context);
     final i18n = S.of(context);
+    final textColor = theme.brightness == Brightness.dark ? Colors.white : Colors.black;
     return state.map(
       loading: (_) => [],
       loaded: (s) => [
@@ -46,13 +42,13 @@ class EstimateBottomSheetDialog extends StatelessWidget {
         _buildToggleButtons(context, s.selectedTransactionType),
         Text('${i18n.startDate}:'),
         TextButton(
-          style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+          style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap, primary: textColor),
           onPressed: () => _changeDate(context, s.fromDate, s.currentLanguage, true),
           child: Align(alignment: Alignment.centerLeft, child: Text(s.fromDateString)),
         ),
         Text('${i18n.untilDate}:'),
         TextButton(
-          style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+          style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap, primary: textColor),
           onPressed: () => _changeDate(context, s.untilDate, s.currentLanguage, false),
           child: Align(alignment: Alignment.centerLeft, child: Text(s.untilDateString)),
         ),

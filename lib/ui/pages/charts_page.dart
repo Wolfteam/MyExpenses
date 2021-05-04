@@ -54,7 +54,8 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
 
   List<Widget> _buildPage(BuildContext context, ChartsState state) {
     final i18n = S.of(context);
-
+    final theme = Theme.of(context);
+    final textColor = theme.brightness == Brightness.dark ? Colors.white : Colors.black;
     return state.map(
       loaded: (state) => [
         Padding(
@@ -67,6 +68,7 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
         Align(
           alignment: Alignment.centerLeft,
           child: TextButton.icon(
+            style: TextButton.styleFrom(primary: textColor),
             onPressed: () => _changeCurrentDate(state),
             icon: const Icon(Icons.calendar_today),
             label: Text(state.currentDateString),
