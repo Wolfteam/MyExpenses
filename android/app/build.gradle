@@ -77,6 +77,11 @@ android {
                     'proguard-rules.pro'
         }
     }
+
+    // Temporary workaround as per https://issuetracker.google.com/issues/158060799
+    lintOptions {
+        checkReleaseBuilds false
+    }
 }
 
 flutter {
@@ -87,6 +92,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.annotation:annotation:1.1.0'
+    implementation "com.jakewharton.threetenabp:threetenabp:1.2.3"
 
     def appCenterSdkVersion = '4.0.0'
     implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"
