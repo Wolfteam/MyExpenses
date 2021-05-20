@@ -39,7 +39,8 @@ import 'services/sync_service.dart';
 import 'telemetry.dart';
 
 Future main() async {
-  initInjection();
+  WidgetsFlutterBinding.ensureInitialized();
+  await initInjection();
   await initTelemetry();
   runApp(MyApp());
 }

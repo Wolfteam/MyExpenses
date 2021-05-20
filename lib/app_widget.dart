@@ -9,14 +9,15 @@ import 'package:my_expenses/ui/pages/main_page.dart';
 import 'package:my_expenses/ui/widgets/loading.dart';
 import 'package:my_expenses/ui/widgets/splash_screen.dart';
 
-class AppWidget extends StatefulWidget {
-  @override
-  _AppWidgetState createState() => _AppWidgetState();
-}
-
-class _AppWidgetState extends State<AppWidget> {
+class AppWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final delegates = <LocalizationsDelegate>[
+      S.delegate,
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ];
     return BlocBuilder<AppBloc, AppState>(
       builder: (ctx, state) => state.map(
         loaded: (state) {
@@ -25,12 +26,6 @@ class _AppWidgetState extends State<AppWidget> {
           }
 
           ctx.read<DrawerBloc>().add(const DrawerEvent.init());
-          final delegates = <LocalizationsDelegate>[
-            S.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ];
           final locale = Locale(state.language.code, state.language.countryCode);
           return MaterialApp(
             home: MainPage(),
@@ -41,7 +36,18 @@ class _AppWidgetState extends State<AppWidget> {
             supportedLocales: S.delegate.supportedLocales,
           );
         },
-        loading: (state) => SplashScreen(),
+        loading: (state) {
+          if (state.theme == null) {
+            context.read<AppBloc>().add(const AppEvent.loadTheme());
+          }
+
+          return MaterialApp(
+            home: SplashScreen(),
+            theme: state.theme,
+            localizationsDelegates: delegates,
+            supportedLocales: S.delegate.supportedLocales,
+          );
+        },
       ),
     );
   }

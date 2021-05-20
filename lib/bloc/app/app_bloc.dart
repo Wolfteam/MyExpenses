@@ -55,9 +55,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   Stream<AppState> mapEventToState(
     AppEvent event,
   ) async* {
-    _logger.info(runtimeType, 'Initializing app settings');
-    await _settingsService.init();
-
     final s = await event.map(
       init: (e) async {
         await BackgroundUtils.initBg();
@@ -107,6 +104,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         bgTaskIsRunning: e.isRunning,
       ),
       languageChanged: (e) async => _loadThemeData(_settingsService.appTheme, _settingsService.accentColor, e.newValue),
+      loadTheme: (e) async {
+        final themeData = _settingsService.accentColor.getThemeData(_settingsService.appTheme);
+        return AppState.loading(theme: themeData);
+      },
     );
 
     yield s;

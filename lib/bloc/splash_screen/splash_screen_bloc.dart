@@ -15,7 +15,6 @@ class SplashScreenBloc extends Bloc<SplashScreenEvent, SplashScreenState> {
 
   @override
   Stream<SplashScreenState> mapEventToState(SplashScreenEvent event) async* {
-    await _settingsService.init();
     final s = event.map(init: (_) => _authenticateUser());
     yield s;
   }

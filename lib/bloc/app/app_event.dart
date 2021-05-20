@@ -6,6 +6,8 @@ class AppEvent with _$AppEvent {
     required bool bgTaskIsRunning,
   }) = _Init;
 
+  const factory AppEvent.loadTheme() = _LoadTheme;
+
   const factory AppEvent.themeChanged({
     required AppThemeType theme,
   }) = _ThemeChanged;

@@ -65,26 +65,20 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       },
       askForPasswordChanged: (e) async {
         _settingsService.askForPassword = e.ask;
-        if (!e.ask) {
-          await _secureStorageService.delete(
-            SecureResourceType.loginPassword,
-            _secureStorageService.defaultUsername,
-          );
-        }
 
         if (e.ask) {
+          _settingsService.askForFingerPrint = false;
           return currentState.copyWith(askForPassword: e.ask, askForFingerPrint: false);
         }
+        await _secureStorageService.delete(SecureResourceType.loginPassword, _secureStorageService.defaultUsername);
         return currentState.copyWith(askForPassword: e.ask);
       },
       askForFingerPrintChanged: (e) async {
         _settingsService.askForFingerPrint = e.ask;
 
         if (e.ask) {
-          await _secureStorageService.delete(
-            SecureResourceType.loginPassword,
-            _secureStorageService.defaultUsername,
-          );
+          await _secureStorageService.delete(SecureResourceType.loginPassword, _secureStorageService.defaultUsername);
+          _settingsService.askForPassword = false;
           return currentState.copyWith(askForPassword: false, askForFingerPrint: e.ask);
         }
         return currentState.copyWith(askForFingerPrint: e.ask);
