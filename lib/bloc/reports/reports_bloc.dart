@@ -97,7 +97,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
       path = await _buildPdfReport(transactions, i18n);
     }
     final filename = basename(path);
-    return ReportState.generated(fileName: filename, filePath: path);
+    return ReportState.generated(fileName: filename, filePath: path, selectedFileType: currentState.selectedFileType);
   }
 
   Future<String> _buildCsvReport(

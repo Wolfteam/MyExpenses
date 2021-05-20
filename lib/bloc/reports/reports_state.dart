@@ -13,5 +13,6 @@ class ReportState with _$ReportState {
   const factory ReportState.generated({
     required String fileName,
     required String filePath,
+    required ReportFileType selectedFileType,
   }) = _GeneratedState;
 }

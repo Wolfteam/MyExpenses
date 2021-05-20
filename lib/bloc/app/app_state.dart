@@ -10,12 +10,4 @@ class AppState with _$AppState {
     required bool bgTaskIsRunning,
     required LanguageModel language,
   }) = _LoadedState;
-
-  const factory AppState.auth({
-    required int retries,
-    required bool askForPassword,
-    required bool askForFingerPrint,
-    required ThemeData theme,
-    required LanguageModel language,
-  }) = _AuthState;
 }

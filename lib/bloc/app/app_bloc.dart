@@ -30,6 +30,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final LoggingService _logger;
   final SettingsService _settingsService;
   final DrawerBloc _drawerBloc;
+
   late StreamSubscription _portSubscription;
 
   AppBloc(
@@ -99,7 +100,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
         return _loadThemeData(_settingsService.appTheme, e.accentColor, _settingsService.language);
       },
-      authenticateUser: (e) async => _authenticateUser(e),
       bgTaskIsRunning: (e) async => _loadThemeData(
         _settingsService.appTheme,
         _settingsService.accentColor,
@@ -132,24 +132,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       theme: themeData,
       bgTaskIsRunning: bgTaskIsRunning,
       language: _getCurrentLanguage(language),
-    );
-  }
-
-  Future<AppState> _authenticateUser(_AuthenticateUser event) async {
-    final themeData = _settingsService.accentColor.getThemeData(_settingsService.appTheme);
-    final currentState = state;
-    int retries = 0;
-
-    if (currentState is _AuthState) {
-      retries = currentState.retries + 1;
-    }
-
-    return AppState.auth(
-      retries: retries,
-      askForPassword: _settingsService.askForPassword,
-      askForFingerPrint: _settingsService.askForFingerPrint,
-      theme: themeData,
-      language: _getCurrentLanguage(_settingsService.language),
     );
   }
 

@@ -14,8 +14,6 @@ class AppEvent with _$AppEvent {
     required AppAccentColorType accentColor,
   }) = _AccentColorChanged;
 
-  const factory AppEvent.authenticateUser() = _AuthenticateUser;
-
   const factory AppEvent.bgTaskIsRunning({
     required bool isRunning,
   }) = _BgTaskIsRunning;
