@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/common/enums/notification_type.dart';
 import 'package:my_expenses/generated/l10n.dart';
 
 import '../../../bloc/reports/reports_bloc.dart';
@@ -34,11 +35,9 @@ class ReportsBottomSheetDialog extends StatelessWidget {
                 }
               },
               generated: (state) {
-                showNotification(
-                  i18n.transactionsReport,
-                  '${i18n.reportWasSuccessfullyGenerated(state.fileName)}.\n${i18n.tapToOpen}',
-                  jsonEncode(AppNotification.openPdf(state.filePath)),
-                );
+                final notificationType = state.selectedFileType == ReportFileType.pdf ? NotificationType.openPdf : NotificationType.openCsv;
+                final json = jsonEncode(AppNotification.openFile(state.filePath, notificationType));
+                showNotification(i18n.transactionsReport, '${i18n.reportWasSuccessfullyGenerated(state.fileName)}.\n${i18n.tapToOpen}', json);
                 Navigator.pop(context);
               },
             );

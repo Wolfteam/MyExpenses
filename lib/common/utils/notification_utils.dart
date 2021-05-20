@@ -40,14 +40,11 @@ Future setupNotifications({
     requestAlertPermission: false,
     onDidReceiveLocalNotification: onIosReceiveLocalNotification,
   );
-  final initializationSettings = InitializationSettings(
-    android: initializationSettingsAndroid,
-    iOS: initializationSettingsIOS,
-  );
-  await _flutterLocalNotificationsPlugin.initialize(
-    initializationSettings,
-    onSelectNotification: onSelectNotification,
-  );
+  final initializationSettings = InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+  final initialized = await _flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: onSelectNotification);
+  if (initialized == false) {
+    debugPrint('Flutter notifications could not be initialized');
+  }
 }
 
 Future<bool> requestIOSPermissions() async {

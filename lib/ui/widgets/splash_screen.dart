@@ -6,29 +6,17 @@ import 'package:local_auth/local_auth.dart';
 import 'package:my_expenses/generated/l10n.dart';
 
 import '../../bloc/app/app_bloc.dart';
+import '../../bloc/splash_screen/splash_screen_bloc.dart';
 import '../../common/presentation/custom_assets.dart';
-import 'settings/password_dialog.dart';
+import 'settings/password_bottom_sheet.dart';
 
-class SplashScreen extends StatefulWidget {
-  @override
-  _SplashScreenState createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    WidgetsBinding.instance!.addPostFrameCallback((duration) {
-      context.read<AppBloc>().add(const AppEvent.authenticateUser());
-    });
-  }
-
+class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AppBloc, AppState>(
+    return BlocConsumer<SplashScreenBloc, SplashScreenState>(
       listener: (ctx, state) async {
-        await state.maybeMap(
-          auth: (state) async {
+        await state.map(
+          initial: (state) async {
             if (state.askForFingerPrint) {
               await _authenticateViaFingerPrint(ctx);
             } else if (state.askForPassword) {
@@ -37,7 +25,6 @@ class _SplashScreenState extends State<SplashScreen> {
               ctx.read<AppBloc>().add(const AppEvent.init(bgTaskIsRunning: false));
             }
           },
-          orElse: () async => ctx.read<AppBloc>().add(const AppEvent.init(bgTaskIsRunning: false)),
         );
       },
       builder: (ctx, state) => Container(
@@ -54,9 +41,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   height: 250,
                 ),
               ),
-              const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
+              const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
             ],
           ),
         ),
@@ -102,7 +87,7 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
       isDismissible: false,
       isScrollControlled: true,
-      builder: (ctx) => const PasswordDialog(promptForPassword: true),
+      builder: (ctx) => const PasswordBottomSheet(promptForPassword: true),
     );
 
     isAuthenticated ??= false;
@@ -114,7 +99,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (isAuthenticated) {
       context.read<AppBloc>().add(const AppEvent.init(bgTaskIsRunning: false));
     } else {
-      context.read<AppBloc>().add(const AppEvent.authenticateUser());
+      context.read<SplashScreenBloc>().add(const SplashScreenEvent.init());
     }
   }
 }

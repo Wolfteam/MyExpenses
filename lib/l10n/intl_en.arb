@@ -190,5 +190,7 @@
   "fingerprintRequired": "Fingerprint required",
   "goToSettings": "Go to settings",
   "goToSettingDescription": "Fingerprint is not set up on your device. Go to Settings > Security to add your fingerprint.",
-  "syncNow": "Sync Now"
+  "syncNow": "Sync Now",
+  "noAppToOpenFile": "There's no app installed to open the file",
+  "fileNotFound": "The file {file} was not found"
 }

@@ -4,16 +4,16 @@ import 'package:my_expenses/generated/l10n.dart';
 
 import '../../../bloc/password_dialog/password_dialog_bloc.dart';
 
-class PasswordDialog extends StatefulWidget {
+class PasswordBottomSheet extends StatefulWidget {
   final bool promptForPassword;
 
-  const PasswordDialog({this.promptForPassword = false});
+  const PasswordBottomSheet({this.promptForPassword = false});
 
   @override
-  _PasswordDialogState createState() => _PasswordDialogState();
+  _PasswordBottomSheetState createState() => _PasswordBottomSheetState();
 }
 
-class _PasswordDialogState extends State<PasswordDialog> {
+class _PasswordBottomSheetState extends State<PasswordBottomSheet> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _passwordFocus = FocusNode();
@@ -31,20 +31,10 @@ class _PasswordDialogState extends State<PasswordDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final i18n = S.of(context);
-    final mediaQuery = MediaQuery.of(context);
     return SingleChildScrollView(
       child: Container(
-        margin: const EdgeInsets.only(
-          left: 10,
-          right: 10,
-          bottom: 10,
-        ),
-        padding: EdgeInsets.only(
-          left: 20,
-          right: 20,
-          top: 20,
-          bottom: mediaQuery.viewInsets.bottom,
-        ),
+        margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+        padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
         child: BlocConsumer<PasswordDialogBloc, PasswordDialogState>(
           listener: (ctx, state) {
             if (state.passwordWasSaved) {

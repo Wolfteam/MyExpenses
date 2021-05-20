@@ -13,7 +13,7 @@ class AppNotification with _$AppNotification {
     String? payload,
   }) = _AppNotification;
 
-  factory AppNotification.openPdf(String path) => AppNotification(type: NotificationType.openPdf, payload: path);
+  factory AppNotification.openFile(String path, NotificationType type) => AppNotification(type: type, payload: path);
 
   factory AppNotification.openTransaction(int id) => AppNotification(
         type: NotificationType.openTransactionDetails,

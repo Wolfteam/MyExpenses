@@ -20,7 +20,7 @@ import '../../common/styles.dart';
 import '../../common/utils/bloc_utils.dart';
 import '../../common/utils/currency_utils.dart';
 import '../../common/utils/toast_utils.dart';
-import '../widgets/settings/password_dialog.dart';
+import '../widgets/settings/password_bottom_sheet.dart';
 import '../widgets/settings/setting_card_subtitle_text.dart';
 import '../widgets/settings/settings_card_title_text.dart';
 
@@ -409,7 +409,7 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
       shape: Styles.modalBottomSheetShape,
       isDismissible: true,
       isScrollControlled: true,
-      builder: (ctx) => const PasswordDialog(),
+      builder: (ctx) => const PasswordBottomSheet(),
     );
 
     if (result == null) return;

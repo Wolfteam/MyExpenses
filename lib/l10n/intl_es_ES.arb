@@ -190,5 +190,7 @@
   "fingerprintRequired": "Huella requireda",
   "goToSettings": "Ir a la configuración",
   "goToSettingDescription": "La huella no esta configurada en tu equipo. Ve a la Configuración > Seguridad para añadir tu huella.",
-  "syncNow": "Sincronizar Ahora"
+  "syncNow": "Sincronizar Ahora",
+  "noAppToOpenFile": "No hay aplicación instalada para abrir este tipo de archivos",
+  "fileNotFound": "El archivo {file} no fue encontrado"
 }
