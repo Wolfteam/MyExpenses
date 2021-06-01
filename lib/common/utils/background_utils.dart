@@ -39,7 +39,6 @@ class BackgroundUtils {
   static ReceivePort port = ReceivePort();
 
   static Future<void> initBg() {
-    //TODO: CHANGE THE ISINDEBUG
     if (Platform.isAndroid) {
       return Workmanager().initialize(callbackDispatcher);
     }
@@ -112,7 +111,7 @@ class BackgroundUtils {
   }
 
   static Future<void> bgSync(String task) async {
-    initInjection();
+    initInjection(runsOnBackground: true);
     final logger = getIt<LoggingService>();
     final settingsService = getIt<SettingsService>();
     await settingsService.init();
