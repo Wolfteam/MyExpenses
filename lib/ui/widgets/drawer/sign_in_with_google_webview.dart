@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_user_agentx/flutter_user_agent.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:my_expenses/generated/l10n.dart';
-import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 
 import '../../../bloc/sign_in_with_google/sign_in_with_google_bloc.dart';
 import '../../../common/utils/bloc_utils.dart';
@@ -81,40 +80,19 @@ class _SignInWithGoogleWebViewState extends State<SignInWithGoogleWebView> {
       initial: (state) {
         if (!state.codeGranted && !state.flowCompleted) {
           final userAgent = FlutterUserAgent.webViewUserAgent!.replaceAll(RegExp(r'wv'), '');
-          return Scaffold(
+          return WebviewScaffold(
+            url: state.authUrl,
+            userAgent: userAgent,
+            clearCache: true,
+            debuggingEnabled: true,
             appBar: AppBar(
               leading: const BackButton(),
               title: Text(i18n.authenticate),
             ),
-            body: WebViewPlus(
-              onPageFinished: (url) {
-                if (mounted) {
-                  context.read<SignInWithGoogleBloc>().add(SignInWithGoogleEvent.urlChanged(url: url));
-                }
-              },
-              initialUrl: state.authUrl,
-              userAgent: userAgent,
-              javascriptMode: JavascriptMode.unrestricted,
+            initialChild: const Center(
+              child: CircularProgressIndicator(),
             ),
           );
-          // return WebviewScaffold(
-          //   url: state.authUrl,
-          //   userAgent: userAgent,
-          //   enableAppScheme: true,
-          //   appCacheEnabled: false,
-          //   clearCache: true,
-          //   debuggingEnabled: true,
-          //   appBar: AppBar(
-          //     leading: const BackButton(),
-          //     title: Text(i18n.authenticate),
-          //   ),
-          //   withJavascript: true,
-          //   withLocalStorage: true,
-          //   hidden: true,
-          //   initialChild: const Center(
-          //     child: CircularProgressIndicator(),
-          //   ),
-          // );
         }
         return Loading();
       },

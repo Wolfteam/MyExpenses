@@ -1,5 +1,5 @@
 import 'package:my_expenses/generated/l10n.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
