@@ -22,7 +22,12 @@ class AppWidget extends StatelessWidget {
       builder: (ctx, state) => state.map(
         loaded: (state) {
           if (state.bgTaskIsRunning) {
-            return Loading();
+            return MaterialApp(
+              theme: state.theme,
+              localizationsDelegates: delegates,
+              supportedLocales: S.delegate.supportedLocales,
+              home: Loading(),
+            );
           }
 
           ctx.read<DrawerBloc>().add(const DrawerEvent.init());
