@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -217,12 +216,11 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
           title: Text(i18n.showNotificationAfterFullSync),
           onChanged: _showNotificationAfterFullSyncChanged,
         ),
-        if (!kReleaseMode)
-          TextButton.icon(
-            icon: const Icon(Icons.sync),
-            onPressed: () => BackgroundUtils.runSyncTask(),
-            label: Text(i18n.syncNow),
-          )
+        TextButton.icon(
+          icon: const Icon(Icons.sync),
+          onPressed: () => BackgroundUtils.runSyncTask(),
+          label: Text(i18n.syncNow),
+        )
       ],
     );
     return _buildSettingsCard(content);
