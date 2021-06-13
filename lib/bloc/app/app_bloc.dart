@@ -38,17 +38,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     this._settingsService,
     this._drawerBloc,
   ) : super(const AppState.loading()) {
-    IsolateNameServer.registerPortWithName(
-      BackgroundUtils.port.sendPort,
-      BackgroundUtils.portName,
-    );
-    _portSubscription = BackgroundUtils.port.listen((data) {
-      final isRunning = data[0] as bool;
-      add(AppEvent.bgTaskIsRunning(isRunning: isRunning));
-      if (!isRunning) {
-        _drawerBloc.add(const DrawerEvent.selectedItemChanged(selectedPage: AppDrawerItemType.transactions));
-      }
-    });
+    _listenBgPort();
   }
 
   @override
@@ -138,5 +128,18 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
   LanguageModel _getCurrentLanguage(AppLanguageType language) {
     return _languagesMap.entries.firstWhere((kvp) => kvp.key == language).value;
+  }
+
+  void _listenBgPort() {
+    //For some reason it seems that I have to remove the port mapping
+    IsolateNameServer.removePortNameMapping(BackgroundUtils.portName);
+    IsolateNameServer.registerPortWithName(BackgroundUtils.port.sendPort, BackgroundUtils.portName);
+    _portSubscription = BackgroundUtils.port.listen((data) {
+      final isRunning = data[0] as bool;
+      add(AppEvent.bgTaskIsRunning(isRunning: isRunning));
+      if (!isRunning) {
+        _drawerBloc.add(const DrawerEvent.selectedItemChanged(selectedPage: AppDrawerItemType.transactions));
+      }
+    });
   }
 }

@@ -13,7 +13,7 @@ import 'services/sync_service.dart';
 
 final GetIt getIt = GetIt.instance;
 
-Future<void> initInjection({bool runsOnBackground = false}) async {
+Future<void> initInjection() async {
   if (!getIt.isRegistered<LoggingService>()) {
     getIt.registerSingleton<LoggingService>(LoggingServiceImpl());
   }
@@ -22,13 +22,6 @@ Future<void> initInjection({bool runsOnBackground = false}) async {
     final settings = SettingsServiceImpl(getIt<LoggingService>());
     await settings.init();
     getIt.registerSingleton<SettingsService>(settings);
-  }
-
-  if (runsOnBackground) {
-    if (getIt.isRegistered<AppDatabase>()) {
-      getIt.unregister<AppDatabase>();
-    }
-    getIt.registerSingleton<AppDatabase>(getDatabase());
   }
 
   if (!getIt.isRegistered<AppDatabase>()) {

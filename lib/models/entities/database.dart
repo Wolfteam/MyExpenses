@@ -84,7 +84,7 @@ Future<DatabaseConnection> _connectAsync() async {
   return isolate.connect();
 }
 
-AppDatabase getDatabase() {
+AppDatabase getIsolateDatabase() {
   return AppDatabase.connect(DatabaseConnection.delayed(_connectAsync()));
 }
 
