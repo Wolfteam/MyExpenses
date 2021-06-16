@@ -83,6 +83,7 @@ class AddEditCategoryPage extends StatelessWidget {
         return [
           CategoryHeader(name: state.name, type: state.type, iconColor: state.iconColor, iconData: state.icon),
           CategoryForm(
+            id: state.id,
             name: state.name,
             type: state.type,
             iconColor: state.iconColor,
@@ -238,6 +239,7 @@ class CategoryHeader extends StatelessWidget {
               children: <Widget>[
                 Material(
                   elevation: 10,
+                  clipBehavior: Clip.hardEdge,
                   color: theme.cardColor.withOpacity(0.8),
                   type: MaterialType.circle,
                   child: IconButton(
@@ -276,6 +278,7 @@ class CategoryHeader extends StatelessWidget {
 }
 
 class CategoryForm extends StatefulWidget {
+  final int id;
   final String name;
   final TransactionType type;
   final IconData iconData;
@@ -285,6 +288,7 @@ class CategoryForm extends StatefulWidget {
 
   const CategoryForm({
     Key? key,
+    required this.id,
     required this.name,
     required this.type,
     required this.iconData,
@@ -357,13 +361,13 @@ class _CategoryFormState extends State<CategoryForm> {
                 Radio<TransactionType>(
                   value: TransactionType.incomes,
                   groupValue: widget.type,
-                  onChanged: (v) => _typeChanged(v!),
+                  onChanged: widget.id > 0 ? null : (v) => _typeChanged(v!),
                 ),
                 Text(i18n.income),
                 Radio<TransactionType>(
                   value: TransactionType.expenses,
                   groupValue: widget.type,
-                  onChanged: (v) => _typeChanged(v!),
+                  onChanged: widget.id > 0 ? null : (v) => _typeChanged(v!),
                 ),
                 Text(i18n.expense),
               ],

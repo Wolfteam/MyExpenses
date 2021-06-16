@@ -45,7 +45,9 @@ class CategoryIconsPage extends StatelessWidget {
     final i18n = S.of(context);
     final icons = CategoryUtils.getAllCategoryIcons();
 
-    for (final type in CategoryIconType.values) {
+    final values = CategoryIconType.values.toList()..sort((x, y) => i18n.getCategoryIconTypeName(x).compareTo(i18n.getCategoryIconTypeName(y)));
+
+    for (final type in values) {
       final filteredIcons = icons.where((i) => i.type == type).toList();
       if (filteredIcons.isEmpty) {
         continue;
