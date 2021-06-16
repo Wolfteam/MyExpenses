@@ -54,7 +54,6 @@ extension AppThemeTypeExtensions on AppAccentColorType {
           primaryColorDark: color,
           primarySwatch: MaterialColor(color.value, getSwatch(color)),
         );
-        break;
       case AppThemeType.light:
         return ThemeData(
           brightness: Brightness.light,
@@ -64,7 +63,6 @@ extension AppThemeTypeExtensions on AppAccentColorType {
           primaryColorDark: color,
           primarySwatch: MaterialColor(color.value, getSwatch(color)),
         );
-        break;
       default:
         throw Exception('The provided theme  = $theme is not valid ');
     }

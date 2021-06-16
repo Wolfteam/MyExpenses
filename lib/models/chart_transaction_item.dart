@@ -1,25 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../common/mixins/transaction_mixin.dart';
 
-class ChartTransactionItem extends Equatable with TransactionMixin {
-  final int order;
-  final double value;
-  final bool dummyItem;
-  final Color categoryColor;
+part 'chart_transaction_item.freezed.dart';
 
-  @override
-  List<Object> get props => [order, value, dummyItem, categoryColor];
-
+@freezed
+class ChartTransactionItem with _$ChartTransactionItem, TransactionMixin {
   bool get isAnIncome => isTransactionAnIncome(value);
 
   Color get transactionColor => getTransactionColor(isAnIncome: isAnIncome);
 
-  ChartTransactionItem({
-    @required this.value,
-    @required this.order,
-    this.categoryColor,
-    this.dummyItem = false,
-  });
+  const factory ChartTransactionItem({
+    required int order,
+    required double value,
+    @Default(false) bool dummyItem,
+    Color? categoryColor,
+  }) = _ChartTransactionItem;
+
+  const ChartTransactionItem._();
 }

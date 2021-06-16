@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../common/enums/sort_direction_type.dart';
 import '../../common/enums/transaction_filter_type.dart';
@@ -10,45 +9,49 @@ import '../../common/utils/transaction_utils.dart';
 import '../../models/chart_grouped_transactions_by_category.dart';
 import '../../models/transaction_item.dart';
 
+part 'chart_details_bloc.freezed.dart';
 part 'chart_details_event.dart';
 part 'chart_details_state.dart';
 
+const _defaultState = ChartDetailsState.initial(
+  filter: TransactionFilterType.date,
+  sortDirection: SortDirectionType.asc,
+  transactions: [],
+  groupedTransactionsByCategory: [],
+);
+
 class ChartDetailsBloc extends Bloc<ChartDetailsEvent, ChartDetailsState> {
-  ChartDetailsBloc() : super(ChartDetailsState.initial());
+  ChartDetailsBloc() : super(_defaultState);
 
   @override
   Stream<ChartDetailsState> mapEventToState(
     ChartDetailsEvent event,
   ) async* {
-    if (event is Initialize) {
-      yield ChartDetailsState.initial().copyWith(transactions: event.transactions);
-    }
+    final s = event.map(
+      initialize: (e) => state.copyWith.call(transactions: e.transactions),
+      filterChanged: (e) => _sort(e.selectedFilter, state.sortDirection),
+      sortDirectionChanged: (e) => _sort(state.filter, e.selectedDirection),
+    );
 
-    if (event is FilterChanged) {
-      yield* _sort(event.selectedFilter, state.sortDirection);
-    }
-
-    if (event is SortDirectionChanged) {
-      yield* _sort(state.filter, event.selectedDirection);
-    }
+    yield s;
   }
 
-  Stream<ChartDetailsState> _sort(
+  ChartDetailsState _sort(
     TransactionFilterType filter,
     SortDirectionType sortDirection,
-  ) async* {
+  ) {
     final transactions = List<TransactionItem>.from(state.transactions);
     if (filter != TransactionFilterType.category) {
       _sortTransactions(transactions, filter, sortDirection);
 
-      yield state.copyWith(
+      return state.copyWith(
         filter: filter,
         sortDirection: sortDirection,
         transactions: transactions,
         groupedTransactionsByCategory: [],
       );
     } else {
-      yield* _groupByCategory(transactions, filter, sortDirection);
+      return _groupByCategory(transactions, filter, sortDirection);
     }
   }
 
@@ -86,11 +89,11 @@ class ChartDetailsBloc extends Bloc<ChartDetailsEvent, ChartDetailsState> {
     }
   }
 
-  Stream<ChartDetailsState> _groupByCategory(
+  ChartDetailsState _groupByCategory(
     List<TransactionItem> transactions,
     TransactionFilterType filter,
     SortDirectionType sortDirection,
-  ) async* {
+  ) {
     final categories = transactions.map((t) => t.category).toList();
     final catsIds = categories.map((c) => c.id).toSet().toList();
     final grouped = <ChartGroupedTransactionsByCategory>[];
@@ -115,7 +118,7 @@ class ChartDetailsBloc extends Bloc<ChartDetailsEvent, ChartDetailsState> {
       grouped.sort((t1, t2) => t2.total.abs().compareTo(t1.total.abs()));
     }
 
-    yield state.copyWith(
+    return state.copyWith(
       filter: filter,
       sortDirection: sortDirection,
       transactions: transactions,

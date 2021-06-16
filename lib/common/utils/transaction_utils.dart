@@ -17,12 +17,9 @@ import 'i18n_utils.dart';
 class TransactionUtils {
   static double getTotalTransactionAmounts(
     List<TransactionItem> transactions, {
-    bool onlyIncomes,
+    bool onlyIncomes = false,
   }) {
-    return transactions
-        .where((t) => t.category.isAnIncome == onlyIncomes)
-        .map((t) => t.amount)
-        .fold(0, (t1, t2) => roundDouble(t1 + t2));
+    return transactions.where((t) => t.category.isAnIncome == onlyIncomes).map((t) => t.amount).fold(0, (t1, t2) => roundDouble(t1 + t2));
   }
 
   static double getTotalTransactionAmount(List<TransactionItem> transactions) =>
@@ -91,8 +88,7 @@ class TransactionUtils {
         if (parent.repetitionCycle == RepetitionCycleType.none) {
           logger.warning(
             TransactionUtils,
-            'checkRecurringTransactions: Transaction = ${parent.description} is marked as parent , ' +
-                'but the repetition cycle is none...',
+            'checkRecurringTransactions: Transaction = ${parent.description} is marked as parent , ' + 'but the repetition cycle is none...',
           );
           continue;
         }
@@ -103,8 +99,7 @@ class TransactionUtils {
               'and next recurring date is = ${parent.nextRecurringDate}',
         );
 
-        final tuple = getRecurringTransactionPeriods(
-            parent.repetitionCycle, parent.transactionDate, parent.nextRecurringDate, now);
+        final tuple = getRecurringTransactionPeriods(parent.repetitionCycle, parent.transactionDate, parent.nextRecurringDate!, now);
         final nextRecurringDate = tuple.item1;
         final periods = tuple.item2;
 
@@ -161,11 +156,11 @@ class TransactionUtils {
     final transPerMonth = <DateTime, List<TransactionItem>>{};
 
     for (final transaction in transactions) {
-      final dateToUse = sortByNextRecurringDate ? transaction.nextRecurringDate : transaction.transactionDate;
+      final dateToUse = (sortByNextRecurringDate ? transaction.nextRecurringDate : transaction.transactionDate)!;
       final date = DateTime(dateToUse.year, dateToUse.month, dateToUse.day);
 
       if (transPerMonth.keys.any((key) => key == date)) {
-        transPerMonth[date].add(transaction);
+        transPerMonth[date]!.add(transaction);
       } else {
         transPerMonth.addAll({
           date: [transaction]

@@ -7,7 +7,7 @@ class IconDataConverter extends TypeConverter<IconData, String> {
   const IconDataConverter();
 
   @override
-  IconData mapToDart(String fromDb) {
+  IconData? mapToDart(String? fromDb) {
     if (fromDb == null) {
       return null;
     }
@@ -15,7 +15,7 @@ class IconDataConverter extends TypeConverter<IconData, String> {
   }
 
   @override
-  String mapToSql(IconData value) {
+  String? mapToSql(IconData? value) {
     if (value == null) {
       return null;
     }

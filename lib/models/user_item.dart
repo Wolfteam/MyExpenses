@@ -1,47 +1,15 @@
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class UserItem extends Equatable {
-  final int id;
-  final String googleUserId;
-  final String name;
-  final String email;
-  final String pictureUrl;
-  final bool isActive;
+part 'user_item.freezed.dart';
 
-  @override
-  List<Object> get props => [
-        id,
-        googleUserId,
-        name,
-        email,
-        pictureUrl,
-        isActive,
-      ];
-
-  const UserItem({
-    this.id,
-    this.googleUserId,
-    this.name,
-    this.email,
-    this.pictureUrl,
-    this.isActive,
-  });
-
-  UserItem copyWith({
-    int id,
-    String googleUserId,
-    String name,
-    String email,
-    String pictureUrl,
-    bool isActive,
-  }) {
-    return UserItem(
-      id: id ?? this.id,
-      email: email ?? this.email,
-      googleUserId: googleUserId ?? this.googleUserId,
-      isActive: isActive ?? this.isActive,
-      name: name ?? this.name,
-      pictureUrl: pictureUrl ?? this.pictureUrl,
-    );
-  }
+@freezed
+class UserItem with _$UserItem {
+  const factory UserItem({
+    required int id,
+    required String googleUserId,
+    required String name,
+    required String email,
+    String? pictureUrl,
+    required bool isActive,
+  }) = _UserItem;
 }

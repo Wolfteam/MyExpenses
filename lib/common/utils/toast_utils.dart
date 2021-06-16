@@ -1,53 +1,83 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexible_toast/flutter_flexible_toast.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
-void showSucceedToast(
-  String msg, {
-  Color textColor = Colors.white,
-  Color bgColor = Colors.green,
-}) {
-  _showToast(msg, ICON.SUCCESS, textColor, bgColor);
+enum ToastType {
+  info,
+  succeed,
+  warning,
+  error,
 }
 
-void showInfoToast(
-  String msg, {
-  Color textColor = Colors.white,
-  Color bgColor = Colors.blue,
-}) {
-  _showToast(msg, ICON.INFO, textColor, bgColor);
-}
+class ToastUtils {
+  static Duration toastDuration = const Duration(seconds: 2);
 
-void showWarningToast(
-  String msg, {
-  Color textColor = Colors.white,
-  Color bgColor = Colors.orange,
-}) {
-  _showToast(msg, ICON.WARNING, textColor, bgColor);
-}
+  static FToast of(BuildContext context) {
+    final fToast = FToast();
+    fToast.init(context);
+    return fToast;
+  }
 
-void showErrorToast(
-  String msg, {
-  Color textColor = Colors.white,
-  Color bgColor = Colors.red,
-}) {
-  _showToast(msg, ICON.ERROR, textColor, bgColor);
-}
+  static void showSucceedToast(BuildContext context, String msg) => _showToast(ToastUtils.of(context), msg, Colors.white, ToastType.succeed);
 
-void _showToast(
-  String msg,
-  ICON icon,
-  Color textColor,
-  Color bgColor, {
-  Toast lenght = Toast.LENGTH_SHORT,
-}) {
-  FlutterFlexibleToast.showToast(
-    message: msg,
-    toastLength: lenght,
-    toastGravity: ToastGravity.BOTTOM,
-    icon: icon,
-    radius: 50,
-    textColor: textColor,
-    backgroundColor: bgColor,
-    timeInSeconds: 2,
-  );
+  static void showInfoToast(BuildContext context, String msg) => _showToast(ToastUtils.of(context), msg, Colors.white, ToastType.info);
+
+  static void showWarningToast(BuildContext context, String msg) => _showToast(ToastUtils.of(context), msg, Colors.white, ToastType.warning);
+
+  static void showErrorToast(BuildContext context, String msg) => _showToast(ToastUtils.of(context), msg, Colors.white, ToastType.error);
+
+  static void _showToast(FToast toast, String msg, Color textColor, ToastType type) {
+    Color bgColor;
+    Icon icon;
+    switch (type) {
+      case ToastType.info:
+        bgColor = Colors.blue;
+        icon = const Icon(Icons.info, color: Colors.white);
+        break;
+      case ToastType.succeed:
+        bgColor = Colors.green;
+        icon = const Icon(Icons.check, color: Colors.white);
+        break;
+      case ToastType.warning:
+        bgColor = Colors.orange;
+        icon = const Icon(Icons.warning, color: Colors.white);
+        break;
+      case ToastType.error:
+        bgColor = Colors.red;
+        icon = const Icon(Icons.dangerous, color: Colors.white);
+        break;
+      default:
+        throw Exception('Invalid toast type = $type');
+    }
+
+    final widget = _buildToast(msg, textColor, bgColor, icon, toast.context!);
+    toast.showToast(
+      child: widget,
+      gravity: ToastGravity.BOTTOM,
+      toastDuration: toastDuration,
+    );
+  }
+
+  static Widget _buildToast(String msg, Color textColor, Color bgColor, Icon icon, BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25.0),
+        color: bgColor,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          icon,
+          const SizedBox(width: 10.0),
+          Flexible(
+            child: Text(
+              msg,
+              style: TextStyle(color: textColor),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

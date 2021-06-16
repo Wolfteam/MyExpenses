@@ -5,7 +5,7 @@ class NothingFound extends StatelessWidget {
   final EdgeInsets padding;
 
   const NothingFound({
-    @required this.msg,
+    required this.msg,
     this.padding = const EdgeInsets.only(bottom: 30, right: 20, left: 20),
   });
 

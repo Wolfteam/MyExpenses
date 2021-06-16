@@ -64,7 +64,7 @@ class SettingsServiceImpl implements SettingsService {
 
   bool _initialized = false;
 
-  SharedPreferences _prefs;
+  late SharedPreferences _prefs;
 
   @override
   AppSettings get appSettings => AppSettings(
@@ -83,27 +83,27 @@ class SettingsServiceImpl implements SettingsService {
       );
 
   @override
-  AppThemeType get appTheme => AppThemeType.values[(_prefs.getInt(_appThemeKey))];
+  AppThemeType get appTheme => AppThemeType.values[(_prefs.getInt(_appThemeKey))!];
   @override
   set appTheme(AppThemeType theme) => _prefs.setInt(_appThemeKey, theme.index);
 
   @override
-  AppAccentColorType get accentColor => AppAccentColorType.values[_prefs.getInt(_accentColorKey)];
+  AppAccentColorType get accentColor => AppAccentColorType.values[_prefs.getInt(_accentColorKey)!];
   @override
   set accentColor(AppAccentColorType accentColor) => _prefs.setInt(_accentColorKey, accentColor.index);
 
   @override
-  AppLanguageType get language => AppLanguageType.values[_prefs.getInt(_appLanguageKey)];
+  AppLanguageType get language => AppLanguageType.values[_prefs.getInt(_appLanguageKey)!];
   @override
   set language(AppLanguageType lang) => _prefs.setInt(_appLanguageKey, lang.index);
 
   @override
-  SyncIntervalType get syncInterval => SyncIntervalType.values[_prefs.getInt(_syncIntervalKey)];
+  SyncIntervalType get syncInterval => SyncIntervalType.values[_prefs.getInt(_syncIntervalKey)!];
   @override
   set syncInterval(SyncIntervalType interval) => _prefs.setInt(_syncIntervalKey, interval.index);
 
   @override
-  bool get showNotifAfterFullSync => _prefs.getBool(_showNotifAfterFullSyncKey);
+  bool get showNotifAfterFullSync => _prefs.getBool(_showNotifAfterFullSyncKey)!;
   @override
   set showNotifAfterFullSync(bool show) => _prefs.setBool(
         _showNotifAfterFullSyncKey,
@@ -111,27 +111,27 @@ class SettingsServiceImpl implements SettingsService {
       );
 
   @override
-  bool get askForPassword => _prefs.getBool(_askForPasswordKey);
+  bool get askForPassword => _prefs.getBool(_askForPasswordKey)!;
   @override
   set askForPassword(bool ask) => _prefs.setBool(_askForPasswordKey, ask);
 
   @override
-  bool get askForFingerPrint => _prefs.getBool(_askForFingerPrintKey);
+  bool get askForFingerPrint => _prefs.getBool(_askForFingerPrintKey)!;
   @override
   set askForFingerPrint(bool ask) => _prefs.setBool(_askForFingerPrintKey, ask);
 
   @override
-  CurrencySymbolType get currencySymbol => CurrencySymbolType.values[_prefs.getInt(_currencySymbolKey)];
+  CurrencySymbolType get currencySymbol => CurrencySymbolType.values[_prefs.getInt(_currencySymbolKey)!];
   @override
   set currencySymbol(CurrencySymbolType type) => _prefs.setInt(_currencySymbolKey, type.index);
 
   @override
-  bool get currencyToTheRight => _prefs.getBool(_currencyToTheRightKey);
+  bool get currencyToTheRight => _prefs.getBool(_currencyToTheRightKey)!;
   @override
   set currencyToTheRight(bool toTheRight) => _prefs.setBool(_currencyToTheRightKey, toTheRight);
 
   @override
-  bool get showNotifForRecurringTrans => _prefs.getBool(_showNotifForRecurringTransKey);
+  bool get showNotifForRecurringTrans => _prefs.getBool(_showNotifForRecurringTransKey)!;
   @override
   set showNotifForRecurringTrans(bool show) => _prefs.setBool(
         _showNotifForRecurringTransKey,
@@ -139,7 +139,7 @@ class SettingsServiceImpl implements SettingsService {
       );
 
   @override
-  bool get isRecurringTransTaskRegistered => _prefs.getBool(_recurringTransTaskIsRegisteredKey);
+  bool get isRecurringTransTaskRegistered => _prefs.getBool(_recurringTransTaskIsRegisteredKey)!;
   @override
   set isRecurringTransTaskRegistered(bool itIs) => _prefs.setBool(
         _recurringTransTaskIsRegisteredKey,

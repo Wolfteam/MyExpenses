@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:my_expenses/generated/l10n.dart';
 
 import '../../../common/styles.dart';
-import '../../../common/utils/date_utils.dart';
-import '../../../generated/i18n.dart';
+import '../../../common/utils/date_utils.dart' as utils;
 import '../../../models/transaction_item.dart';
 import '../transactions/transaction_item.dart' as trans_item;
 
@@ -19,10 +19,10 @@ class ChartTransactionCardContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final i18n = I18n.of(context);
-    final formattedDate = DateUtils.formatDateWithoutLocale(
+    final i18n = S.of(context);
+    final formattedDate = utils.DateUtils.formatDateWithoutLocale(
       item.transactionDate,
-      DateUtils.monthDayAndYearFormat,
+      utils.DateUtils.monthDayAndYearFormat,
     );
     final dateString = '${i18n.date}: $formattedDate';
     final percentageString = percentage.toStringAsFixed(2);

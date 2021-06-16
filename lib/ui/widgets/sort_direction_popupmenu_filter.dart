@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:my_expenses/generated/l10n.dart';
 
 import '../../common/enums/sort_direction_type.dart';
 import '../../common/extensions/i18n_extensions.dart';
-import '../../generated/i18n.dart';
 
 class SortDirectionPopupMenuFilter extends StatelessWidget {
   final SortDirectionType selectedSortDirection;
   final Function(SortDirectionType) onSelected;
 
   const SortDirectionPopupMenuFilter({
-    Key key,
-    @required this.selectedSortDirection,
-    @required this.onSelected,
+    Key? key,
+    required this.selectedSortDirection,
+    required this.onSelected,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
     final values = SortDirectionType.values.map((direction) {
       return CheckedPopupMenuItem<SortDirectionType>(
         checked: selectedSortDirection == direction,

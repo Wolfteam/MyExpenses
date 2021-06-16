@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/generated/l10n.dart';
 
 import '../../../bloc/search/search_bloc.dart';
 import '../../../common/enums/comparer_type.dart';
 import '../../../common/extensions/i18n_extensions.dart';
 import '../../../common/extensions/string_extensions.dart';
 import '../../../common/styles.dart';
-import '../../../generated/i18n.dart';
 import '../modal_sheet_separator.dart';
 import '../modal_sheet_title.dart';
 
 class SearchAmountFilterBottomSheetDialog extends StatefulWidget {
-  final double initialAmount;
+  final double? initialAmount;
+
   const SearchAmountFilterBottomSheetDialog({
-    Key key,
-    @required this.initialAmount,
+    Key? key,
+    required this.initialAmount,
   }) : super(key: key);
 
   @override
@@ -22,7 +23,7 @@ class SearchAmountFilterBottomSheetDialog extends StatefulWidget {
 }
 
 class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilterBottomSheetDialog> {
-  TextEditingController _amountController;
+  late TextEditingController _amountController;
 
   @override
   void initState() {
@@ -35,7 +36,6 @@ class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilter
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Container(
         margin: Styles.modalBottomSheetContainerMargin,
         padding: Styles.modalBottomSheetContainerPadding,
@@ -52,7 +52,7 @@ class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilter
 
   List<Widget> _buildPage(SearchState state) {
     final theme = Theme.of(context);
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
 
     return state.map(
       loading: (_) => [],
@@ -68,7 +68,7 @@ class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilter
   }
 
   Widget _buildAmountInput(BuildContext context) {
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
     final suffixIcon = _amountController.text.isNotEmpty
         ? IconButton(
             alignment: Alignment.bottomCenter,
@@ -104,7 +104,7 @@ class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilter
   }
 
   Widget _buildComparerRadioButtons(ComparerType selectedComparer) {
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: ComparerType.values
@@ -113,7 +113,7 @@ class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilter
               contentPadding: const EdgeInsets.all(0),
               dense: true,
               title: Text(i18n.getComparerTypeName(e)),
-              leading: Radio<ComparerType>(value: e, groupValue: selectedComparer, onChanged: _comparererChanged),
+              leading: Radio<ComparerType>(value: e, groupValue: selectedComparer, onChanged: (v) => _comparerChanged(v!)),
             ),
           )
           .toList(),
@@ -122,16 +122,16 @@ class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilter
 
   Widget _buildBottomButtonBar(BuildContext context) {
     final theme = Theme.of(context);
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
     return ButtonBar(
       layoutBehavior: ButtonBarLayoutBehavior.constrained,
       buttonPadding: const EdgeInsets.symmetric(horizontal: 20),
       children: <Widget>[
-        OutlineButton(
+        OutlinedButton(
           onPressed: () => _closeModal(context),
           child: Text(i18n.close, style: TextStyle(color: theme.primaryColor)),
         ),
-        RaisedButton(
+        ElevatedButton(
           onPressed: () => _applyAmount(context),
           child: Text(i18n.apply),
         ),
@@ -143,17 +143,17 @@ class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilter
     //TODO: CHECK NEGATIVE VALUES
     try {
       if (_amountController.text.isNullEmptyOrWhitespace) {
-        context.read<SearchBloc>().tempAmountChanged(null);
+        context.read<SearchBloc>().add(const SearchEvent.tempAmountChanged());
         return;
       }
       final amount = double.parse(_amountController.text);
-      context.read<SearchBloc>().tempAmountChanged(amount.abs());
+      context.read<SearchBloc>().add(SearchEvent.tempAmountChanged(newValue: amount.abs()));
     } catch (e) {
       _amountController.text = '0';
     }
   }
 
-  void _comparererChanged(ComparerType newValue) => context.read<SearchBloc>().tempComparerTypeChanged(newValue);
+  void _comparerChanged(ComparerType newValue) => context.read<SearchBloc>().add(SearchEvent.tempComparerTypeChanged(newValue: newValue));
 
   void _cleanAmount() => _amountController.clear();
 
@@ -161,8 +161,8 @@ class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilter
     Navigator.pop(context);
   }
 
-  Future<void> _applyAmount(BuildContext context) {
+  void _applyAmount(BuildContext context) {
     _closeModal(context);
-    return context.read<SearchBloc>().applyTempAmount();
+    context.read<SearchBloc>().add(const SearchEvent.applyTempAmount());
   }
 }

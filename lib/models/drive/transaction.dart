@@ -1,66 +1,29 @@
-import 'package:flutter/widgets.dart';
-import 'package:json_annotation/json_annotation.dart';
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../common/enums/repetition_cycle_type.dart';
 
+part 'transaction.freezed.dart';
 part 'transaction.g.dart';
 
-@JsonSerializable()
-class Transaction extends Equatable {
-  final double amount;
-  final String description;
-  final DateTime transactionDate;
-  final RepetitionCycleType repetitionCycle;
-  final String parentTransactionCreatedHash;
-  final bool isParentTransaction;
-  final DateTime nextRecurringDate;
-  final String imagePath;
-  final String categoryCreatedHash;
-  final DateTime createdAt;
-  final String createdBy;
-  final String createdHash;
-  final DateTime updatedAt;
-  final String updatedBy;
-  final String longDescription;
-
-  @override
-  List<Object> get props => [
-        amount,
-        description,
-        transactionDate,
-        repetitionCycle,
-        parentTransactionCreatedHash,
-        isParentTransaction,
-        nextRecurringDate,
-        imagePath,
-        categoryCreatedHash,
-        createdAt,
-        createdBy,
-        createdHash,
-        updatedAt,
-        updatedBy,
-        longDescription,
-      ];
-
-  const Transaction({
-    @required this.amount,
-    @required this.description,
-    @required this.transactionDate,
-    @required this.repetitionCycle,
-    @required this.parentTransactionCreatedHash,
-    @required this.isParentTransaction,
-    @required this.nextRecurringDate,
-    @required this.imagePath,
-    @required this.categoryCreatedHash,
-    @required this.createdAt,
-    @required this.createdBy,
-    @required this.createdHash,
-    @required this.updatedAt,
-    @required this.updatedBy,
-    this.longDescription,
-  });
+@freezed
+class Transaction with _$Transaction {
+  const factory Transaction({
+    required double amount,
+    required String description,
+    required DateTime transactionDate,
+    required RepetitionCycleType repetitionCycle,
+    String? parentTransactionCreatedHash,
+    required bool isParentTransaction,
+    DateTime? nextRecurringDate,
+    String? imagePath,
+    required String categoryCreatedHash,
+    required DateTime createdAt,
+    required String createdBy,
+    required String createdHash,
+    DateTime? updatedAt,
+    String? updatedBy,
+    String? longDescription,
+  }) = _Transaction;
 
   factory Transaction.fromJson(Map<String, dynamic> json) => _$TransactionFromJson(json);
-  Map<String, dynamic> toJson() => _$TransactionToJson(this);
 }

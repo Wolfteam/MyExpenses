@@ -1,28 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:my_expenses/generated/l10n.dart';
 
 import '../../../common/enums/transaction_filter_type.dart';
 import '../../../common/extensions/i18n_extensions.dart';
-import '../../../generated/i18n.dart';
 
-class TransactionPoupMenuFilter extends StatelessWidget {
+class TransactionPopupMenuFilter extends StatelessWidget {
   // final TransactionFilterType initialValue;
   final TransactionFilterType selectedValue;
   final Function(TransactionFilterType) onSelected;
-  final List<TransactionFilterType> exclude;
+  final List<TransactionFilterType>? exclude;
 
-  const TransactionPoupMenuFilter({
-    Key key,
-    @required this.selectedValue,
-    @required this.onSelected,
+  const TransactionPopupMenuFilter({
+    Key? key,
+    required this.selectedValue,
+    required this.onSelected,
     this.exclude,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final i18n = I18n.of(context);
-    final transValues = exclude != null && exclude.isNotEmpty
-        ? TransactionFilterType.values.where((el) => !exclude.contains(el))
-        : TransactionFilterType.values;
+    final i18n = S.of(context);
+    final transValues =
+        exclude != null && exclude!.isNotEmpty ? TransactionFilterType.values.where((el) => !exclude!.contains(el)) : TransactionFilterType.values;
     final values = transValues
         .map((filter) => CheckedPopupMenuItem<TransactionFilterType>(
               checked: selectedValue == filter,

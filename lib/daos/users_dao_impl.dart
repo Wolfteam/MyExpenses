@@ -22,7 +22,7 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase> with _$UsersDaoImplMixi
     String imgUrl,
   ) async {
     int id;
-    final existingUser = await (select(users)..where((u) => u.googleUserId.equals(googleUserId))).getSingle();
+    final existingUser = await (select(users)..where((u) => u.googleUserId.equals(googleUserId))).getSingleOrNull();
     final now = DateTime.now();
     //user exists
     if (existingUser != null) {
@@ -37,14 +37,13 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase> with _$UsersDaoImplMixi
       );
       await (update(users)..where((u) => u.id.equals(existingUser.id))).write(updatedFields);
     } else {
-      id = await into(users).insert(User(
-        id: null,
+      id = await into(users).insert(UsersCompanion.insert(
         localStatus: LocalStatusType.nothing,
         googleUserId: googleUserId,
-        isActive: false,
+        isActive: const Value(false),
         name: fullName,
         email: email,
-        pictureUrl: imgUrl,
+        pictureUrl: Value(imgUrl),
         createdBy: createdBy,
         createdAt: now,
         createdHash: createdHash([
@@ -64,12 +63,12 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase> with _$UsersDaoImplMixi
   }
 
   @override
-  Future<UserItem> getActiveUser() {
-    return (select(users)..where((u) => u.isActive)).map(_mapToUserItem).getSingle();
+  Future<UserItem?> getActiveUser() {
+    return (select(users)..where((u) => u.isActive)).map(_mapToUserItem).getSingleOrNull();
   }
 
   @override
-  Future<void> changeActiveUser(int newActiveUserId) async {
+  Future<void> changeActiveUser(int? newActiveUserId) async {
     await update(users).write(
       UsersCompanion(
         updatedBy: const Value(createdBy),

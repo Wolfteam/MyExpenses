@@ -6,7 +6,7 @@ class TransactionMixin {
   }
 
   Color getTransactionColor({
-    bool isAnIncome,
+    bool isAnIncome = false,
   }) {
     return isAnIncome ? Colors.green : Colors.red;
   }

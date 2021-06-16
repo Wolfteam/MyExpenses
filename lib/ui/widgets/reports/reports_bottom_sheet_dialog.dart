@@ -2,13 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/common/enums/notification_type.dart';
+import 'package:my_expenses/generated/l10n.dart';
 
 import '../../../bloc/reports/reports_bloc.dart';
 import '../../../common/enums/report_file_type.dart';
 import '../../../common/extensions/i18n_extensions.dart';
+import '../../../common/utils/date_utils.dart' as utils;
 import '../../../common/utils/notification_utils.dart';
 import '../../../common/utils/toast_utils.dart';
-import '../../../generated/i18n.dart';
 import '../../../models/app_notification.dart';
 import '../modal_sheet_separator.dart';
 import '../modal_sheet_title.dart';
@@ -18,31 +20,27 @@ class ReportsBottomSheetDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Container(
-        margin: const EdgeInsets.only(
-          left: 10,
-          right: 10,
-          bottom: 10,
-        ),
+        margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
         padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
         child: BlocConsumer<ReportsBloc, ReportState>(
           listener: (ctx, state) async {
-            final i18n = I18n.of(context);
-            if (state is ReportSheetState) {
-              await requestIOSPermissions();
+            final i18n = S.of(ctx);
 
-              if (state.errorOccurred) {
-                showErrorToast(i18n.unknownErrorOcurred);
-              }
-            }
+            state.map(
+              initial: (state) async {
+                await requestIOSPermissions();
 
-            if (state is ReportGeneratedState) {
-              showNotification(
-                i18n.transactionsReport,
-                '${i18n.reportWasSuccessfullyGenerated(state.fileName)}.\n${i18n.tapToOpen}',
-                jsonEncode(AppNotification.openPdf(state.filePath)),
-              );
-              Navigator.pop(context);
-            }
+                if (state.errorOccurred) {
+                  ToastUtils.showErrorToast(ctx, i18n.unknownErrorOcurred);
+                }
+              },
+              generated: (state) {
+                final notificationType = state.selectedFileType == ReportFileType.pdf ? NotificationType.openPdf : NotificationType.openCsv;
+                final json = jsonEncode(AppNotification.openFile(state.filePath, notificationType));
+                showNotification(i18n.transactionsReport, '${i18n.reportWasSuccessfullyGenerated(state.fileName)}.\n${i18n.tapToOpen}', json);
+                Navigator.pop(context);
+              },
+            );
           },
           builder: (ctx, state) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,87 +52,84 @@ class ReportsBottomSheetDialog extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildPage(
-    BuildContext context,
-    ReportState state,
-  ) {
+  List<Widget> _buildPage(BuildContext context, ReportState state) {
     final theme = Theme.of(context);
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
+    final textColor = theme.brightness == Brightness.dark ? Colors.white : Colors.black;
+    return state.map(
+      initial: (state) {
+        if (state.generatingReport) {
+          return const [
+            SizedBox(
+              height: 300,
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            )
+          ];
+        }
+        final fromDateString = utils.DateUtils.formatDateWithoutLocale(state.from, utils.DateUtils.monthDayAndYearFormat);
+        final toDateString = utils.DateUtils.formatDateWithoutLocale(state.to, utils.DateUtils.monthDayAndYearFormat);
 
-    if (state is ReportSheetState) {
-      if (state.generatingReport) {
         return [
-          Container(
-            height: 300,
-            child: const Center(
-              child: CircularProgressIndicator(),
-            ),
-          )
-        ];
-      }
-
-      return [
-        ModalSheetSeparator(),
-        ModalSheetTitle(title: i18n.exportFrom),
-        Text('${i18n.startDate}:'),
-        FlatButton(
+          ModalSheetSeparator(),
+          ModalSheetTitle(title: i18n.exportFrom),
+          Text('${i18n.startDate}:'),
+          TextButton(
+            style: TextButton.styleFrom(primary: textColor),
             onPressed: () => _showDatePicker(context, state.from, true),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text(state.fromDateString),
-            )),
-        Text('${i18n.endDate}:'),
-        FlatButton(
-          onPressed: () => _showDatePicker(context, state.to, false),
-          child: Align(
-            alignment: Alignment.centerLeft,
-            child: Text(state.toDateString),
+              child: Text(fromDateString),
+            ),
           ),
-        ),
-        Text(i18n.reportFormat),
-        Padding(
-          padding: const EdgeInsets.only(
-            left: 16,
-            right: 16,
+          Text('${i18n.endDate}:'),
+          TextButton(
+            style: TextButton.styleFrom(primary: textColor),
+            onPressed: () => _showDatePicker(context, state.to, false),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(toDateString),
+            ),
           ),
-          child: DropdownButton<ReportFileType>(
-            isExpanded: true,
-            hint: Text(i18n.selectFormat),
-            underline: Container(height: 0, color: Colors.transparent),
-            value: state.selectedFileType,
-            items: _buildDropdownItems(context),
-            onChanged: (newValue) => _reportFileTypeChanged(context, newValue),
+          Text(i18n.reportFormat),
+          Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16),
+            child: DropdownButton<ReportFileType>(
+              isExpanded: true,
+              hint: Text(i18n.selectFormat),
+              underline: Container(height: 0, color: Colors.transparent),
+              value: state.selectedFileType,
+              items: _buildDropdownItems(context),
+              onChanged: (newValue) => _reportFileTypeChanged(context, newValue!),
+            ),
           ),
-        ),
-        ButtonBar(
-          buttonPadding: const EdgeInsets.symmetric(horizontal: 20),
-          children: <Widget>[
-            OutlineButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text(
-                i18n.cancel,
-                style: TextStyle(color: theme.primaryColor),
+          ButtonBar(
+            buttonPadding: const EdgeInsets.symmetric(horizontal: 20),
+            children: <Widget>[
+              OutlinedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  i18n.cancel,
+                  style: TextStyle(color: theme.primaryColor),
+                ),
               ),
-            ),
-            RaisedButton(
-              color: theme.primaryColor,
-              onPressed: () => _generateReport(context),
-              child: Text(i18n.generate),
-            ),
-          ],
-        )
-      ];
-    }
-
-    return [];
+              ElevatedButton(
+                onPressed: () => _generateReport(context),
+                child: Text(i18n.generate),
+              ),
+            ],
+          )
+        ];
+      },
+      generated: (_) => [],
+    );
   }
 
-  List<DropdownMenuItem<ReportFileType>> _buildDropdownItems(
-    BuildContext context,
-  ) {
-    final i18n = I18n.of(context);
+  List<DropdownMenuItem<ReportFileType>> _buildDropdownItems(BuildContext context) {
+    final i18n = S.of(context);
     return ReportFileType.values.map((item) {
       return DropdownMenuItem<ReportFileType>(
         value: item,
@@ -143,11 +138,7 @@ class ReportsBottomSheetDialog extends StatelessWidget {
     }).toList();
   }
 
-  Future _showDatePicker(
-    BuildContext context,
-    DateTime initialDate,
-    bool isFromDate,
-  ) async {
+  Future _showDatePicker(BuildContext context, DateTime initialDate, bool isFromDate) async {
     final now = DateTime.now();
     final selectedDate = await showDatePicker(
       context: context,
@@ -156,23 +147,22 @@ class ReportsBottomSheetDialog extends StatelessWidget {
       lastDate: DateTime(now.year, now.month, now.day, 23, 59, 59),
     );
 
-    if (selectedDate == null) return;
+    if (selectedDate == null) {
+      return;
+    }
 
     if (isFromDate) {
-      context.read<ReportsBloc>().add(FromDateChanged(selectedDate));
+      context.read<ReportsBloc>().add(ReportsEvent.fromDateChanged(selectedDate: selectedDate));
     } else {
-      context.read<ReportsBloc>().add(ToDateChanged(selectedDate));
+      context.read<ReportsBloc>().add(ReportsEvent.toDateChanged(selectedDate: selectedDate));
     }
   }
 
-  void _reportFileTypeChanged(
-    BuildContext context,
-    ReportFileType newValue,
-  ) =>
-      context.read<ReportsBloc>().add(FileTypeChanged(newValue));
+  void _reportFileTypeChanged(BuildContext context, ReportFileType newValue) =>
+      context.read<ReportsBloc>().add(ReportsEvent.fileTypeChanged(selectedFileType: newValue));
 
   void _generateReport(BuildContext context) {
-    final i18n = I18n.of(context);
-    context.read<ReportsBloc>().add(GenerateReport(i18n));
+    final i18n = S.of(context);
+    context.read<ReportsBloc>().add(ReportsEvent.generateReport(i18n: i18n));
   }
 }

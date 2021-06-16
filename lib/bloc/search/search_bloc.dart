@@ -15,25 +15,51 @@ import '../../services/logging_service.dart';
 import '../../services/settings_service.dart';
 
 part 'search_bloc.freezed.dart';
+part 'search_event.dart';
 part 'search_state.dart';
 
-class SearchBloc extends Cubit<SearchState> {
+class SearchBloc extends Bloc<SearchEvent, SearchState> {
   final LoggingService _logger;
   final TransactionsDao _transactionsDao;
   final UsersDao _usersDao;
   final SettingsService _settingsService;
 
-  SearchInitialState get currentState => state as SearchInitialState;
+  _InitialState get currentState => state as _InitialState;
 
   SearchBloc(
     this._logger,
     this._transactionsDao,
     this._usersDao,
     this._settingsService,
-  ) : super(SearchState.loading());
+  ) : super(const SearchState.loading());
 
-  Future<void> init() async {
-    emit(SearchState.loading());
+  @override
+  Stream<SearchState> mapEventToState(SearchEvent event) async* {
+    if (event is _Init) {
+      yield const SearchState.loading();
+    }
+    final s = await event.map(
+      init: (_) async => _init(),
+      loadMore: (_) async => _loadMore(),
+      descriptionChanged: (e) async => _descriptionChanged(e.newValue),
+      applyTempDates: (_) async => _applyTempDates(),
+      tempFromDateChanged: (e) async => _tempFromDateChanged(e.newValue),
+      tempToDateChanged: (e) async => _tempToDateChanged(e.newValue),
+      resetTempDates: (_) async => _resetTempDates(),
+      applyTempAmount: (_) async => _applyTempAmount(),
+      tempAmountChanged: (e) async => _tempAmountChanged(e.newValue),
+      tempComparerTypeChanged: (e) async => _tempComparerTypeChanged(e.newValue),
+      comparerTypeChanged: (e) async => _comparerTypeChanged(e.newValue),
+      categoryChanged: (e) async => _categoryChanged(e.newValue),
+      transactionFilterChanged: (e) async => _transactionFilterChanged(e.newValue),
+      sortDirectionChanged: (e) async => _sortDirectionChanged(e.newValue),
+      transactionTypeChanged: (e) async => _transactionTypeChanged(e.newValue),
+    );
+
+    yield s;
+  }
+
+  Future<SearchState> _init() async {
     final now = DateTime.now();
     final from = DateUtils.getFirstDayDateOfTheMonth(now);
     final to = DateUtils.getLastDayDateOfTheMonth(now);
@@ -41,10 +67,10 @@ class SearchBloc extends Cubit<SearchState> {
     return _buildInitialState(_settingsService.language, from: from, to: to);
   }
 
-  Future<void> loadMore() async {
+  Future<SearchState> _loadMore() async {
     final s = currentState;
     await Future.delayed(const Duration(milliseconds: 250));
-    await _buildInitialState(
+    return _buildInitialState(
       s.currentLanguage,
       page: s.page + 1,
       from: s.from,
@@ -59,7 +85,7 @@ class SearchBloc extends Cubit<SearchState> {
     );
   }
 
-  Future<void> descriptionChanged(String newValue) {
+  Future<SearchState> _descriptionChanged(String newValue) {
     final s = currentState;
 
     return _buildInitialState(
@@ -76,7 +102,7 @@ class SearchBloc extends Cubit<SearchState> {
     );
   }
 
-  Future<void> applyTempDates() {
+  Future<SearchState> _applyTempDates() {
     final s = currentState;
     return _buildInitialState(
       s.currentLanguage,
@@ -92,19 +118,19 @@ class SearchBloc extends Cubit<SearchState> {
     );
   }
 
-  void tempFromDateChanged(DateTime newValue) {
+  SearchState _tempFromDateChanged(DateTime? newValue) {
     final correctedDates = DateUtils.correctDates(newValue, currentState.tempUntil);
-    _tempDatesChanged(correctedDates.item1, correctedDates.item2);
+    return _tempDatesChanged(correctedDates.item1, correctedDates.item2);
   }
 
-  void tempToDateChanged(DateTime newValue) {
+  SearchState _tempToDateChanged(DateTime? newValue) {
     final correctedDates = DateUtils.correctDates(currentState.tempFrom, newValue, fromHasPriority: false);
-    _tempDatesChanged(correctedDates.item1, correctedDates.item2);
+    return _tempDatesChanged(correctedDates.item1, correctedDates.item2);
   }
 
-  void resetTempDates() => _tempDatesChanged(currentState.from, currentState.until);
+  SearchState _resetTempDates() => _tempDatesChanged(currentState.from, currentState.until);
 
-  Future<void> applyTempAmount() {
+  Future<SearchState> _applyTempAmount() {
     final s = currentState;
     return _buildInitialState(
       s.currentLanguage,
@@ -120,11 +146,11 @@ class SearchBloc extends Cubit<SearchState> {
     );
   }
 
-  void tempAmountChanged(double newValue) => emit(currentState.copyWith.call(tempAmount: newValue));
+  SearchState _tempAmountChanged(double? newValue) => currentState.copyWith.call(tempAmount: newValue);
 
-  void tempComparerTypeChanged(ComparerType newValue) => emit(currentState.copyWith.call(tempComparerType: newValue));
+  SearchState _tempComparerTypeChanged(ComparerType newValue) => currentState.copyWith.call(tempComparerType: newValue);
 
-  Future<void> comparerTypeChanged(ComparerType newValue) {
+  Future<SearchState> _comparerTypeChanged(ComparerType newValue) {
     final s = currentState;
     return _buildInitialState(
       s.currentLanguage,
@@ -140,7 +166,7 @@ class SearchBloc extends Cubit<SearchState> {
     );
   }
 
-  Future<void> categoryChanged(CategoryItem newValue) {
+  Future<SearchState> _categoryChanged(CategoryItem? newValue) {
     final s = currentState;
     return _buildInitialState(
       s.currentLanguage,
@@ -156,7 +182,7 @@ class SearchBloc extends Cubit<SearchState> {
     );
   }
 
-  Future<void> transactionFilterChanged(TransactionFilterType newValue) {
+  Future<SearchState> _transactionFilterChanged(TransactionFilterType newValue) {
     final s = currentState;
     return _buildInitialState(
       s.currentLanguage,
@@ -172,7 +198,7 @@ class SearchBloc extends Cubit<SearchState> {
     );
   }
 
-  Future<void> sortDirectionchanged(SortDirectionType newValue) {
+  Future<SearchState> _sortDirectionChanged(SortDirectionType newValue) {
     final s = currentState;
     return _buildInitialState(
       s.currentLanguage,
@@ -188,7 +214,7 @@ class SearchBloc extends Cubit<SearchState> {
     );
   }
 
-  Future<void> transactionTypeChanged(int newValue) {
+  Future<SearchState> _transactionTypeChanged(TransactionType? newValue) {
     final s = currentState;
     return _buildInitialState(
       s.currentLanguage,
@@ -198,23 +224,23 @@ class SearchBloc extends Cubit<SearchState> {
       amount: s.amount,
       comparerType: s.comparerType,
       category: s.category,
-      transactionType: newValue < 0 ? null : TransactionType.values.firstWhere((el) => el.index == newValue),
+      transactionType: newValue,
       transactionFilterType: s.transactionFilterType,
       sortDirectionType: s.sortDirectionType,
     );
   }
 
-  Future<void> _buildInitialState(
+  Future<SearchState> _buildInitialState(
     AppLanguageType languageType, {
     int take = 10,
     int page = 1,
-    DateTime from,
-    DateTime to,
-    String description,
-    double amount,
+    DateTime? from,
+    DateTime? to,
+    String? description,
+    double? amount,
     ComparerType comparerType = ComparerType.equal,
-    CategoryItem category,
-    TransactionType transactionType,
+    CategoryItem? category,
+    TransactionType? transactionType,
     TransactionFilterType transactionFilterType = TransactionFilterType.date,
     SortDirectionType sortDirectionType = SortDirectionType.desc,
   }) async {
@@ -237,8 +263,8 @@ class SearchBloc extends Cubit<SearchState> {
       );
       final hasReachedMax = transactions.isEmpty || transactions.length < take;
 
-      if (state is! SearchInitialState) {
-        final s = SearchState.initial(
+      if (state is! _InitialState) {
+        return SearchState.initial(
           currentLanguage: languageType,
           hasReachedMax: hasReachedMax,
           page: page,
@@ -259,16 +285,14 @@ class SearchBloc extends Cubit<SearchState> {
           fromString: DateUtils.formatAppDate(from, languageType, DateUtils.monthDayAndYearFormat),
           untilString: DateUtils.formatAppDate(to, languageType, DateUtils.monthDayAndYearFormat),
         );
-        emit(s);
-        return;
       }
 
       //If we can't load more results, avoid generating a new state
       if (currentState.hasReachedMax && page > 1) {
-        return;
+        return currentState;
       }
 
-      final s = currentState.copyWith.call(
+      return currentState.copyWith.call(
         hasReachedMax: hasReachedMax,
         page: page,
         from: from,
@@ -288,19 +312,20 @@ class SearchBloc extends Cubit<SearchState> {
         fromString: DateUtils.formatAppDate(from, languageType, DateUtils.monthDayAndYearFormat),
         untilString: DateUtils.formatAppDate(to, languageType, DateUtils.monthDayAndYearFormat),
       );
-      emit(s);
     } catch (e, s) {
       _logger.error(runtimeType, '_buildInitialState: Unknown error occurred', e, s);
     }
+
+    return currentState;
   }
 
-  void _tempDatesChanged(DateTime from, DateTime to) {
+  SearchState _tempDatesChanged(DateTime? from, DateTime? to) {
     final s = currentState.copyWith.call(
       tempFrom: from,
       fromString: DateUtils.formatAppDate(from, currentState.currentLanguage, DateUtils.monthDayAndYearFormat),
       tempUntil: to,
       untilString: DateUtils.formatAppDate(to, currentState.currentLanguage, DateUtils.monthDayAndYearFormat),
     );
-    emit(s);
+    return s;
   }
 }

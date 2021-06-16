@@ -1,57 +1,26 @@
 part of 'password_dialog_bloc.dart';
 
-abstract class PasswordDialogEvent extends Equatable {
-  const PasswordDialogEvent();
-}
+@freezed
+class PasswordDialogEvent with _$PasswordDialogEvent {
+  const factory PasswordDialogEvent.passwordChanged({
+    required String newValue,
+  }) = _PasswordChanged;
 
-abstract class _PasswordChanged extends PasswordDialogEvent {
-  final String newValue;
+  const factory PasswordDialogEvent.showPassword({
+    required bool show,
+  }) = _ShowPasswod;
 
-  @override
-  List<Object> get props => [newValue];
+  const factory PasswordDialogEvent.confirmPasswordChanged({
+    required String newValue,
+  }) = _ConfirmPasswordChanged;
 
-  const _PasswordChanged({@required this.newValue});
-}
+  const factory PasswordDialogEvent.showConfirmPassword({
+    required bool show,
+  }) = _ShowConfirmPasswod;
 
-abstract class _ShowPassword extends PasswordDialogEvent {
-  final bool show;
+  const factory PasswordDialogEvent.submit() = _Submit;
 
-  @override
-  List<Object> get props => [show];
-
-  const _ShowPassword({@required this.show});
-}
-
-class PasswordChanged extends _PasswordChanged {
-  const PasswordChanged({@required String newValue})
-      : super(newValue: newValue);
-}
-
-class ShowPassword extends _ShowPassword {
-  const ShowPassword({@required bool show}) : super(show: show);
-}
-
-class ConfirmPasswordChanged extends _PasswordChanged {
-  const ConfirmPasswordChanged({@required String newValue})
-      : super(newValue: newValue);
-}
-
-class ShowConfirmPassword extends _ShowPassword {
-  const ShowConfirmPassword({@required bool show}) : super(show: show);
-}
-
-class SubmitForm extends PasswordDialogEvent {
-  @override
-  List<Object> get props => [];
-
-  const SubmitForm();
-}
-
-class ValidatePassword extends PasswordDialogEvent {
-  final String password;
-
-  @override
-  List<Object> get props => [password];
-
-  const ValidatePassword(this.password);
+  const factory PasswordDialogEvent.validatePassword({
+    required String password,
+  }) = _ValidatePassword;
 }

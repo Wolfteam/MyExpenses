@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/generated/l10n.dart';
 
 import '../../../bloc/password_dialog/password_dialog_bloc.dart';
-import '../../../generated/i18n.dart';
 
-class PasswordDialog extends StatefulWidget {
+class PasswordBottomSheet extends StatefulWidget {
   final bool promptForPassword;
 
-  const PasswordDialog({this.promptForPassword = false});
+  const PasswordBottomSheet({this.promptForPassword = false});
 
   @override
-  _PasswordDialogState createState() => _PasswordDialogState();
+  _PasswordBottomSheetState createState() => _PasswordBottomSheetState();
 }
 
-class _PasswordDialogState extends State<PasswordDialog> {
+class _PasswordBottomSheetState extends State<PasswordBottomSheet> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _passwordFocus = FocusNode();
@@ -30,26 +30,16 @@ class _PasswordDialogState extends State<PasswordDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final i18n = I18n.of(context);
-    final mediaQuery = MediaQuery.of(context);
+    final i18n = S.of(context);
     return SingleChildScrollView(
       child: Container(
-        margin: const EdgeInsets.only(
-          left: 10,
-          right: 10,
-          bottom: 10,
-        ),
-        padding: EdgeInsets.only(
-          left: 20,
-          right: 20,
-          top: 20,
-          bottom: mediaQuery.viewInsets.bottom,
-        ),
+        margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+        padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
         child: BlocConsumer<PasswordDialogBloc, PasswordDialogState>(
           listener: (ctx, state) {
             if (state.passwordWasSaved) {
               Navigator.of(ctx).pop(true);
-            } else if (state.userIsValid != null && state.userIsValid) {
+            } else if (state.userIsValid != null && state.userIsValid == true) {
               Navigator.of(ctx).pop(true);
             }
           },
@@ -95,10 +85,7 @@ class _PasswordDialogState extends State<PasswordDialog> {
     super.dispose();
   }
 
-  Widget _buildPasswordInput(
-    I18n i18n,
-    PasswordDialogState state,
-  ) {
+  Widget _buildPasswordInput(S i18n, PasswordDialogState state) {
     return TextFormField(
       obscureText: !state.showPassword,
       minLines: 1,
@@ -121,18 +108,14 @@ class _PasswordDialogState extends State<PasswordDialog> {
       onFieldSubmitted: (_) {
         _fieldFocusChange(context, _passwordFocus, _confirmPasswordFocus);
       },
-      autovalidate: state.isPasswordDirty,
-      validator: (_) => (!widget.promptForPassword && !state.isPasswordValid) ||
-              (widget.promptForPassword && state.userIsValid == false)
+      autovalidateMode: state.isPasswordDirty ? AutovalidateMode.always : null,
+      validator: (_) => (!widget.promptForPassword && !state.isPasswordValid) || (widget.promptForPassword && state.userIsValid == false)
           ? i18n.passwordIsNotValid
           : null,
     );
   }
 
-  Widget _buildConfirmPasswordInput(
-    I18n i18n,
-    PasswordDialogState state,
-  ) {
+  Widget _buildConfirmPasswordInput(S i18n, PasswordDialogState state) {
     return TextFormField(
       obscureText: !state.showConfirmPassword,
       minLines: 1,
@@ -152,21 +135,17 @@ class _PasswordDialogState extends State<PasswordDialog> {
           onPressed: () => _showConfirmPassword(!state.showConfirmPassword),
         ),
       ),
-      autovalidate: state.isConfirmPasswordDirty,
+      autovalidateMode: state.isConfirmPasswordDirty ? AutovalidateMode.always : null,
       validator: (_) => state.isConfirmPasswordValid ? null : i18n.confirmPasswordIsNotValid,
     );
   }
 
-  Widget _buildButtons(
-    ThemeData theme,
-    I18n i18n,
-    PasswordDialogState state,
-  ) {
+  Widget _buildButtons(ThemeData theme, S i18n, PasswordDialogState state) {
     return ButtonBar(
       buttonPadding: const EdgeInsets.symmetric(horizontal: 20),
       children: <Widget>[
         if (!widget.promptForPassword)
-          OutlineButton(
+          OutlinedButton(
             onPressed: () {
               Navigator.pop(context);
             },
@@ -175,8 +154,7 @@ class _PasswordDialogState extends State<PasswordDialog> {
               style: TextStyle(color: theme.primaryColor),
             ),
           ),
-        RaisedButton(
-          color: theme.primaryColor,
+        ElevatedButton(
           onPressed: !widget.promptForPassword && !state.isFormValid
               ? null
               : !widget.promptForPassword
@@ -190,26 +168,21 @@ class _PasswordDialogState extends State<PasswordDialog> {
     );
   }
 
-  void _fieldFocusChange(
-    BuildContext context,
-    FocusNode currentFocus,
-    FocusNode nextFocus,
-  ) {
+  void _fieldFocusChange(BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
     currentFocus.unfocus();
     FocusScope.of(context).requestFocus(nextFocus);
   }
 
-  void _passwordChanged() =>
-      context.read<PasswordDialogBloc>().add(PasswordChanged(newValue: _passwordController.text));
+  void _passwordChanged() => context.read<PasswordDialogBloc>().add(PasswordDialogEvent.passwordChanged(newValue: _passwordController.text));
 
-  void _showPassword(bool show) => context.read<PasswordDialogBloc>().add(ShowPassword(show: show));
+  void _showPassword(bool show) => context.read<PasswordDialogBloc>().add(PasswordDialogEvent.showPassword(show: show));
 
   void _confirmPasswordChanged() =>
-      context.read<PasswordDialogBloc>().add(ConfirmPasswordChanged(newValue: _confirmPasswordController.text));
+      context.read<PasswordDialogBloc>().add(PasswordDialogEvent.confirmPasswordChanged(newValue: _confirmPasswordController.text));
 
-  void _showConfirmPassword(bool show) => context.read<PasswordDialogBloc>().add(ShowConfirmPassword(show: show));
+  void _showConfirmPassword(bool show) => context.read<PasswordDialogBloc>().add(PasswordDialogEvent.showConfirmPassword(show: show));
 
-  void _submitForm() => context.read<PasswordDialogBloc>().add(const SubmitForm());
+  void _submitForm() => context.read<PasswordDialogBloc>().add(const PasswordDialogEvent.submit());
 
-  void _validatePassword() => context.read<PasswordDialogBloc>().add(ValidatePassword(_passwordController.text));
+  void _validatePassword() => context.read<PasswordDialogBloc>().add(PasswordDialogEvent.validatePassword(password: _passwordController.text));
 }

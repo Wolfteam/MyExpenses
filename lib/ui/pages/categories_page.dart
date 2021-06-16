@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_flexible_toast/flutter_flexible_toast.dart';
+import 'package:my_expenses/common/utils/toast_utils.dart';
+import 'package:my_expenses/generated/l10n.dart';
 import 'package:provider/provider.dart';
 
-import '../../generated/i18n.dart';
 import '../../models/category_item.dart';
 import '../../models/current_selected_category.dart';
 import '../pages/categories_list_page.dart';
@@ -10,7 +10,7 @@ import '../pages/categories_list_page.dart';
 class CategoriesPage extends StatefulWidget {
   final bool isInSelectionMode;
   final bool showDeselectButton;
-  final CategoryItem selectedCategory;
+  final CategoryItem? selectedCategory;
 
   const CategoriesPage({
     this.isInSelectionMode = false,
@@ -23,7 +23,7 @@ class CategoriesPage extends StatefulWidget {
 }
 
 class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProviderStateMixin {
-  TabController _tabController;
+  late TabController _tabController;
 
   @override
   void initState() {
@@ -34,7 +34,7 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
     final tabs = _buildTabs(context);
     final tabBar = TabBar(
       indicatorColor: theme.primaryColor,
@@ -77,7 +77,7 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
   }
 
   List<Tab> _buildTabs(BuildContext context) {
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
     return [
       Tab(icon: const Icon(Icons.more), text: i18n.incomes),
       Tab(icon: const Icon(Icons.pages), text: i18n.expenses),
@@ -110,18 +110,9 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
       return;
     }
 
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
 
-    FlutterFlexibleToast.showToast(
-      message: i18n.mustSelectCategory,
-      toastLength: Toast.LENGTH_SHORT,
-      toastGravity: ToastGravity.BOTTOM,
-      icon: ICON.INFO,
-      radius: 50,
-      textColor: Colors.white,
-      backgroundColor: Colors.blue,
-      timeInSeconds: 2,
-    );
+    ToastUtils.showInfoToast(context, i18n.mustSelectCategory);
   }
 
   void _deSelect() {

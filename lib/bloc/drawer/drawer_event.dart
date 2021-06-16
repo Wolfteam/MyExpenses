@@ -1,28 +1,12 @@
 part of 'drawer_bloc.dart';
 
-abstract class DrawerEvent extends Equatable {
-  const DrawerEvent();
-}
+@freezed
+class DrawerEvent with _$DrawerEvent {
+  const factory DrawerEvent.init() = _Init;
 
-class InitializeDrawer extends DrawerEvent {
-  @override
-  List<Object> get props => [];
+  const factory DrawerEvent.selectedItemChanged({
+    required AppDrawerItemType selectedPage,
+  }) = _SelectedItemChanged;
 
-  const InitializeDrawer();
-}
-
-class DrawerItemSelectionChanged extends DrawerEvent {
-  final AppDrawerItemType selectedPage;
-
-  const DrawerItemSelectionChanged(this.selectedPage);
-
-  @override
-  List<Object> get props => [selectedPage];
-}
-
-class SignOut extends DrawerEvent {
-  @override
-  List<Object> get props => [];
-
-  const SignOut();
+  const factory DrawerEvent.signOut() = _SignOut;
 }

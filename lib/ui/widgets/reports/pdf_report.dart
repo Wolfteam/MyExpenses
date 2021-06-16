@@ -2,12 +2,12 @@ import 'dart:collection';
 
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as image_lib;
-import 'package:package_info/package_info.dart';
+import 'package:my_expenses/generated/l10n.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
 import '../../../common/presentation/custom_assets.dart';
-import '../../../generated/i18n.dart';
 import '../../../models/transaction_item.dart';
 import 'pdf_footer.dart';
 import 'pdf_header.dart';
@@ -17,7 +17,7 @@ import 'pdf_transaction_table.dart';
 Future<Document> buildPdf(
   String Function(double) formater,
   List<TransactionItem> transactions,
-  I18n i18n,
+  S i18n,
   DateTime from,
   DateTime to,
 ) async {
@@ -44,7 +44,7 @@ Future<Document> buildPdf(
 
   final imgBytes = await rootBundle.load(CustomAssets.appIcon);
   final img = image_lib.decodeImage(imgBytes.buffer.asUint8List());
-  final resizedImg = image_lib.copyResize(img, width: 120, height: 120);
+  final resizedImg = image_lib.copyResize(img!, width: 120, height: 120);
   final image = PdfImage(
     pdf.document,
     image: resizedImg.data.buffer.asUint8List(),
@@ -112,7 +112,7 @@ List<Widget> _buildPdfBody(
   PackageInfo packageInfo,
   PdfImage img,
   List<TransactionItem> transactions,
-  I18n i18n,
+  S i18n,
   DateTime from,
   DateTime to,
   String Function(double) formatter,
@@ -155,13 +155,10 @@ Map<DateTime, List<TransactionItem>> _buildTransactionsPerMonth(
   final transPerMonth = <DateTime, List<TransactionItem>>{};
 
   for (final transaction in transactions) {
-    final date = DateTime(
-      transaction.transactionDate.year,
-      transaction.transactionDate.month,
-    );
+    final date = DateTime(transaction.transactionDate.year, transaction.transactionDate.month);
 
     if (transPerMonth.keys.any((key) => key == date)) {
-      transPerMonth[date].add(transaction);
+      transPerMonth[date]!.add(transaction);
     } else {
       transPerMonth.addAll({
         date: [transaction]

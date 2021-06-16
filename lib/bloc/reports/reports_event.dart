@@ -1,46 +1,22 @@
 part of 'reports_bloc.dart';
 
-abstract class ReportsEvent extends Equatable {
-  @override
-  List<Object> get props => [];
-  const ReportsEvent();
-}
+@freezed
+class ReportsEvent with _$ReportsEvent {
+  const factory ReportsEvent.resetReportSheet() = _ResetReportSheet;
 
-class ResetReportSheet extends ReportsEvent {
-  const ResetReportSheet();
-}
+  const factory ReportsEvent.fromDateChanged({
+    required DateTime selectedDate,
+  }) = _FromDateChanged;
 
-class FromDateChanged extends ReportsEvent {
-  final DateTime selectedDate;
-  @override
-  List<Object> get props => [selectedDate];
+  const factory ReportsEvent.toDateChanged({
+    required DateTime selectedDate,
+  }) = _ToDateChanged;
 
-  const FromDateChanged(this.selectedDate);
-}
+  const factory ReportsEvent.fileTypeChanged({
+    required ReportFileType selectedFileType,
+  }) = _FileTypeChanged;
 
-class ToDateChanged extends ReportsEvent {
-  final DateTime selectedDate;
-  @override
-  List<Object> get props => [selectedDate];
-
-  const ToDateChanged(this.selectedDate);
-}
-
-class FileTypeChanged extends ReportsEvent {
-  final ReportFileType selectedFileType;
-  @override
-  List<Object> get props => [selectedFileType];
-
-  const FileTypeChanged(this.selectedFileType);
-}
-
-class GenerateReport extends ReportsEvent {
-  final I18n i18n;
-
-  @override
-  List<Object> get props => [i18n];
-
-  const GenerateReport(
-    this.i18n,
-  );
+  const factory ReportsEvent.generateReport({
+    required S i18n,
+  }) = _GenerateReport;
 }

@@ -1,14 +1,14 @@
+import 'package:my_expenses/generated/l10n.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
 
 import '../../../common/utils/date_utils.dart';
 import '../../../common/utils/transaction_utils.dart';
-import '../../../generated/i18n.dart';
 import '../../../models/transaction_item.dart';
 
 class PdfTransactionTable extends StatelessWidget {
   final List<TransactionItem> transactions;
-  final I18n i18n;
+  final S i18n;
   final String Function(double) formatter;
 
   PdfTransactionTable(this.transactions, this.i18n, this.formatter);
@@ -23,17 +23,14 @@ class PdfTransactionTable extends StatelessWidget {
     final lastFormattedDate = DateUtils.formatDateWithoutLocale(lastDate, DateUtils.monthDayAndYearFormat);
 
     final incomeAmount = TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: true);
-    final expenseAmount = TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: false);
+    final expenseAmount = TransactionUtils.getTotalTransactionAmounts(transactions);
     final balance = TransactionUtils.roundDouble(incomeAmount + expenseAmount);
 
     final rows = <TableRow>[
       //headers
       _buildRowHeader(context, i18n),
       //rows
-      ...transactions
-          .asMap()
-          .map((index, t) => MapEntry(index, _buildRowItem(context, index + 1, t, i18n, formatter)))
-          .values
+      ...transactions.asMap().map((index, t) => MapEntry(index, _buildRowItem(context, index + 1, t, i18n, formatter))).values
     ];
 
     return Container(
@@ -94,7 +91,7 @@ class PdfTransactionTable extends StatelessWidget {
     );
   }
 
-  TableRow _buildRowHeader(Context context, I18n i18n) {
+  TableRow _buildRowHeader(Context context, S i18n) {
     final tableCellHeaderStyle = Theme.of(context).tableHeader.copyWith(color: PdfColors.white);
     const headerCellPadding = EdgeInsets.all(5);
     return TableRow(children: [
@@ -174,7 +171,7 @@ class PdfTransactionTable extends StatelessWidget {
     Context context,
     int index,
     TransactionItem t,
-    I18n i18n,
+    S i18n,
     String Function(double) formatter,
   ) {
     final textStyle = Theme.of(context).tableCell;

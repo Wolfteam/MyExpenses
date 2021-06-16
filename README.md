@@ -36,7 +36,7 @@
 [<img height="100" width="300" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" />](https://play.google.com/store/apps/details?id=com.miraisoft.my_expenses)
 
 ### Support
-If you have any bug report, suggestion, feature request, etc, please go into the [Issues section](https://github.com/Wolfteam/MyExpenses/issues) and create a new issue. 
+If you have any bug report, suggestion, feature request, etc, please go into the [Issues section](https://github.com/Wolfteam/MyExpenses/issues) and create a new issue.
 >**Note**: I'm looking for a new app icon, if you would like to donate one i won't stop you :D**
 
 ### Donations
@@ -58,7 +58,7 @@ keyAlias=your_alias
 storeFile=C:/path/to_your/keystore/your.keystore
 ````
 
-To generate the app bundle, just: 
+To generate the app bundle, just:
 ````
 flutter build appbundle
 ````

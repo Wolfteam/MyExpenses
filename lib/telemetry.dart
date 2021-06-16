@@ -6,6 +6,6 @@ Future<void> initTelemetry() async {
   await AppCenter.startAsync(appSecretAndroid: Secrets.appCenterKey, appSecretIOS: '');
 }
 
-Future<void> trackEventAsync(String name, [Map<String, String> properties]) {
-  return AppCenter.trackEventAsync(name, properties);
+Future<void> trackEventAsync(String name, [Map<String, String> properties = const {}]) async {
+  await AppCenter.trackEventAsync(name, properties);
 }

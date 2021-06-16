@@ -1,29 +1,25 @@
 part of '../models/entities/database.dart';
 
 @UseDao(tables: [Transactions, Categories])
-class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
-    with _$TransactionsDaoImplMixin
-    implements TransactionsDao {
+class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$TransactionsDaoImplMixin implements TransactionsDao {
   TransactionsDaoImpl(AppDatabase db) : super(db);
 
   @override
   Future<List<TransactionItem>> getAllTransactions(
-    int userId,
+    int? userId,
     DateTime from,
     DateTime to,
   ) {
     final query = (select(transactions)
           ..where(
             (t) =>
-                t.localStatus.equals(LocalStatusType.deleted.index).not() &
-                t.transactionDate.isBetweenValues(from, to) &
-                t.isParentTransaction.not(),
+                t.localStatus.equals(LocalStatusType.deleted.index).not() & t.transactionDate.isBetweenValues(from, to) & t.isParentTransaction.not(),
           ))
         .join([
       innerJoin(categories, categories.id.equalsExp(transactions.categoryId)),
     ]);
     if (userId == null) {
-      return (query..where((isNull(categories.userId)))).map(_mapToTransactionItem).get();
+      return (query..where((categories.userId.isNull()))).map(_mapToTransactionItem).get();
     }
     return (query..where(categories.userId.equals(userId))).map(_mapToTransactionItem).get();
   }
@@ -34,8 +30,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
 
     final now = DateTime.now();
     if (transaction.id <= 0) {
-      final id = await into(transactions).insert(Transaction(
-        id: null,
+      final id = await into(transactions).insert(TransactionsCompanion.insert(
         localStatus: LocalStatusType.created,
         amount: transaction.amount,
         categoryId: transaction.category.id,
@@ -44,10 +39,10 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
         description: transaction.description,
         repetitionCycle: transaction.repetitionCycle,
         transactionDate: transaction.transactionDate,
-        parentTransactionId: transaction.parentTransactionId,
+        parentTransactionId: Value(transaction.parentTransactionId),
         isParentTransaction: transaction.isParentTransaction,
-        imagePath: transaction.imagePath,
-        nextRecurringDate: transaction.nextRecurringDate,
+        imagePath: Value(transaction.imagePath),
+        nextRecurringDate: Value(transaction.nextRecurringDate),
         createdHash: createdHash([
           transaction.amount,
           transaction.category.id,
@@ -56,12 +51,10 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
           transaction.description,
           transaction.repetitionCycle,
           transaction.transactionDate,
-          transaction.parentTransactionId,
+          transaction.parentTransactionId ?? -1,
           transaction.isParentTransaction,
-          transaction.imagePath,
-          transaction.nextRecurringDate,
         ]),
-        longDescription: transaction.longDescription,
+        longDescription: Value(transaction.longDescription),
       ));
 
       final query = select(transactions)..where((t) => t.id.equals(id));
@@ -81,9 +74,8 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
         isParentTransaction: Value(transaction.isParentTransaction),
         imagePath: Value(transaction.imagePath),
         nextRecurringDate: Value(transaction.nextRecurringDate),
-        localStatus: currentTrans.localStatus == LocalStatusType.created
-            ? const Value(LocalStatusType.created)
-            : const Value(LocalStatusType.updated),
+        localStatus:
+            currentTrans.localStatus == LocalStatusType.created ? const Value(LocalStatusType.created) : const Value(LocalStatusType.updated),
         longDescription: Value(transaction.longDescription),
       );
       await (update(transactions)..where((t) => t.id.equals(transaction.id))).write(updatedFields);
@@ -91,7 +83,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
       final isNoLongerAParent = currentTrans.isParentTransaction && !transaction.isParentTransaction;
 
       if (isNoLongerAParent) {
-        final childTransactions = await _getChildTransactions(transaction.id);
+        final childTransactions = await _getChildrenTransactions(transaction.id);
         await batch((b) {
           for (final child in childTransactions) {
             final updatedFields = TransactionsCompanion(
@@ -99,9 +91,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
               parentTransactionId: const Value(null),
               updatedAt: Value(now),
               updatedBy: const Value(createdBy),
-              localStatus: child.localStatus == LocalStatusType.created
-                  ? const Value(LocalStatusType.created)
-                  : const Value(LocalStatusType.updated),
+              localStatus: child.localStatus == LocalStatusType.created ? const Value(LocalStatusType.created) : const Value(LocalStatusType.updated),
             );
             b.update<Transactions, Transaction>(
               transactions,
@@ -150,7 +140,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
 
   @override
   Future<List<TransactionItem>> getAllParentTransactions(
-    int userId,
+    int? userId,
   ) {
     final query = (select(transactions)
           ..where(
@@ -167,7 +157,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
     ]);
 
     if (userId == null) {
-      return (query..where((isNull(categories.userId)))).map(_mapToTransactionItem).get();
+      return (query..where((categories.userId.isNull()))).map(_mapToTransactionItem).get();
     }
 
     return (query..where(categories.userId.equals(userId))).map(_mapToTransactionItem).get();
@@ -175,7 +165,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
 
   @override
   Future<List<TransactionItem>> getAllParentTransactionsUntil(
-    int userId,
+    int? userId,
     DateTime until,
   ) {
     final query = (select(transactions)
@@ -183,7 +173,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
             (t) =>
                 t.localStatus.equals(LocalStatusType.deleted.index).not() &
                 t.repetitionCycle.equals(RepetitionCycleType.none.index).not() &
-                isNotNull(t.nextRecurringDate) &
+                t.nextRecurringDate.isNotNull() &
                 t.nextRecurringDate.isSmallerOrEqualValue(until) &
                 t.isParentTransaction,
           ))
@@ -195,7 +185,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
     ]);
 
     if (userId == null) {
-      return (query..where((isNull(categories.userId)))).map(_mapToTransactionItem).get();
+      return (query..where((categories.userId.isNull()))).map(_mapToTransactionItem).get();
     }
 
     return (query..where(categories.userId.equals(userId))).map(_mapToTransactionItem).get();
@@ -247,9 +237,8 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
         nextRecurringDate: Value(nextRecurringDate),
         updatedBy: const Value(createdBy),
         updatedAt: Value(DateTime.now()),
-        localStatus: currentParent.localStatus == LocalStatusType.created
-            ? const Value(LocalStatusType.created)
-            : const Value(LocalStatusType.updated),
+        localStatus:
+            currentParent.localStatus == LocalStatusType.created ? const Value(LocalStatusType.created) : const Value(LocalStatusType.updated),
       );
 
       b.update<$TransactionsTable, Transaction>(
@@ -266,10 +255,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
 
     return (select(transactions)
           ..where(
-            (t) =>
-                isNotNull(t.parentTransactionId) &
-                t.parentTransactionId.equals(parent.id) &
-                t.transactionDate.isIn(periods),
+            (t) => t.parentTransactionId.isNotNull() & t.parentTransactionId.equals(parent.id) & t.transactionDate.isIn(periods),
           ))
         .join([
           innerJoin(
@@ -297,12 +283,12 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
   }) async {
     final parentTrans = await (select(transactions)..where((c) => c.id.equals(id))).getSingle();
 
-    final childs = await _getChildTransactions(id);
+    final children = await _getChildrenTransactions(id);
 
     if (keepChildTransactions) {
-      await _deleteParentTransaction(parentTrans, childs);
+      await _deleteParentTransaction(parentTrans, children);
     } else {
-      await _deleteParentAndChildTransactions(parentTrans, childs);
+      await _deleteParentAndChildTransactions(parentTrans, children);
     }
     return true;
   }
@@ -310,29 +296,26 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
   @override
   Future<void> updateNextRecurringDate(
     int id,
-    DateTime nextRecurringDate,
+    DateTime? nextRecurringDate,
   ) async {
     final parentTrans = await (select(transactions)..where((c) => c.id.equals(id))).getSingle();
 
-    return (update(transactions)..where((t) => t.id.equals(id))).write(
+    await (update(transactions)..where((t) => t.id.equals(id))).write(
       TransactionsCompanion(
         nextRecurringDate: Value(nextRecurringDate),
         updatedBy: const Value(createdBy),
         updatedAt: Value(DateTime.now()),
-        localStatus: parentTrans.localStatus == LocalStatusType.created
-            ? const Value(LocalStatusType.created)
-            : const Value(LocalStatusType.updated),
+        localStatus: parentTrans.localStatus == LocalStatusType.created ? const Value(LocalStatusType.created) : const Value(LocalStatusType.updated),
       ),
     );
   }
 
   @override
-  Future<void> deleteAll(int userId) async {
-    final joinStatement =
-        select(transactions).join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))]);
+  Future<void> deleteAll(int? userId) async {
+    final joinStatement = select(transactions).join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))]);
 
     if (userId == null) {
-      joinStatement.where(isNull(categories.userId));
+      joinStatement.where(categories.userId.isNull());
     } else {
       joinStatement.where(categories.userId.equals(userId));
     }
@@ -342,12 +325,12 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
       return trans.id;
     }).get();
 
-    return (delete(transactions)..where((t) => t.id.isIn(transToDelete))).go();
+    await (delete(transactions)..where((t) => t.id.isIn(transToDelete))).go();
   }
 
   @override
   Future<List<sync_trans.Transaction>> getAllTransactionsToSync(
-    int userId,
+    int? userId,
   ) async {
     final parents = await (select(transactions)
           ..where(
@@ -364,7 +347,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
           ))
         .join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))]);
     if (userId == null) {
-      joinStatement.where(isNull(categories.userId));
+      joinStatement.where(categories.userId.isNull());
     } else {
       joinStatement.where(categories.userId.equals(userId));
     }
@@ -374,7 +357,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
 
   @override
   Future<void> syncDownDelete(
-    int userId,
+    int? userId,
     List<sync_trans.Transaction> existingTrans,
   ) async {
     final joinStatement = (select(transactions)
@@ -383,7 +366,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
           ))
         .join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))]);
     if (userId == null) {
-      joinStatement.where(isNull(categories.userId));
+      joinStatement.where(categories.userId.isNull());
     } else {
       joinStatement.where(categories.userId.equals(userId));
     }
@@ -396,8 +379,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
     final downloadedTransHash = existingTrans.map((t) => t.createdHash).toList();
     final transToDelete = transInDb.where((t) => !downloadedTransHash.contains(t.createdHash)).toList();
 
-    final normalTrans =
-        transToDelete.where((t) => !t.isParentTransaction && t.parentTransactionId == null).map((t) => t.id).toList();
+    final normalTrans = transToDelete.where((t) => !t.isParentTransaction && t.parentTransactionId == null).map((t) => t.id).toList();
 
     final parentTrans = transToDelete.where((t) => t.isParentTransaction).map((t) => t.id).toList();
 
@@ -428,22 +410,22 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
   }
 
   @override
-  Future<void> syncUpDelete(int userId) async {
+  Future<void> syncUpDelete(int? userId) async {
     final childsQuery = (select(transactions)
           ..where(
-            (t) => t.localStatus.equals(LocalStatusType.deleted.index) & isNotNull(t.parentTransactionId),
+            (t) => t.localStatus.equals(LocalStatusType.deleted.index) & t.parentTransactionId.isNotNull(),
           ))
         .join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))]);
 
     final parentsQuery = (select(transactions)
           ..where(
-            (t) => t.localStatus.equals(LocalStatusType.deleted.index) & isNull(t.parentTransactionId),
+            (t) => t.localStatus.equals(LocalStatusType.deleted.index) & t.parentTransactionId.isNull(),
           ))
         .join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))]);
 
     if (userId == null) {
-      childsQuery.where(isNull(categories.userId));
-      parentsQuery.where(isNull(categories.userId));
+      childsQuery.where(categories.userId.isNull());
+      parentsQuery.where(categories.userId.isNull());
     } else {
       childsQuery.where(categories.userId.equals(userId));
       parentsQuery.where(categories.userId.equals(userId));
@@ -459,7 +441,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
       return trans.id;
     }).get();
 
-    //first we delete the childs...
+    //first we delete the children...
     await (delete(transactions)..where((t) => t.id.isIn(childIds))).go();
 
     //and then the parents
@@ -468,13 +450,12 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
 
   @override
   Future<void> syncDownCreate(
-    int userId,
+    int? userId,
     List<sync_trans.Transaction> existingTrans,
   ) async {
-    final joinStatement =
-        select(transactions).join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))]);
+    final joinStatement = select(transactions).join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))]);
     if (userId == null) {
-      joinStatement.where(isNull(categories.userId));
+      joinStatement.where(categories.userId.isNull());
     } else {
       joinStatement.where(categories.userId.equals(userId));
     }
@@ -510,19 +491,19 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
       }
     });
 
-    //Childs must be inserted after inserting their parents
-    final childs = await Stream.fromIterable(childTrans).asyncMap((item) => _mapToTransaction(item)).toList();
+    //Children must be inserted after inserting their parents
+    final children = await Stream.fromIterable(childTrans).asyncMap((item) => _mapToTransaction(item)).toList();
 
     await batch((b) {
-      if (childs.isNotEmpty) {
-        b.insertAll(transactions, childs);
+      if (children.isNotEmpty) {
+        b.insertAll(transactions, children);
       }
     });
   }
 
   @override
   Future<void> syncDownUpdate(
-    int userId,
+    int? userId,
     List<sync_trans.Transaction> existingTrans,
   ) async {
     final existingTransToUse = existingTrans.where((t) => t.updatedAt != null).toList();
@@ -534,7 +515,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
         .join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))]);
 
     if (userId == null) {
-      joinStatement.where(isNull(categories.userId));
+      joinStatement.where(categories.userId.isNull());
     } else {
       joinStatement.where(categories.userId.equals(userId));
     }
@@ -546,7 +527,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
     for (final updatedTrans in existingTransToUse) {
       final localTrans = transInDb.singleWhere((t) => t.createdHash == updatedTrans.createdHash);
 
-      if (localTrans.updatedAt == null || localTrans.updatedAt.isBefore(updatedTrans.updatedAt)) {
+      if (localTrans.updatedAt == null || updatedTrans.updatedAt != null && localTrans.updatedAt!.isBefore(updatedTrans.updatedAt!)) {
         transToUpdate.add(localTrans);
         if (!updatedCatsHash.contains(updatedTrans.categoryCreatedHash)) {
           updatedCatsHash.add(updatedTrans.categoryCreatedHash);
@@ -558,11 +539,8 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
 
     final cats = await (select(categories)..where((c) => c.createdHash.isIn(updatedCatsHash))).get();
 
-    final parentsHash = existingTransToUse
-        .where((t) => t.parentTransactionCreatedHash != null)
-        .map((t) => t.parentTransactionCreatedHash)
-        .toSet()
-        .toList();
+    final parentsHash =
+        existingTransToUse.where((t) => t.parentTransactionCreatedHash != null).map((t) => t.parentTransactionCreatedHash).toSet().toList();
 
     final parents = await (select(transactions)..where((t) => t.createdHash.isIn(parentsHash))).get();
 
@@ -570,10 +548,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
       for (final trans in transToUpdate) {
         final updatedTrans = existingTransToUse.singleWhere((t) => t.createdHash == trans.createdHash);
         final parent = updatedTrans.parentTransactionCreatedHash != null
-            ? parents.singleWhere(
-                (t) => t.createdHash == updatedTrans.parentTransactionCreatedHash,
-                orElse: () => null,
-              )
+            ? parents.singleWhereOrNull((t) => t.createdHash == updatedTrans.parentTransactionCreatedHash)
             : null;
 
         final cat = cats.singleWhere(
@@ -614,14 +589,14 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
 
   @override
   Future<List<TransactionItem>> getAllTransactionsForSearch(
-    int userId,
-    DateTime from,
-    DateTime to,
-    String description,
-    double amount,
+    int? userId,
+    DateTime? from,
+    DateTime? to,
+    String? description,
+    double? amount,
     ComparerType comparerType,
-    int categoryId,
-    TransactionType transactionType,
+    int? categoryId,
+    TransactionType? transactionType,
     TransactionFilterType transactionFilterType,
     SortDirectionType sortDirectionType,
     int take,
@@ -635,7 +610,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
       innerJoin(categories, categories.id.equalsExp(transactions.categoryId)),
     ]);
     if (userId == null) {
-      query = query..where((isNull(categories.userId)));
+      query = query..where((categories.userId.isNull()));
     } else {
       query = query..where(categories.userId.equals(userId));
     }
@@ -649,7 +624,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
     }
 
     if (!description.isNullEmptyOrWhitespace) {
-      query = query..where(transactions.description.contains(description));
+      query = query..where(transactions.description.contains(description!));
     }
 
     if (amount != null) {
@@ -677,14 +652,12 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
     OrderingTerm orderingTerm;
     switch (transactionFilterType) {
       case TransactionFilterType.description:
-        orderingTerm = sortDirectionType == SortDirectionType.asc
-            ? OrderingTerm.asc(transactions.description)
-            : OrderingTerm.desc(transactions.description);
+        orderingTerm =
+            sortDirectionType == SortDirectionType.asc ? OrderingTerm.asc(transactions.description) : OrderingTerm.desc(transactions.description);
         break;
       case TransactionFilterType.amount:
-        orderingTerm = sortDirectionType == SortDirectionType.asc
-            ? OrderingTerm.asc(transactions.amount.abs())
-            : OrderingTerm.desc(transactions.amount.abs());
+        orderingTerm =
+            sortDirectionType == SortDirectionType.asc ? OrderingTerm.asc(transactions.amount.abs()) : OrderingTerm.desc(transactions.amount.abs());
         break;
       case TransactionFilterType.date:
         orderingTerm = sortDirectionType == SortDirectionType.asc
@@ -692,32 +665,27 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
             : OrderingTerm.desc(transactions.transactionDate);
         break;
       case TransactionFilterType.category:
-        orderingTerm = sortDirectionType == SortDirectionType.asc
-            ? OrderingTerm.asc(categories.name)
-            : OrderingTerm.desc(categories.name);
+        orderingTerm = sortDirectionType == SortDirectionType.asc ? OrderingTerm.asc(categories.name) : OrderingTerm.desc(categories.name);
         break;
     }
-    if (orderingTerm != null) {
-      query = query..orderBy([orderingTerm]);
-    }
+    query = query..orderBy([orderingTerm]);
 
     return (query..limit(take, offset: skip)).map(_mapToTransactionItem).get();
   }
 
-  List<Transaction> _buildChildTransactions(
+  List<TransactionsCompanion> _buildChildTransactions(
     TransactionItem parent,
     List<DateTime> periods,
   ) {
     return periods.map((p) => _buildFromParent(parent, p)).toList();
   }
 
-  Transaction _buildFromParent(
+  TransactionsCompanion _buildFromParent(
     TransactionItem parent,
     DateTime transactionDate,
   ) {
     final now = DateTime.now();
-    return Transaction(
-      id: null,
+    return TransactionsCompanion.insert(
       localStatus: LocalStatusType.created,
       amount: parent.amount,
       categoryId: parent.category.id,
@@ -725,7 +693,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
       createdAt: now,
       repetitionCycle: parent.repetitionCycle,
       description: parent.description,
-      parentTransactionId: parent.id,
+      parentTransactionId: Value(parent.id),
       transactionDate: transactionDate,
       isParentTransaction: false,
       createdHash: createdHash([
@@ -739,7 +707,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
         transactionDate,
         false,
       ]),
-      longDescription: parent.longDescription,
+      longDescription: Value(parent.longDescription),
     );
   }
 
@@ -762,17 +730,17 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
         name: cat.name,
         icon: cat.icon,
         iconColor: cat.iconColor,
-        isSeleted: true,
+        isSelected: true,
       ),
       longDescription: trans.longDescription,
     );
   }
 
-  Future<List<Transaction>> _getChildTransactions(int parentId) {
+  Future<List<Transaction>> _getChildrenTransactions(int parentId) {
     return (select(transactions)..where((t) => t.parentTransactionId.equals(parentId))).get();
   }
 
-  Future<Transaction> _mapToTransaction(
+  Future<TransactionsCompanion> _mapToTransaction(
     sync_trans.Transaction transaction,
   ) async {
     final cat = await (select(categories)
@@ -781,15 +749,12 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
           ))
         .getSingle();
 
-    int parentId;
+    int? parentId;
     if (transaction.parentTransactionCreatedHash != null) {
-      final parent = await (select(transactions)
-            ..where((t) => t.createdHash.equals(transaction.parentTransactionCreatedHash)))
-          .getSingle();
+      final parent = await (select(transactions)..where((t) => t.createdHash.equals(transaction.parentTransactionCreatedHash))).getSingle();
       parentId = parent.id;
     }
-    return Transaction(
-      id: null,
+    return TransactionsCompanion.insert(
       localStatus: LocalStatusType.nothing,
       amount: transaction.amount,
       categoryId: cat.id,
@@ -798,14 +763,14 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
       description: transaction.description,
       repetitionCycle: transaction.repetitionCycle,
       transactionDate: transaction.transactionDate,
-      parentTransactionId: parentId,
+      parentTransactionId: Value(parentId),
       isParentTransaction: transaction.isParentTransaction,
-      imagePath: transaction.imagePath,
-      nextRecurringDate: transaction.nextRecurringDate,
+      imagePath: Value(transaction.imagePath),
+      nextRecurringDate: Value(transaction.nextRecurringDate),
       createdHash: transaction.createdHash,
-      updatedAt: transaction.updatedAt,
-      updatedBy: transaction.updatedBy,
-      longDescription: transaction.longDescription,
+      updatedAt: Value(transaction.updatedAt),
+      updatedBy: Value(transaction.updatedBy),
+      longDescription: Value(transaction.longDescription),
     );
   }
 
@@ -815,9 +780,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
   ) {
     final cat = row.readTable(categories);
     final trans = row.readTable(transactions);
-    final parentCreatedHash = trans.parentTransactionId != null
-        ? parents.singleWhere((t) => t.id == trans.parentTransactionId).createdHash
-        : null;
+    final parentCreatedHash = trans.parentTransactionId != null ? parents.singleWhere((t) => t.id == trans.parentTransactionId).createdHash : null;
     return sync_trans.Transaction(
       amount: trans.amount,
       categoryCreatedHash: cat.createdHash,
@@ -848,9 +811,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase>
           parentTransactionId: const Value(null),
           updatedAt: Value(DateTime.now()),
           updatedBy: const Value(createdBy),
-          localStatus: child.localStatus == LocalStatusType.created
-              ? const Value(LocalStatusType.created)
-              : const Value(LocalStatusType.updated),
+          localStatus: child.localStatus == LocalStatusType.created ? const Value(LocalStatusType.created) : const Value(LocalStatusType.updated),
         );
         b.update<Transactions, Transaction>(
           transactions,

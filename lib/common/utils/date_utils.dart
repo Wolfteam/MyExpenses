@@ -14,7 +14,7 @@ class DateUtils {
   static const String monthDayYearAndHourFormat = 'dd/MM/yyyy hh:mm:ss a';
 
   static String formatAppDate(
-    DateTime date,
+    DateTime? date,
     AppLanguageType language, [
     String format = dayAndMonthFormat,
   ]) {
@@ -22,7 +22,7 @@ class DateUtils {
   }
 
   static String formatDate(
-    DateTime date,
+    DateTime? date,
     String locale, [
     String format = dayAndMonthFormat,
   ]) {
@@ -35,7 +35,7 @@ class DateUtils {
   }
 
   static String formatDateWithoutLocale(
-    DateTime date, [
+    DateTime? date, [
     String format = dayAndMonthFormat,
   ]) {
     if (date == null) {
@@ -93,9 +93,9 @@ class DateUtils {
     }
   }
 
-  static Tuple2<DateTime, DateTime> correctDates(
-    DateTime from,
-    DateTime to, {
+  static Tuple2<DateTime?, DateTime?> correctDates(
+    DateTime? from,
+    DateTime? to, {
     bool fromHasPriority = true,
   }) {
     var start = from;

@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../common/enums/category_icon_type.dart';
 
-class CategoryIcon extends Equatable {
-  final Icon icon;
-  final String name;
-  final CategoryIconType type;
-  final bool isSelected;
+part 'category_icon.freezed.dart';
 
-  @override
-  List<Object> get props => [icon, name, type, isSelected];
-
-  const CategoryIcon({
-    @required this.icon,
-    @required this.name,
-    @required this.type,
-    this.isSelected = false,
-  });
+@freezed
+class CategoryIcon with _$CategoryIcon {
+  const factory CategoryIcon({
+    required Icon icon,
+    required String name,
+    required CategoryIconType type,
+    @Default(false) bool isSelected,
+  }) = _CategoryIcon;
 }

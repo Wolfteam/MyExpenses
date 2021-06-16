@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_user_agent/flutter_user_agent.dart';
+import 'package:flutter_user_agentx/flutter_user_agent.dart';
+import 'package:my_expenses/generated/l10n.dart';
 
 import '../../../bloc/drawer/drawer_bloc.dart';
 import '../../../bloc/users_accounts/user_accounts_bloc.dart';
 import '../../../common/utils/bloc_utils.dart';
 import '../../../common/utils/toast_utils.dart';
-import '../../../generated/i18n.dart';
 import '../../../models/user_item.dart';
 import '../modal_sheet_separator.dart';
 import '../nothing_found.dart';
@@ -18,22 +18,18 @@ class UserAccountsBottomSheetDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Container(
-        margin: const EdgeInsets.only(
-          left: 10,
-          right: 10,
-          bottom: 10,
-        ),
+        margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
         padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
         child: BlocConsumer<UserAccountsBloc, UserAccountsState>(
           listener: (ctx, state) {
-            final i18n = I18n.of(context);
+            final i18n = S.of(ctx);
             if (state.userWasDeleted) {
-              showSucceedToast(i18n.userWasSuccessfullyDeleted);
-              ctx.read<DrawerBloc>().add(const InitializeDrawer());
+              ToastUtils.showSucceedToast(ctx, i18n.userWasSuccessfullyDeleted);
+              ctx.read<DrawerBloc>().add(const DrawerEvent.init());
             } else if (state.activeUserChanged) {
               BlocUtils.raiseAllCommonBlocEvents(ctx);
-            } else if (state.errorOcurred) {
-              showErrorToast(i18n.unknownErrorOcurred);
+            } else if (state.errorOccurred) {
+              ToastUtils.showErrorToast(ctx, i18n.unknownErrorOcurred);
             }
           },
           builder: (ctx, state) => _buildPage(ctx, state),
@@ -42,12 +38,9 @@ class UserAccountsBottomSheetDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildPage(
-    BuildContext context,
-    UserAccountsState state,
-  ) {
+  Widget _buildPage(BuildContext context, UserAccountsState state) {
     final theme = Theme.of(context);
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,7 +70,7 @@ class UserAccountsBottomSheetDialog extends StatelessWidget {
         ButtonBar(
           buttonPadding: const EdgeInsets.symmetric(horizontal: 20),
           children: <Widget>[
-            OutlineButton(
+            OutlinedButton(
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -86,8 +79,7 @@ class UserAccountsBottomSheetDialog extends StatelessWidget {
                 style: TextStyle(color: theme.primaryColor),
               ),
             ),
-            RaisedButton(
-              color: theme.primaryColor,
+            ElevatedButton(
               onPressed: () => _addAccount(context),
               child: Text(i18n.add),
             ),
@@ -97,15 +89,12 @@ class UserAccountsBottomSheetDialog extends StatelessWidget {
     );
   }
 
-  UserAccountItem _buildUserAccountItem(
-    UserItem user,
-    bool canBeDeleted,
-  ) {
+  UserAccountItem _buildUserAccountItem(UserItem user, bool canBeDeleted) {
     return UserAccountItem(
       id: user.id,
       fullname: user.name,
       email: user.email,
-      imgUrl: user.pictureUrl,
+      imgUrl: user.pictureUrl!,
       isActive: user.isActive,
       canBeDeleted: canBeDeleted,
     );

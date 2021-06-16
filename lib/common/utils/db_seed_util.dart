@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moor/moor.dart';
 
 import '../../common/enums/repetition_cycle_type.dart';
 import '../../common/utils/category_utils.dart';
@@ -9,18 +10,18 @@ import '../enums/local_status_type.dart';
 
 const createdBy = 'ebastidas';
 
-List<Category> getDefaultCategories() {
+List<CategoriesCompanion> getDefaultCategories() {
   final categories = [
     //Income
     _buildCategory(
       'Money',
-      CategoryUtils.getByName(CategoryUtils.money2).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.money2).icon.icon!,
       Colors.green,
       true,
     ),
     _buildCategory(
       'Bank',
-      CategoryUtils.getByName(CategoryUtils.bank).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.bank).icon.icon!,
       Colors.black,
       true,
     ),
@@ -28,115 +29,115 @@ List<Category> getDefaultCategories() {
     //Food
     _buildCategory(
       'Fast Food',
-      CategoryUtils.getByName(CategoryUtils.fastFood).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.fastFood).icon.icon!,
       Colors.red,
     ),
     _buildCategory(
       'Restaurant',
-      CategoryUtils.getByName(CategoryUtils.restaurant).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.restaurant).icon.icon!,
       Colors.brown,
     ),
     _buildCategory(
       'Cafe',
-      CategoryUtils.getByName(CategoryUtils.cafe).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.cafe).icon.icon!,
       Colors.orange,
     ),
 
     //Home
     _buildCategory(
       'Gas',
-      CategoryUtils.getByName(CategoryUtils.gas).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.gas).icon.icon!,
       Colors.blueAccent,
     ),
     _buildCategory(
       'Water',
-      CategoryUtils.getByName(CategoryUtils.waterDrop).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.waterDrop).icon.icon!,
       Colors.blue,
     ),
     _buildCategory(
       'Light',
-      CategoryUtils.getByName(CategoryUtils.battery).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.battery).icon.icon!,
       Colors.yellow,
     ),
     _buildCategory(
       'Phone',
-      CategoryUtils.getByName(CategoryUtils.smartphone).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.smartphone).icon.icon!,
       Colors.green,
     ),
     _buildCategory(
       'TV',
-      CategoryUtils.getByName(CategoryUtils.tv).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.tv).icon.icon!,
       Colors.brown,
     ),
     _buildCategory(
       'Internet',
-      CategoryUtils.getByName(CategoryUtils.web).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.web).icon.icon!,
       Colors.blueAccent,
     ),
 
     //life
     _buildCategory(
       'Games',
-      CategoryUtils.getByName(CategoryUtils.gamepad).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.gamepad).icon.icon!,
       Colors.indigo,
     ),
     _buildCategory(
       'Movies',
-      CategoryUtils.getByName(CategoryUtils.movies).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.movies).icon.icon!,
       Colors.grey,
     ),
     _buildCategory(
       'Sports',
-      CategoryUtils.getByName(CategoryUtils.soccerBall).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.soccerBall).icon.icon!,
       Colors.black,
     ),
     _buildCategory(
       'Health',
-      CategoryUtils.getByName(CategoryUtils.healing).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.healing).icon.icon!,
       Colors.red,
     ),
     _buildCategory(
       'Pharmacy',
-      CategoryUtils.getByName(CategoryUtils.pharmacy).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.pharmacy).icon.icon!,
       Colors.red,
     ),
     _buildCategory(
       'Education',
-      CategoryUtils.getByName(CategoryUtils.school).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.school).icon.icon!,
       Colors.grey,
     ),
 
     //Shopping
     _buildCategory(
       'Shopping',
-      CategoryUtils.getByName(CategoryUtils.shop).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.shop).icon.icon!,
       Colors.cyan,
     ),
     _buildCategory(
       'Offer',
-      CategoryUtils.getByName(CategoryUtils.offer).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.offer).icon.icon!,
       Colors.green,
     ),
 
     //Transport
     _buildCategory(
       'Taxi',
-      CategoryUtils.getByName(CategoryUtils.taxi).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.taxi).icon.icon!,
       Colors.yellow,
     ),
     _buildCategory(
       'Bus',
-      CategoryUtils.getByName(CategoryUtils.bus).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.bus).icon.icon!,
       Colors.black,
     ),
     _buildCategory(
       'Car',
-      CategoryUtils.getByName(CategoryUtils.car).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.car).icon.icon!,
       Colors.red,
     ),
     _buildCategory(
       'Subway',
-      CategoryUtils.getByName(CategoryUtils.subway).icon.icon,
+      CategoryUtils.getByName(CategoryUtils.subway).icon.icon!,
       Colors.grey,
     ),
   ];
@@ -145,7 +146,7 @@ List<Category> getDefaultCategories() {
 }
 
 //TODO: DELETE THIS ONCE THE APP IS COMPLETED
-List<Transaction> getDefaultTransactions() {
+List<TransactionsCompanion> getDefaultTransactions() {
   final transactions = [
     _buildTransaction(
       4,
@@ -218,7 +219,7 @@ List<Transaction> getDefaultTransactions() {
   return transactions;
 }
 
-List<Transaction> getDefaultRecurringTransactions() {
+List<TransactionsCompanion> getDefaultRecurringTransactions() {
   final now = DateTime.now();
   final transDate = now.subtract(const Duration(days: 60));
   return [
@@ -234,15 +235,14 @@ List<Transaction> getDefaultRecurringTransactions() {
   ];
 }
 
-Category _buildCategory(
+CategoriesCompanion _buildCategory(
   String name,
   IconData icon,
   Color color, [
   bool isAnIncome = false,
 ]) {
   final now = DateTime.now();
-  return Category(
-    id: null,
+  return CategoriesCompanion.insert(
     localStatus: LocalStatusType.nothing,
     name: name,
     isAnIncome: isAnIncome,
@@ -253,7 +253,7 @@ Category _buildCategory(
     createdHash: createdHash([
       name,
       isAnIncome,
-      const IconDataConverter().mapToSql(icon),
+      const IconDataConverter().mapToSql(icon)!,
       const ColorConverter().mapToSql(color),
       createdBy,
       now,
@@ -262,18 +262,17 @@ Category _buildCategory(
   );
 }
 
-Transaction _buildTransaction(
+TransactionsCompanion _buildTransaction(
   int categoryId,
   String description,
   double amount,
   DateTime date, {
   int repetitions = 0,
   RepetitionCycleType cycle = RepetitionCycleType.none,
-  DateTime nextRecurringDate,
+  DateTime? nextRecurringDate,
 }) {
   final now = DateTime.now();
-  return Transaction(
-    id: null,
+  return TransactionsCompanion.insert(
     localStatus: LocalStatusType.nothing,
     amount: amount,
     categoryId: categoryId,
@@ -282,7 +281,7 @@ Transaction _buildTransaction(
     repetitionCycle: cycle,
     createdBy: createdBy,
     isParentTransaction: cycle != RepetitionCycleType.none,
-    nextRecurringDate: nextRecurringDate,
+    nextRecurringDate: Value(nextRecurringDate),
     createdAt: now,
     createdHash: createdHash([
       amount,
@@ -292,7 +291,7 @@ Transaction _buildTransaction(
       cycle,
       createdBy,
       cycle != RepetitionCycleType.none,
-      nextRecurringDate,
+      nextRecurringDate ?? -1,
       now,
       LocalStatusType.nothing,
     ]),
