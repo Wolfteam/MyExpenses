@@ -312,6 +312,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.1"
+  flutter_rating_bar:
+    dependency: transitive
+    description:
+      name: flutter_rating_bar
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.0"
   flutter_secure_storage:
     dependency: "direct main"
     description:
@@ -433,7 +440,7 @@ packages:
       name: image_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.7.5+3"
+    version: "0.8.0+3"
   image_picker_for_web:
     dependency: transitive
     description:
@@ -594,7 +601,7 @@ packages:
       name: package_info_plus
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.1"
+    version: "1.0.3"
   package_info_plus_linux:
     dependency: transitive
     description:
@@ -622,7 +629,7 @@ packages:
       name: package_info_plus_web
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.1"
+    version: "1.0.2"
   package_info_plus_windows:
     dependency: transitive
     description:
@@ -791,6 +798,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.1"
+  rate_my_app:
+    dependency: "direct main"
+    description:
+      name: rate_my_app
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0+1"
   recase:
     dependency: transitive
     description:

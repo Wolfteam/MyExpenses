@@ -20,6 +20,7 @@ import 'package:my_expenses/services/settings_service.dart';
 import 'package:my_expenses/ui/pages/add_edit_transasctiton_page.dart';
 import 'package:open_file/open_file.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:rate_my_app/rate_my_app.dart';
 
 import '../../bloc/drawer/drawer_bloc.dart';
 import '../../common/enums/app_drawer_item_type.dart';
@@ -65,39 +66,56 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
           onSelectNotification: (payload) => _onSelectNotification(payload),
         );
       },
-      child: Scaffold(
-        appBar: AppBar(title: Text(S.of(context).appName)),
-        drawer: AppDrawer(),
-        body: SafeArea(
-          child: TabBarView(
-            controller: _tabController,
-            physics: const NeverScrollableScrollPhysics(),
-            children: _pages,
+      child: RateMyAppBuilder(
+        rateMyApp: RateMyApp(minDays: 7, minLaunches: 10, remindDays: 7, remindLaunches: 10),
+        onInitialized: (ctx, rateMyApp) async {
+          if (!rateMyApp.shouldOpenDialog) {
+            return;
+          }
+          final s = S.of(ctx);
+          await rateMyApp.showRateDialog(
+            ctx,
+            title: s.rateThisApp,
+            message: s.rateMsg,
+            rateButton: s.rate,
+            laterButton: s.maybeLater,
+            noButton: s.noThanks,
+          );
+        },
+        builder: (ctx) => Scaffold(
+          appBar: AppBar(title: Text(S.of(context).appName)),
+          drawer: AppDrawer(),
+          body: SafeArea(
+            child: TabBarView(
+              controller: _tabController,
+              physics: const NeverScrollableScrollPhysics(),
+              children: _pages,
+            ),
           ),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Theme.of(context).primaryColor,
-          heroTag: 'CreateTransactionFab',
-          onPressed: _gotoAddTransactionPage,
-          child: const Icon(Icons.add),
-        ),
-        bottomNavigationBar: BlocConsumer<DrawerBloc, DrawerState>(
-          listener: (ctx, state) {
-            final index = _getSelectedIndex(state.selectedPage);
-            _tabController.animateTo(index);
-          },
-          builder: (ctx, state) {
-            final index = _getSelectedIndex(state.selectedPage);
-            return BottomNavigationBar(
-              showUnselectedLabels: true,
-              selectedItemColor: Theme.of(context).primaryColor,
-              type: BottomNavigationBarType.fixed,
-              currentIndex: index,
-              onTap: _changeCurrentTab,
-              items: _buildBottomNavBars(),
-            );
-          },
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: Theme.of(context).primaryColor,
+            heroTag: 'CreateTransactionFab',
+            onPressed: _gotoAddTransactionPage,
+            child: const Icon(Icons.add),
+          ),
+          bottomNavigationBar: BlocConsumer<DrawerBloc, DrawerState>(
+            listener: (ctx, state) {
+              final index = _getSelectedIndex(state.selectedPage);
+              _tabController.animateTo(index);
+            },
+            builder: (ctx, state) {
+              final index = _getSelectedIndex(state.selectedPage);
+              return BottomNavigationBar(
+                showUnselectedLabels: true,
+                selectedItemColor: Theme.of(context).primaryColor,
+                type: BottomNavigationBarType.fixed,
+                currentIndex: index,
+                onTap: _changeCurrentTab,
+                items: _buildBottomNavBars(),
+              );
+            },
+          ),
         ),
       ),
     );
