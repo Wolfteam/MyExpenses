@@ -162,7 +162,11 @@
   "life": "Vida",
   "personal": "Personal",
   "shopping": "Compras",
-  "transportation": "Trasnporte",
+  "transportation": "Transporte",
+  "brands": "Marcas",
+  "pets": "Mascotas",
+  "religion": "Religión",
+  "sports": "Deportes",
   "theme": "Tema",
   "selectAppTheme": "Selecciona un tema",
   "chooseAppTheme": "Escoge un color base para la app",
@@ -192,5 +196,10 @@
   "goToSettingDescription": "La huella no esta configurada en tu equipo. Ve a la Configuración > Seguridad para añadir tu huella.",
   "syncNow": "Sincronizar Ahora",
   "noAppToOpenFile": "No hay aplicación instalada para abrir este tipo de archivos",
-  "fileNotFound": "El archivo {file} no fue encontrado"
+  "fileNotFound": "El archivo {file} no fue encontrado",
+  "rateThisApp": "Califica esta aplicación",
+  "rateMsg": "Si te gusta esta aplicación, por favor tomate un segundo para calificarla !\nAl hacerlo, me ayudas y además no te tomará más de un minuto.",
+  "rate": "Calificar",
+  "noThanks": "No gracias",
+  "maybeLater": "Quizás después"
 }

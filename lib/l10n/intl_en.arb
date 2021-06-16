@@ -163,6 +163,10 @@
   "personal": "Personal",
   "shopping": "Shopping",
   "transportation": "Transportation",
+  "brands": "Brands",
+  "pets": "Pets",
+  "religion": "Religion",
+  "sports": "Sports",
   "theme": "Theme",
   "selectAppTheme": "Select an app theme",
   "chooseAppTheme": "Choose a base app color",
@@ -192,5 +196,10 @@
   "goToSettingDescription": "Fingerprint is not set up on your device. Go to Settings > Security to add your fingerprint.",
   "syncNow": "Sync Now",
   "noAppToOpenFile": "There's no app installed to open the file",
-  "fileNotFound": "The file {file} was not found"
+  "fileNotFound": "The file {file} was not found",
+  "rateThisApp": "Rate this app",
+  "rateMsg": "If you like this app, please take a little bit of your time to review it !\nIt really helps me and it shouldn't take you more than one minute.",
+  "rate": "Rate",
+  "noThanks": "No thanks",
+  "maybeLater": "Maybe later"
 }

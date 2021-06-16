@@ -107,6 +107,14 @@ extension I18nExtensions on S {
         return transportation;
       case CategoryIconType.others:
         return others;
+      case CategoryIconType.brands:
+        return brands;
+      case CategoryIconType.sports:
+        return sports;
+      case CategoryIconType.religion:
+        return religion;
+      case CategoryIconType.pets:
+        return pets;
       default:
         return na;
     }
