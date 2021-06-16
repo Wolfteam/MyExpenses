@@ -11,7 +11,6 @@ class CategoryItem with _$CategoryItem {
     required int id,
     required bool isAnIncome,
     required String name,
-    //TODO: THIS 2 WERE IGNORED IN THE JSON
     @JsonKey(ignore: true) IconData? icon,
     @JsonKey(ignore: true) Color? iconColor,
     @Default(false) bool isSelected,
