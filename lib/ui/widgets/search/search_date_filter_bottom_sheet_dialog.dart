@@ -52,7 +52,7 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
             onPressed: () => _changeDate(context, s.tempUntil ?? now, s.currentLanguage, false),
             child: Align(alignment: Alignment.centerLeft, child: Text(untilText!)),
           ),
-          Divider(color: theme.accentColor),
+          Divider(color: theme.colorScheme.secondary),
           _buildBottomButtonBar(context),
         ];
       },

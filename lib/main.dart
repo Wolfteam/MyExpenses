@@ -94,58 +94,72 @@ class MyApp extends StatelessWidget {
               );
             },
           ),
-          BlocProvider(create: (ctx) {
-            final logger = getIt<LoggingService>();
-            final transactionsDao = getIt<TransactionsDao>();
-            final settingsService = getIt<SettingsService>();
-            final usersDao = getIt<UsersDao>();
-            return TransactionFormBloc(
-              logger,
-              transactionsDao,
-              usersDao,
-              settingsService,
-            );
-          }),
-          BlocProvider(create: (ctx) {
-            final logger = getIt<LoggingService>();
-            final usersDao = getIt<UsersDao>();
-            final categoriesDao = getIt<CategoriesDao>();
-            return DrawerBloc(logger, usersDao, categoriesDao);
-          }),
-          BlocProvider(create: (ctx) {
-            return MainTabBloc();
-          }),
-          BlocProvider(create: (ctx) {
-            final logger = getIt<LoggingService>();
-            final settingsService = getIt<SettingsService>();
-            final drawerBloc = ctx.read<DrawerBloc>();
-            return app_bloc.AppBloc(logger, settingsService, drawerBloc);
-          }),
-          BlocProvider(create: (ctx) {
-            final settingsService = getIt<SettingsService>();
-            final secureStorage = getIt<SecureStorageService>();
-            final usersDao = getIt<UsersDao>();
-            return SettingsBloc(settingsService, secureStorage, usersDao, ctx.read<app_bloc.AppBloc>());
-          }),
-          BlocProvider(create: (ctx) {
-            final logger = getIt<LoggingService>();
-            final categoriesDao = getIt<CategoriesDao>();
-            final usersDao = getIt<UsersDao>();
-            return CategoryFormBloc(logger, categoriesDao, usersDao);
-          }),
+          BlocProvider(
+            create: (ctx) {
+              final logger = getIt<LoggingService>();
+              final transactionsDao = getIt<TransactionsDao>();
+              final settingsService = getIt<SettingsService>();
+              final usersDao = getIt<UsersDao>();
+              return TransactionFormBloc(
+                logger,
+                transactionsDao,
+                usersDao,
+                settingsService,
+              );
+            },
+          ),
+          BlocProvider(
+            create: (ctx) {
+              final logger = getIt<LoggingService>();
+              final usersDao = getIt<UsersDao>();
+              final categoriesDao = getIt<CategoriesDao>();
+              return DrawerBloc(logger, usersDao, categoriesDao);
+            },
+          ),
+          BlocProvider(
+            create: (ctx) {
+              return MainTabBloc();
+            },
+          ),
+          BlocProvider(
+            create: (ctx) {
+              final logger = getIt<LoggingService>();
+              final settingsService = getIt<SettingsService>();
+              final drawerBloc = ctx.read<DrawerBloc>();
+              return app_bloc.AppBloc(logger, settingsService, drawerBloc);
+            },
+          ),
+          BlocProvider(
+            create: (ctx) {
+              final settingsService = getIt<SettingsService>();
+              final secureStorage = getIt<SecureStorageService>();
+              final usersDao = getIt<UsersDao>();
+              return SettingsBloc(settingsService, secureStorage, usersDao, ctx.read<app_bloc.AppBloc>());
+            },
+          ),
+          BlocProvider(
+            create: (ctx) {
+              final logger = getIt<LoggingService>();
+              final categoriesDao = getIt<CategoriesDao>();
+              final usersDao = getIt<UsersDao>();
+              return CategoryFormBloc(logger, categoriesDao, usersDao);
+            },
+          ),
           BlocProvider(create: (ctx) => CategoryIconBloc()),
-          BlocProvider(create: (ctx) {
-            final logger = getIt<LoggingService>();
-            final transactionsDao = getIt<TransactionsDao>();
-            final usersDao = getIt<UsersDao>();
-            final settingsService = getIt<SettingsService>();
-            return ChartsBloc(
-              logger,
-              transactionsDao,
-              usersDao,
-              settingsService,
-            );
-          }),
+          BlocProvider(
+            create: (ctx) {
+              final logger = getIt<LoggingService>();
+              final transactionsDao = getIt<TransactionsDao>();
+              final usersDao = getIt<UsersDao>();
+              final settingsService = getIt<SettingsService>();
+              return ChartsBloc(
+                logger,
+                transactionsDao,
+                usersDao,
+                settingsService,
+              );
+            },
+          ),
           BlocProvider(create: (ctx) => ChartDetailsBloc()),
           BlocProvider(
             create: (ctx) {
@@ -161,59 +175,71 @@ class MyApp extends StatelessWidget {
               );
             },
           ),
-          BlocProvider(create: (ctx) {
-            final logger = getIt<LoggingService>();
-            final secureStorage = getIt<SecureStorageService>();
-            return PasswordDialogBloc(logger, secureStorage);
-          }),
-          BlocProvider(create: (ctx) {
-            final logger = getIt<LoggingService>();
-            final categoriesDao = getIt<CategoriesDao>();
-            final transactionsDao = getIt<TransactionsDao>();
-            final usersDao = getIt<UsersDao>();
-            final secureStorage = getIt<SecureStorageService>();
-            return UserAccountsBloc(
-              logger,
-              categoriesDao,
-              transactionsDao,
-              usersDao,
-              secureStorage,
-            );
-          }),
-          BlocProvider(create: (ctx) {
-            final logger = getIt<LoggingService>();
-            final googleService = getIt<GoogleService>();
-            final usersDao = getIt<UsersDao>();
-            final networkService = getIt<NetworkService>();
-            final secureStorage = getIt<SecureStorageService>();
-            final syncService = getIt<SyncService>();
-            return SignInWithGoogleBloc(
-              logger,
-              usersDao,
-              googleService,
-              networkService,
-              secureStorage,
-              syncService,
-            );
-          }),
-          BlocProvider(create: (ctx) {
-            final logger = getIt<LoggingService>();
-            final settingsService = getIt<SettingsService>();
-            final usersDao = getIt<UsersDao>();
-            final transactionsDao = getIt<TransactionsDao>();
-            return EstimatesBloc(logger, settingsService, usersDao, transactionsDao);
-          }),
-          BlocProvider(create: (ctx) {
-            final logger = getIt<LoggingService>();
-            final settingsService = getIt<SettingsService>();
-            final usersDao = getIt<UsersDao>();
-            final transactionsDao = getIt<TransactionsDao>();
-            return SearchBloc(logger, transactionsDao, usersDao, settingsService);
-          }),
-          BlocProvider(create: (ctx) {
-            final settingsService = getIt<SettingsService>();
-            return SplashScreenBloc(settingsService)..add(const SplashScreenEvent.init());
-          }),
+          BlocProvider(
+            create: (ctx) {
+              final logger = getIt<LoggingService>();
+              final secureStorage = getIt<SecureStorageService>();
+              return PasswordDialogBloc(logger, secureStorage);
+            },
+          ),
+          BlocProvider(
+            create: (ctx) {
+              final logger = getIt<LoggingService>();
+              final categoriesDao = getIt<CategoriesDao>();
+              final transactionsDao = getIt<TransactionsDao>();
+              final usersDao = getIt<UsersDao>();
+              final secureStorage = getIt<SecureStorageService>();
+              return UserAccountsBloc(
+                logger,
+                categoriesDao,
+                transactionsDao,
+                usersDao,
+                secureStorage,
+              );
+            },
+          ),
+          BlocProvider(
+            create: (ctx) {
+              final logger = getIt<LoggingService>();
+              final googleService = getIt<GoogleService>();
+              final usersDao = getIt<UsersDao>();
+              final networkService = getIt<NetworkService>();
+              final secureStorage = getIt<SecureStorageService>();
+              final syncService = getIt<SyncService>();
+              return SignInWithGoogleBloc(
+                logger,
+                usersDao,
+                googleService,
+                networkService,
+                secureStorage,
+                syncService,
+              );
+            },
+          ),
+          BlocProvider(
+            create: (ctx) {
+              final logger = getIt<LoggingService>();
+              final settingsService = getIt<SettingsService>();
+              final usersDao = getIt<UsersDao>();
+              final transactionsDao = getIt<TransactionsDao>();
+              return EstimatesBloc(logger, settingsService, usersDao, transactionsDao);
+            },
+          ),
+          BlocProvider(
+            create: (ctx) {
+              final logger = getIt<LoggingService>();
+              final settingsService = getIt<SettingsService>();
+              final usersDao = getIt<UsersDao>();
+              final transactionsDao = getIt<TransactionsDao>();
+              return SearchBloc(logger, transactionsDao, usersDao, settingsService);
+            },
+          ),
+          BlocProvider(
+            create: (ctx) {
+              final settingsService = getIt<SettingsService>();
+              return SplashScreenBloc(settingsService)..add(const SplashScreenEvent.init());
+            },
+          ),
         ],
         child: AppWidget(),
       ),

@@ -51,11 +51,7 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
   }
 
   Future<ChartsState> _buildLoadedState(DateTime now) async {
-    final dateString = toBeginningOfSentenceCase(DateUtils.formatAppDate(
-      now,
-      _settingsService.language,
-      DateUtils.fullMonthAndYearFormat,
-    ));
+    final dateString = toBeginningOfSentenceCase(DateUtils.formatAppDate(now, _settingsService.language, DateUtils.fullMonthAndYearFormat));
     final from = DateUtils.getFirstDayDateOfTheMonth(now);
     final to = DateUtils.getLastDayDateOfTheMonth(now);
     var transactions = <TransactionItem>[];
@@ -102,7 +98,8 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
       final last = DateTime(next.year, next.month, next.day, 23, 59, 59);
 
       final amount = TransactionUtils.getTotalTransactionAmount(
-          transactions.where((t) => t.transactionDate.isAfter(first) && t.transactionDate.isBefore(last)).toList());
+        transactions.where((t) => t.transactionDate.isAfter(first) && t.transactionDate.isBefore(last)).toList(),
+      );
 
       final start = DateUtils.formatAppDate(first, lang);
       final end = DateUtils.formatAppDate(last, lang);

@@ -179,11 +179,7 @@ class TransactionUtils {
 
       final dateSummary = '$dateString ${toBeginningOfSentenceCase(dayString, locale)}';
 
-      models.add(TransactionCardItems(
-        date: kvp.key,
-        dateString: dateSummary,
-        transactions: kvp.value,
-      ));
+      models.add(TransactionCardItems(date: kvp.key, dateString: dateSummary, transactions: kvp.value));
     }
 
     if (sortType == SortDirectionType.asc) {

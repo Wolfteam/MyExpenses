@@ -15,15 +15,7 @@ class ImageUtils {
   ) async {
     final receivePort = ReceivePort();
 
-    await Isolate.spawn(
-        _resizeImage,
-        _ResizeParams(
-          receivePort.sendPort,
-          input,
-          output,
-          width,
-          height,
-        ));
+    await Isolate.spawn(_resizeImage, _ResizeParams(receivePort.sendPort, input, output, width, height));
 
     await receivePort.first;
   }

@@ -30,11 +30,7 @@ class ChartsState with _$ChartsState {
       final catId = cats[i];
       final category = transactions.firstWhere((t) => t.category.id == catId).category;
       final double amount = transactions.where((t) => t.category.id == catId).map((e) => e.amount).sum;
-      items.add(ChartTransactionItem(
-        value: amount,
-        order: i,
-        categoryColor: category.iconColor,
-      ));
+      items.add(ChartTransactionItem(value: amount, order: i, categoryColor: category.iconColor));
     }
 
     return items;

@@ -26,7 +26,7 @@ class UserAccountItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: const EdgeInsets.all(0),
+      contentPadding: EdgeInsets.zero,
       title: Text(fullname),
       subtitle: Text(email),
       leading: CircleAvatar(

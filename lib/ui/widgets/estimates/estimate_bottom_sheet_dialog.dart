@@ -52,7 +52,7 @@ class EstimateBottomSheetDialog extends StatelessWidget {
           onPressed: () => _changeDate(context, s.untilDate, s.currentLanguage, false),
           child: Align(alignment: Alignment.centerLeft, child: Text(s.untilDateString)),
         ),
-        Divider(color: theme.accentColor),
+        Divider(color: theme.colorScheme.secondary),
         Text('${i18n.period}: ${s.fromDateString} - ${s.untilDateString}'),
         _buildSummary(context, s.selectedTransactionType, s.incomeAmount, s.expenseAmount, s.totalAmount),
         _buildBottomButtonBar(context),
@@ -211,7 +211,6 @@ class EstimateBottomSheetDialog extends StatelessWidget {
     final i18n = S.of(context);
     return ButtonBar(
       layoutBehavior: ButtonBarLayoutBehavior.constrained,
-      buttonPadding: const EdgeInsets.symmetric(horizontal: 20),
       children: <Widget>[
         OutlinedButton(
           onPressed: () => Navigator.pop(context),

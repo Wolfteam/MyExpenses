@@ -1,10 +1,9 @@
-import 'dart:async';
 import 'dart:core';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_user_agentx/flutter_user_agent.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:my_expenses/generated/l10n.dart';
 
 import '../../../bloc/sign_in_with_google/sign_in_with_google_bloc.dart';
@@ -20,19 +19,7 @@ class SignInWithGoogleWebView extends StatefulWidget {
 }
 
 class _SignInWithGoogleWebViewState extends State<SignInWithGoogleWebView> {
-  final _flutterWebviewPlugin = FlutterWebviewPlugin();
-  late StreamSubscription<String> _onUrlChanged;
-
-  @override
-  void initState() {
-    super.initState();
-    _flutterWebviewPlugin.close();
-    _onUrlChanged = _flutterWebviewPlugin.onUrlChanged.listen((url) {
-      if (mounted) {
-        context.read<SignInWithGoogleBloc>().add(SignInWithGoogleEvent.urlChanged(url: url));
-      }
-    });
-  }
+  bool _loading = true;
 
   @override
   void didChangeDependencies() {
@@ -43,16 +30,51 @@ class _SignInWithGoogleWebViewState extends State<SignInWithGoogleWebView> {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     return BlocConsumer<SignInWithGoogleBloc, SignInWithGoogleState>(
       listener: _handleStateChanges,
-      builder: (ctx, state) => _buildPage(ctx, state),
+      builder: (ctx, state) => state.maybeMap(
+        initial: (state) {
+          if (!state.codeGranted && !state.flowCompleted) {
+            return Stack(
+              children: [
+                Scaffold(
+                  appBar: AppBar(
+                    leading: const BackButton(),
+                    title: Text(s.authenticate),
+                  ),
+                  body: InAppWebView(
+                    initialUrlRequest: URLRequest(url: Uri.parse(state.authUrl)),
+                    initialOptions: InAppWebViewGroupOptions(
+                      android: AndroidInAppWebViewOptions(
+                        useHybridComposition: true,
+                      ),
+                      crossPlatform: InAppWebViewOptions(
+                        // preferredContentMode: device == DeviceScreenType.mobile ? UserPreferredContentMode.MOBILE : UserPreferredContentMode.RECOMMENDED,
+                        //This may fail on weird devices (chinese ones ?)...
+                        userAgent: FlutterUserAgent.webViewUserAgent!.replaceAll(RegExp('wv'), ''),
+                        transparentBackground: true,
+                      ),
+                    ),
+                    onLoadStop: (controller, url) async {
+                      if (mounted && url != null) {
+                        context.read<SignInWithGoogleBloc>().add(SignInWithGoogleEvent.urlChanged(url: url.toString()));
+                      }
+                      setState(() {
+                        _loading = false;
+                      });
+                    },
+                  ),
+                ),
+                if (_loading) Loading(),
+              ],
+            );
+          }
+          return Loading();
+        },
+        orElse: () => Loading(),
+      ),
     );
-  }
-
-  @override
-  void dispose() {
-    _onUrlChanged.cancel();
-    super.dispose();
   }
 
   void _handleStateChanges(BuildContext ctx, SignInWithGoogleState state) {
@@ -62,7 +84,6 @@ class _SignInWithGoogleWebViewState extends State<SignInWithGoogleWebView> {
         if (state.flowCompleted) {
           BlocUtils.raiseAllCommonBlocEvents(ctx);
           Navigator.of(ctx).pop();
-          _flutterWebviewPlugin.close();
         } else if (!state.isNetworkAvailable) {
           ToastUtils.showWarningToast(ctx, i18n.networkIsNotAvailable);
           Navigator.of(ctx).pop();
@@ -71,32 +92,6 @@ class _SignInWithGoogleWebViewState extends State<SignInWithGoogleWebView> {
         }
       },
       orElse: () {},
-    );
-  }
-
-  Widget _buildPage(BuildContext context, SignInWithGoogleState state) {
-    final i18n = S.of(context);
-    return state.maybeMap(
-      initial: (state) {
-        if (!state.codeGranted && !state.flowCompleted) {
-          final userAgent = FlutterUserAgent.webViewUserAgent!.replaceAll(RegExp(r'wv'), '');
-          return WebviewScaffold(
-            url: state.authUrl,
-            userAgent: userAgent,
-            clearCache: true,
-            debuggingEnabled: true,
-            appBar: AppBar(
-              leading: const BackButton(),
-              title: Text(i18n.authenticate),
-            ),
-            initialChild: const Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
-        return Loading();
-      },
-      orElse: () => Loading(),
     );
   }
 }

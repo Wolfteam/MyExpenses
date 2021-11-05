@@ -25,7 +25,7 @@ class SortDirectionPopupMenuFilter extends StatelessWidget {
       );
     }).toList();
     return PopupMenuButton<SortDirectionType>(
-      padding: const EdgeInsets.all(0),
+      padding: EdgeInsets.zero,
       initialValue: selectedSortDirection,
       icon: const Icon(Icons.sort),
       onSelected: onSelected,

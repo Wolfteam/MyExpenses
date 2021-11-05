@@ -6,7 +6,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:my_expenses/common/enums/app_language_type.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/ui/widgets/input_suffix_icon.dart';
-import 'package:nil/nil.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 import 'package:transparent_image/transparent_image.dart';
@@ -291,7 +290,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
           ),
         ],
       ),
-      _ImagePreview(imagePath: imagePath, imageExists: imageExists),
+      if (imageExists) _ImagePreview(imagePath: imagePath),
     ];
   }
 
@@ -309,13 +308,18 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
 
   Future<void> _pickPicture(bool fromGallery, S i18n) async {
     try {
-      final image = await ImagePicker().getImage(
+      final image = await ImagePicker().pickImage(
         source: fromGallery ? ImageSource.gallery : ImageSource.camera,
         maxHeight: 600,
         maxWidth: 600,
       );
-      if (image == null) return;
-      context.read<TransactionFormBloc>().add(TransactionFormEvent.imageChanged(path: image.path, imageExists: true));
+      if (image == null) {
+        return;
+      }
+
+      if (mounted) {
+        context.read<TransactionFormBloc>().add(TransactionFormEvent.imageChanged(path: image.path, imageExists: true));
+      }
     } catch (e) {
       ToastUtils.showWarningToast(context, i18n.acceptPermissionsToUseThisFeature);
     }
@@ -604,7 +608,7 @@ class _RecurringSwitch extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           SwitchListTile(
-            activeColor: theme.accentColor,
+            activeColor: theme.colorScheme.secondary,
             value: isRecurringTransactionRunning,
             title: Text(
               isRecurringTransactionRunning ? i18n.running : i18n.stopped,
@@ -981,41 +985,36 @@ class _RepetitionCycleDropdown extends StatelessWidget {
 }
 
 class _ImagePreview extends StatelessWidget {
-  final bool imageExists;
   final String? imagePath;
 
   const _ImagePreview({
     Key? key,
-    required this.imageExists,
     required this.imagePath,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    if (imageExists) {
-      return Container(
-        margin: const EdgeInsets.only(left: 10, right: 10, bottom: 30),
-        child: Stack(
-          alignment: Alignment.center,
-          children: <Widget>[
-            Container(
-              margin: const EdgeInsets.only(top: 10),
-              child: const Center(child: CircularProgressIndicator()),
+    return Container(
+      margin: const EdgeInsets.only(left: 10, right: 10, bottom: 30),
+      child: Stack(
+        alignment: Alignment.center,
+        children: <Widget>[
+          Container(
+            margin: const EdgeInsets.only(top: 10),
+            child: const Center(child: CircularProgressIndicator()),
+          ),
+          GestureDetector(
+            onTap: () => _showImageDialog(imagePath!, context),
+            child: FadeInImage(
+              fit: BoxFit.fill,
+              fadeInDuration: const Duration(seconds: 1),
+              placeholder: MemoryImage(kTransparentImage),
+              image: FileImage(File(imagePath!)),
             ),
-            GestureDetector(
-              onTap: () => _showImageDialog(imagePath!, context),
-              child: FadeInImage(
-                fit: BoxFit.fill,
-                fadeInDuration: const Duration(seconds: 1),
-                placeholder: MemoryImage(kTransparentImage),
-                image: FileImage(File(imagePath!)),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-    return nil;
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _showImageDialog(String imagePath, BuildContext context) {

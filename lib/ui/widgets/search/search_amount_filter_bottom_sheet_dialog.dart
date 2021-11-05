@@ -58,10 +58,10 @@ class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilter
       loading: (_) => [],
       initial: (s) => [
         ModalSheetSeparator(),
-        ModalSheetTitle(title: i18n.filterByX(i18n.amount.toLowerCase()), padding: const EdgeInsets.all(0)),
+        ModalSheetTitle(title: i18n.filterByX(i18n.amount.toLowerCase()), padding: EdgeInsets.zero),
         _buildAmountInput(context),
         if (!_amountController.text.isNullEmptyOrWhitespace) _buildComparerRadioButtons(s.tempComparerType),
-        Divider(color: theme.accentColor),
+        Divider(color: theme.colorScheme.secondary),
         _buildBottomButtonBar(context),
       ],
     );
@@ -110,7 +110,7 @@ class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilter
       children: ComparerType.values
           .map(
             (e) => ListTile(
-              contentPadding: const EdgeInsets.all(0),
+              contentPadding: EdgeInsets.zero,
               dense: true,
               title: Text(i18n.getComparerTypeName(e)),
               leading: Radio<ComparerType>(value: e, groupValue: selectedComparer, onChanged: (v) => _comparerChanged(v!)),
@@ -125,7 +125,6 @@ class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilter
     final i18n = S.of(context);
     return ButtonBar(
       layoutBehavior: ButtonBarLayoutBehavior.constrained,
-      buttonPadding: const EdgeInsets.symmetric(horizontal: 20),
       children: <Widget>[
         OutlinedButton(
           onPressed: () => _closeModal(context),

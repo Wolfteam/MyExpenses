@@ -58,7 +58,7 @@ class AppDrawer extends StatelessWidget {
     final i18n = S.of(context);
 
     return DrawerHeader(
-      margin: const EdgeInsets.all(0),
+      margin: EdgeInsets.zero,
       // decoration: BoxDecoration(color: Colors.transparent),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -172,7 +172,7 @@ class AppDrawer extends StatelessWidget {
 
     if (state.selectedPage == item) {
       return Ink(
-        color: theme.accentColor.withOpacity(0.35),
+        color: theme.colorScheme.secondary.withOpacity(0.35),
         child: listTitle,
       );
     }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:my_expenses/generated/l10n.dart';
+import 'package:my_expenses/ui/widgets/nothing_found.dart';
 
 import '../../bloc/chart_details/chart_details_bloc.dart';
 import '../../bloc/charts/charts_bloc.dart';
@@ -12,7 +13,6 @@ import '../../bloc/currency/currency_bloc.dart';
 import '../../common/extensions/iterable_extensions.dart';
 import '../../common/utils/i18n_utils.dart';
 import '../widgets/charts/pie_chart_transactions_per_month.dart';
-import '../widgets/nothing_found.dart';
 import 'chart_details_page.dart';
 
 class ChartsPage extends StatefulWidget {
@@ -107,7 +107,7 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
               enabled: false,
               touchTooltipData: BarTouchTooltipData(
                 tooltipBgColor: Colors.transparent,
-                tooltipPadding: const EdgeInsets.all(0),
+                tooltipPadding: EdgeInsets.zero,
                 tooltipMargin: 8,
                 getTooltipItem: (group, groupIndex, rod, rodIndex) => BarTooltipItem(
                   currencyBloc.format(rod.y),
@@ -118,8 +118,8 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
             titlesData: FlTitlesData(
               bottomTitles: SideTitles(
                 showTitles: true,
-                getTextStyles: (value) => textStyle,
-                rotateAngle: 30,
+                getTextStyles: (ctx, value) => textStyle.copyWith(fontSize: 9, fontWeight: FontWeight.bold),
+                rotateAngle: 25,
                 getTitles: (double value) {
                   final date = state.transactionsPerDate.elementAt(value.toInt() - 1);
                   return date.dateRangeString;
@@ -127,11 +127,13 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
               ),
               leftTitles: SideTitles(
                 showTitles: true,
-                getTextStyles: (value) => textStyle,
+                getTextStyles: (ctx, value) => textStyle,
                 reservedSize: reservedSize,
                 getTitles: (double value) => currencyBloc.format(value, showSymbol: false),
                 interval: interval,
               ),
+              rightTitles: SideTitles(showTitles: false),
+              topTitles: SideTitles(showTitles: false),
             ),
             gridData: FlGridData(
               show: true,
@@ -162,7 +164,7 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
               BarChartRodData(
                 y: e.totalAmount,
                 width: 50,
-                borderRadius: const BorderRadius.all(Radius.zero),
+                borderRadius: BorderRadius.zero,
                 rodStackItems: [
                   BarChartRodStackItem(0, e.totalAmount, e.color),
                 ],
@@ -192,43 +194,46 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
     final dataToUse = incomes ? ChartsState.incomeChartTransactions(state.transactions) : ChartsState.expenseChartTransactions(state.transactions);
 
     final currencyBloc = context.read<CurrencyBloc>();
-    final double aspectRatio = MediaQuery.of(context).orientation == Orientation.portrait ? 1 : 3 / 1.5;
+    final double aspectRatio = MediaQuery.of(context).orientation == Orientation.portrait ? 1 : 1.5;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        TextButton(
-          style: TextButton.styleFrom(padding: const EdgeInsets.all(0)),
-          onPressed: () => dataToUse.isNotEmpty ? _goToDetailsPage(context, state, incomes) : null,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    margin: const EdgeInsets.only(left: 20),
-                    child: Text(incomes ? i18n.incomes : i18n.expenses, style: titleStyle),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(left: 20),
-                    child: Text(
-                      currencyBloc.format(incomes ? state.totalIncomeAmount : state.totalExpenseAmount),
-                      overflow: TextOverflow.ellipsis,
-                      style: textStyle!.copyWith(color: incomes ? Colors.green : Colors.red),
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          TextButton(
+            style: TextButton.styleFrom(padding: EdgeInsets.zero),
+            onPressed: () => dataToUse.isNotEmpty ? _goToDetailsPage(context, state, incomes) : null,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                      margin: const EdgeInsets.only(left: 20),
+                      child: Text(incomes ? i18n.incomes : i18n.expenses, style: titleStyle),
                     ),
-                  ),
-                ],
-              ),
-              Icon(
-                Icons.arrow_forward,
-                color: isDarkTheme ? Colors.white : Colors.black,
-              ),
-            ],
+                    Container(
+                      margin: const EdgeInsets.only(left: 20),
+                      child: Text(
+                        currencyBloc.format(incomes ? state.totalIncomeAmount : state.totalExpenseAmount),
+                        overflow: TextOverflow.ellipsis,
+                        style: textStyle!.copyWith(color: incomes ? Colors.green : Colors.red),
+                      ),
+                    ),
+                  ],
+                ),
+                Icon(
+                  Icons.arrow_forward,
+                  color: isDarkTheme ? Colors.white : Colors.black,
+                ),
+              ],
+            ),
           ),
-        ),
-        AspectRatio(aspectRatio: aspectRatio, child: PieChartTransactionsPerMonths(dataToUse)),
-      ],
+          AspectRatio(aspectRatio: aspectRatio, child: PieChartTransactionsPerMonths(dataToUse)),
+        ],
+      ),
     );
   }
 
@@ -251,15 +256,19 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
   Future<void> _changeCurrentDate(ChartsState state) async {
     final now = DateTime.now();
     final selectedDate = await showMonthPicker(
-        context: context,
-        initialDate: state.currentDate,
-        // firstDate: state.currentDate,
-        lastDate: DateTime(now.year + 1),
-        locale: currentLocale(state.language));
+      context: context,
+      initialDate: state.currentDate,
+      // firstDate: state.currentDate,
+      lastDate: DateTime(now.year + 1),
+      locale: currentLocale(state.language),
+    );
 
     if (selectedDate == null) {
       return;
     }
-    context.read<ChartsBloc>().add(ChartsEvent.loadChart(from: selectedDate));
+
+    if (mounted) {
+      context.read<ChartsBloc>().add(ChartsEvent.loadChart(from: selectedDate));
+    }
   }
 }

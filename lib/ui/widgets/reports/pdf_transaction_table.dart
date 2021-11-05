@@ -94,77 +94,79 @@ class PdfTransactionTable extends StatelessWidget {
   TableRow _buildRowHeader(Context context, S i18n) {
     final tableCellHeaderStyle = Theme.of(context).tableHeader.copyWith(color: PdfColors.white);
     const headerCellPadding = EdgeInsets.all(5);
-    return TableRow(children: [
-      Container(
-        padding: headerCellPadding,
-        alignment: Alignment.center,
-        color: PdfColors.black,
-        child: Text(
-          '#',
-          style: tableCellHeaderStyle,
+    return TableRow(
+      children: [
+        Container(
+          padding: headerCellPadding,
+          alignment: Alignment.center,
+          color: PdfColors.black,
+          child: Text(
+            '#',
+            style: tableCellHeaderStyle,
+          ),
         ),
-      ),
-      Container(
-        padding: headerCellPadding,
-        alignment: Alignment.center,
-        color: PdfColors.black,
-        child: Text(
-          i18n.description,
-          textAlign: TextAlign.left,
-          style: tableCellHeaderStyle,
+        Container(
+          padding: headerCellPadding,
+          alignment: Alignment.center,
+          color: PdfColors.black,
+          child: Text(
+            i18n.description,
+            textAlign: TextAlign.left,
+            style: tableCellHeaderStyle,
+          ),
         ),
-      ),
-      Container(
-        padding: headerCellPadding,
-        alignment: Alignment.center,
-        color: PdfColors.black,
-        child: Text(
-          i18n.amount,
-          textAlign: TextAlign.center,
-          style: tableCellHeaderStyle,
+        Container(
+          padding: headerCellPadding,
+          alignment: Alignment.center,
+          color: PdfColors.black,
+          child: Text(
+            i18n.amount,
+            textAlign: TextAlign.center,
+            style: tableCellHeaderStyle,
+          ),
         ),
-      ),
-      Container(
-        padding: headerCellPadding,
-        alignment: Alignment.center,
-        color: PdfColors.black,
-        child: Text(
-          i18n.date,
-          textAlign: TextAlign.center,
-          style: tableCellHeaderStyle,
+        Container(
+          padding: headerCellPadding,
+          alignment: Alignment.center,
+          color: PdfColors.black,
+          child: Text(
+            i18n.date,
+            textAlign: TextAlign.center,
+            style: tableCellHeaderStyle,
+          ),
         ),
-      ),
-      Container(
-        padding: headerCellPadding,
-        alignment: Alignment.center,
-        color: PdfColors.black,
-        child: Text(
-          i18n.category,
-          textAlign: TextAlign.center,
-          style: tableCellHeaderStyle,
+        Container(
+          padding: headerCellPadding,
+          alignment: Alignment.center,
+          color: PdfColors.black,
+          child: Text(
+            i18n.category,
+            textAlign: TextAlign.center,
+            style: tableCellHeaderStyle,
+          ),
         ),
-      ),
-      Container(
-        padding: headerCellPadding,
-        alignment: Alignment.center,
-        color: PdfColors.black,
-        child: Text(
-          i18n.type,
-          textAlign: TextAlign.right,
-          style: tableCellHeaderStyle,
+        Container(
+          padding: headerCellPadding,
+          alignment: Alignment.center,
+          color: PdfColors.black,
+          child: Text(
+            i18n.type,
+            textAlign: TextAlign.right,
+            style: tableCellHeaderStyle,
+          ),
         ),
-      ),
-      Container(
-        padding: headerCellPadding,
-        alignment: Alignment.center,
-        color: PdfColors.black,
-        child: Text(
-          i18n.recurring,
-          textAlign: TextAlign.right,
-          style: tableCellHeaderStyle,
+        Container(
+          padding: headerCellPadding,
+          alignment: Alignment.center,
+          color: PdfColors.black,
+          child: Text(
+            i18n.recurring,
+            textAlign: TextAlign.right,
+            style: tableCellHeaderStyle,
+          ),
         ),
-      ),
-    ]);
+      ],
+    );
   }
 
   TableRow _buildRowItem(

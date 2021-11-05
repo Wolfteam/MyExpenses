@@ -90,7 +90,7 @@ class HomeLast7DaysSummary extends StatelessWidget {
             enabled: false,
             touchTooltipData: BarTouchTooltipData(
               tooltipBgColor: Colors.transparent,
-              tooltipPadding: const EdgeInsets.all(0),
+              tooltipPadding: EdgeInsets.zero,
               tooltipMargin: 0,
               getTooltipItem: (group, groupIndex, rod, rodIndex) => BarTooltipItem(
                 currencyBloc.format(rod.y),
@@ -101,8 +101,9 @@ class HomeLast7DaysSummary extends StatelessWidget {
           titlesData: FlTitlesData(
             bottomTitles: SideTitles(
               showTitles: true,
-              getTextStyles: (value) => TextStyle(color: incomesIsChecked ? Colors.green : Colors.red, fontSize: 11, fontWeight: FontWeight.bold),
-              rotateAngle: 45,
+              getTextStyles: (ctx, value) =>
+                  TextStyle(color: incomesIsChecked ? Colors.green : Colors.red, fontSize: 11, fontWeight: FontWeight.bold),
+              rotateAngle: 30,
               margin: incomesIsChecked ? 20 : 0,
               getTitles: (value) {
                 final date = finalData.elementAt(value.toInt() - 1);
@@ -112,10 +113,12 @@ class HomeLast7DaysSummary extends StatelessWidget {
             leftTitles: SideTitles(
               showTitles: true,
               reservedSize: reservedSize,
-              getTextStyles: (value) => textStyle,
+              getTextStyles: (ctx, value) => textStyle,
               getTitles: (value) => currencyBloc.format(value, showSymbol: false),
               interval: interval,
             ),
+            rightTitles: SideTitles(showTitles: false),
+            topTitles: SideTitles(showTitles: false),
           ),
           gridData: FlGridData(
             show: true,
@@ -141,7 +144,7 @@ class HomeLast7DaysSummary extends StatelessWidget {
                     BarChartRodData(
                       y: e.totalDayAmount,
                       width: 30,
-                      borderRadius: const BorderRadius.all(Radius.zero),
+                      borderRadius: BorderRadius.zero,
                       rodStackItems: [
                         BarChartRodStackItem(0, e.totalDayAmount, e.color),
                       ],

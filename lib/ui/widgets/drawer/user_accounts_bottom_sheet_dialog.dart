@@ -56,7 +56,7 @@ class UserAccountsBottomSheetDialog extends StatelessWidget {
             shrinkWrap: true,
             itemCount: state.users.length,
             physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(0),
+            padding: EdgeInsets.zero,
             itemBuilder: (ctx, index) => _buildUserAccountItem(
               state.users[index],
               state.users.length > 1,
@@ -68,7 +68,6 @@ class UserAccountsBottomSheetDialog extends StatelessWidget {
             padding: const EdgeInsets.only(right: 20, left: 20, top: 10),
           ),
         ButtonBar(
-          buttonPadding: const EdgeInsets.symmetric(horizontal: 20),
           children: <Widget>[
             OutlinedButton(
               onPressed: () {
