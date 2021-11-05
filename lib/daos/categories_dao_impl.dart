@@ -1,6 +1,6 @@
 part of '../models/entities/database.dart';
 
-@UseDao(tables: [Categories, Transactions])
+@DriftAccessor(tables: [Categories, Transactions])
 class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesDaoImplMixin implements CategoriesDao {
   CategoriesDaoImpl(AppDatabase db) : super(db);
 

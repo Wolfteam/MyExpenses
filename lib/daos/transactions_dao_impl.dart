@@ -1,6 +1,6 @@
 part of '../models/entities/database.dart';
 
-@UseDao(tables: [Transactions, Categories])
+@DriftAccessor(tables: [Transactions, Categories])
 class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$TransactionsDaoImplMixin implements TransactionsDao {
   TransactionsDaoImpl(AppDatabase db) : super(db);
 

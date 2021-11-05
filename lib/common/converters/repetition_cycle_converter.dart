@@ -1,4 +1,4 @@
-import 'package:moor/moor.dart';
+import 'package:drift/drift.dart';
 import 'package:my_expenses/common/enums/repetition_cycle_type.dart';
 
 class RepetitionCycleConverter extends TypeConverter<RepetitionCycleType, int> {

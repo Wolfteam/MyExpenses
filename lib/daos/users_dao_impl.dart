@@ -1,6 +1,6 @@
 part of '../models/entities/database.dart';
 
-@UseDao(tables: [Users])
+@DriftAccessor(tables: [Users])
 class UsersDaoImpl extends DatabaseAccessor<AppDatabase> with _$UsersDaoImplMixin implements UsersDao {
   UsersDaoImpl(AppDatabase db) : super(db);
 
