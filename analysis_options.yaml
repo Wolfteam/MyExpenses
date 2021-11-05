@@ -4,11 +4,14 @@ linter:
   rules:
     prefer_single_quotes: true
     avoid_classes_with_only_static_members: false
+    depend_on_referenced_packages: false
 
 analyzer:
   exclude: 
     - '**/*.freezed.dart'
     - '**/*.g.dart'
     - lib/**/*.*.dart
+    - lib/generated/*
+    - '**/custom_icons.dart'
   errors:
     missing_return: error
