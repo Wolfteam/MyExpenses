@@ -18,3 +18,15 @@ class TransactionsSummaryPerDate with _$TransactionsSummaryPerDate, TransactionM
 
   const TransactionsSummaryPerDate._();
 }
+
+@freezed
+class TransactionsSummaryPerYear with _$TransactionsSummaryPerYear, TransactionMixin {
+  bool get isAnIncome => isTransactionAnIncome(totalAmount);
+
+  const factory TransactionsSummaryPerYear({
+    required double totalAmount,
+    required int month,
+  }) = _TransactionsSummaryPerYear;
+
+  const TransactionsSummaryPerYear._();
+}

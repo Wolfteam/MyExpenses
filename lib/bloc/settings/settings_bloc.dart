@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
@@ -108,7 +109,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     final appSettings = _settingsService.appSettings;
     final packageInfo = await PackageInfo.fromPlatform();
     final localAuth = LocalAuthentication();
-    final availableBiometrics = await localAuth.getAvailableBiometrics();
+    final availableBiometrics = Platform.isWindows ? [] : await localAuth.getAvailableBiometrics();
     final currentUser = await _usersDao.getActiveUser();
     final canUseFingerPrint = await localAuth.canCheckBiometrics && await localAuth.isDeviceSupported();
 

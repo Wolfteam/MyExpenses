@@ -32,6 +32,7 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
     final theme = Theme.of(context);
     final i18n = S.of(context);
     final now = DateTime.now();
+    final textColor = theme.brightness == Brightness.dark ? Colors.white : Colors.black;
     return state.map(
       loading: (_) => [],
       initial: (s) {
@@ -42,13 +43,13 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
           ModalSheetTitle(title: i18n.filterByX(i18n.date.toLowerCase())),
           Text('${i18n.startDate}:'),
           TextButton(
-            style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+            style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap, primary: textColor),
             onPressed: () => _changeDate(context, s.tempFrom ?? now, s.currentLanguage, true),
             child: Align(alignment: Alignment.centerLeft, child: Text(startText!)),
           ),
           Text('${i18n.untilDate}:'),
           TextButton(
-            style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+            style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap, primary: textColor),
             onPressed: () => _changeDate(context, s.tempUntil ?? now, s.currentLanguage, false),
             child: Align(alignment: Alignment.centerLeft, child: Text(untilText!)),
           ),

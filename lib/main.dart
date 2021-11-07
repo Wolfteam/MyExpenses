@@ -152,12 +152,9 @@ class MyApp extends StatelessWidget {
               final transactionsDao = getIt<TransactionsDao>();
               final usersDao = getIt<UsersDao>();
               final settingsService = getIt<SettingsService>();
-              return ChartsBloc(
-                logger,
-                transactionsDao,
-                usersDao,
-                settingsService,
-              );
+              final now = DateTime.now();
+              return ChartsBloc(logger, transactionsDao, usersDao, settingsService)
+                ..add(ChartsEvent.loadChart(selectedMonthDate: now, selectedYear: now.year));
             },
           ),
           BlocProvider(create: (ctx) => ChartDetailsBloc()),

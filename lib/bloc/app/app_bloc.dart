@@ -17,9 +17,7 @@ import '../../services/settings_service.dart';
 import '../drawer/drawer_bloc.dart';
 
 part 'app_bloc.freezed.dart';
-
 part 'app_event.dart';
-
 part 'app_state.dart';
 
 const _languagesMap = {
