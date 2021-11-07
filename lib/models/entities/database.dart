@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:isolate';
 
@@ -12,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:sqlite3/open.dart';
 
 import '../../common/converters/db_converters.dart';
 import '../../common/converters/local_status_converter.dart';
@@ -63,6 +65,7 @@ Future<String> _getDatabasePath() async {
 }
 
 LazyDatabase _openConnection() {
+  open.overrideFor(OperatingSystem.windows, _openOnWindows);
   // the LazyDatabase util lets us find the right location for the file async.
   return LazyDatabase(() async {
     // put the database file, called db.sqlite here, into the documents folder
@@ -77,6 +80,15 @@ LazyDatabase _openConnection() {
     // }
     return NativeDatabase(file);
   });
+}
+
+DynamicLibrary _openOnWindows() {
+  //https://www.sqlite.org/download.html
+  //Precompiled Binaries for Windows
+  final script = File(Platform.script.toFilePath()).parent;
+  final path = '${script.path}/sqlite3.dll';
+  final libraryNextToScript = File(path);
+  return DynamicLibrary.open(libraryNextToScript.path);
 }
 
 Future<DatabaseConnection> _connectAsync() async {
