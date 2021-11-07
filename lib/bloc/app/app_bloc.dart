@@ -4,7 +4,6 @@ import 'dart:ui';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:my_expenses/common/utils/app_path_utils.dart';
 import 'package:my_expenses/models/language_model.dart';
 
 import '../../common/enums/app_accent_color_type.dart';
@@ -48,43 +47,24 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     final s = await event.map(
       init: (e) async {
         await BackgroundUtils.initBg();
-        try {
-          _logger.info(runtimeType, 'Deleting old logs...');
-          await AppPathUtils.deleteOlLogs();
-        } catch (e, s) {
-          _logger.error(runtimeType, 'Unknown error while deleting old logs', e, s);
-        }
 
         if (!_settingsService.isRecurringTransTaskRegistered) {
-          _logger.info(
-            runtimeType,
-            'Recurring trans task is not registered, registering it...',
-          );
+          _logger.info(runtimeType, 'Recurring trans task is not registered, registering it...');
           await BackgroundUtils.registerRecurringTransactionsTask();
           _settingsService.isRecurringTransTaskRegistered = true;
         }
-        _logger.info(
-          runtimeType,
-          'Current settings are: ${_settingsService.appSettings.toJson()}',
-        );
+        _logger.info(runtimeType, 'Current settings are: ${_settingsService.appSettings.toJson()}');
 
         await Future.delayed(const Duration(milliseconds: 500));
 
         return _loadThemeData(_settingsService.appTheme, _settingsService.accentColor, _settingsService.language);
       },
       themeChanged: (e) async {
-        _logger.info(
-          runtimeType,
-          'App theme changed, the selected theme is: ${e.theme}',
-        );
+        _logger.info(runtimeType, 'App theme changed, the selected theme is: ${e.theme}');
         return _loadThemeData(e.theme, _settingsService.accentColor, _settingsService.language);
       },
       accentColorChanged: (e) async {
-        _logger.info(
-          runtimeType,
-          'App accent color changed, the selected color is: ${e.accentColor}',
-        );
-
+        _logger.info(runtimeType, 'App accent color changed, the selected color is: ${e.accentColor}');
         return _loadThemeData(_settingsService.appTheme, e.accentColor, _settingsService.language);
       },
       bgTaskIsRunning: (e) async => _loadThemeData(

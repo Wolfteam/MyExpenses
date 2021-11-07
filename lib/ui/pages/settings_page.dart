@@ -211,7 +211,7 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
         SettingsCardSubtitleText(text: i18n.chooseSyncInterval),
         Padding(padding: Styles.edgeInsetHorizontal16, child: dropdown),
         SwitchListTile(
-          activeColor: theme.accentColor,
+          activeColor: theme.colorScheme.secondary,
           value: showNotificationAfterFullSync,
           title: Text(i18n.showNotificationAfterFullSync),
           onChanged: _showNotificationAfterFullSyncChanged,
@@ -226,29 +226,39 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
     return _buildSettingsCard(content);
   }
 
-  Widget _buildOtherSettings(BuildContext context, CurrencySymbolType currencySymbolType, bool currencyToTheRight, bool askForPassword,
-      bool canUseFingerPrint, bool askForFingerPrint, bool showNotificationForRecurringTrans, S i18n) {
+  Widget _buildOtherSettings(
+    BuildContext context,
+    CurrencySymbolType currencySymbolType,
+    bool currencyToTheRight,
+    bool askForPassword,
+    bool canUseFingerPrint,
+    bool askForFingerPrint,
+    bool showNotificationForRecurringTrans,
+    S i18n,
+  ) {
     final theme = Theme.of(context);
     final currencyDropDown = DropdownButton<CurrencySymbolType>(
       isExpanded: true,
       isDense: true,
       selectedItemBuilder: (ctx) => CurrencySymbolType.values
-          .map((value) => Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text(i18n.currencySymbol),
-                      Container(
-                        margin: const EdgeInsets.only(right: 15),
-                        child: Text(CurrencyUtils.getCurrencySymbol(value)),
-                      ),
-                    ],
-                  ),
-                ],
-              ))
+          .map(
+            (value) => Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(i18n.currencySymbol),
+                    Container(
+                      margin: const EdgeInsets.only(right: 15),
+                      child: Text(CurrencyUtils.getCurrencySymbol(value)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          )
           .toList(),
       value: currencySymbolType,
       underline: Container(height: 0, color: Colors.transparent),
@@ -274,26 +284,26 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
           child: currencyDropDown,
         ),
         SwitchListTile(
-          activeColor: theme.accentColor,
+          activeColor: theme.colorScheme.secondary,
           value: currencyToTheRight,
           title: Text(i18n.currencySymbolToRight),
           onChanged: _currencyPlacementChanged,
         ),
         SwitchListTile(
-          activeColor: theme.accentColor,
+          activeColor: theme.colorScheme.secondary,
           value: askForPassword,
           title: Text(i18n.askForPassword),
           onChanged: _askForPasswordChanged,
         ),
         if (canUseFingerPrint)
           SwitchListTile(
-            activeColor: theme.accentColor,
+            activeColor: theme.colorScheme.secondary,
             value: askForFingerPrint,
             title: Text(i18n.askForFingerPrint),
             onChanged: _askForFingerPrintChanged,
           ),
         SwitchListTile(
-          activeColor: theme.accentColor,
+          activeColor: theme.colorScheme.secondary,
           value: showNotificationForRecurringTrans,
           title: Text(i18n.showNotificationForRecurringTrans),
           onChanged: _showNotificationForRecurringTransChanged,
@@ -410,9 +420,13 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
       builder: (ctx) => const PasswordBottomSheet(),
     );
 
-    if (result == null) return;
+    if (result == null) {
+      return;
+    }
 
-    context.read<SettingsBloc>().add(SettingsEvent.askForPasswordChanged(ask: result));
+    if (mounted) {
+      context.read<SettingsBloc>().add(SettingsEvent.askForPasswordChanged(ask: result));
+    }
   }
 
   void _currencyChanged(CurrencySymbolType newValue) {

@@ -18,6 +18,10 @@ class AppCenter {
     bool enableDistribute = false,
     bool usePrivateDistributeTrack = false,
   }) async {
+    if (Platform.isWindows) {
+      return;
+    }
+
     String appsecret;
     if (Platform.isAndroid) {
       appsecret = appSecretAndroid;

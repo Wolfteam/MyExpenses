@@ -1,6 +1,6 @@
 part of '../models/entities/database.dart';
 
-@UseDao(tables: [Transactions, Categories])
+@DriftAccessor(tables: [Transactions, Categories])
 class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$TransactionsDaoImplMixin implements TransactionsDao {
   TransactionsDaoImpl(AppDatabase db) : super(db);
 
@@ -30,32 +30,34 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
 
     final now = DateTime.now();
     if (transaction.id <= 0) {
-      final id = await into(transactions).insert(TransactionsCompanion.insert(
-        localStatus: LocalStatusType.created,
-        amount: transaction.amount,
-        categoryId: transaction.category.id,
-        createdBy: createdBy,
-        createdAt: now,
-        description: transaction.description,
-        repetitionCycle: transaction.repetitionCycle,
-        transactionDate: transaction.transactionDate,
-        parentTransactionId: Value(transaction.parentTransactionId),
-        isParentTransaction: transaction.isParentTransaction,
-        imagePath: Value(transaction.imagePath),
-        nextRecurringDate: Value(transaction.nextRecurringDate),
-        createdHash: createdHash([
-          transaction.amount,
-          transaction.category.id,
-          createdBy,
-          now,
-          transaction.description,
-          transaction.repetitionCycle,
-          transaction.transactionDate,
-          transaction.parentTransactionId ?? -1,
-          transaction.isParentTransaction,
-        ]),
-        longDescription: Value(transaction.longDescription),
-      ));
+      final id = await into(transactions).insert(
+        TransactionsCompanion.insert(
+          localStatus: LocalStatusType.created,
+          amount: transaction.amount,
+          categoryId: transaction.category.id,
+          createdBy: createdBy,
+          createdAt: now,
+          description: transaction.description,
+          repetitionCycle: transaction.repetitionCycle,
+          transactionDate: transaction.transactionDate,
+          parentTransactionId: Value(transaction.parentTransactionId),
+          isParentTransaction: transaction.isParentTransaction,
+          imagePath: Value(transaction.imagePath),
+          nextRecurringDate: Value(transaction.nextRecurringDate),
+          createdHash: createdHash([
+            transaction.amount,
+            transaction.category.id,
+            createdBy,
+            now,
+            transaction.description,
+            transaction.repetitionCycle,
+            transaction.transactionDate,
+            transaction.parentTransactionId ?? -1,
+            transaction.isParentTransaction,
+          ]),
+          longDescription: Value(transaction.longDescription),
+        ),
+      );
 
       final query = select(transactions)..where((t) => t.id.equals(id));
       savedTransaction = (await query.get()).first;
@@ -580,11 +582,13 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
 
   @override
   Future<void> updateAllLocalStatus(LocalStatusType newValue) {
-    return update(transactions).write(TransactionsCompanion(
-      updatedAt: Value(DateTime.now()),
-      updatedBy: const Value(createdBy),
-      localStatus: Value(newValue),
-    ));
+    return update(transactions).write(
+      TransactionsCompanion(
+        updatedAt: Value(DateTime.now()),
+        updatedBy: const Value(createdBy),
+        localStatus: Value(newValue),
+      ),
+    );
   }
 
   @override

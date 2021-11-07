@@ -1,6 +1,6 @@
 part of '../models/entities/database.dart';
 
-@UseDao(tables: [Categories, Transactions])
+@DriftAccessor(tables: [Categories, Transactions])
 class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesDaoImplMixin implements CategoriesDao {
   CategoriesDaoImpl(AppDatabase db) : super(db);
 
@@ -19,13 +19,15 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
     }
 
     return query
-        .map((row) => CategoryItem(
-              id: row.id,
-              isAnIncome: row.isAnIncome,
-              name: row.name,
-              icon: row.icon,
-              iconColor: row.iconColor,
-            ))
+        .map(
+          (row) => CategoryItem(
+            id: row.id,
+            isAnIncome: row.isAnIncome,
+            name: row.name,
+            icon: row.icon,
+            iconColor: row.iconColor,
+          ),
+        )
         .get();
   }
 
@@ -74,24 +76,26 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
     int id = 0;
     final now = DateTime.now();
     if (category.id <= 0) {
-      id = await into(categories).insert(CategoriesCompanion.insert(
-        localStatus: LocalStatusType.created,
-        userId: Value(userId),
-        icon: category.icon!,
-        iconColor: category.iconColor!,
-        isAnIncome: category.isAnIncome,
-        name: category.name,
-        createdAt: now,
-        createdBy: createdBy,
-        createdHash: createdHash([
-          category.name,
-          now,
-          createdBy,
-          category.isAnIncome,
-          const ColorConverter().mapToSql(category.iconColor),
-          const IconDataConverter().mapToSql(category.icon) ?? '',
-        ]),
-      ));
+      id = await into(categories).insert(
+        CategoriesCompanion.insert(
+          localStatus: LocalStatusType.created,
+          userId: Value(userId),
+          icon: category.icon!,
+          iconColor: category.iconColor!,
+          isAnIncome: category.isAnIncome,
+          name: category.name,
+          createdAt: now,
+          createdBy: createdBy,
+          createdHash: createdHash([
+            category.name,
+            now,
+            createdBy,
+            category.isAnIncome,
+            const ColorConverter().mapToSql(category.iconColor),
+            const IconDataConverter().mapToSql(category.icon) ?? '',
+          ]),
+        ),
+      );
     } else {
       id = category.id;
       final currentCat = await (select(categories)..where((c) => c.id.equals(id))).getSingle();
@@ -175,17 +179,19 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
           ..orderBy(
             [(c) => OrderingTerm(expression: c.id)],
           ))
-        .map((row) => sync_cat.Category(
-              createdAt: row.createdAt,
-              createdBy: row.createdBy,
-              createdHash: row.createdHash,
-              icon: const IconDataConverter().mapToSql(row.icon)!,
-              iconColor: const ColorConverter().mapToSql(row.iconColor),
-              isAnIncome: row.isAnIncome,
-              name: row.name,
-              updatedAt: row.updatedAt,
-              updatedBy: row.updatedBy,
-            ))
+        .map(
+          (row) => sync_cat.Category(
+            createdAt: row.createdAt,
+            createdBy: row.createdBy,
+            createdHash: row.createdHash,
+            icon: const IconDataConverter().mapToSql(row.icon)!,
+            iconColor: const ColorConverter().mapToSql(row.iconColor),
+            isAnIncome: row.isAnIncome,
+            name: row.name,
+            updatedAt: row.updatedAt,
+            updatedBy: row.updatedBy,
+          ),
+        )
         .get();
   }
 
@@ -230,19 +236,21 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
     final localCatsHash = catsInDb.map((c) => c.createdHash).toList();
     final catsToBeCreated = existingCats
         .where((c) => !localCatsHash.contains(c.createdHash))
-        .map((c) => CategoriesCompanion.insert(
-              localStatus: LocalStatusType.nothing,
-              createdAt: c.createdAt,
-              createdBy: c.createdBy,
-              createdHash: c.createdHash,
-              icon: const IconDataConverter().mapToDart(c.icon)!,
-              iconColor: const ColorConverter().mapToDart(c.iconColor),
-              isAnIncome: c.isAnIncome,
-              name: c.name,
-              updatedAt: Value(c.updatedAt),
-              updatedBy: Value(c.updatedBy),
-              userId: Value(userId),
-            ))
+        .map(
+          (c) => CategoriesCompanion.insert(
+            localStatus: LocalStatusType.nothing,
+            createdAt: c.createdAt,
+            createdBy: c.createdBy,
+            createdHash: c.createdHash,
+            icon: const IconDataConverter().mapToDart(c.icon)!,
+            iconColor: const ColorConverter().mapToDart(c.iconColor),
+            isAnIncome: c.isAnIncome,
+            name: c.name,
+            updatedAt: Value(c.updatedAt),
+            updatedBy: Value(c.updatedBy),
+            userId: Value(userId),
+          ),
+        )
         .toList();
 
     if (catsToBeCreated.isEmpty) return;
@@ -302,11 +310,13 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
 
   @override
   Future<void> updateAllLocalStatus(LocalStatusType newValue) {
-    return update(categories).write(CategoriesCompanion(
-      updatedAt: Value(DateTime.now()),
-      updatedBy: const Value(createdBy),
-      localStatus: Value(newValue),
-    ));
+    return update(categories).write(
+      CategoriesCompanion(
+        updatedAt: Value(DateTime.now()),
+        updatedBy: const Value(createdBy),
+        localStatus: Value(newValue),
+      ),
+    );
   }
 
   CategoryItem _mapToCategoryItem(Category cat) {

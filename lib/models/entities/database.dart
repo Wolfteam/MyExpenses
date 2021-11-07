@@ -1,17 +1,19 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:isolate';
 
 import 'package:collection/collection.dart';
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
+import 'package:drift/drift.dart';
+import 'package:drift/isolate.dart';
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:moor/ffi.dart';
-import 'package:moor/isolate.dart';
-import 'package:moor/moor.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:sqlite3/open.dart';
 
 import '../../common/converters/db_converters.dart';
 import '../../common/converters/local_status_converter.dart';
@@ -63,6 +65,7 @@ Future<String> _getDatabasePath() async {
 }
 
 LazyDatabase _openConnection() {
+  open.overrideFor(OperatingSystem.windows, _openOnWindows);
   // the LazyDatabase util lets us find the right location for the file async.
   return LazyDatabase(() async {
     // put the database file, called db.sqlite here, into the documents folder
@@ -75,8 +78,17 @@ LazyDatabase _openConnection() {
     //   debugPrint('********Db path =  ${dbFolder.path}');
     //   await file.delete();
     // }
-    return VmDatabase(file);
+    return NativeDatabase(file);
   });
+}
+
+DynamicLibrary _openOnWindows() {
+  //https://www.sqlite.org/download.html
+  //Precompiled Binaries for Windows
+  final script = File(Platform.script.toFilePath()).parent;
+  final path = '${script.path}/sqlite3.dll';
+  final libraryNextToScript = File(path);
+  return DynamicLibrary.open(libraryNextToScript.path);
 }
 
 Future<DatabaseConnection> _connectAsync() async {
@@ -88,7 +100,7 @@ AppDatabase getIsolateDatabase() {
   return AppDatabase.connect(DatabaseConnection.delayed(_connectAsync()));
 }
 
-Future<MoorIsolate> _createMoorIsolate() async {
+Future<DriftIsolate> _createMoorIsolate() async {
   // this method is called from the main isolate. Since we can't use
   // getApplicationDocumentsDirectory on a background isolate, we calculate
   // the database path in the foreground isolate and then inform the
@@ -102,18 +114,18 @@ Future<MoorIsolate> _createMoorIsolate() async {
   );
 
   // _startBackground will send the MoorIsolate to this ReceivePort
-  final isolate = await receivePort.first as MoorIsolate;
+  final isolate = await receivePort.first as DriftIsolate;
   return isolate;
 }
 
 void _startBackground(_IsolateStartRequest request) {
   // this is the entry point from the background isolate! Let's create
   // the database from the path we received
-  final executor = VmDatabase(File(request.targetPath));
+  final executor = NativeDatabase(File(request.targetPath));
   // we're using MoorIsolate.inCurrent here as this method already runs on a
   // background isolate. If we used MoorIsolate.spawn, a third isolate would be
   // started which is not what we want!
-  final moorIsolate = MoorIsolate.inCurrent(
+  final moorIsolate = DriftIsolate.inCurrent(
     () => DatabaseConnection.fromExecutor(executor),
   );
   // inform the starting isolate about this, so that it can call .connect()
@@ -129,7 +141,7 @@ class _IsolateStartRequest {
   _IsolateStartRequest(this.sendMoorIsolate, this.targetPath);
 }
 
-@UseMoor(
+@DriftDatabase(
   tables: [
     Users,
     Transactions,

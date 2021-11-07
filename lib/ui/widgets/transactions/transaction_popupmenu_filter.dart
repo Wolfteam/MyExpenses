@@ -23,15 +23,17 @@ class TransactionPopupMenuFilter extends StatelessWidget {
     final transValues =
         exclude != null && exclude!.isNotEmpty ? TransactionFilterType.values.where((el) => !exclude!.contains(el)) : TransactionFilterType.values;
     final values = transValues
-        .map((filter) => CheckedPopupMenuItem<TransactionFilterType>(
-              checked: selectedValue == filter,
-              value: filter,
-              child: Text(i18n.getTransactionFilterTypeName(filter)),
-            ))
+        .map(
+          (filter) => CheckedPopupMenuItem<TransactionFilterType>(
+            checked: selectedValue == filter,
+            value: filter,
+            child: Text(i18n.getTransactionFilterTypeName(filter)),
+          ),
+        )
         .toList();
 
     return PopupMenuButton<TransactionFilterType>(
-      padding: const EdgeInsets.all(0),
+      padding: EdgeInsets.zero,
       initialValue: selectedValue,
       icon: const Icon(Icons.filter_list),
       onSelected: onSelected,

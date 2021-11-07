@@ -14,7 +14,7 @@ const _largeIcon = 'cost';
 const _androidPlatformChannelSpecifics = AndroidNotificationDetails(
   _channelId,
   _channelName,
-  _channelDescription,
+  channelDescription: _channelDescription,
   importance: Importance.max,
   priority: Priority.high,
   enableLights: true,
@@ -70,7 +70,7 @@ Future<void> showNotification(
     final androidPlatformChannelSpecificsBigStyle = AndroidNotificationDetails(
       _channelId,
       _channelName,
-      _channelDescription,
+      channelDescription: _channelDescription,
       importance: Importance.max,
       priority: Priority.high,
       enableLights: true,

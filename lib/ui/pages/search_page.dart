@@ -170,7 +170,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
             child: TextField(
               controller: _searchBoxTextController,
               focusNode: _searchFocusNode,
-              cursorColor: theme.accentColor,
+              cursorColor: theme.colorScheme.secondary,
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.go,
               decoration: InputDecoration(

@@ -106,10 +106,7 @@ class ChartDetailsBloc extends Bloc<ChartDetailsEvent, ChartDetailsState> {
         TransactionFilterType.amount,
         sortDirection,
       );
-      grouped.add(ChartGroupedTransactionsByCategory(
-        category: category,
-        transactions: trans,
-      ));
+      grouped.add(ChartGroupedTransactionsByCategory(category: category, transactions: trans));
     }
 
     if (sortDirection == SortDirectionType.asc) {

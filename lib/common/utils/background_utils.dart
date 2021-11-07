@@ -217,12 +217,7 @@ class BackgroundUtils {
       logger.info(runtimeType, 'runBgRecurringTransTask: Show ${children.length} child notifications...');
 
       final futures = children
-          .map((t) => showNotification(
-                i18n.recurringTransactions,
-                t.description,
-                jsonEncode(AppNotification.openTransaction(t.id)),
-                id: t.id,
-              ))
+          .map((t) => showNotification(i18n.recurringTransactions, t.description, jsonEncode(AppNotification.openTransaction(t.id)), id: t.id))
           .toList();
 
       await Future.wait(futures);

@@ -83,6 +83,9 @@ class _CategoriesListPageState extends State<CategoriesListPage> with AutomaticK
     context.read<CategoryFormBloc>().add(const CategoryFormEvent.addCategory());
     await Navigator.of(context).push(route);
     await route.completed;
-    context.read<CategoryFormBloc>().add(const CategoryFormEvent.formClosed());
+
+    if (mounted) {
+      context.read<CategoryFormBloc>().add(const CategoryFormEvent.formClosed());
+    }
   }
 }

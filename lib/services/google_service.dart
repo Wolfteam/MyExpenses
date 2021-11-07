@@ -79,12 +79,15 @@ class GoogleServiceImpl implements GoogleService {
         runtimeType,
         'exchangeAuthCodeAndSaveCredentials: Changing code for an auth token...',
       );
-      final response = await http.post(Uri.parse(_tokenUrl), body: {
-        'client_id': Secrets.googleClientId,
-        'redirect_uri': _redirectUrl,
-        'grant_type': 'authorization_code',
-        'code': code,
-      });
+      final response = await http.post(
+        Uri.parse(_tokenUrl),
+        body: {
+          'client_id': Secrets.googleClientId,
+          'redirect_uri': _redirectUrl,
+          'grant_type': 'authorization_code',
+          'code': code,
+        },
+      );
 
       final json = jsonDecode(response.body);
       final token = json['access_token'] as String;

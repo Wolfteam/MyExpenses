@@ -97,21 +97,25 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
 
       final showLast7Days = DateTime.now().month == inThisDate.month;
       if (state is! _InitialState) {
-        _transactionsLast7DaysBloc.add(TransactionsLast7DaysEvent.init(
-          selectedType: TransactionType.incomes,
-          incomes: incomeTransPerWeek,
-          expenses: expenseTransPerWeek,
-          showLast7Days: showLast7Days,
-        ));
+        _transactionsLast7DaysBloc.add(
+          TransactionsLast7DaysEvent.init(
+            selectedType: TransactionType.incomes,
+            incomes: incomeTransPerWeek,
+            expenses: expenseTransPerWeek,
+            showLast7Days: showLast7Days,
+          ),
+        );
 
         return TransactionsState.initial(currentDate: inThisDate, transactionsPerMonth: transPerMonth, language: _settingsService.language);
       }
 
-      _transactionsLast7DaysBloc.add(TransactionsLast7DaysEvent.init(
-        incomes: incomeTransPerWeek,
-        expenses: expenseTransPerWeek,
-        showLast7Days: showLast7Days,
-      ));
+      _transactionsLast7DaysBloc.add(
+        TransactionsLast7DaysEvent.init(
+          incomes: incomeTransPerWeek,
+          expenses: expenseTransPerWeek,
+          showLast7Days: showLast7Days,
+        ),
+      );
 
       return currentState.copyWith.call(
         currentDate: inThisDate,
@@ -215,12 +219,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         map.addAll({mustExistDate: 0.0});
       }
 
-      final models = map.entries
-          .map((kvp) => TransactionsSummaryPerDay(
-                date: kvp.key,
-                totalDayAmount: kvp.value,
-              ))
-          .toList();
+      final models = map.entries.map((kvp) => TransactionsSummaryPerDay(date: kvp.key, totalDayAmount: kvp.value)).toList();
 
       models.sort((t1, t2) => t1.date.compareTo(t2.date));
       return models;

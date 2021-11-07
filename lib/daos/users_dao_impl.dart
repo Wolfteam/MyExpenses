@@ -1,6 +1,6 @@
 part of '../models/entities/database.dart';
 
-@UseDao(tables: [Users])
+@DriftAccessor(tables: [Users])
 class UsersDaoImpl extends DatabaseAccessor<AppDatabase> with _$UsersDaoImplMixin implements UsersDao {
   UsersDaoImpl(AppDatabase db) : super(db);
 
@@ -37,25 +37,27 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase> with _$UsersDaoImplMixi
       );
       await (update(users)..where((u) => u.id.equals(existingUser.id))).write(updatedFields);
     } else {
-      id = await into(users).insert(UsersCompanion.insert(
-        localStatus: LocalStatusType.nothing,
-        googleUserId: googleUserId,
-        isActive: const Value(false),
-        name: fullName,
-        email: email,
-        pictureUrl: Value(imgUrl),
-        createdBy: createdBy,
-        createdAt: now,
-        createdHash: createdHash([
-          googleUserId,
-          false,
-          fullName,
-          email,
-          imgUrl,
-          createdBy,
-          now,
-        ]),
-      ));
+      id = await into(users).insert(
+        UsersCompanion.insert(
+          localStatus: LocalStatusType.nothing,
+          googleUserId: googleUserId,
+          isActive: const Value(false),
+          name: fullName,
+          email: email,
+          pictureUrl: Value(imgUrl),
+          createdBy: createdBy,
+          createdAt: now,
+          createdHash: createdHash([
+            googleUserId,
+            false,
+            fullName,
+            email,
+            imgUrl,
+            createdBy,
+            now,
+          ]),
+        ),
+      );
     }
 
     await changeActiveUser(id);

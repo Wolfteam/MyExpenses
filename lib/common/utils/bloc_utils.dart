@@ -27,9 +27,7 @@ class BlocUtils {
     bool reloadDrawer = false,
     bool reloadSettings = false,
   }) {
-    debugPrint(
-      'Raising corresponding events for transactions, charts, incomes, expenses and drawer bloc',
-    );
+    debugPrint('Raising corresponding events for transactions, charts, incomes, expenses and drawer bloc');
 
     final now = DateTime.now();
     if (reloadTransactions) {
@@ -42,7 +40,7 @@ class BlocUtils {
     }
 
     if (reloadCharts) {
-      ctx.read<ChartsBloc>().add(ChartsEvent.loadChart(from: now));
+      ctx.read<ChartsBloc>().add(ChartsEvent.loadChart(selectedMonthDate: now, selectedYear: now.year));
     }
 
     if (reloadCategories) {

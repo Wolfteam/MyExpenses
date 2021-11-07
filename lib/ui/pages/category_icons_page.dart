@@ -19,25 +19,26 @@ class CategoryIconsPage extends StatelessWidget {
     final i18n = S.of(context);
 
     return BlocBuilder<CategoryIconBloc, CategoryIconState>(
-        builder: (ctx, state) => Scaffold(
-              appBar: AppBar(
-                title: Text(i18n.pickIcon),
-                leading: const BackButton(),
-                actions: <Widget>[
-                  IconButton(
-                    icon: const Icon(Icons.check),
-                    onPressed: () => _onIconSelected(context, state),
-                  ),
-                ],
-              ),
-              body: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: _buildCategoryIcons(context, state),
-                ),
-              ),
-            ));
+      builder: (ctx, state) => Scaffold(
+        appBar: AppBar(
+          title: Text(i18n.pickIcon),
+          leading: const BackButton(),
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.check),
+              onPressed: () => _onIconSelected(context, state),
+            ),
+          ],
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: _buildCategoryIcons(context, state),
+          ),
+        ),
+      ),
+    );
   }
 
   List<Widget> _buildCategoryIcons(BuildContext context, CategoryIconState state) {
@@ -77,7 +78,7 @@ class CategoryIconsPage extends StatelessWidget {
     final grid = GridView.count(
       childAspectRatio: orientation == Orientation.portrait ? 1.5 : 2,
       crossAxisCount: 4,
-      padding: const EdgeInsets.all(0),
+      padding: EdgeInsets.zero,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       children: List.generate(

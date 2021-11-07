@@ -106,17 +106,19 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
   ) async {
     final csvData = [
       <String>[i18n.id, i18n.description, i18n.amount, i18n.date, i18n.categoryName, i18n.type],
-      ...transactions.map((t) => [
-            t.id,
-            t.description,
-            _currencyBloc.format(t.amount),
-            DateUtils.formatDateWithoutLocale(
-              t.transactionDate,
-              DateUtils.monthDayAndYearFormat,
-            ),
-            t.category.name,
-            if (t.category.isAnIncome) i18n.income else i18n.expense,
-          ]),
+      ...transactions.map(
+        (t) => [
+          t.id,
+          t.description,
+          _currencyBloc.format(t.amount),
+          DateUtils.formatDateWithoutLocale(
+            t.transactionDate,
+            DateUtils.monthDayAndYearFormat,
+          ),
+          t.category.name,
+          if (t.category.isAnIncome) i18n.income else i18n.expense,
+        ],
+      ),
     ];
 
     final csv = const ListToCsvConverter().convert(csvData);

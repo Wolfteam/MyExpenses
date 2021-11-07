@@ -53,13 +53,15 @@ Future<void> initInjection() async {
   }
 
   if (!getIt.isRegistered<SyncService>()) {
-    getIt.registerSingleton<SyncService>(SyncServiceImpl(
-      getIt<LoggingService>(),
-      getIt<TransactionsDao>(),
-      getIt<CategoriesDao>(),
-      getIt<UsersDao>(),
-      getIt<GoogleService>(),
-      getIt<SecureStorageService>(),
-    ));
+    getIt.registerSingleton<SyncService>(
+      SyncServiceImpl(
+        getIt<LoggingService>(),
+        getIt<TransactionsDao>(),
+        getIt<CategoriesDao>(),
+        getIt<UsersDao>(),
+        getIt<GoogleService>(),
+        getIt<SecureStorageService>(),
+      ),
+    );
   }
 }
