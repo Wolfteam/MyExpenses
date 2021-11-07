@@ -201,5 +201,7 @@
   "rateMsg": "Si te gusta esta aplicación, por favor tomate un segundo para calificarla !\nAl hacerlo, me ayudas y además no te tomará más de un minuto.",
   "rate": "Calificar",
   "noThanks": "No gracias",
-  "maybeLater": "Quizás después"
+  "maybeLater": "Quizás después",
+  "yearly": "Anual",
+  "pickYear": "Selecciona un año"
 }
