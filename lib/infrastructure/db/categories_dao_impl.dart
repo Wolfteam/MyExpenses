@@ -1,4 +1,13 @@
-part of '../models/entities/database.dart';
+import 'package:drift/drift.dart';
+import 'package:my_expenses/domain/enums/enums.dart';
+import 'package:my_expenses/domain/models/drive.dart' as drive;
+import 'package:my_expenses/domain/models/entities.dart';
+import 'package:my_expenses/domain/models/entities/converters/db_converters.dart';
+import 'package:my_expenses/domain/models/entities/daos/categories_dao.dart';
+import 'package:my_expenses/domain/models/models.dart';
+import 'package:my_expenses/infrastructure/db/database.dart';
+
+part 'categories_dao_impl.g.dart';
 
 @DriftAccessor(tables: [Categories, Transactions])
 class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesDaoImplMixin implements CategoriesDao {
@@ -171,7 +180,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
   }
 
   @override
-  Future<List<sync_cat.Category>> getAllCategoriesToSync(int userId) {
+  Future<List<drive.Category>> getAllCategoriesToSync(int userId) {
     return (select(categories)
           ..where(
             (c) => c.localStatus.equals(LocalStatusType.deleted.index).not() & c.userId.equals(userId),
@@ -180,7 +189,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
             [(c) => OrderingTerm(expression: c.id)],
           ))
         .map(
-          (row) => sync_cat.Category(
+          (row) => drive.Category(
             createdAt: row.createdAt,
             createdBy: row.createdBy,
             createdHash: row.createdHash,
@@ -198,7 +207,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
   @override
   Future<void> syncDownDelete(
     int userId,
-    List<sync_cat.Category> existingCats,
+    List<drive.Category> existingCats,
   ) async {
     final catsInDb = await (select(categories)
           ..where(
@@ -230,7 +239,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
   @override
   Future<void> syncDownCreate(
     int userId,
-    List<sync_cat.Category> existingCats,
+    List<drive.Category> existingCats,
   ) async {
     final catsInDb = await (select(categories)..where((c) => c.userId.equals(userId))).get();
     final localCatsHash = catsInDb.map((c) => c.createdHash).toList();
@@ -263,7 +272,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
   @override
   Future<void> syncDownUpdate(
     int userId,
-    List<sync_cat.Category> existingCats,
+    List<drive.Category> existingCats,
   ) async {
     final existingCatsToUse = existingCats.where((t) => t.updatedAt != null).toList();
     final downloadedCatsHash = existingCatsToUse.map((c) => c.createdHash).toList();

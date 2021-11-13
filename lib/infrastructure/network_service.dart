@@ -1,8 +1,5 @@
 import 'package:internet_connection_checker/internet_connection_checker.dart';
-
-abstract class NetworkService {
-  Future<bool> isInternetAvailable();
-}
+import 'package:my_expenses/domain/services/services.dart';
 
 class NetworkServiceImpl implements NetworkService {
   @override

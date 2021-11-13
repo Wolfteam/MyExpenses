@@ -7,38 +7,11 @@ import 'package:googleapis/people/v1.dart' as people;
 import 'package:googleapis/sheets/v4.dart' as sheets;
 import 'package:googleapis_auth/auth_io.dart' as g_auth;
 import 'package:http/http.dart' as http;
+import 'package:my_expenses/domain/enums/enums.dart';
+import 'package:my_expenses/domain/models/models.dart';
+import 'package:my_expenses/domain/services/services.dart';
+import 'package:my_expenses/infrastructure/secrets.dart';
 import 'package:path/path.dart';
-
-import '../common/enums/secure_resource_type.dart';
-import '../models/user_item.dart';
-import '../secrets.dart';
-import '../services/logging_service.dart';
-import 'secure_storage_service.dart';
-
-abstract class GoogleService {
-  String get redirectUrl;
-
-  String getAuthUrl();
-
-  Future<bool> exchangeAuthCodeAndSaveCredentials(String code);
-
-  Future<UserItem> getUserInfo();
-
-  Future<bool> appFolderExist();
-
-  Future<String> uploadFile(String filePath);
-
-  Future<String> downloadFile(String fileName, String filePath);
-
-  Future<String> updateFile(
-    String fileId,
-    String filePath,
-  );
-
-  Future<Map<String, String>> getAllImgs(
-    String imgPrefix,
-  );
-}
 
 class GoogleServiceImpl implements GoogleService {
   final LoggingService _logger;
@@ -177,10 +150,7 @@ class GoogleServiceImpl implements GoogleService {
   }
 
   @override
-  Future<String> downloadFile(
-    String fileName,
-    String filePath,
-  ) async {
+  Future<String> downloadFile(String fileName, String filePath) async {
     try {
       final fileToSave = File(filePath);
       final fileExists = await fileToSave.exists();
@@ -277,10 +247,7 @@ class GoogleServiceImpl implements GoogleService {
   }
 
   @override
-  Future<String> updateFile(
-    String fileId,
-    String filePath,
-  ) async {
+  Future<String> updateFile(String fileId, String filePath) async {
     try {
       final localFile = File(filePath);
       _logger.info(
@@ -316,9 +283,7 @@ class GoogleServiceImpl implements GoogleService {
   }
 
   @override
-  Future<Map<String, String>> getAllImgs(
-    String imgPrefix,
-  ) async {
+  Future<Map<String, String>> getAllImages(String imgPrefix) async {
     try {
       final files = <drive.File>[];
       String? pageToken;
@@ -347,104 +312,44 @@ class GoogleServiceImpl implements GoogleService {
   }
 
   Future<g_auth.AccessCredentials?> _getAccessCredentials() async {
-    final currentUser = await _secureStorageService.get(
-      SecureResourceType.currentUser,
-      _secureStorageService.defaultUsername,
-    );
+    final currentUser = await _secureStorageService.get(SecureResourceType.currentUser, _secureStorageService.defaultUsername);
 
     if (currentUser == null) {
       return null;
     }
 
-    final type = await _secureStorageService.get(
-      SecureResourceType.accessTokenType,
-      currentUser,
-    );
+    final type = await _secureStorageService.get(SecureResourceType.accessTokenType, currentUser);
+    final data = await _secureStorageService.get(SecureResourceType.accessTokenData, currentUser);
+    final expiricy = await _secureStorageService.get(SecureResourceType.accessTokenExpiricy, currentUser);
+    final refreshToken = await _secureStorageService.get(SecureResourceType.refreshToken, currentUser);
 
-    final data = await _secureStorageService.get(
-      SecureResourceType.accessTokenData,
-      currentUser,
-    );
-
-    final expiricy = await _secureStorageService.get(
-      SecureResourceType.accessTokenExpiricy,
-      currentUser,
-    );
-
-    final refreshToken = await _secureStorageService.get(
-      SecureResourceType.refreshToken,
-      currentUser,
-    );
     if (type == null || data == null || expiricy == null || refreshToken == null) {
       return null;
     }
 
-    final accessToken = g_auth.AccessToken(
-      type,
-      data,
-      DateTime.parse(expiricy),
-    );
-
-    final credentials = g_auth.AccessCredentials(
-      accessToken,
-      refreshToken,
-      _scopes,
-    );
-
+    final accessToken = g_auth.AccessToken(type, data, DateTime.parse(expiricy));
+    final credentials = g_auth.AccessCredentials(accessToken, refreshToken, _scopes);
     return credentials;
   }
 
-  Future<bool> _saveAccessCredentials(
-    g_auth.AccessCredentials credentials,
-  ) async {
+  Future<bool> _saveAccessCredentials(g_auth.AccessCredentials credentials) async {
     try {
-      _logger.info(
-        runtimeType,
-        '_saveAccessCredentials: Trying to save access credentials...',
-      );
+      _logger.info(runtimeType, '_saveAccessCredentials: Trying to save access credentials...');
       final accessToken = credentials.accessToken;
       final refreshToken = credentials.refreshToken;
       await Future.wait([
-        _secureStorageService.save(
-          SecureResourceType.accessTokenData,
-          _secureStorageService.defaultUsername,
-          accessToken.data,
-        ),
-        _secureStorageService.save(
-          SecureResourceType.accessTokenExpiricy,
-          _secureStorageService.defaultUsername,
-          accessToken.expiry.toString(),
-        ),
-        _secureStorageService.save(
-          SecureResourceType.accessTokenType,
-          _secureStorageService.defaultUsername,
-          accessToken.type,
-        ),
-        _secureStorageService.save(
-          SecureResourceType.refreshToken,
-          _secureStorageService.defaultUsername,
-          refreshToken!,
-        ),
-        _secureStorageService.save(
-          SecureResourceType.currentUser,
-          _secureStorageService.defaultUsername,
-          _secureStorageService.defaultUsername,
-        ),
+        _secureStorageService.save(SecureResourceType.accessTokenData, _secureStorageService.defaultUsername, accessToken.data),
+        _secureStorageService.save(SecureResourceType.accessTokenExpiricy, _secureStorageService.defaultUsername, accessToken.expiry.toString()),
+        _secureStorageService.save(SecureResourceType.accessTokenType, _secureStorageService.defaultUsername, accessToken.type),
+        _secureStorageService.save(SecureResourceType.refreshToken, _secureStorageService.defaultUsername, refreshToken!),
+        _secureStorageService.save(SecureResourceType.currentUser, _secureStorageService.defaultUsername, _secureStorageService.defaultUsername),
       ]);
 
-      _logger.info(
-        runtimeType,
-        '_saveAccessCredentials: Access credentials were successfully saved',
-      );
+      _logger.info(runtimeType, '_saveAccessCredentials: Access credentials were successfully saved');
 
       return true;
     } catch (e, s) {
-      _logger.error(
-        runtimeType,
-        '_saveAccessCredentials: Unknown error occurred...',
-        e,
-        s,
-      );
+      _logger.error(runtimeType, '_saveAccessCredentials: Unknown error occurred...', e, s);
       return false;
     }
   }
@@ -453,32 +358,19 @@ class GoogleServiceImpl implements GoogleService {
     _logger.info(runtimeType, '_getAuthClient: Getting auth client...');
     var credentials = await _getAccessCredentials();
     if (credentials == null) {
-      _logger.warning(runtimeType, '_getAuthClient: Credentials doesnt exist');
+      _logger.warning(runtimeType, '_getAuthClient: Credentials does not exist');
       throw Exception('Credentials does not exist');
     }
 
     if (credentials.accessToken.hasExpired) {
-      _logger.info(
-        runtimeType,
-        '_getAuthClient: Token expired, updating it...',
-      );
-      credentials = await g_auth.refreshCredentials(
-        g_auth.ClientId(Secrets.googleClientId, ''),
-        credentials,
-        http.Client(),
-      );
+      _logger.info(runtimeType, '_getAuthClient: Token expired, updating it...');
+      credentials = await g_auth.refreshCredentials(g_auth.ClientId(Secrets.googleClientId, ''), credentials, http.Client());
 
-      _logger.info(
-        runtimeType,
-        '_getAuthClient: Token was updated, saving it...',
-      );
+      _logger.info(runtimeType, '_getAuthClient: Token was updated, saving it...');
       await _saveAccessCredentials(credentials);
     }
 
-    final client = g_auth.authenticatedClient(
-      http.Client(),
-      credentials,
-    );
+    final client = g_auth.authenticatedClient(http.Client(), credentials);
 
     _logger.info(runtimeType, '_getAuthClient: Returning auth client...');
     return client;

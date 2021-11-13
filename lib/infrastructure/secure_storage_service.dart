@@ -1,25 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
-import '../common/enums/secure_resource_type.dart';
-
-abstract class SecureStorageService {
-  String get defaultUsername;
-
-  Future<void> save(SecureResourceType resource, String username, String value);
-
-  Future<String?> get(SecureResourceType resource, String username);
-
-  Future<void> delete(SecureResourceType resource, String username);
-
-  Future<void> deleteAll(String username);
-
-  Future<void> update(
-    SecureResourceType resource,
-    String username,
-    bool updateUsername,
-    String newValueOrOwner,
-  );
-}
+import 'package:my_expenses/domain/enums/enums.dart';
+import 'package:my_expenses/domain/services/services.dart';
 
 class SecureStorageServiceImpl implements SecureStorageService {
   final _storage = const FlutterSecureStorage();
@@ -28,11 +9,7 @@ class SecureStorageServiceImpl implements SecureStorageService {
   String get defaultUsername => 'DefaultUser';
 
   @override
-  Future<void> save(
-    SecureResourceType resource,
-    String username,
-    String value,
-  ) {
+  Future<void> save(SecureResourceType resource, String username, String value) {
     final key = _buildKey(resource, username);
     return _storage.write(key: key, value: value);
   }
@@ -59,12 +36,7 @@ class SecureStorageServiceImpl implements SecureStorageService {
   }
 
   @override
-  Future<void> update(
-    SecureResourceType resource,
-    String username,
-    bool updateUsername,
-    String newValueOrOwner,
-  ) async {
+  Future<void> update(SecureResourceType resource, String username, bool updateUsername, String newValueOrOwner) async {
     if (updateUsername) {
       final currentSecret = await get(resource, username);
       await delete(resource, username);

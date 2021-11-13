@@ -1,4 +1,11 @@
-part of '../models/entities/database.dart';
+import 'package:drift/drift.dart';
+import 'package:my_expenses/domain/enums/enums.dart';
+import 'package:my_expenses/domain/models/entities.dart';
+import 'package:my_expenses/domain/models/entities/daos/users_dao.dart';
+import 'package:my_expenses/domain/models/models.dart';
+import 'package:my_expenses/infrastructure/db/database.dart';
+
+part 'users_dao_impl.g.dart';
 
 @DriftAccessor(tables: [Users])
 class UsersDaoImpl extends DatabaseAccessor<AppDatabase> with _$UsersDaoImplMixin implements UsersDao {

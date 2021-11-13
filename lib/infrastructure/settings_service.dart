@@ -1,51 +1,12 @@
+import 'package:my_expenses/domain/enums/enums.dart';
+import 'package:my_expenses/domain/models/models.dart';
+import 'package:my_expenses/domain/services/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../common/enums/app_accent_color_type.dart';
-import '../common/enums/app_language_type.dart';
-import '../common/enums/app_theme_type.dart';
-import '../common/enums/currency_symbol_type.dart';
-import '../common/enums/sync_intervals_type.dart';
-import '../models/app_settings.dart';
-import 'logging_service.dart';
-
-abstract class SettingsService {
-  AppSettings get appSettings;
-
-  AppThemeType get appTheme;
-  set appTheme(AppThemeType theme);
-
-  AppAccentColorType get accentColor;
-  set accentColor(AppAccentColorType accentColor);
-
-  AppLanguageType get language;
-  set language(AppLanguageType lang);
-
-  SyncIntervalType get syncInterval;
-  set syncInterval(SyncIntervalType interval);
-
-  bool get showNotifAfterFullSync;
-  set showNotifAfterFullSync(bool show);
-
-  bool get askForPassword;
-  set askForPassword(bool ask);
-
-  bool get askForFingerPrint;
-  set askForFingerPrint(bool ask);
-
-  CurrencySymbolType get currencySymbol;
-  set currencySymbol(CurrencySymbolType type);
-
-  bool get currencyToTheRight;
-  set currencyToTheRight(bool toTheRight);
-
-  bool get showNotifForRecurringTrans;
-  set showNotifForRecurringTrans(bool show);
-
-  bool get isRecurringTransTaskRegistered;
-  set isRecurringTransTaskRegistered(bool itIs);
-
-  Future init();
-}
+const _languagesMap = {
+  AppLanguageType.english: LanguageModel('en', 'US'),
+  AppLanguageType.spanish: LanguageModel('es', 'ES'),
+};
 
 class SettingsServiceImpl implements SettingsService {
   final _appThemeKey = 'AppTheme';
@@ -84,67 +45,69 @@ class SettingsServiceImpl implements SettingsService {
 
   @override
   AppThemeType get appTheme => AppThemeType.values[(_prefs.getInt(_appThemeKey))!];
+
   @override
   set appTheme(AppThemeType theme) => _prefs.setInt(_appThemeKey, theme.index);
 
   @override
   AppAccentColorType get accentColor => AppAccentColorType.values[_prefs.getInt(_accentColorKey)!];
+
   @override
   set accentColor(AppAccentColorType accentColor) => _prefs.setInt(_accentColorKey, accentColor.index);
 
   @override
   AppLanguageType get language => AppLanguageType.values[_prefs.getInt(_appLanguageKey)!];
+
   @override
   set language(AppLanguageType lang) => _prefs.setInt(_appLanguageKey, lang.index);
 
   @override
   SyncIntervalType get syncInterval => SyncIntervalType.values[_prefs.getInt(_syncIntervalKey)!];
+
   @override
   set syncInterval(SyncIntervalType interval) => _prefs.setInt(_syncIntervalKey, interval.index);
 
   @override
   bool get showNotifAfterFullSync => _prefs.getBool(_showNotifAfterFullSyncKey)!;
+
   @override
-  set showNotifAfterFullSync(bool show) => _prefs.setBool(
-        _showNotifAfterFullSyncKey,
-        show,
-      );
+  set showNotifAfterFullSync(bool show) => _prefs.setBool(_showNotifAfterFullSyncKey, show);
 
   @override
   bool get askForPassword => _prefs.getBool(_askForPasswordKey)!;
+
   @override
   set askForPassword(bool ask) => _prefs.setBool(_askForPasswordKey, ask);
 
   @override
   bool get askForFingerPrint => _prefs.getBool(_askForFingerPrintKey)!;
+
   @override
   set askForFingerPrint(bool ask) => _prefs.setBool(_askForFingerPrintKey, ask);
 
   @override
   CurrencySymbolType get currencySymbol => CurrencySymbolType.values[_prefs.getInt(_currencySymbolKey)!];
+
   @override
   set currencySymbol(CurrencySymbolType type) => _prefs.setInt(_currencySymbolKey, type.index);
 
   @override
   bool get currencyToTheRight => _prefs.getBool(_currencyToTheRightKey)!;
+
   @override
   set currencyToTheRight(bool toTheRight) => _prefs.setBool(_currencyToTheRightKey, toTheRight);
 
   @override
   bool get showNotifForRecurringTrans => _prefs.getBool(_showNotifForRecurringTransKey)!;
+
   @override
-  set showNotifForRecurringTrans(bool show) => _prefs.setBool(
-        _showNotifForRecurringTransKey,
-        show,
-      );
+  set showNotifForRecurringTrans(bool show) => _prefs.setBool(_showNotifForRecurringTransKey, show);
 
   @override
   bool get isRecurringTransTaskRegistered => _prefs.getBool(_recurringTransTaskIsRegisteredKey)!;
+
   @override
-  set isRecurringTransTaskRegistered(bool itIs) => _prefs.setBool(
-        _recurringTransTaskIsRegisteredKey,
-        itIs,
-      );
+  set isRecurringTransTaskRegistered(bool itIs) => _prefs.setBool(_recurringTransTaskIsRegisteredKey, itIs);
 
   SettingsServiceImpl(this._logger);
 
@@ -180,10 +143,7 @@ class SettingsServiceImpl implements SettingsService {
     }
 
     if (_prefs.get(_showNotifAfterFullSyncKey) == null) {
-      _logger.info(
-        runtimeType,
-        'Setting show notif after full sync to false...',
-      );
+      _logger.info(runtimeType, 'Setting show notif after full sync to false...');
       _prefs.setBool(_showNotifAfterFullSyncKey, false);
     }
 
@@ -198,10 +158,7 @@ class SettingsServiceImpl implements SettingsService {
     }
 
     if (_prefs.get(_currencySymbolKey) == null) {
-      _logger.info(
-        runtimeType,
-        'Setting current currency to ${CurrencySymbolType.dolar}...',
-      );
+      _logger.info(runtimeType, 'Setting current currency to ${CurrencySymbolType.dolar}...');
       _prefs.setInt(_currencySymbolKey, CurrencySymbolType.dolar.index);
     }
 
@@ -211,22 +168,22 @@ class SettingsServiceImpl implements SettingsService {
     }
 
     if (_prefs.get(_showNotifForRecurringTransKey) == null) {
-      _logger.info(
-        runtimeType,
-        'Setting show notif for recurring trans to false...',
-      );
+      _logger.info(runtimeType, 'Setting show notif for recurring trans to false...');
       _prefs.setBool(_showNotifForRecurringTransKey, false);
     }
 
     if (_prefs.get(_recurringTransTaskIsRegisteredKey) == null) {
-      _logger.info(
-        runtimeType,
-        'Setting recurring trans task is registered to false...',
-      );
+      _logger.info(runtimeType, 'Setting recurring trans task is registered to false...');
       _prefs.setBool(_recurringTransTaskIsRegisteredKey, false);
     }
 
     _initialized = true;
     _logger.info(runtimeType, 'Settings were initialized successfully');
   }
+
+  @override
+  LanguageModel getLanguageModel(AppLanguageType lang) => _languagesMap.entries.firstWhere((kvp) => kvp.key == lang).value;
+
+  @override
+  LanguageModel getCurrentLanguageModel() => _languagesMap.entries.firstWhere((kvp) => kvp.key == language).value;
 }
