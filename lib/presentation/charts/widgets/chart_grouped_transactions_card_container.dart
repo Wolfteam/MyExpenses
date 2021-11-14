@@ -26,10 +26,8 @@ class ChartGroupedTransactionsCardContainer extends StatelessWidget {
     final currencyBloc = context.read<CurrencyBloc>();
 
     return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      margin: const EdgeInsets.all(10),
+      shape: Styles.transactionCardShape,
+      margin: Styles.edgeInsetAll10,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[

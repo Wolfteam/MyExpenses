@@ -7,6 +7,7 @@ import 'package:my_expenses/presentation/settings/widgets/language_settings_card
 import 'package:my_expenses/presentation/settings/widgets/others_settings_card.dart';
 import 'package:my_expenses/presentation/settings/widgets/sync_settings_card.dart';
 import 'package:my_expenses/presentation/settings/widgets/theme_settings_card.dart';
+import 'package:my_expenses/presentation/shared/styles.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -21,10 +22,12 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
   Widget build(BuildContext context) {
     super.build(context);
     return Padding(
-      padding: const EdgeInsets.all(5),
+      padding: Styles.edgeInsetAll5,
       child: BlocBuilder<SettingsBloc, SettingsState>(
         builder: (ctx, state) {
           return ListView(
+            //without this it crashes on windows...
+            controller: ScrollController(),
             children: state.map(
               loading: (_) => [const Center(child: CircularProgressIndicator())],
               initial: (state) => [

@@ -21,9 +21,7 @@ class ChartDetailsBloc extends Bloc<ChartDetailsEvent, ChartDetailsState> {
   ChartDetailsBloc() : super(_defaultState);
 
   @override
-  Stream<ChartDetailsState> mapEventToState(
-    ChartDetailsEvent event,
-  ) async* {
+  Stream<ChartDetailsState> mapEventToState(ChartDetailsEvent event) async* {
     final s = event.map(
       initialize: (e) => state.copyWith.call(transactions: e.transactions),
       filterChanged: (e) => _sort(e.selectedFilter, state.sortDirection),

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
-import 'package:darq/darq.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
@@ -42,9 +41,7 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
   ) : super(_defaultState);
 
   @override
-  Stream<ChartsState> mapEventToState(
-    ChartsEvent event,
-  ) async* {
+  Stream<ChartsState> mapEventToState(ChartsEvent event) async* {
     yield _defaultState;
     final s = await event.map(loadChart: (e) async => _buildLoadedState(e.selectedMonthDate, e.selectedYear));
     yield s;

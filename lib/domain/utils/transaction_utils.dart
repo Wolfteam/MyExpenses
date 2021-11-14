@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:collection/collection.dart';
+import 'package:darq/darq.dart' show SelectExtension, DistinctExtension;
 import 'package:intl/intl.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/models/models.dart';
@@ -117,5 +119,19 @@ class TransactionUtils {
     }
 
     return models;
+  }
+
+  static List<ChartTransactionItem> buildChartTransactionItems(List<TransactionItem> transactions, {bool onlyIncomes = true}) {
+    final items = <ChartTransactionItem>[];
+    final cats = transactions.where((t) => t.category.isAnIncome == onlyIncomes).select((element, index) => element.category.id).distinct().toList();
+
+    for (var i = 0; i < cats.length; i++) {
+      final catId = cats[i];
+      final category = transactions.firstWhere((t) => t.category.id == catId).category;
+      final double amount = transactions.where((t) => t.category.id == catId).map((e) => e.amount).sum;
+      items.add(ChartTransactionItem(value: amount, order: i, categoryColor: category.iconColor));
+    }
+
+    return items;
   }
 }
