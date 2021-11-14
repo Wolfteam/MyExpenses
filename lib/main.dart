@@ -105,7 +105,8 @@ class MyApp extends StatelessWidget {
               final secureStorage = getIt<SecureStorageService>();
               final bgService = getIt<BackgroundService>();
               final deviceInfoService = getIt<DeviceInfoService>();
-              return SettingsBloc(settingsService, secureStorage, bgService, deviceInfoService, getIt<UsersDao>(), ctx.read<AppBloc>());
+              return SettingsBloc(settingsService, secureStorage, bgService, deviceInfoService, getIt<UsersDao>(), ctx.read<AppBloc>())
+                ..add(const SettingsEvent.load());
             },
           ),
           BlocProvider(
@@ -139,17 +140,6 @@ class MyApp extends StatelessWidget {
               final notificationService = getIt<NotificationService>();
               final deviceInfoService = getIt<DeviceInfoService>();
               return ReportsBloc(logger, transactionsDao, pathService, notificationService, deviceInfoService, usersDao, currencyBloc);
-            },
-          ),
-          BlocProvider(
-            create: (ctx) {
-              final logger = getIt<LoggingService>();
-              final categoriesDao = getIt<CategoriesDao>();
-              final transactionsDao = getIt<TransactionsDao>();
-              final usersDao = getIt<UsersDao>();
-              final secureStorage = getIt<SecureStorageService>();
-              final pathService = getIt<PathService>();
-              return UserAccountsBloc(logger, categoriesDao, transactionsDao, usersDao, secureStorage, pathService);
             },
           ),
           BlocProvider(

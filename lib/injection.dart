@@ -20,6 +20,16 @@ class Injection {
     return PasswordDialogBloc(logger, secureStorage);
   }
 
+  static UserAccountsBloc get userAccountsBloc {
+    final logger = getIt<LoggingService>();
+    final categoriesDao = getIt<CategoriesDao>();
+    final transactionsDao = getIt<TransactionsDao>();
+    final usersDao = getIt<UsersDao>();
+    final secureStorage = getIt<SecureStorageService>();
+    final pathService = getIt<PathService>();
+    return UserAccountsBloc(logger, categoriesDao, transactionsDao, usersDao, secureStorage, pathService);
+  }
+
   static Future<void> init() async {
     if (!getIt.isRegistered<NetworkService>()) {
       getIt.registerSingleton<NetworkService>(NetworkServiceImpl());

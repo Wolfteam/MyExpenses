@@ -8,6 +8,8 @@ class CommonDropdownButton<T> extends StatelessWidget {
   final Function(T, BuildContext)? onChanged;
   final bool isExpanded;
   final bool withoutUnderLine;
+  final bool isDense;
+  final DropdownButtonBuilder? selectedItemBuilder;
 
   const CommonDropdownButton({
     Key? key,
@@ -17,6 +19,8 @@ class CommonDropdownButton<T> extends StatelessWidget {
     this.onChanged,
     this.isExpanded = true,
     this.withoutUnderLine = true,
+    this.isDense = false,
+    this.selectedItemBuilder,
   }) : super(key: key);
 
   @override
@@ -25,6 +29,7 @@ class CommonDropdownButton<T> extends StatelessWidget {
       isExpanded: isExpanded,
       hint: Text(hint),
       value: currentValue,
+      isDense: isDense,
       underline: withoutUnderLine
           ? Container(
               height: 0,
@@ -32,14 +37,15 @@ class CommonDropdownButton<T> extends StatelessWidget {
             )
           : null,
       onChanged: onChanged != null ? (v) => onChanged!(v as T, context) : null,
-      selectedItemBuilder: (context) => values
-          .map(
-            (lang) => Align(
-              alignment: Alignment.centerLeft,
-              child: Text(lang.translation, textAlign: TextAlign.center),
-            ),
-          )
-          .toList(),
+      selectedItemBuilder: selectedItemBuilder ??
+          (context) => values
+              .map(
+                (lang) => Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(lang.translation, textAlign: TextAlign.center),
+                ),
+              )
+              .toList(),
       items: values
           .map<DropdownMenuItem<T>>(
             (lang) => DropdownMenuItem<T>(

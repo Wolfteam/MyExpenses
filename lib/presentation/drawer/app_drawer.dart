@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -182,15 +181,9 @@ class AppDrawer extends StatelessWidget {
 
   Future<void> _showReportSheet(BuildContext context) async {
     Navigator.pop(context);
-    context.read<ReportsBloc>().add(const ReportsEvent.resetReportSheet());
     //TODO: IF THE CONTENT IS TO LARGE, WE CANT CLOSE THE SHEET
     await showModalBottomSheet(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(35),
-          topLeft: Radius.circular(35),
-        ),
-      ),
+      shape: Styles.modalBottomSheetShape,
       isDismissible: true,
       isScrollControlled: true,
       context: context,
@@ -247,15 +240,8 @@ class AppDrawer extends StatelessWidget {
 
   Future<void> _signIn(BuildContext context, DrawerState state) async {
     Navigator.pop(context);
-    context.read<UserAccountsBloc>().add(const UserAccountsEvent.init());
-
-    showModalBottomSheet(
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(35),
-          topLeft: Radius.circular(35),
-        ),
-      ),
+    return showModalBottomSheet(
+      shape: Styles.modalBottomSheetShape,
       isDismissible: true,
       isScrollControlled: true,
       context: context,
