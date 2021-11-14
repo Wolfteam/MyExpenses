@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/generated/l10n.dart';
+import 'package:my_expenses/presentation/shared/dialogs/confirm_dialog.dart';
 
 class UserAccountItem extends StatelessWidget {
   final int id;
@@ -52,32 +53,14 @@ class UserAccountItem extends StatelessWidget {
   }
 
   void _showDeleteDialog(BuildContext context) {
-    final theme = Theme.of(context);
     final i18n = S.of(context);
-
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(i18n.confirmation),
-        content: Text(i18n.deleteX(fullname)),
-        actions: <Widget>[
-          OutlinedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-            },
-            child: Text(
-              i18n.cancel,
-              style: TextStyle(color: theme.primaryColor),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              context.read<UserAccountsBloc>().add(UserAccountsEvent.deleteAccount(id: id));
-            },
-            child: Text(i18n.yes),
-          ),
-        ],
+      builder: (ctx) => ConfirmDialog(
+        title: i18n.confirmation,
+        content: i18n.deleteX(fullname),
+        okText: i18n.yes,
+        onOk: () => context.read<UserAccountsBloc>().add(UserAccountsEvent.deleteAccount(id: id)),
       ),
     );
   }

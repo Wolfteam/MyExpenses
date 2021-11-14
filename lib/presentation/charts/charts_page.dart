@@ -17,6 +17,7 @@ class ChartsPage extends StatefulWidget {
   _ChartsPageState createState() => _ChartsPageState();
 }
 
+//TODO: MAYBE IMPROVE THIS BLOC AND THE DETAILS ONE
 class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMixin<ChartsPage> {
   @override
   bool get wantKeepAlive => true;

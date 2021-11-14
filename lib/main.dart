@@ -82,7 +82,7 @@ class MyApp extends StatelessWidget {
               final usersDao = getIt<UsersDao>();
               final categoriesDao = getIt<CategoriesDao>();
               final bgService = getIt<BackgroundService>();
-              return DrawerBloc(logger, usersDao, categoriesDao, bgService);
+              return DrawerBloc(logger, usersDao, categoriesDao, bgService)..add(const DrawerEvent.init());
             },
           ),
           BlocProvider(
@@ -121,7 +121,6 @@ class MyApp extends StatelessWidget {
                 ..add(ChartsEvent.loadChart(selectedMonthDate: now, selectedYear: now.year));
             },
           ),
-          BlocProvider(create: (ctx) => ChartDetailsBloc()),
           BlocProvider(
             create: (ctx) {
               final logger = getIt<LoggingService>();

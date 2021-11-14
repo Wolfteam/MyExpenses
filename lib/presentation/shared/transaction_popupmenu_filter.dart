@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/shared/extensions/i18n_extensions.dart';
+import 'package:my_expenses/presentation/shared/styles.dart';
 
 class TransactionPopupMenuFilter extends StatelessWidget {
   // final TransactionFilterType initialValue;
@@ -31,13 +32,18 @@ class TransactionPopupMenuFilter extends StatelessWidget {
         )
         .toList();
 
-    return PopupMenuButton<TransactionFilterType>(
-      padding: EdgeInsets.zero,
-      initialValue: selectedValue,
-      icon: const Icon(Icons.filter_list),
-      onSelected: onSelected,
-      itemBuilder: (context) => values,
-      tooltip: i18n.sortType,
+    return ClipRRect(
+      borderRadius: Styles.popupMenuButtonRadius,
+      child: Material(
+        child: PopupMenuButton<TransactionFilterType>(
+          padding: EdgeInsets.zero,
+          initialValue: selectedValue,
+          icon: const Icon(Icons.filter_list),
+          onSelected: onSelected,
+          itemBuilder: (context) => values,
+          tooltip: i18n.sortType,
+        ),
+      ),
     );
   }
 }

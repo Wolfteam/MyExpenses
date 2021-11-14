@@ -25,9 +25,7 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
   ) : super(const DrawerState.loaded(selectedPage: AppDrawerItemType.transactions));
 
   @override
-  Stream<DrawerState> mapEventToState(
-    DrawerEvent event,
-  ) async* {
+  Stream<DrawerState> mapEventToState(DrawerEvent event) async* {
     final s = await event.map(
       init: (_) async => _initialize(),
       selectedItemChanged: (e) async => state.copyWith(

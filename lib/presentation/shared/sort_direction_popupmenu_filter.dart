@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/shared/extensions/i18n_extensions.dart';
+import 'package:my_expenses/presentation/shared/styles.dart';
 
 class SortDirectionPopupMenuFilter extends StatelessWidget {
   final SortDirectionType selectedSortDirection;
@@ -23,13 +24,19 @@ class SortDirectionPopupMenuFilter extends StatelessWidget {
         child: Text(i18n.getSortDirectionName(direction)),
       );
     }).toList();
-    return PopupMenuButton<SortDirectionType>(
-      padding: EdgeInsets.zero,
-      initialValue: selectedSortDirection,
-      icon: const Icon(Icons.sort),
-      onSelected: onSelected,
-      itemBuilder: (context) => values,
-      tooltip: i18n.sortDirection,
+    return ClipRRect(
+      borderRadius: Styles.popupMenuButtonRadius,
+      child: Material(
+        child: PopupMenuButton<SortDirectionType>(
+          padding: EdgeInsets.zero,
+          initialValue: selectedSortDirection,
+          icon: const Icon(Icons.sort),
+          onSelected: onSelected,
+          // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          itemBuilder: (context) => values,
+          tooltip: i18n.sortDirection,
+        ),
+      ),
     );
   }
 }

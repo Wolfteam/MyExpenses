@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:my_expenses/application/app/app_bloc.dart';
-import 'package:my_expenses/application/drawer/drawer_bloc.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/main/main_page.dart';
@@ -62,9 +61,7 @@ class _AppWidgetState extends State<AppWidget> {
             );
           }
 
-          ctx.read<DrawerBloc>().add(const DrawerEvent.init());
           final locale = _getLocale(state.language);
-
           return MaterialApp(
             home: MainPage(),
             theme: theme,
