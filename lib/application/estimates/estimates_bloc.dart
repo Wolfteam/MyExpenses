@@ -11,9 +11,7 @@ import 'package:my_expenses/domain/utils/date_utils.dart';
 import 'package:my_expenses/domain/utils/transaction_utils.dart';
 
 part 'estimates_bloc.freezed.dart';
-
 part 'estimates_event.dart';
-
 part 'estimates_state.dart';
 
 class EstimatesBloc extends Bloc<EstimatesEvent, EstimatesState> {

@@ -27,6 +27,7 @@ class SortDirectionPopupMenuFilter extends StatelessWidget {
     return ClipRRect(
       borderRadius: Styles.popupMenuButtonRadius,
       child: Material(
+        color: Colors.transparent,
         child: PopupMenuButton<SortDirectionType>(
           padding: EdgeInsets.zero,
           initialValue: selectedSortDirection,

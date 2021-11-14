@@ -35,6 +35,7 @@ class TransactionPopupMenuFilter extends StatelessWidget {
     return ClipRRect(
       borderRadius: Styles.popupMenuButtonRadius,
       child: Material(
+        color: Colors.transparent,
         child: PopupMenuButton<TransactionFilterType>(
           padding: EdgeInsets.zero,
           initialValue: selectedValue,

@@ -127,8 +127,6 @@ class AppDrawerItem extends StatelessWidget {
 
   void _showSearchPage(BuildContext context) {
     Navigator.pop(context);
-    //TODO: THIS BLOC
-    context.read<SearchBloc>().add(const SearchEvent.init());
     Navigator.push(context, SearchPage.route());
   }
 

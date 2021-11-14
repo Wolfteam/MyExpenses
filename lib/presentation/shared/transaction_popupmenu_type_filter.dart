@@ -36,21 +36,27 @@ class TransactionPopupMenuTypeFilter extends StatelessWidget {
       assert(selectedValue != null, 'You need to provide a selected value if you are not showing the NA value');
     }
 
-    return PopupMenuButton<int>(
-      padding: Styles.edgeInsetAll0,
-      tooltip: i18n.transactionType,
-      initialValue: selectedValue == null ? nothingSelected : selectedValue!.index,
-      onSelected: onSelectedValue,
-      itemBuilder: (context) => <PopupMenuEntry<int>>[
-        if (showNa)
-          CheckedPopupMenuItem<int>(
-            checked: selectedValue == null,
-            value: nothingSelected,
-            child: Text(i18n.na),
-          ),
-        income,
-        expense,
-      ],
+    return ClipRRect(
+      borderRadius: Styles.popupMenuButtonRadius,
+      child: Material(
+        color: Colors.transparent,
+        child: PopupMenuButton<int>(
+          padding: Styles.edgeInsetAll0,
+          tooltip: i18n.transactionType,
+          initialValue: selectedValue == null ? nothingSelected : selectedValue!.index,
+          onSelected: onSelectedValue,
+          itemBuilder: (context) => <PopupMenuEntry<int>>[
+            if (showNa)
+              CheckedPopupMenuItem<int>(
+                checked: selectedValue == null,
+                value: nothingSelected,
+                child: Text(i18n.na),
+              ),
+            income,
+            expense,
+          ],
+        ),
+      ),
     );
   }
 }

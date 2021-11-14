@@ -20,4 +20,6 @@ class Styles {
   static const textStyleGrey12 = TextStyle(fontSize: 12, color: Colors.grey);
 
   static final popupMenuButtonRadius = BorderRadius.circular(18);
+
+  static const double iconButtonSplashRadius = 20;
 }
