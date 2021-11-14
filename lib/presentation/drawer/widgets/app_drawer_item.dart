@@ -116,9 +116,6 @@ class AppDrawerItem extends StatelessWidget {
 
   void _showEstimatesBottomSheet(BuildContext context) {
     Navigator.pop(context);
-    //TODO: THIS BLOC
-    context.read<EstimatesBloc>().add(EstimatesEvent.load());
-
     showModalBottomSheet(
       shape: Styles.modalBottomSheetShape,
       isDismissible: true,

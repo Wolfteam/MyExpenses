@@ -11,7 +11,9 @@ import 'package:my_expenses/domain/utils/date_utils.dart';
 import 'package:my_expenses/domain/utils/transaction_utils.dart';
 
 part 'estimates_bloc.freezed.dart';
+
 part 'estimates_event.dart';
+
 part 'estimates_state.dart';
 
 class EstimatesBloc extends Bloc<EstimatesEvent, EstimatesState> {
@@ -25,9 +27,7 @@ class EstimatesBloc extends Bloc<EstimatesEvent, EstimatesState> {
   _EstimatesInitialState get currentState => state as _EstimatesInitialState;
 
   @override
-  Stream<EstimatesState> mapEventToState(
-    EstimatesEvent event,
-  ) async* {
+  Stream<EstimatesState> mapEventToState(EstimatesEvent event) async* {
     final s = event.map(
       load: (_) async => _calculateAmounts(
         0,

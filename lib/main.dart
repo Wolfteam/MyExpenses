@@ -151,15 +151,6 @@ class MyApp extends StatelessWidget {
               final settingsService = getIt<SettingsService>();
               final usersDao = getIt<UsersDao>();
               final transactionsDao = getIt<TransactionsDao>();
-              return EstimatesBloc(logger, settingsService, usersDao, transactionsDao);
-            },
-          ),
-          BlocProvider(
-            create: (ctx) {
-              final logger = getIt<LoggingService>();
-              final settingsService = getIt<SettingsService>();
-              final usersDao = getIt<UsersDao>();
-              final transactionsDao = getIt<TransactionsDao>();
               return SearchBloc(logger, transactionsDao, usersDao, settingsService);
             },
           ),
