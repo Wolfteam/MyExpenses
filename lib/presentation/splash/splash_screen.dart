@@ -1,0 +1,106 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:local_auth/auth_strings.dart';
+import 'package:local_auth/local_auth.dart';
+import 'package:my_expenses/application/bloc.dart';
+import 'package:my_expenses/domain/models/models.dart';
+import 'package:my_expenses/generated/l10n.dart';
+import 'package:my_expenses/presentation/settings/widgets/password_bottom_sheet.dart';
+import 'package:my_expenses/presentation/shared/custom_assets.dart';
+import 'package:my_expenses/presentation/shared/extensions/i18n_extensions.dart';
+
+class SplashScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<SplashScreenBloc, SplashScreenState>(
+      listener: (ctx, state) async {
+        await state.map(
+          initial: (state) async {
+            final translations = S.of(ctx).getBackgroundTranslations();
+            if (state.askForFingerPrint) {
+              await _authenticateViaFingerPrint(ctx, translations);
+            } else if (state.askForPassword) {
+              await _authenticateViaPassword(ctx, translations);
+            } else {
+              ctx.read<AppBloc>().add(AppEvent.init(bgTaskIsRunning: false, translations: translations));
+            }
+          },
+        );
+      },
+      builder: (ctx, state) => Container(
+        color: Colors.orange,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                margin: const EdgeInsets.all(10),
+                child: Image.asset(
+                  CustomAssets.appIcon,
+                  width: 250,
+                  height: 250,
+                ),
+              ),
+              const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _authenticateViaFingerPrint(BuildContext context, BackgroundTranslations translations) async {
+    //this one is required, for the language change
+    await Future.delayed(const Duration(seconds: 1));
+
+    final i18n = S.of(context);
+    final localAuth = LocalAuthentication();
+    try {
+      final isAuthenticated = await localAuth.authenticate(
+        biometricOnly: true,
+        localizedReason: i18n.fingerprintRequired,
+        androidAuthStrings: AndroidAuthMessages(
+          biometricHint: i18n.fingerprintHint,
+          biometricNotRecognized: i18n.fingerprintNotRecognized,
+          biometricSuccess: i18n.fingerprintSuccess,
+          cancelButton: i18n.cancel,
+          signInTitle: i18n.signInTitle,
+          biometricRequiredTitle: i18n.fingerprintRequired,
+          goToSettingsButton: i18n.goToSettings,
+          goToSettingsDescription: i18n.goToSettingDescription,
+        ),
+      );
+      _handleAuthenticationResult(context, isAuthenticated, translations);
+    } catch (e) {
+      SystemNavigator.pop();
+    }
+  }
+
+  Future<void> _authenticateViaPassword(BuildContext context, BackgroundTranslations translations) async {
+    var isAuthenticated = await showModalBottomSheet<bool?>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(35),
+          topLeft: Radius.circular(35),
+        ),
+      ),
+      isDismissible: false,
+      isScrollControlled: true,
+      builder: (ctx) => const PasswordBottomSheet(promptForPassword: true),
+    );
+
+    isAuthenticated ??= false;
+
+    _handleAuthenticationResult(context, isAuthenticated, translations);
+  }
+
+  void _handleAuthenticationResult(BuildContext context, bool isAuthenticated, BackgroundTranslations translations) {
+    if (isAuthenticated) {
+      context.read<AppBloc>().add(AppEvent.init(bgTaskIsRunning: false, translations: translations));
+    } else {
+      context.read<SplashScreenBloc>().add(const SplashScreenEvent.init());
+    }
+  }
+}
