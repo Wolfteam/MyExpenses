@@ -29,7 +29,12 @@ class _CategoriesListPageState extends State<CategoriesListPage> with AutomaticK
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    _loadCategories();
+    final event = CategoriesListEvent.getCategories(loadIncomes: widget.loadIncomes, selectedCategory: widget.selectedCategory);
+    if (widget.loadIncomes) {
+      context.read<IncomesCategoriesBloc>().add(event);
+    } else {
+      context.read<ExpensesCategoriesBloc>().add(event);
+    }
   }
 
   @override
@@ -39,10 +44,16 @@ class _CategoriesListPageState extends State<CategoriesListPage> with AutomaticK
     return Scaffold(
       body: widget.loadIncomes
           ? BlocBuilder<IncomesCategoriesBloc, CategoriesListState>(
-              builder: (ctx, state) => _buildPage(state),
+              builder: (ctx, state) => state.maybeMap(
+                loaded: (state) => _List(categories: state.categories, isInSelectionMode: widget.isInSelectionMode),
+                orElse: () => const Center(child: CircularProgressIndicator()),
+              ),
             )
           : BlocBuilder<ExpensesCategoriesBloc, CategoriesListState>(
-              builder: (ctx, state) => _buildPage(state),
+              builder: (ctx, state) => state.maybeMap(
+                loaded: (state) => _List(categories: state.categories, isInSelectionMode: widget.isInSelectionMode),
+                orElse: () => const Center(child: CircularProgressIndicator()),
+              ),
             ),
       floatingActionButton: !widget.isInSelectionMode
           ? FloatingActionButton(
@@ -54,36 +65,33 @@ class _CategoriesListPageState extends State<CategoriesListPage> with AutomaticK
     );
   }
 
-  Widget _buildPage(CategoriesListState state) {
-    return state.maybeMap(
-      loaded: (state) => ListView.builder(
-        itemCount: state.categories.length,
-        itemBuilder: (ctx, index) => CategoryItem(
-          category: state.categories[index],
-          isInSelectionMode: widget.isInSelectionMode,
-        ),
-      ),
-      orElse: () => const Center(child: CircularProgressIndicator()),
-    );
-  }
-
-  void _loadCategories() {
-    final event = CategoriesListEvent.getCategories(loadIncomes: widget.loadIncomes, selectedCategory: widget.selectedCategory);
-    if (widget.loadIncomes) {
-      context.read<IncomesCategoriesBloc>().add(event);
-    } else {
-      context.read<ExpensesCategoriesBloc>().add(event);
-    }
-  }
-
   Future _gotoAddCategoryPage() async {
-    final route = MaterialPageRoute(builder: (ctx) => AddEditCategoryPage());
-    context.read<CategoryFormBloc>().add(const CategoryFormEvent.addCategory());
+    final route = MaterialPageRoute(builder: (ctx) => const AddEditCategoryPage());
     await Navigator.of(context).push(route);
     await route.completed;
+  }
+}
 
-    if (mounted) {
-      context.read<CategoryFormBloc>().add(const CategoryFormEvent.formClosed());
-    }
+class _List extends StatelessWidget {
+  final List<models.CategoryItem> categories;
+  final bool isInSelectionMode;
+
+  const _List({
+    Key? key,
+    required this.categories,
+    required this.isInSelectionMode,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: categories.length,
+      //just to avoid problems on desktop
+      controller: ScrollController(),
+      itemBuilder: (ctx, index) => CategoryItem(
+        category: categories[index],
+        isInSelectionMode: isInSelectionMode,
+      ),
+    );
   }
 }

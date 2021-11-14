@@ -2,11 +2,9 @@ part of 'category_form_bloc.dart';
 
 @freezed
 class CategoryState with _$CategoryState {
-  static bool isFormValid(_InitialState state) => state.isNameValid && state.isTypeValid && state.isIconValid;
+  const factory CategoryState.loading() = _LoadingState;
 
-  static bool newCategory(_InitialState state) => state.id <= 0;
-
-  const factory CategoryState.initial({
+  const factory CategoryState.loaded({
     required int id,
     required String name,
     required bool isNameValid,
@@ -16,15 +14,11 @@ class CategoryState with _$CategoryState {
     required IconData icon,
     required bool isIconValid,
     required Color iconColor,
+    required bool isFormValid,
+    required bool isNew,
     @Default(false) bool errorOccurred,
     @Default(false) bool categoryCantBeDeleted,
-  }) = _InitialState;
-
-  const factory CategoryState.saved({
-    required CategoryItem category,
-  }) = _SavedState;
-
-  const factory CategoryState.deleted({
-    required CategoryItem category,
-  }) = _DeletedState;
+    @Default(false) bool saved,
+    @Default(false) bool deleted,
+  }) = _LoadedState;
 }

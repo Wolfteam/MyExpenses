@@ -27,6 +27,4 @@ class CategoryFormEvent with _$CategoryFormEvent {
   const factory CategoryFormEvent.deleteCategory() = _DeleteCategory;
 
   const factory CategoryFormEvent.formSubmitted() = _FormSubmitted;
-
-  const factory CategoryFormEvent.formClosed() = _FormClosed;
 }

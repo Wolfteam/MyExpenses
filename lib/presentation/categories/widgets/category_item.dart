@@ -24,14 +24,13 @@ class CategoryItem extends StatelessWidget {
       isAnotherItemSelected = selectedCatProvider.currentSelectedItem != null && selectedCatProvider.currentSelectedItem!.id != category.id;
     }
 
-    final icon = IconTheme(
-      data: IconThemeData(color: category.iconColor),
-      child: Icon(category.icon),
-    );
     return Container(
       decoration: isInSelectionMode && !isAnotherItemSelected && category.isSelected ? BoxDecoration(color: theme.primaryColorLight) : null,
       child: ListTile(
-        leading: icon,
+        leading: IconTheme(
+          data: IconThemeData(color: category.iconColor),
+          child: Icon(category.icon),
+        ),
         title: Text(category.name),
         onTap: () => _onItemClick(context),
       ),
@@ -60,11 +59,8 @@ class CategoryItem extends StatelessWidget {
   }
 
   Future _handleItemClick(BuildContext context) async {
-    final route = MaterialPageRoute(builder: (ctx) => AddEditCategoryPage());
-
-    context.read<CategoryFormBloc>().add(CategoryFormEvent.editCategory(category: category));
+    final route = MaterialPageRoute(builder: (ctx) => AddEditCategoryPage(category: category));
     await Navigator.of(context).push(route);
     await route.completed;
-    context.read<CategoryFormBloc>().add(const CategoryFormEvent.formClosed());
   }
 }

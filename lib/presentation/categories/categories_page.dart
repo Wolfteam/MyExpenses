@@ -31,23 +31,17 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final i18n = S.of(context);
-    final tabs = _buildTabs(context);
-    final tabBar = TabBar(
-      indicatorColor: theme.primaryColor,
-      labelColor: theme.brightness == Brightness.dark ? Colors.white : Colors.black,
-      // unselectedLabelColor: theme.unselectedWidgetColor,
-      controller: _tabController,
-      tabs: tabs,
-    );
 
     if (!widget.isInSelectionMode) {
       return Scaffold(
-        appBar: tabBar,
-        body: TabBarView(
-          controller: _tabController,
-          children: _buildCategoriesListPages(),
+        appBar: _TabBar(
+          tabController: _tabController,
+        ),
+        body: _TabBarView(
+          tabController: _tabController,
+          isInSelectionMode: widget.isInSelectionMode,
+          selectedCategory: widget.selectedCategory,
         ),
       );
     }
@@ -56,14 +50,21 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
       appBar: AppBar(
         actions: <Widget>[
           IconButton(icon: const Icon(Icons.done), onPressed: _onDone),
-          if (widget.showDeselectButton) IconButton(icon: const Icon(Icons.clear_all), onPressed: _deSelect),
+          if (widget.showDeselectButton)
+            IconButton(
+              icon: const Icon(Icons.clear_all),
+              onPressed: _deSelect,
+            ),
         ],
         title: Text(i18n.selectCategory),
-        bottom: tabBar,
+        bottom: _TabBar(
+          tabController: _tabController,
+        ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: _buildCategoriesListPages(),
+      body: _TabBarView(
+        tabController: _tabController,
+        isInSelectionMode: widget.isInSelectionMode,
+        selectedCategory: widget.selectedCategory,
       ),
     );
   }
@@ -72,29 +73,6 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
   void dispose() {
     _tabController.dispose();
     super.dispose();
-  }
-
-  List<Tab> _buildTabs(BuildContext context) {
-    final i18n = S.of(context);
-    return [
-      Tab(icon: const Icon(Icons.more), text: i18n.incomes),
-      Tab(icon: const Icon(Icons.pages), text: i18n.expenses),
-    ];
-  }
-
-  List<CategoriesListPage> _buildCategoriesListPages() {
-    final incomes = CategoriesListPage(
-      loadIncomes: true,
-      isInSelectionMode: widget.isInSelectionMode,
-      selectedCategory: widget.selectedCategory,
-    );
-    final expenses = CategoriesListPage(
-      loadIncomes: false,
-      isInSelectionMode: widget.isInSelectionMode,
-      selectedCategory: widget.selectedCategory,
-    );
-
-    return [incomes, expenses];
   }
 
   void _onDone() {
@@ -121,5 +99,61 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
 
     selectedCatProvider.currentSelectedItem = null;
     Navigator.of(context).pop(selectedCatProvider.currentSelectedItem);
+  }
+}
+
+class _TabBar extends StatelessWidget implements PreferredSizeWidget {
+  final TabController tabController;
+
+  const _TabBar({Key? key, required this.tabController}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final i18n = S.of(context);
+    return TabBar(
+      indicatorColor: theme.primaryColor,
+      labelColor: theme.brightness == Brightness.dark ? Colors.white : Colors.black,
+      controller: tabController,
+      tabs: [
+        Tab(icon: const Icon(Icons.more), text: i18n.incomes),
+        Tab(icon: const Icon(Icons.pages), text: i18n.expenses),
+      ],
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(76);
+}
+
+class _TabBarView extends StatelessWidget {
+  final bool isInSelectionMode;
+  final CategoryItem? selectedCategory;
+  final TabController tabController;
+
+  const _TabBarView({
+    Key? key,
+    required this.tabController,
+    required this.isInSelectionMode,
+    required this.selectedCategory,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TabBarView(
+      controller: tabController,
+      children: [
+        CategoriesListPage(
+          loadIncomes: true,
+          isInSelectionMode: isInSelectionMode,
+          selectedCategory: selectedCategory,
+        ),
+        CategoriesListPage(
+          loadIncomes: false,
+          isInSelectionMode: isInSelectionMode,
+          selectedCategory: selectedCategory,
+        )
+      ],
+    );
   }
 }

@@ -8,14 +8,19 @@ import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/shared/extensions/i18n_extensions.dart';
 import 'package:my_expenses/presentation/shared/utils/category_utils.dart';
 
-class CategoryIconsPage extends StatelessWidget {
-  final _selectedKey = GlobalKey();
+final _selectedKey = GlobalKey();
+final _icons = CategoryUtils.getAllCategoryIcons();
 
+class CategoryIconsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SchedulerBinding.instance!.addPostFrameCallback((_) => _animateToIndex());
 
     final i18n = S.of(context);
+    final icons = CategoryUtils.getAllCategoryIcons();
+
+    final types = CategoryIconType.values.where((el) => icons.any((i) => i.type == el)).toList()
+      ..sort((x, y) => i18n.getCategoryIconTypeName(x).compareTo(i18n.getCategoryIconTypeName(y)));
 
     return BlocBuilder<CategoryIconBloc, CategoryIconState>(
       builder: (ctx, state) => Scaffold(
@@ -33,59 +38,38 @@ class CategoryIconsPage extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: _buildCategoryIcons(context, state),
+            children: types.map((e) => _CategoryIconsPerType(type: e, selectedIcon: state.selectedIcon)).toList(),
           ),
         ),
       ),
     );
   }
 
-  List<Widget> _buildCategoryIcons(BuildContext context, CategoryIconState state) {
-    final categoryIcons = <Widget>[];
-    final i18n = S.of(context);
-    final icons = CategoryUtils.getAllCategoryIcons();
-
-    final values = CategoryIconType.values.toList()..sort((x, y) => i18n.getCategoryIconTypeName(x).compareTo(i18n.getCategoryIconTypeName(y)));
-
-    for (final type in values) {
-      final filteredIcons = icons.where((i) => i.type == type).toList();
-      if (filteredIcons.isEmpty) {
-        continue;
-      }
-
-      final categoryType = i18n.getCategoryIconTypeName(type);
-      final widgets = _buildCategoryIconsPerType(
-        context,
-        categoryType,
-        filteredIcons,
-        state,
+  void _animateToIndex() => Scrollable.ensureVisible(
+        _selectedKey.currentContext!,
+        duration: const Duration(seconds: 1),
+        curve: Curves.fastOutSlowIn,
       );
-      categoryIcons.add(widgets);
-    }
 
-    return categoryIcons;
-  }
+  void _onIconSelected(BuildContext context, CategoryIconState state) => Navigator.of(context).pop<CategoryIcon>(state.selectedIcon);
+}
 
-  Widget _buildCategoryIconsPerType(
-    BuildContext context,
-    String categoryType,
-    List<CategoryIcon> icons,
-    CategoryIconState state,
-  ) {
+class _CategoryIconsPerType extends StatelessWidget {
+  final CategoryIconType type;
+  final CategoryIcon selectedIcon;
+
+  const _CategoryIconsPerType({
+    Key? key,
+    required this.type,
+    required this.selectedIcon,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final i18n = S.of(context);
     final theme = Theme.of(context);
     final orientation = MediaQuery.of(context).orientation;
-    final grid = GridView.count(
-      childAspectRatio: orientation == Orientation.portrait ? 1.5 : 2,
-      crossAxisCount: 4,
-      padding: EdgeInsets.zero,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      children: List.generate(
-        icons.length,
-        (index) => _buildIcon(icons[index], theme, context, state),
-      ),
-    );
-
+    final icons = _icons.where((i) => i.type == type).toList();
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 15),
       child: Column(
@@ -94,19 +78,44 @@ class CategoryIconsPage extends StatelessWidget {
           Container(
             margin: const EdgeInsets.only(bottom: 10),
             child: Text(
-              categoryType,
+              i18n.getCategoryIconTypeName(type),
               style: theme.textTheme.headline6!.copyWith(fontSize: 17),
               textAlign: TextAlign.center,
             ),
           ),
-          grid,
+          GridView.count(
+            childAspectRatio: orientation == Orientation.portrait ? 1.5 : 2,
+            crossAxisCount: 4,
+            padding: EdgeInsets.zero,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: List.generate(
+              icons.length,
+              (index) => _Icon(
+                icon: icons[index],
+                isSelected: icons[index].name == selectedIcon.name,
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildIcon(CategoryIcon icon, ThemeData theme, BuildContext context, CategoryIconState state) {
-    final isSelected = icon.name == state.selectedIcon.name;
+class _Icon extends StatelessWidget {
+  final CategoryIcon icon;
+  final bool isSelected;
+
+  const _Icon({
+    Key? key,
+    required this.icon,
+    required this.isSelected,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return IconButton(
       key: isSelected ? _selectedKey : null,
       iconSize: 30,
@@ -120,14 +129,6 @@ class CategoryIconsPage extends StatelessWidget {
     );
   }
 
-  void _animateToIndex() => Scrollable.ensureVisible(
-        _selectedKey.currentContext!,
-        duration: const Duration(seconds: 1),
-        curve: Curves.fastOutSlowIn,
-      );
-
   void _onIconClick(CategoryIcon icon, BuildContext context) =>
       context.read<CategoryIconBloc>().add(CategoryIconEvent.selectionChanged(selectedIcon: icon));
-
-  void _onIconSelected(BuildContext context, CategoryIconState state) => Navigator.of(context).pop<CategoryIcon>(state.selectedIcon);
 }

@@ -109,14 +109,6 @@ class MyApp extends StatelessWidget {
                 ..add(const SettingsEvent.load());
             },
           ),
-          BlocProvider(
-            create: (ctx) {
-              final logger = getIt<LoggingService>();
-              final categoriesDao = getIt<CategoriesDao>();
-              final usersDao = getIt<UsersDao>();
-              return CategoryFormBloc(logger, categoriesDao, usersDao);
-            },
-          ),
           BlocProvider(create: (ctx) => CategoryIconBloc()),
           BlocProvider(
             create: (ctx) {

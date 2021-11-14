@@ -15,38 +15,35 @@ part 'category_form_bloc.freezed.dart';
 part 'category_form_event.dart';
 part 'category_form_state.dart';
 
-CategoryState _initialState() {
-  final cat = CategoryUtils.getByName(CategoryUtils.question);
-  return CategoryState.initial(
-    id: 0,
-    name: '',
-    isNameValid: false,
-    isNameDirty: false,
-    type: TransactionType.incomes,
-    isTypeValid: true,
-    icon: cat.icon.icon!,
-    isIconValid: true,
-    iconColor: Colors.white,
-  );
-}
-
 class CategoryFormBloc extends Bloc<CategoryFormEvent, CategoryState> {
   final LoggingService _logger;
   final CategoriesDao _categoriesDao;
   final UsersDao _usersDao;
 
-  CategoryFormBloc(this._logger, this._categoriesDao, this._usersDao) : super(_initialState());
+  _LoadedState get currentState => state as _LoadedState;
 
-  _InitialState get currentState => state as _InitialState;
+  static int maxNameLength = 30;
+
+  CategoryFormBloc(this._logger, this._categoriesDao, this._usersDao) : super(const CategoryState.loading());
 
   @override
-  Stream<CategoryState> mapEventToState(
-    CategoryFormEvent event,
-  ) async* {
+  Stream<CategoryState> mapEventToState(CategoryFormEvent event) async* {
     try {
       final s = await event.map(
-        addCategory: (_) async => _initialState(),
-        editCategory: (e) async => currentState.copyWith(
+        addCategory: (_) async => CategoryState.loaded(
+          id: 0,
+          name: '',
+          isNameValid: false,
+          isNameDirty: false,
+          type: TransactionType.incomes,
+          isTypeValid: true,
+          icon: CategoryUtils.getByName(CategoryUtils.question).icon.icon!,
+          isIconValid: true,
+          iconColor: Colors.white,
+          isFormValid: false,
+          isNew: true,
+        ),
+        editCategory: (e) async => CategoryState.loaded(
           id: e.category.id,
           name: e.category.name,
           isNameValid: true,
@@ -55,51 +52,61 @@ class CategoryFormBloc extends Bloc<CategoryFormEvent, CategoryState> {
           icon: e.category.icon!,
           isIconValid: true,
           iconColor: e.category.iconColor!,
+          isFormValid: true,
+          isNew: false,
+          isNameDirty: false,
         ),
-        nameChanged: (e) async => currentState.copyWith(
-          name: e.name,
-          isNameValid: isNameValid(e.name),
-          isNameDirty: true,
+        nameChanged: (e) async => state.map(
+          loading: (state) => state,
+          loaded: (state) => state.copyWith(name: e.name, isNameValid: isNameValid(e.name), isNameDirty: true),
         ),
-        typeChanged: (e) async => currentState.copyWith(
-          type: e.selectedType,
-          isTypeValid: true,
+        typeChanged: (e) async => state.map(
+          loading: (state) => state,
+          loaded: (state) => state.copyWith(type: e.selectedType, isTypeValid: true),
         ),
-        iconChanged: (e) async => currentState.copyWith(
-          icon: e.selectedIcon,
-          isIconValid: true,
+        iconChanged: (e) async => state.map(
+          loading: (state) => state,
+          loaded: (state) => state.copyWith(icon: e.selectedIcon, isIconValid: true),
         ),
-        iconColorChanged: (e) async => currentState.copyWith(iconColor: e.iconColor),
+        iconColorChanged: (e) async => state.map(
+          loading: (state) => state,
+          loaded: (state) => state.copyWith(iconColor: e.iconColor),
+        ),
         deleteCategory: (e) async => _deleteCategory(),
         formSubmitted: (e) async => _saveCategory(),
-        formClosed: (_) async => _initialState(),
       );
 
       yield s;
-      if (s is _DeletedState) {
-        yield _initialState();
-      }
 
-      if (state is _InitialState) {
+      if (state is _LoadedState && currentState.categoryCantBeDeleted) {
         yield currentState.copyWith.call(categoryCantBeDeleted: false);
       }
     } catch (e, s) {
       _logger.error(runtimeType, 'An unknown error occurred', e, s);
-      if (state is _InitialState) {
+      if (state is _LoadedState) {
         yield currentState.copyWith.call(errorOccurred: true);
         yield currentState.copyWith.call(errorOccurred: false, categoryCantBeDeleted: false);
       }
     }
   }
 
-  bool isNameValid(String name) => !name.isNullOrEmpty(minLength: 1);
+  bool isNameValid(String name) => !name.isNullOrEmpty(minLength: 1, maxLength: maxNameLength);
+
+  bool isFormValid() => currentState.isNameValid && currentState.isTypeValid && currentState.isIconValid;
 
   Future<CategoryState> _saveCategory() async {
     final category = _buildCategoryItem();
     _logger.info(runtimeType, '_saveCategory: Trying to save category = ${category.toJson()}');
     final currentUser = await _usersDao.getActiveUser();
     final savedCategory = await _categoriesDao.saveCategory(currentUser?.id, category);
-    return CategoryState.saved(category: savedCategory);
+    return currentState.copyWith.call(
+      id: savedCategory.id,
+      icon: savedCategory.icon!,
+      type: savedCategory.isAnIncome ? TransactionType.incomes : TransactionType.expenses,
+      name: savedCategory.name,
+      iconColor: savedCategory.iconColor!,
+      saved: true,
+    );
   }
 
   Future<CategoryState> _deleteCategory() async {
@@ -109,7 +116,7 @@ class CategoryFormBloc extends Bloc<CategoryFormEvent, CategoryState> {
 
     if (!isBeingUsed) {
       await _categoriesDao.deleteCategory(category.id);
-      return CategoryState.deleted(category: category);
+      return currentState.copyWith.call(deleted: true);
     } else {
       return currentState.copyWith(categoryCantBeDeleted: true);
     }

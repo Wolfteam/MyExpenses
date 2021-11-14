@@ -30,6 +30,13 @@ class Injection {
     return UserAccountsBloc(logger, categoriesDao, transactionsDao, usersDao, secureStorage, pathService);
   }
 
+  static CategoryFormBloc get categoryFormBloc {
+    final logger = getIt<LoggingService>();
+    final categoriesDao = getIt<CategoriesDao>();
+    final usersDao = getIt<UsersDao>();
+    return CategoryFormBloc(logger, categoriesDao, usersDao);
+  }
+
   static Future<void> init() async {
     if (!getIt.isRegistered<NetworkService>()) {
       getIt.registerSingleton<NetworkService>(NetworkServiceImpl());
