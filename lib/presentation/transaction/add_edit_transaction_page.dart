@@ -8,6 +8,7 @@ import 'package:my_expenses/domain/extensions/string_extensions.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/domain/utils/date_utils.dart' as utils;
 import 'package:my_expenses/generated/l10n.dart';
+import 'package:my_expenses/injection.dart';
 import 'package:my_expenses/presentation/categories/categories_page.dart';
 import 'package:my_expenses/presentation/shared/extensions/i18n_extensions.dart';
 import 'package:my_expenses/presentation/shared/input_suffix_icon.dart';
@@ -25,13 +26,21 @@ class AddEditTransactionPage extends StatefulWidget {
   const AddEditTransactionPage({this.item});
 
   static MaterialPageRoute addRoute(BuildContext context) {
-    context.read<TransactionFormBloc>().add(const TransactionFormEvent.add());
-    return MaterialPageRoute(builder: (ctx) => const AddEditTransactionPage());
+    return MaterialPageRoute(
+      builder: (ctx) => BlocProvider<TransactionFormBloc>(
+        create: (ctx) => Injection.transactionFormBloc..add(const TransactionFormEvent.add()),
+        child: const AddEditTransactionPage(),
+      ),
+    );
   }
 
   static MaterialPageRoute editRoute(TransactionItem transaction, BuildContext context) {
-    context.read<TransactionFormBloc>().add(TransactionFormEvent.edit(id: transaction.id));
-    return MaterialPageRoute(builder: (ctx) => AddEditTransactionPage(item: transaction));
+    return MaterialPageRoute(
+      builder: (ctx) => BlocProvider<TransactionFormBloc>(
+        create: (ctx) => Injection.transactionFormBloc..add(TransactionFormEvent.edit(id: transaction.id)),
+        child: AddEditTransactionPage(item: transaction),
+      ),
+    );
   }
 
   @override
@@ -49,7 +58,6 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   final FocusNode _repetitionsFocus = FocusNode();
 
   final _formKey = GlobalKey<FormState>();
-  bool _didChangeDependencies = false;
 
   late double _currentAmount;
   late String _currentDescription;
@@ -74,20 +82,6 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     _descriptionController.addListener(_descriptionChanged);
     _longDescriptionController.addListener(_longDescriptionChanged);
     super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    if (_didChangeDependencies) return;
-    if (widget.item != null) {
-      context.read<TransactionFormBloc>().add(TransactionFormEvent.edit(id: widget.item!.id));
-    } else {
-      context.read<TransactionFormBloc>().add(const TransactionFormEvent.add());
-    }
-
-    _didChangeDependencies = true;
   }
 
   @override
@@ -218,7 +212,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               initial: (state) => FormAppBar(
                 isNewTransaction: TransactionFormState.isNewTransaction(state),
                 isParentTransaction: state.isParentTransaction,
-                toEditTransaction: widget.item == null,
+                toEditTransaction: widget.item != null,
                 isChildTransaction: TransactionFormState.isChildTransaction(state),
                 isFormValid: TransactionFormState.isFormValid(state),
                 description: state.description,

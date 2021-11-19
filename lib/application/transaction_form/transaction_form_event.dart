@@ -46,6 +46,4 @@ class TransactionFormEvent with _$TransactionFormEvent {
   }) = _DeleteTransaction;
 
   const factory TransactionFormEvent.submit() = _Submit;
-
-  const factory TransactionFormEvent.close() = _Close;
 }

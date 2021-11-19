@@ -101,7 +101,6 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
         isRunningChanged: (e) async => _isRunningChanged(e.isRunning),
         deleteTransaction: (e) async => _deleteTransaction(currentState.id, e.keepChildren),
         submit: (e) async => _saveTransaction(),
-        close: (_) async => _initialState(),
       );
       yield s;
 

@@ -170,10 +170,12 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
         case NotificationType.openTransactionDetails:
           final transDao = getIt<TransactionsDao>();
           final transaction = await transDao.getTransaction(int.parse(notification.payload!));
+          if (!mounted) {
+            return;
+          }
           final route = AddEditTransactionPage.editRoute(transaction, context);
           await Navigator.push(context, route);
           await route.completed;
-          context.read<TransactionFormBloc>().add(const TransactionFormEvent.close());
           break;
         case NotificationType.msg:
           break;

@@ -69,16 +69,6 @@ class MyApp extends StatelessWidget {
           BlocProvider(
             create: (ctx) {
               final logger = getIt<LoggingService>();
-              final transactionsDao = getIt<TransactionsDao>();
-              final settingsService = getIt<SettingsService>();
-              final usersDao = getIt<UsersDao>();
-              final pathService = getIt<PathService>();
-              return TransactionFormBloc(logger, transactionsDao, usersDao, settingsService, pathService);
-            },
-          ),
-          BlocProvider(
-            create: (ctx) {
-              final logger = getIt<LoggingService>();
               final usersDao = getIt<UsersDao>();
               final categoriesDao = getIt<CategoriesDao>();
               final bgService = getIt<BackgroundService>();

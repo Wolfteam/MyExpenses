@@ -79,6 +79,15 @@ class Injection {
     return ReportsBloc(logger, transactionsDao, pathService, notificationService, deviceInfoService, usersDao, currencyBloc);
   }
 
+  static TransactionFormBloc get transactionFormBloc {
+    final logger = getIt<LoggingService>();
+    final transactionsDao = getIt<TransactionsDao>();
+    final settingsService = getIt<SettingsService>();
+    final usersDao = getIt<UsersDao>();
+    final pathService = getIt<PathService>();
+    return TransactionFormBloc(logger, transactionsDao, usersDao, settingsService, pathService);
+  }
+
   static Future<void> init() async {
     if (!getIt.isRegistered<NetworkService>()) {
       getIt.registerSingleton<NetworkService>(NetworkServiceImpl());
