@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:my_expenses/application/bloc.dart';
@@ -50,14 +51,24 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   final _formKey = GlobalKey<FormState>();
   bool _didChangeDependencies = false;
 
+  late double _currentAmount;
+  late String _currentDescription;
+  late String _currentLongDescription;
+
   @override
   void initState() {
     final double amount = widget.item?.amount ?? 0;
     final description = widget.item?.description ?? '';
+    final longDescription = widget.item?.longDescription ?? '';
 
+    _currentAmount = amount;
     _amountController = TextEditingController(text: '$amount');
+
+    _currentDescription = description;
     _descriptionController = TextEditingController(text: description);
-    _longDescriptionController = TextEditingController(text: widget.item?.longDescription ?? '');
+
+    _currentLongDescription = longDescription;
+    _longDescriptionController = TextEditingController(text: longDescription);
 
     _amountController.addListener(_amountChanged);
     _descriptionController.addListener(_descriptionChanged);
@@ -272,15 +283,28 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
 
   void _amountChanged() {
     final amount = double.tryParse(_amountController.text) ?? 0;
+    if (_currentAmount == amount) {
+      return;
+    }
+    _currentAmount = amount;
     context.read<TransactionFormBloc>().add(TransactionFormEvent.amountChanged(amount: amount));
   }
 
   void _descriptionChanged() {
+    if (_currentDescription == _descriptionController.text) {
+      return;
+    }
+    _currentDescription = _descriptionController.text;
     context.read<TransactionFormBloc>().add(TransactionFormEvent.descriptionChanged(description: _descriptionController.text));
   }
 
-  void _longDescriptionChanged() =>
-      context.read<TransactionFormBloc>().add(TransactionFormEvent.longDescriptionChanged(longDescription: _longDescriptionController.text));
+  void _longDescriptionChanged() {
+    if (_currentLongDescription == _longDescriptionController.text) {
+      return;
+    }
+    _currentLongDescription = _longDescriptionController.text;
+    context.read<TransactionFormBloc>().add(TransactionFormEvent.longDescriptionChanged(longDescription: _longDescriptionController.text));
+  }
 
   Future<void> _pickPicture(bool fromGallery, S i18n) async {
     try {
@@ -583,7 +607,8 @@ class _AmountInput extends StatelessWidget {
             enabled: !isChildTransaction,
             controller: amountController,
             minLines: 1,
-            maxLength: 255,
+            maxLength: TransactionFormBloc.maxAmountLength,
+            maxLengthEnforcement: MaxLengthEnforcement.enforced,
             focusNode: amountFocus,
             textInputAction: TextInputAction.next,
             keyboardType: TextInputType.number,
@@ -637,7 +662,8 @@ class _DescriptionInput extends StatelessWidget {
             controller: descriptionController,
             keyboardType: TextInputType.text,
             minLines: 1,
-            maxLength: 255,
+            maxLength: TransactionFormBloc.maxDescriptionLength,
+            maxLengthEnforcement: MaxLengthEnforcement.enforced,
             focusNode: descriptionFocus,
             textInputAction: TextInputAction.next,
             decoration: InputDecoration(
@@ -691,7 +717,8 @@ class _LongDescriptionInput extends StatelessWidget {
             keyboardType: TextInputType.text,
             maxLines: 5,
             minLines: 1,
-            maxLength: 500,
+            maxLength: TransactionFormBloc.maxLongDescriptionLength,
+            maxLengthEnforcement: MaxLengthEnforcement.enforced,
             focusNode: longDescriptionFocus,
             textInputAction: TextInputAction.next,
             decoration: InputDecoration(

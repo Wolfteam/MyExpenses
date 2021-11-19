@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
@@ -87,7 +88,8 @@ class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilter
             enabled: true,
             controller: _amountController,
             minLines: 1,
-            maxLength: 255,
+            maxLength: TransactionFormBloc.maxAmountLength,
+            maxLengthEnforcement: MaxLengthEnforcement.enforced,
             textInputAction: TextInputAction.done,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(

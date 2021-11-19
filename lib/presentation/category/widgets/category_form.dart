@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
@@ -133,6 +134,7 @@ class _NameInputState extends State<_NameInput> {
         child: TextFormField(
           minLines: 1,
           maxLength: CategoryFormBloc.maxNameLength,
+          maxLengthEnforcement: MaxLengthEnforcement.enforced,
           validator: (_) => state.maybeMap(
             loaded: (state) => state.isNameValid ? null : i18n.invalidName,
             orElse: () => null,

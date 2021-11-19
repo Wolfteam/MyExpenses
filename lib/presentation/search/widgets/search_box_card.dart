@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
 
@@ -35,6 +36,8 @@ class SearchBoxCard extends StatelessWidget {
               controller: controller,
               focusNode: focusNode,
               cursorColor: theme.colorScheme.secondary,
+              maxLength: 50,
+              maxLengthEnforcement: MaxLengthEnforcement.enforced,
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.go,
               decoration: InputDecoration(

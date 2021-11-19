@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/injection.dart';
 import 'package:my_expenses/presentation/shared/modal_sheet_separator.dart';
 import 'package:my_expenses/presentation/shared/modal_sheet_title.dart';
+import 'package:my_expenses/presentation/shared/styles.dart';
 
 class PasswordBottomSheet extends StatelessWidget {
   final bool promptForPassword;
@@ -16,8 +18,8 @@ class PasswordBottomSheet extends StatelessWidget {
     return SingleChildScrollView(
       padding: MediaQuery.of(context).viewInsets,
       child: Container(
-        margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
-        padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+        margin: Styles.modalBottomSheetContainerMargin,
+        padding: Styles.modalBottomSheetContainerPadding,
         child: BlocProvider(
           create: (ctx) => Injection.passwordDialogBloc,
           child: _Form(promptForPassword: promptForPassword),
@@ -29,6 +31,7 @@ class PasswordBottomSheet extends StatelessWidget {
 
 class _Form extends StatefulWidget {
   final bool promptForPassword;
+
   const _Form({Key? key, required this.promptForPassword}) : super(key: key);
 
   @override
@@ -40,6 +43,9 @@ class _FormState extends State<_Form> {
   final _confirmPasswordController = TextEditingController();
   final _passwordFocus = FocusNode();
   final _confirmPasswordFocus = FocusNode();
+
+  String _currentPasswordValue = '';
+  String _currentConfirmPasswordValue = '';
 
   @override
   void initState() {
@@ -71,7 +77,8 @@ class _FormState extends State<_Form> {
             TextFormField(
               obscureText: !state.showPassword,
               minLines: 1,
-              maxLength: 10,
+              maxLength: PasswordDialogBloc.maxLength,
+              maxLengthEnforcement: MaxLengthEnforcement.enforced,
               controller: _passwordController,
               textInputAction: TextInputAction.next,
               keyboardType: TextInputType.text,
@@ -99,7 +106,8 @@ class _FormState extends State<_Form> {
               TextFormField(
                 obscureText: !state.showConfirmPassword,
                 minLines: 1,
-                maxLength: 10,
+                maxLength: PasswordDialogBloc.maxLength,
+                maxLengthEnforcement: MaxLengthEnforcement.enforced,
                 controller: _confirmPasswordController,
                 textInputAction: TextInputAction.done,
                 keyboardType: TextInputType.text,
@@ -160,12 +168,23 @@ class _FormState extends State<_Form> {
     FocusScope.of(context).requestFocus(nextFocus);
   }
 
-  void _passwordChanged() => context.read<PasswordDialogBloc>().add(PasswordDialogEvent.passwordChanged(newValue: _passwordController.text));
+  void _passwordChanged() {
+    if (_currentPasswordValue == _passwordController.text) {
+      return;
+    }
+    _currentPasswordValue = _passwordController.text;
+    context.read<PasswordDialogBloc>().add(PasswordDialogEvent.passwordChanged(newValue: _currentPasswordValue));
+  }
 
   void _showPassword(bool show) => context.read<PasswordDialogBloc>().add(PasswordDialogEvent.showPassword(show: show));
 
-  void _confirmPasswordChanged() =>
-      context.read<PasswordDialogBloc>().add(PasswordDialogEvent.confirmPasswordChanged(newValue: _confirmPasswordController.text));
+  void _confirmPasswordChanged() {
+    if (_currentConfirmPasswordValue == _confirmPasswordController.text) {
+      return;
+    }
+    _currentConfirmPasswordValue = _confirmPasswordController.text;
+    context.read<PasswordDialogBloc>().add(PasswordDialogEvent.confirmPasswordChanged(newValue: _currentConfirmPasswordValue));
+  }
 
   void _showConfirmPassword(bool show) => context.read<PasswordDialogBloc>().add(PasswordDialogEvent.showConfirmPassword(show: show));
 
