@@ -35,7 +35,10 @@ class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilter
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final i18n = S.of(context);
     return SingleChildScrollView(
+      padding: MediaQuery.of(context).viewInsets,
       child: Container(
         margin: Styles.modalBottomSheetContainerMargin,
         padding: Styles.modalBottomSheetContainerPadding,
@@ -43,99 +46,80 @@ class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilter
           builder: (ctx, state) => Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[..._buildPage(state)],
+            children: state.map(
+              loading: (state) => [],
+              initial: (state) => [
+                ModalSheetSeparator(),
+                ModalSheetTitle(title: i18n.filterByX(i18n.amount.toLowerCase()), padding: EdgeInsets.zero),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      margin: const EdgeInsets.only(right: 10),
+                      child: const Icon(Icons.attach_money, size: 30),
+                    ),
+                    Expanded(
+                      child: TextFormField(
+                        enabled: true,
+                        controller: _amountController,
+                        minLines: 1,
+                        maxLength: TransactionFormBloc.maxAmountLength,
+                        maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                        textInputAction: TextInputAction.done,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          suffixIcon: _amountController.text.isNotEmpty
+                              ? IconButton(
+                                  alignment: Alignment.bottomCenter,
+                                  icon: const Icon(Icons.close),
+                                  onPressed: _cleanAmount,
+                                )
+                              : null,
+                          alignLabelWithHint: true,
+                          hintText: '0\$',
+                          labelText: i18n.amount,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                if (!_amountController.text.isNullEmptyOrWhitespace)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: ComparerType.values
+                        .map(
+                          (e) => ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            dense: true,
+                            title: Text(i18n.getComparerTypeName(e)),
+                            leading: Radio<ComparerType>(
+                              value: e,
+                              groupValue: state.tempComparerType,
+                              activeColor: theme.colorScheme.secondary,
+                              onChanged: (v) => _comparerChanged(v!),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                Divider(color: theme.colorScheme.secondary),
+                ButtonBar(
+                  layoutBehavior: ButtonBarLayoutBehavior.constrained,
+                  children: <Widget>[
+                    OutlinedButton(
+                      onPressed: () => _closeModal(context),
+                      child: Text(i18n.close, style: TextStyle(color: theme.primaryColor)),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => _applyAmount(context),
+                      child: Text(i18n.apply),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    );
-  }
-
-  List<Widget> _buildPage(SearchState state) {
-    final theme = Theme.of(context);
-    final i18n = S.of(context);
-
-    return state.map(
-      loading: (_) => [],
-      initial: (s) => [
-        ModalSheetSeparator(),
-        ModalSheetTitle(title: i18n.filterByX(i18n.amount.toLowerCase()), padding: EdgeInsets.zero),
-        _buildAmountInput(context),
-        if (!_amountController.text.isNullEmptyOrWhitespace) _buildComparerRadioButtons(s.tempComparerType),
-        Divider(color: theme.colorScheme.secondary),
-        _buildBottomButtonBar(context),
-      ],
-    );
-  }
-
-  Widget _buildAmountInput(BuildContext context) {
-    final i18n = S.of(context);
-    final suffixIcon = _amountController.text.isNotEmpty
-        ? IconButton(
-            alignment: Alignment.bottomCenter,
-            icon: const Icon(Icons.close),
-            onPressed: _cleanAmount,
-          )
-        : null;
-
-    return Row(
-      children: <Widget>[
-        Container(
-          margin: const EdgeInsets.only(right: 10),
-          child: const Icon(Icons.attach_money, size: 30),
-        ),
-        Expanded(
-          child: TextFormField(
-            enabled: true,
-            controller: _amountController,
-            minLines: 1,
-            maxLength: TransactionFormBloc.maxAmountLength,
-            maxLengthEnforcement: MaxLengthEnforcement.enforced,
-            textInputAction: TextInputAction.done,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              suffixIcon: suffixIcon,
-              alignLabelWithHint: true,
-              hintText: '0\$',
-              labelText: i18n.amount,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildComparerRadioButtons(ComparerType selectedComparer) {
-    final i18n = S.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: ComparerType.values
-          .map(
-            (e) => ListTile(
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-              title: Text(i18n.getComparerTypeName(e)),
-              leading: Radio<ComparerType>(value: e, groupValue: selectedComparer, onChanged: (v) => _comparerChanged(v!)),
-            ),
-          )
-          .toList(),
-    );
-  }
-
-  Widget _buildBottomButtonBar(BuildContext context) {
-    final theme = Theme.of(context);
-    final i18n = S.of(context);
-    return ButtonBar(
-      layoutBehavior: ButtonBarLayoutBehavior.constrained,
-      children: <Widget>[
-        OutlinedButton(
-          onPressed: () => _closeModal(context),
-          child: Text(i18n.close, style: TextStyle(color: theme.primaryColor)),
-        ),
-        ElevatedButton(
-          onPressed: () => _applyAmount(context),
-          child: Text(i18n.apply),
-        ),
-      ],
     );
   }
 

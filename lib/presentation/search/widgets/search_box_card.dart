@@ -41,6 +41,7 @@ class SearchBoxCard extends StatelessWidget {
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.go,
               decoration: InputDecoration(
+                counterText: '',
                 border: InputBorder.none,
                 contentPadding: Styles.edgeInsetHorizontal16,
                 hintText: '${i18n.search}...',

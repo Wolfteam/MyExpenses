@@ -17,7 +17,10 @@ class SearchPage extends StatefulWidget {
   static MaterialPageRoute route() {
     final route = MaterialPageRoute(
       fullscreenDialog: true,
-      builder: (ctx) => SearchPage(),
+      builder: (ctx) => BlocProvider<SearchBloc>(
+        create: (ctx) => Injection.searchBloc..add(const SearchEvent.init()),
+        child: SearchPage(),
+      ),
     );
     return route;
   }
@@ -48,20 +51,17 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<SearchBloc>(
-      create: (ctx) => Injection.searchBloc..add(const SearchEvent.init()),
-      child: Scaffold(
-        body: _Body(scrollController: _scrollController),
-        floatingActionButton: FadeTransition(
-          opacity: _hideFabAnimController,
-          child: ScaleTransition(
-            scale: _hideFabAnimController,
-            child: FloatingActionButton(
-              mini: true,
-              backgroundColor: Theme.of(context).primaryColor,
-              onPressed: () => _scrollController.goToTheTop(),
-              child: const Icon(Icons.arrow_upward),
-            ),
+    return Scaffold(
+      body: _Body(scrollController: _scrollController),
+      floatingActionButton: FadeTransition(
+        opacity: _hideFabAnimController,
+        child: ScaleTransition(
+          scale: _hideFabAnimController,
+          child: FloatingActionButton(
+            mini: true,
+            backgroundColor: Theme.of(context).primaryColor,
+            onPressed: () => _scrollController.goToTheTop(),
+            child: const Icon(Icons.arrow_upward),
           ),
         ),
       ),
@@ -87,6 +87,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
 
 class _Body extends StatefulWidget {
   final ScrollController scrollController;
+
   const _Body({Key? key, required this.scrollController}) : super(key: key);
 
   @override
@@ -96,6 +97,7 @@ class _Body extends StatefulWidget {
 class _BodyState extends State<_Body> {
   final _searchFocusNode = FocusNode();
   late TextEditingController _searchBoxTextController;
+  String _currentText = '';
 
   @override
   void initState() {
@@ -196,5 +198,11 @@ class _BodyState extends State<_Body> {
     super.dispose();
   }
 
-  void _onSearchTextChanged() => context.read<SearchBloc>().add(SearchEvent.descriptionChanged(newValue: _searchBoxTextController.text));
+  void _onSearchTextChanged() {
+    if (_currentText == _searchBoxTextController.text) {
+      return;
+    }
+    _currentText = _searchBoxTextController.text;
+    context.read<SearchBloc>().add(SearchEvent.descriptionChanged(newValue: _searchBoxTextController.text));
+  }
 }

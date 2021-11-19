@@ -18,6 +18,7 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
     final textColor = theme.brightness == Brightness.dark ? Colors.white : Colors.black;
 
     return SingleChildScrollView(
+      padding: MediaQuery.of(context).viewInsets,
       child: Container(
         margin: Styles.modalBottomSheetContainerMargin,
         padding: Styles.modalBottomSheetContainerPadding,

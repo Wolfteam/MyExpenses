@@ -26,6 +26,14 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
   final SettingsService _settingsService;
   final PathService _pathService;
 
+  static int maxDescriptionLength = 50;
+  static int minDescriptionLength = 3;
+
+  static int maxLongDescriptionLength = 500;
+  static int minLongDescriptionLength = 3;
+
+  static int maxAmountLength = 9;
+
   TransactionFormBloc(
     this._logger,
     this._transactionsDao,
@@ -190,11 +198,16 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
     );
   }
 
-  bool _isAmountValid(double amount) => amount != 0;
+  bool _isAmountValid(double amount) => amount != 0 && '$amount'.length <= maxAmountLength;
 
-  bool _isDescriptionValid(String description) => !description.isNullOrEmpty(minLength: 1);
+  bool _isDescriptionValid(String description) => !description.isNullOrEmpty(minLength: minDescriptionLength, maxLength: maxDescriptionLength);
 
-  bool _isLongDescriptionValid(String description) => description.isNullEmptyOrWhitespace || !description.isNullOrEmpty(minLength: 1, maxLength: 500);
+  bool _isLongDescriptionValid(String description) =>
+      description.isNullEmptyOrWhitespace ||
+      !description.isNullOrEmpty(
+        minLength: minLongDescriptionLength,
+        maxLength: maxLongDescriptionLength,
+      );
 
   bool _isTransactionDateValid(DateTime date, RepetitionCycleType cycle) {
     if (cycle == RepetitionCycleType.none) return true;

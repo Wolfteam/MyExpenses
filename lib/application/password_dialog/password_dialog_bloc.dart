@@ -28,6 +28,9 @@ class PasswordDialogBloc extends Bloc<PasswordDialogEvent, PasswordDialogState> 
   final LoggingService _logger;
   final SecureStorageService _secureStorageService;
 
+  static int maxLength = 10;
+  static int minLength = 3;
+
   PasswordDialogBloc(this._logger, this._secureStorageService) : super(_initialState);
 
   @override
@@ -79,7 +82,7 @@ class PasswordDialogBloc extends Bloc<PasswordDialogEvent, PasswordDialogState> 
     }
   }
 
-  bool _isPasswordValid(String password) => !password.isNullOrEmpty(minLength: 3, maxLength: 10);
+  bool _isPasswordValid(String password) => !password.isNullOrEmpty(minLength: minLength, maxLength: maxLength);
 
   bool _passwordMatches(String password, String confirmPassword) =>
       _isPasswordValid(password) && _isPasswordValid(confirmPassword) && password == confirmPassword;
