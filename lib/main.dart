@@ -146,12 +146,6 @@ class MyApp extends StatelessWidget {
               return SignInWithGoogleBloc(logger, usersDao, googleService, networkService, secureStorage, syncService, imgService);
             },
           ),
-          BlocProvider(
-            create: (ctx) {
-              final settingsService = getIt<SettingsService>();
-              return SplashScreenBloc(settingsService)..add(const SplashScreenEvent.init());
-            },
-          ),
         ],
         child: AppWidget(),
       ),

@@ -14,6 +14,11 @@ import 'package:my_expenses/infrastructure/infrastructure.dart';
 final GetIt getIt = GetIt.instance;
 
 class Injection {
+  static SplashScreenBloc get splashScreenBloc {
+    final settingsService = getIt<SettingsService>();
+    return SplashScreenBloc(settingsService);
+  }
+
   static PasswordDialogBloc get passwordDialogBloc {
     final logger = getIt<LoggingService>();
     final secureStorage = getIt<SecureStorageService>();

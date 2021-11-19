@@ -6,29 +6,48 @@ import 'package:local_auth/local_auth.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/generated/l10n.dart';
+import 'package:my_expenses/injection.dart';
 import 'package:my_expenses/presentation/settings/widgets/password_bottom_sheet.dart';
 import 'package:my_expenses/presentation/shared/custom_assets.dart';
 import 'package:my_expenses/presentation/shared/extensions/i18n_extensions.dart';
+import 'package:my_expenses/presentation/shared/styles.dart';
 
 class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<SplashScreenBloc, SplashScreenState>(
+    return BlocProvider<SplashScreenBloc>(
+      create: (ctx) => Injection.splashScreenBloc..add(const SplashScreenEvent.init()),
+      child: const _Body(),
+    );
+  }
+}
+
+class _Body extends StatefulWidget {
+  const _Body({Key? key}) : super(key: key);
+
+  @override
+  _BodyState createState() => _BodyState();
+}
+
+class _BodyState extends State<_Body> {
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<SplashScreenBloc, SplashScreenState>(
       listener: (ctx, state) async {
         await state.map(
           initial: (state) async {
             final translations = S.of(ctx).getBackgroundTranslations();
             if (state.askForFingerPrint) {
-              await _authenticateViaFingerPrint(ctx, translations);
+              await _authenticateViaFingerPrint(translations);
             } else if (state.askForPassword) {
-              await _authenticateViaPassword(ctx, translations);
+              await _authenticateViaPassword(translations);
             } else {
               ctx.read<AppBloc>().add(AppEvent.init(bgTaskIsRunning: false, translations: translations));
             }
           },
         );
       },
-      builder: (ctx, state) => Container(
+      child: Container(
         color: Colors.orange,
         child: Center(
           child: Column(
@@ -50,9 +69,13 @@ class SplashScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _authenticateViaFingerPrint(BuildContext context, BackgroundTranslations translations) async {
+  Future<void> _authenticateViaFingerPrint(BackgroundTranslations translations) async {
     //this one is required, for the language change
     await Future.delayed(const Duration(seconds: 1));
+
+    if (!mounted) {
+      return;
+    }
 
     final i18n = S.of(context);
     final localAuth = LocalAuthentication();
@@ -71,21 +94,16 @@ class SplashScreen extends StatelessWidget {
           goToSettingsDescription: i18n.goToSettingDescription,
         ),
       );
-      _handleAuthenticationResult(context, isAuthenticated, translations);
+      _handleAuthenticationResult(isAuthenticated, translations);
     } catch (e) {
       SystemNavigator.pop();
     }
   }
 
-  Future<void> _authenticateViaPassword(BuildContext context, BackgroundTranslations translations) async {
+  Future<void> _authenticateViaPassword(BackgroundTranslations translations) async {
     var isAuthenticated = await showModalBottomSheet<bool?>(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(35),
-          topLeft: Radius.circular(35),
-        ),
-      ),
+      shape: Styles.modalBottomSheetShape,
       isDismissible: false,
       isScrollControlled: true,
       builder: (ctx) => const PasswordBottomSheet(promptForPassword: true),
@@ -93,10 +111,14 @@ class SplashScreen extends StatelessWidget {
 
     isAuthenticated ??= false;
 
-    _handleAuthenticationResult(context, isAuthenticated, translations);
+    _handleAuthenticationResult(isAuthenticated, translations);
   }
 
-  void _handleAuthenticationResult(BuildContext context, bool isAuthenticated, BackgroundTranslations translations) {
+  void _handleAuthenticationResult(bool isAuthenticated, BackgroundTranslations translations) {
+    if (!mounted) {
+      return;
+    }
+
     if (isAuthenticated) {
       context.read<AppBloc>().add(AppEvent.init(bgTaskIsRunning: false, translations: translations));
     } else {
