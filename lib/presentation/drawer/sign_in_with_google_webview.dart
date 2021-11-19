@@ -6,6 +6,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_user_agentx/flutter_user_agent.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/generated/l10n.dart';
+import 'package:my_expenses/injection.dart';
 import 'package:my_expenses/presentation/shared/loading.dart';
 import 'package:my_expenses/presentation/shared/utils/bloc_utils.dart';
 import 'package:my_expenses/presentation/shared/utils/toast_utils.dart';
@@ -13,19 +14,21 @@ import 'package:my_expenses/presentation/shared/utils/toast_utils.dart';
 class SignInWithGoogleWebView extends StatefulWidget {
   const SignInWithGoogleWebView();
 
+  static MaterialPageRoute route() {
+    return MaterialPageRoute(
+      builder: (ctx) => BlocProvider<SignInWithGoogleBloc>(
+        create: (ctx) => Injection.signInWithGoogleBloc..add(const SignInWithGoogleEvent.init()),
+        child: const SignInWithGoogleWebView(),
+      ),
+    );
+  }
+
   @override
   _SignInWithGoogleWebViewState createState() => _SignInWithGoogleWebViewState();
 }
 
 class _SignInWithGoogleWebViewState extends State<SignInWithGoogleWebView> {
   bool _loading = true;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    context.read<SignInWithGoogleBloc>().add(const SignInWithGoogleEvent.init());
-  }
 
   @override
   Widget build(BuildContext context) {

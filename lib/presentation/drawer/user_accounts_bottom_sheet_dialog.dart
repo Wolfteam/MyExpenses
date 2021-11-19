@@ -103,7 +103,6 @@ class _Content extends StatelessWidget {
 
   void _addAccount(BuildContext context) {
     Navigator.of(context).pop();
-    final route = MaterialPageRoute(builder: (ctx) => const SignInWithGoogleWebView());
-    Navigator.of(context).push(route);
+    Navigator.of(context).push(SignInWithGoogleWebView.route());
   }
 }

@@ -58,6 +58,17 @@ class Injection {
     return SearchBloc(logger, transactionsDao, usersDao, settingsService);
   }
 
+  static SignInWithGoogleBloc get signInWithGoogleBloc {
+    final logger = getIt<LoggingService>();
+    final googleService = getIt<GoogleService>();
+    final usersDao = getIt<UsersDao>();
+    final networkService = getIt<NetworkService>();
+    final secureStorage = getIt<SecureStorageService>();
+    final syncService = getIt<SyncService>();
+    final imgService = getIt<ImageService>();
+    return SignInWithGoogleBloc(logger, usersDao, googleService, networkService, secureStorage, syncService, imgService);
+  }
+
   static Future<void> init() async {
     if (!getIt.isRegistered<NetworkService>()) {
       getIt.registerSingleton<NetworkService>(NetworkServiceImpl());

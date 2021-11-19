@@ -134,18 +134,6 @@ class MyApp extends StatelessWidget {
               return ReportsBloc(logger, transactionsDao, pathService, notificationService, deviceInfoService, usersDao, currencyBloc);
             },
           ),
-          BlocProvider(
-            create: (ctx) {
-              final logger = getIt<LoggingService>();
-              final googleService = getIt<GoogleService>();
-              final usersDao = getIt<UsersDao>();
-              final networkService = getIt<NetworkService>();
-              final secureStorage = getIt<SecureStorageService>();
-              final syncService = getIt<SyncService>();
-              final imgService = getIt<ImageService>();
-              return SignInWithGoogleBloc(logger, usersDao, googleService, networkService, secureStorage, syncService, imgService);
-            },
-          ),
         ],
         child: AppWidget(),
       ),
