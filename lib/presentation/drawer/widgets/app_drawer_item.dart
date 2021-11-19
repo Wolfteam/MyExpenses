@@ -40,7 +40,7 @@ class AppDrawerItem extends StatelessWidget {
         text = i18n.charts;
         break;
       case AppDrawerItemType.categories:
-        icon = const Icon(Icons.settings);
+        icon = const Icon(Icons.category);
         text = i18n.categories;
         break;
       case AppDrawerItemType.settings:

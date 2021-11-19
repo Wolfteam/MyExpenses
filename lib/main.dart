@@ -96,7 +96,8 @@ class MyApp extends StatelessWidget {
               final settingsService = getIt<SettingsService>();
               final drawerBloc = ctx.read<DrawerBloc>();
               final bgService = getIt<BackgroundService>();
-              return AppBloc(logger, settingsService, drawerBloc, bgService);
+              final deviceInfoService = getIt<DeviceInfoService>();
+              return AppBloc(logger, settingsService, drawerBloc, bgService, deviceInfoService);
             },
           ),
           BlocProvider(

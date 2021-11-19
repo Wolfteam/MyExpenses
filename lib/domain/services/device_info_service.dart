@@ -11,5 +11,9 @@ abstract class DeviceInfoService {
 
   bool get canUseFingerPrint;
 
+  String get previousVersion;
+
+  int get previousBuildVersion;
+
   Future<void> init();
 }

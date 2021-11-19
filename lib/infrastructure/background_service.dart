@@ -150,11 +150,17 @@ class BackgroundServiceImpl implements BackgroundService {
 
   @override
   Future<void> cancelSyncTask() {
+    if (!Platform.isAndroid) {
+      return Future.value();
+    }
     return Workmanager().cancelByUniqueName(_syncTaskId);
   }
 
   @override
   Future<void> cancelRecurringTransactionsTask() {
+    if (!Platform.isAndroid) {
+      return Future.value();
+    }
     return Workmanager().cancelByUniqueName(_recurringTransId);
   }
 
@@ -165,6 +171,9 @@ class BackgroundServiceImpl implements BackgroundService {
 
   @override
   Future<void> handleBackgroundTask(String task, BackgroundTranslations translations, {bool calledFromBg = false}) async {
+    if (!Platform.isAndroid) {
+      return Future.value();
+    }
     try {
       switch (task) {
         case _syncTaskName:

@@ -20,6 +20,7 @@ class SettingsServiceImpl implements SettingsService {
   final _currencyToTheRightKey = 'CurrencyToTheRight';
   final _showNotifForRecurringTransKey = 'ShowNotificationForRecurringTransactions';
   final _recurringTransTaskIsRegisteredKey = 'RecurringTransIsRegistered';
+  final _usesVersionOnePointTwoKey = 'UsesVersionOnePointTwoKey';
 
   final LoggingService _logger;
 
@@ -108,6 +109,12 @@ class SettingsServiceImpl implements SettingsService {
 
   @override
   set isRecurringTransTaskRegistered(bool itIs) => _prefs.setBool(_recurringTransTaskIsRegisteredKey, itIs);
+
+  @override
+  bool get usesVersionOnePointTwo => _prefs.getBool(_usesVersionOnePointTwoKey)!;
+
+  @override
+  set usesVersionOnePointTwo(bool itUsesIt) => _prefs.setBool(_usesVersionOnePointTwoKey, itUsesIt);
 
   SettingsServiceImpl(this._logger);
 

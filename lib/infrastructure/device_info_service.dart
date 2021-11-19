@@ -16,6 +16,8 @@ class DeviceInfoServiceImpl implements DeviceInfoService {
   late String _appName;
   late bool _versionChanged = false;
   late bool _canUseFingerPrint = false;
+  late String _previousVersion;
+  late int _previousBuildVersion;
 
   @override
   Map<String, String> get deviceInfo => _deviceInfo;
@@ -35,6 +37,12 @@ class DeviceInfoServiceImpl implements DeviceInfoService {
 
   @override
   bool get canUseFingerPrint => _canUseFingerPrint;
+
+  @override
+  String get previousVersion => _previousVersion;
+
+  @override
+  int get previousBuildVersion => _previousBuildVersion;
 
   @override
   Future<void> init() async {
@@ -98,6 +106,8 @@ class DeviceInfoServiceImpl implements DeviceInfoService {
   Future<void> _initVersionTracker() async {
     final vt = VersionTracker();
     await vt.track();
-    _versionChanged = vt.isFirstLaunchForCurrentBuild ?? vt.isFirstLaunchForCurrentVersion ?? vt.isFirstLaunchEver ?? false;
+    _previousVersion = vt.previousVersion ?? _na;
+    _previousBuildVersion = int.tryParse(vt.previousBuild ?? '-1') ?? -1;
+    _versionChanged = vt.isFirstLaunchForCurrentBuild == true || vt.isFirstLaunchForCurrentVersion == true || vt.isFirstLaunchEver == true;
   }
 }

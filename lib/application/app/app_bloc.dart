@@ -17,10 +17,17 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final SettingsService _settingsService;
   final DrawerBloc _drawerBloc;
   final BackgroundService _backgroundService;
+  final DeviceInfoService _deviceInfoService;
 
   late StreamSubscription _portSubscription;
 
-  AppBloc(this._logger, this._settingsService, this._drawerBloc, this._backgroundService) : super(const AppState.loading()) {
+  AppBloc(
+    this._logger,
+    this._settingsService,
+    this._drawerBloc,
+    this._backgroundService,
+    this._deviceInfoService,
+  ) : super(const AppState.loading()) {
     _listenBgPort();
   }
 
@@ -28,10 +35,19 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   Stream<AppState> mapEventToState(AppEvent event) async* {
     final s = await event.map(
       init: (e) async {
+        // If the user comes from this version,
+        // we need to re register the background task due to all the changes made in 1.2.0
+        if (_deviceInfoService.versionChanged && _deviceInfoService.previousBuildVersion < 39) {
+          await _backgroundService.cancelSyncTask();
+          await _registerRecurringBackgroundTask(e.translations);
+          await _backgroundService.registerSyncTask(_settingsService.syncInterval, e.translations);
+        }
+
         if (!_settingsService.isRecurringTransTaskRegistered) {
           _logger.info(runtimeType, 'Recurring trans task is not registered, registering it...');
           await _registerRecurringBackgroundTask(e.translations);
         }
+
         _logger.info(runtimeType, 'Current settings are: ${_settingsService.appSettings.toJson()}');
 
         await Future.delayed(const Duration(milliseconds: 500));
