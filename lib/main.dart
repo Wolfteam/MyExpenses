@@ -122,18 +122,6 @@ class MyApp extends StatelessWidget {
                 ..add(ChartsEvent.loadChart(selectedMonthDate: now, selectedYear: now.year));
             },
           ),
-          BlocProvider(
-            create: (ctx) {
-              final logger = getIt<LoggingService>();
-              final transactionsDao = getIt<TransactionsDao>();
-              final usersDao = getIt<UsersDao>();
-              final currencyBloc = ctx.read<CurrencyBloc>();
-              final pathService = getIt<PathService>();
-              final notificationService = getIt<NotificationService>();
-              final deviceInfoService = getIt<DeviceInfoService>();
-              return ReportsBloc(logger, transactionsDao, pathService, notificationService, deviceInfoService, usersDao, currencyBloc);
-            },
-          ),
         ],
         child: AppWidget(),
       ),
