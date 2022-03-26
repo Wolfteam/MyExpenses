@@ -198,7 +198,27 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                           language: state.languageModel,
                           transactionDate: state.transactionDate,
                         ),
-                        ..._buildPickImageButtons(isChildTransaction, state.imageExists, state.imagePath)
+                        Text(
+                          i18n.addPicture,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                        ),
+                        ButtonBar(
+                          alignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            TextButton.icon(
+                              onPressed: !isChildTransaction ? () => _pickPicture(true, i18n) : null,
+                              icon: const Icon(Icons.photo_library),
+                              label: Text(i18n.fromGallery),
+                            ),
+                            TextButton.icon(
+                              onPressed: !isChildTransaction ? () => _pickPicture(false, i18n) : null,
+                              icon: const Icon(Icons.camera_enhance),
+                              label: Text(i18n.fromCamera),
+                            ),
+                          ],
+                        ),
+                        if (state.imageExists) FormImagePreview(imagePath: state.imagePath!),
                       ],
                     ),
                   ),
@@ -245,34 +265,6 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   void _fieldFocusChange(BuildContext context, FocusNode currentFocus, FocusNode nextFocus) {
     currentFocus.unfocus();
     FocusScope.of(context).requestFocus(nextFocus);
-  }
-
-  List<Widget> _buildPickImageButtons(bool isChildTransaction, bool imageExists, String? imagePath) {
-    final i18n = S.of(context);
-
-    return [
-      Text(
-        i18n.addPicture,
-        textAlign: TextAlign.center,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-      ),
-      ButtonBar(
-        alignment: MainAxisAlignment.center,
-        children: <Widget>[
-          TextButton.icon(
-            onPressed: !isChildTransaction ? () => _pickPicture(true, i18n) : null,
-            icon: const Icon(Icons.photo_library),
-            label: Text(i18n.fromGallery),
-          ),
-          TextButton.icon(
-            onPressed: !isChildTransaction ? () => _pickPicture(false, i18n) : null,
-            icon: const Icon(Icons.camera_enhance),
-            label: Text(i18n.fromCamera),
-          ),
-        ],
-      ),
-      if (imageExists) FormImagePreview(imagePath: imagePath!),
-    ];
   }
 
   void _amountChanged() {

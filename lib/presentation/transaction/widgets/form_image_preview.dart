@@ -44,7 +44,10 @@ class FormImagePreview extends StatelessWidget {
     return showDialog(
       barrierDismissible: true,
       context: context,
-      builder: (_) => _ImageDialog(imagePath: imagePath),
+      builder: (_) => BlocProvider.value(
+        value: context.read<TransactionFormBloc>(),
+        child: _ImageDialog(imagePath: imagePath),
+      ),
     );
   }
 }
@@ -77,7 +80,13 @@ class _ImageDialog extends StatelessWidget {
                 IconButton(
                   color: Theme.of(context).primaryColor,
                   icon: const Icon(Icons.delete),
-                  onPressed: () => _showDeleteImageDialog(context),
+                  onPressed: () => _showDeleteImageDialog(context).then(
+                    (value) {
+                      if (value == true) {
+                        _deleteImage(context);
+                      }
+                    },
+                  ),
                 ),
               ],
             ),
@@ -87,10 +96,18 @@ class _ImageDialog extends StatelessWidget {
     );
   }
 
-  Future<void> _showDeleteImageDialog(BuildContext context) {
-    return showDialog(
+  void _deleteImage(BuildContext context) {
+    context.read<TransactionFormBloc>().add(const TransactionFormEvent.imageChanged(path: '', imageExists: false));
+    Navigator.of(context).pop();
+  }
+
+  Future<bool?> _showDeleteImageDialog(BuildContext context) {
+    return showDialog<bool>(
       context: context,
-      builder: (ctx) => const _DeleteImageDialog(),
+      builder: (_) => BlocProvider.value(
+        value: context.read<TransactionFormBloc>(),
+        child: const _DeleteImageDialog(),
+      ),
     );
   }
 }
@@ -107,16 +124,13 @@ class _DeleteImageDialog extends StatelessWidget {
       actions: <Widget>[
         OutlinedButton(
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(false);
           },
           child: Text(i18n.cancel),
         ),
         ElevatedButton(
           onPressed: () {
-            context.read<TransactionFormBloc>().add(const TransactionFormEvent.imageChanged(path: '', imageExists: false));
-            //One for this dialog and the other for the preview
-            Navigator.of(context).pop();
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(true);
           },
           child: Text(i18n.yes),
         ),
