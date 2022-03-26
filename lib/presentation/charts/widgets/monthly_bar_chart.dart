@@ -1,6 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:darq/darq.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_expenses/application/bloc.dart';
@@ -40,32 +41,41 @@ class MonthlyBarChart extends StatelessWidget {
                 tooltipPadding: EdgeInsets.zero,
                 tooltipMargin: 8,
                 getTooltipItem: (group, groupIndex, rod, rodIndex) => BarTooltipItem(
-                  currencyBloc.format(rod.y),
+                  currencyBloc.format(rod.toY),
                   TextStyle(color: lineColor, fontWeight: FontWeight.bold, fontSize: 11),
                 ),
               ),
             ),
             titlesData: FlTitlesData(
-              bottomTitles: SideTitles(
-                showTitles: true,
-                getTextStyles: (ctx, value) => textStyle.copyWith(fontSize: 9, fontWeight: FontWeight.bold),
-                rotateAngle: 25,
-                getTitles: (double value) {
-                  final date = transactionsPerDate.elementAt(value.toInt() - 1);
-                  return date.dateRangeString;
-                },
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, meta) => Transform.rotate(
+                    angle: math.pi / 7.2,
+                    child: Text(
+                      transactionsPerDate.elementAt(value.toInt() - 1).dateRangeString,
+                      style: textStyle.copyWith(fontSize: 9, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
               ),
-              leftTitles: SideTitles(
-                showTitles: true,
-                getTextStyles: (ctx, value) => textStyle,
-                reservedSize: reservedSize,
-                interval: interval,
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  getTitlesWidget: (value, meta) => Container(
+                    margin: const EdgeInsets.only(right: 5),
+                    child: Text(meta.formattedValue, textAlign: TextAlign.end, style: textStyle),
+                  ),
+                  reservedSize: reservedSize,
+                  interval: interval,
+                ),
               ),
-              rightTitles: SideTitles(showTitles: false),
-              topTitles: SideTitles(showTitles: false),
+              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
             ),
             gridData: FlGridData(
               show: true,
+              drawVerticalLine: false,
               horizontalInterval: interval,
               checkToShowHorizontalLine: (value) => true,
               getDrawingHorizontalLine: (value) {
@@ -83,7 +93,7 @@ class MonthlyBarChart extends StatelessWidget {
                     showingTooltipIndicators: [0],
                     barRods: [
                       BarChartRodData(
-                        y: e.totalAmount,
+                        toY: e.totalAmount,
                         width: 50,
                         borderRadius: BorderRadius.zero,
                         rodStackItems: [BarChartRodStackItem(0, e.totalAmount, e.color)],

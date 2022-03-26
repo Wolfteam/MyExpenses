@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:darq/darq.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -91,35 +93,41 @@ class HomeLast7DaysSummary extends StatelessWidget {
               tooltipPadding: EdgeInsets.zero,
               tooltipMargin: 0,
               getTooltipItem: (group, groupIndex, rod, rodIndex) => BarTooltipItem(
-                currencyBloc.format(rod.y),
+                currencyBloc.format(rod.toY),
                 TextStyle(color: lineColor, fontWeight: FontWeight.bold, fontSize: 11),
               ),
             ),
           ),
           titlesData: FlTitlesData(
-            bottomTitles: SideTitles(
-              showTitles: true,
-              getTextStyles: (ctx, value) =>
-                  TextStyle(color: incomesIsChecked ? Colors.green : Colors.red, fontSize: 11, fontWeight: FontWeight.bold),
-              rotateAngle: 30,
-              margin: incomesIsChecked ? 20 : 0,
-              getTitles: (value) {
-                final date = finalData.elementAt(value.toInt() - 1);
-                return utils.DateUtils.formatDateWithoutLocale(date.date);
-              },
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) => Transform.rotate(
+                  angle: math.pi / 6,
+                  child: Container(
+                    margin: const EdgeInsets.only(top: 10),
+                    child: Text(
+                      utils.DateUtils.formatDateWithoutLocale(finalData.elementAt(value.toInt() - 1).date),
+                      style: TextStyle(color: incomesIsChecked ? Colors.green : Colors.red, fontSize: 11, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ),
             ),
-            leftTitles: SideTitles(
-              showTitles: true,
-              reservedSize: reservedSize,
-              getTextStyles: (ctx, value) => textStyle,
-              getTitles: (value) => currencyBloc.format(value, showSymbol: false),
-              interval: interval,
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: reservedSize,
+                getTitlesWidget: (value, meta) => Text(currencyBloc.format(value, showSymbol: false), style: textStyle),
+                interval: interval,
+              ),
             ),
-            rightTitles: SideTitles(showTitles: false),
-            topTitles: SideTitles(showTitles: false),
+            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
           ),
           gridData: FlGridData(
             show: true,
+            drawVerticalLine: false,
             horizontalInterval: interval,
             checkToShowHorizontalLine: (value) => true,
             getDrawingHorizontalLine: (value) {
@@ -140,7 +148,7 @@ class HomeLast7DaysSummary extends StatelessWidget {
                   showingTooltipIndicators: [0],
                   barRods: [
                     BarChartRodData(
-                      y: e.totalDayAmount,
+                      toY: e.totalDayAmount,
                       width: 30,
                       borderRadius: BorderRadius.zero,
                       rodStackItems: [

@@ -1,6 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:darq/darq.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -42,28 +43,45 @@ class YearlyChart extends StatelessWidget {
             ),
             titlesData: FlTitlesData(
               show: true,
-              rightTitles: SideTitles(showTitles: false),
-              topTitles: SideTitles(showTitles: false),
-              bottomTitles: SideTitles(
-                showTitles: true,
-                interval: 1,
-                getTextStyles: (context, value) => const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 10,
+              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  interval: 1,
+                  getTitlesWidget: (value, meta) => Container(
+                    margin: const EdgeInsets.only(top: 10),
+                    child: Transform.rotate(
+                      angle: math.pi / 6,
+                      child: Text(
+                        DateFormat('MMM').format(DateTime(year, (value + 1).toInt())),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-                rotateAngle: 30,
-                getTitles: (value) => DateFormat('MMM').format(DateTime(year, (value + 1).toInt())),
               ),
-              leftTitles: SideTitles(
-                showTitles: true,
-                interval: yInterval,
-                getTextStyles: (context, value) => TextStyle(
-                  color: gridColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 10,
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  interval: yInterval,
+                  getTitlesWidget: (value, meta) => Container(
+                    margin: const EdgeInsets.only(right: 5),
+                    child: Text(
+                      meta.formattedValue,
+                      textAlign: TextAlign.end,
+                      style: TextStyle(
+                        color: gridColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+                  reservedSize: 40,
                 ),
-                reservedSize: 40,
-                margin: 12,
               ),
             ),
             borderData: FlBorderData(show: true, border: Border.all(color: gridColor, width: 0.5)),
@@ -85,7 +103,7 @@ class YearlyChart extends StatelessWidget {
               LineChartBarData(
                 spots: spots,
                 isCurved: false,
-                colors: gradientColors,
+                gradient: LinearGradient(colors: gradientColors),
                 barWidth: 3,
                 isStrokeCapRound: true,
                 shadow: Shadow(color: accentColor),
@@ -95,7 +113,7 @@ class YearlyChart extends StatelessWidget {
                 ),
                 belowBarData: BarAreaData(
                   show: true,
-                  colors: gradientColors.map((color) => color.withOpacity(0.3)).toList(),
+                  gradient: LinearGradient(colors: gradientColors.map((color) => color.withOpacity(0.3)).toList()),
                 ),
               ),
             ],
