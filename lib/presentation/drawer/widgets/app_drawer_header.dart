@@ -56,7 +56,7 @@ class AppDrawerHeader extends StatelessWidget {
             if (isUserSignedIn)
               Flexible(
                 child: Tooltip(
-                  message: fullName!,
+                  message: fullName,
                   child: Text(
                     fullName!,
                     style: theme.textTheme.subtitle2,
@@ -66,7 +66,7 @@ class AppDrawerHeader extends StatelessWidget {
             if (isUserSignedIn)
               Flexible(
                 child: Tooltip(
-                  message: email!,
+                  message: email,
                   child: Text(
                     email!,
                     style: theme.textTheme.caption,

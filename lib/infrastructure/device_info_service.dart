@@ -81,7 +81,7 @@ class DeviceInfoServiceImpl implements DeviceInfoService {
     final deviceInfo = device_info_plus_windows.DeviceInfoWindows();
     //TODO: DeviceInfoPlugin CRASHES ON WINDOWS
     final info = await deviceInfo.windowsInfo();
-    final model = info != null ? info.computerName : _na;
+    final model = info.computerName;
     _deviceInfo = {
       'Model': model,
       'OsVersion': _na,

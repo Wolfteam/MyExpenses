@@ -110,10 +110,8 @@ class SettingsServiceImpl implements SettingsService {
   @override
   set isRecurringTransTaskRegistered(bool itIs) => _prefs.setBool(_recurringTransTaskIsRegisteredKey, itIs);
 
-  @override
   bool get usesVersionOnePointTwo => _prefs.getBool(_usesVersionOnePointTwoKey)!;
 
-  @override
   set usesVersionOnePointTwo(bool itUsesIt) => _prefs.setBool(_usesVersionOnePointTwoKey, itUsesIt);
 
   SettingsServiceImpl(this._logger);

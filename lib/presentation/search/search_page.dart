@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/extensions/string_extensions.dart';
@@ -11,7 +10,6 @@ import 'package:my_expenses/presentation/shared/extensions/scroll_controller_ext
 import 'package:my_expenses/presentation/shared/nothing_found.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
 import 'package:my_expenses/presentation/transactions/widgets/transaction_item_card_container.dart';
-import 'package:provider/provider.dart';
 
 class SearchPage extends StatefulWidget {
   static MaterialPageRoute route() {
