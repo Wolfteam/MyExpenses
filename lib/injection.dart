@@ -1,67 +1,229 @@
 import 'package:get_it/get_it.dart';
-
-import 'daos/categories_dao.dart';
-import 'daos/transactions_dao.dart';
-import 'daos/users_dao.dart';
-import 'models/entities/database.dart';
-import 'services/google_service.dart';
-import 'services/logging_service.dart';
-import 'services/network_service.dart';
-import 'services/secure_storage_service.dart';
-import 'services/settings_service.dart';
-import 'services/sync_service.dart';
+import 'package:my_expenses/application/bloc.dart';
+import 'package:my_expenses/domain/models/entities/daos/categories_dao.dart';
+import 'package:my_expenses/domain/models/entities/daos/transactions_dao.dart';
+import 'package:my_expenses/domain/models/entities/daos/users_dao.dart';
+import 'package:my_expenses/domain/services/services.dart';
+import 'package:my_expenses/infrastructure/background_service.dart';
+import 'package:my_expenses/infrastructure/db/categories_dao_impl.dart';
+import 'package:my_expenses/infrastructure/db/database.dart';
+import 'package:my_expenses/infrastructure/db/transactions_dao_impl.dart';
+import 'package:my_expenses/infrastructure/db/users_dao_impl.dart';
+import 'package:my_expenses/infrastructure/infrastructure.dart';
 
 final GetIt getIt = GetIt.instance;
 
-Future<void> initInjection() async {
-  if (!getIt.isRegistered<LoggingService>()) {
-    getIt.registerSingleton<LoggingService>(LoggingServiceImpl());
+class Injection {
+  static SplashScreenBloc get splashScreenBloc {
+    final settingsService = getIt<SettingsService>();
+    return SplashScreenBloc(settingsService);
   }
 
-  if (!getIt.isRegistered<SettingsService>()) {
-    final settings = SettingsServiceImpl(getIt<LoggingService>());
-    await settings.init();
-    getIt.registerSingleton<SettingsService>(settings);
+  static PasswordDialogBloc get passwordDialogBloc {
+    final logger = getIt<LoggingService>();
+    final secureStorage = getIt<SecureStorageService>();
+    return PasswordDialogBloc(logger, secureStorage);
   }
 
-  if (!getIt.isRegistered<AppDatabase>()) {
-    getIt.registerSingleton<AppDatabase>(AppDatabase());
+  static UserAccountsBloc get userAccountsBloc {
+    final logger = getIt<LoggingService>();
+    final categoriesDao = getIt<CategoriesDao>();
+    final transactionsDao = getIt<TransactionsDao>();
+    final usersDao = getIt<UsersDao>();
+    final secureStorage = getIt<SecureStorageService>();
+    final pathService = getIt<PathService>();
+    return UserAccountsBloc(logger, categoriesDao, transactionsDao, usersDao, secureStorage, pathService);
   }
 
-  if (!getIt.isRegistered<CategoriesDao>()) {
-    getIt.registerSingleton<CategoriesDao>(CategoriesDaoImpl(getIt<AppDatabase>()));
+  static CategoryFormBloc get categoryFormBloc {
+    final logger = getIt<LoggingService>();
+    final categoriesDao = getIt<CategoriesDao>();
+    final usersDao = getIt<UsersDao>();
+    return CategoryFormBloc(logger, categoriesDao, usersDao);
   }
 
-  if (!getIt.isRegistered<TransactionsDao>()) {
-    getIt.registerSingleton<TransactionsDao>(TransactionsDaoImpl(getIt<AppDatabase>()));
+  static EstimatesBloc get estimatesBloc {
+    final logger = getIt<LoggingService>();
+    final settingsService = getIt<SettingsService>();
+    final usersDao = getIt<UsersDao>();
+    final transactionsDao = getIt<TransactionsDao>();
+    return EstimatesBloc(logger, settingsService, usersDao, transactionsDao);
   }
 
-  if (!getIt.isRegistered<UsersDao>()) {
-    getIt.registerSingleton<UsersDao>(UsersDaoImpl(getIt<AppDatabase>()));
+  static SearchBloc get searchBloc {
+    final logger = getIt<LoggingService>();
+    final settingsService = getIt<SettingsService>();
+    final usersDao = getIt<UsersDao>();
+    final transactionsDao = getIt<TransactionsDao>();
+    return SearchBloc(logger, transactionsDao, usersDao, settingsService);
   }
 
-  if (!getIt.isRegistered<SecureStorageService>()) {
-    getIt.registerSingleton<SecureStorageService>(SecureStorageServiceImpl());
+  static SignInWithGoogleBloc get signInWithGoogleBloc {
+    final logger = getIt<LoggingService>();
+    final googleService = getIt<GoogleService>();
+    final usersDao = getIt<UsersDao>();
+    final networkService = getIt<NetworkService>();
+    final secureStorage = getIt<SecureStorageService>();
+    final syncService = getIt<SyncService>();
+    final imgService = getIt<ImageService>();
+    return SignInWithGoogleBloc(logger, usersDao, googleService, networkService, secureStorage, syncService, imgService);
   }
 
-  if (!getIt.isRegistered<GoogleService>()) {
-    getIt.registerSingleton<GoogleService>(GoogleServiceImpl(getIt<LoggingService>(), getIt<SecureStorageService>()));
+  static ReportsBloc getReportsBloc(CurrencyBloc currencyBloc) {
+    final logger = getIt<LoggingService>();
+    final transactionsDao = getIt<TransactionsDao>();
+    final usersDao = getIt<UsersDao>();
+    final pathService = getIt<PathService>();
+    final notificationService = getIt<NotificationService>();
+    final deviceInfoService = getIt<DeviceInfoService>();
+    return ReportsBloc(logger, transactionsDao, pathService, notificationService, deviceInfoService, usersDao, currencyBloc);
   }
 
-  if (!getIt.isRegistered<NetworkService>()) {
-    getIt.registerSingleton<NetworkService>(NetworkServiceImpl());
+  static TransactionFormBloc get transactionFormBloc {
+    final logger = getIt<LoggingService>();
+    final transactionsDao = getIt<TransactionsDao>();
+    final settingsService = getIt<SettingsService>();
+    final usersDao = getIt<UsersDao>();
+    final pathService = getIt<PathService>();
+    return TransactionFormBloc(logger, transactionsDao, usersDao, settingsService, pathService);
   }
 
-  if (!getIt.isRegistered<SyncService>()) {
-    getIt.registerSingleton<SyncService>(
-      SyncServiceImpl(
+  static Future<void> init() async {
+    if (!getIt.isRegistered<NetworkService>()) {
+      getIt.registerSingleton<NetworkService>(NetworkServiceImpl());
+    }
+
+    if (!getIt.isRegistered<TelemetryService>()) {
+      final impl = TelemetryServiceImpl();
+      await impl.init();
+      getIt.registerSingleton<TelemetryService>(impl);
+    }
+
+    if (!getIt.isRegistered<DeviceInfoService>()) {
+      final impl = DeviceInfoServiceImpl();
+      await impl.init();
+      getIt.registerSingleton<DeviceInfoService>(impl);
+    }
+
+    if (!getIt.isRegistered<LoggingService>()) {
+      getIt.registerSingleton<LoggingService>(LoggingServiceImpl(getIt<TelemetryService>(), getIt<DeviceInfoService>()));
+    }
+
+    if (!getIt.isRegistered<PathService>()) {
+      final impl = PathServiceImpl();
+      getIt.registerSingleton<PathService>(impl);
+    }
+
+    if (!getIt.isRegistered<ImageService>()) {
+      final impl = ImageServiceImpl(getIt<PathService>());
+      getIt.registerSingleton<ImageService>(impl);
+    }
+
+    if (!getIt.isRegistered<NotificationService>()) {
+      final impl = NotificationServiceImpl(getIt<LoggingService>());
+      getIt.registerSingleton<NotificationService>(impl);
+    }
+
+    if (!getIt.isRegistered<SettingsService>()) {
+      final settings = SettingsServiceImpl(getIt<LoggingService>());
+      await settings.init();
+      getIt.registerSingleton<SettingsService>(settings);
+    }
+
+    if (!getIt.isRegistered<AppDatabase>()) {
+      getIt.registerSingleton<AppDatabase>(AppDatabase());
+    }
+
+    if (!getIt.isRegistered<CategoriesDao>()) {
+      getIt.registerSingleton<CategoriesDao>(CategoriesDaoImpl(getIt<AppDatabase>()));
+    }
+
+    if (!getIt.isRegistered<TransactionsDao>()) {
+      getIt.registerSingleton<TransactionsDao>(TransactionsDaoImpl(getIt<AppDatabase>()));
+    }
+
+    if (!getIt.isRegistered<UsersDao>()) {
+      getIt.registerSingleton<UsersDao>(UsersDaoImpl(getIt<AppDatabase>()));
+    }
+
+    if (!getIt.isRegistered<SecureStorageService>()) {
+      getIt.registerSingleton<SecureStorageService>(SecureStorageServiceImpl());
+    }
+
+    if (!getIt.isRegistered<GoogleService>()) {
+      getIt.registerSingleton<GoogleService>(GoogleServiceImpl(getIt<LoggingService>(), getIt<SecureStorageService>()));
+    }
+
+    if (!getIt.isRegistered<NetworkService>()) {
+      getIt.registerSingleton<NetworkService>(NetworkServiceImpl());
+    }
+
+    if (!getIt.isRegistered<SyncService>()) {
+      getIt.registerSingleton<SyncService>(
+        SyncServiceImpl(
+          getIt<LoggingService>(),
+          getIt<TransactionsDao>(),
+          getIt<CategoriesDao>(),
+          getIt<UsersDao>(),
+          getIt<GoogleService>(),
+          getIt<SecureStorageService>(),
+          getIt<PathService>(),
+        ),
+      );
+    }
+
+    if (!getIt.isRegistered<BackgroundService>()) {
+      final impl = await getBackgroundService();
+      await impl.init();
+      getIt.registerSingleton<BackgroundService>(impl);
+    }
+  }
+
+  static Future<BackgroundService> getBackgroundService({bool forBgTask = false}) async {
+    if (!forBgTask) {
+      return BackgroundServiceImpl(
+        getIt<NetworkService>(),
+        getIt<SyncService>(),
         getIt<LoggingService>(),
+        getIt<SettingsService>(),
+        getIt<NotificationService>(),
         getIt<TransactionsDao>(),
-        getIt<CategoriesDao>(),
         getIt<UsersDao>(),
-        getIt<GoogleService>(),
-        getIt<SecureStorageService>(),
-      ),
+        getIt<AppDatabase>(),
+      );
+    }
+
+    //To avoid problems, its better to just get some instances manually
+    final telemetryService = TelemetryServiceImpl();
+    //For some reason the init does not work here...
+    // await telemetryService.init();
+
+    final deviceInfoService = DeviceInfoServiceImpl();
+    await deviceInfoService.init();
+
+    final loggingService = LoggingServiceImpl(telemetryService, deviceInfoService);
+    final settingsService = SettingsServiceImpl(loggingService);
+    await settingsService.init();
+
+    final notificationService = NotificationServiceImpl(loggingService);
+    final pathService = PathServiceImpl();
+    final db = getIsolateDatabase();
+    final transactionsDao = TransactionsDaoImpl(db);
+    final categoriesDao = CategoriesDaoImpl(db);
+    final usersDao = UsersDaoImpl(db);
+    final secureStorage = SecureStorageServiceImpl();
+    final googleService = GoogleServiceImpl(loggingService, secureStorage);
+    final syncService = SyncServiceImpl(loggingService, transactionsDao, categoriesDao, usersDao, googleService, secureStorage, pathService);
+    final networkService = NetworkServiceImpl();
+    return BackgroundServiceImpl(
+      networkService,
+      syncService,
+      loggingService,
+      settingsService,
+      notificationService,
+      transactionsDao,
+      usersDao,
+      db,
     );
   }
 }
