@@ -68,16 +68,17 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
                   style: Theme.of(context).textTheme.subtitle1,
                 ),
               ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TextButton.icon(
-                  style: TextButton.styleFrom(primary: textColor),
-                  onPressed: () => _changeCurrentMonthDate(state),
-                  icon: const Icon(Icons.calendar_today),
-                  label: Text(state.currentMonthDateString),
+              if (state.transactionsPerMonth.isNotEmpty)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton.icon(
+                    style: TextButton.styleFrom(primary: textColor),
+                    onPressed: () => _changeCurrentMonthDate(state),
+                    icon: const Icon(Icons.calendar_today),
+                    label: Text(state.currentMonthDateString),
+                  ),
                 ),
-              ),
-              MonthlyBarChart(transactionsPerDate: state.transactionsPerMonth),
+              if (state.transactionsPerMonth.isNotEmpty) MonthlyBarChart(transactionsPerDate: state.transactionsPerMonth),
               if (state.transactions.isNotEmpty)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
