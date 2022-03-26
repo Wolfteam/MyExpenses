@@ -3,7 +3,7 @@ import '../models/user_item.dart';
 abstract class UsersDao {
   Future<List<UserItem>> getAllUsers();
 
-  Future<UserItem> getActiveUser();
+  Future<UserItem?> getActiveUser();
 
   Future<UserItem> getUser(String googleUserId);
 
@@ -18,5 +18,5 @@ abstract class UsersDao {
 
   Future<void> deleteAll();
 
-  Future<void> changeActiveUser(int newActiveUserId);
+  Future<void> changeActiveUser(int? newActiveUserId);
 }

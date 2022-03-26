@@ -1,62 +1,71 @@
 part of 'charts_bloc.dart';
 
-abstract class ChartsState extends Equatable {
-  @override
-  List<Object> get props => [];
+@freezed
+class ChartsState with _$ChartsState {
+  double get totalIncomeAmount =>
+      transactions.where((t) => t.category.isAnIncome == true).map((t) => t.amount).fold(0, (t1, t2) => TransactionUtils.roundDouble(t1 + t2));
 
-  const ChartsState();
-}
+  double get totalExpenseAmount =>
+      transactions.where((t) => t.category.isAnIncome == false).map((t) => t.amount).fold(0, (t1, t2) => TransactionUtils.roundDouble(t1 + t2));
 
-class LoadingState extends ChartsState {}
+  const ChartsState._();
 
-class LoadedState extends ChartsState {
-  final DateTime currentDate;
-  final String currentDateString;
-  final List<TransactionsSummaryPerDate> transactionsPerDate;
-  final List<TransactionItem> transactions;
-  final AppLanguageType language;
+  const factory ChartsState.loaded({
+    required int currentYear,
+    required DateTime currentMonthDate,
+    required String currentMonthDateString,
+    required List<TransactionsSummaryPerDate> transactionsPerMonth,
+    required List<TransactionsSummaryPerYear> transactionsPerYear,
+    required List<TransactionItem> transactions,
+    required AppLanguageType language,
+  }) = _Loaded;
 
-  double get totalIncomeAmount => transactions
-      .where((t) => t.category.isAnIncome == true)
-      .map((t) => t.amount)
-      .fold(0, (t1, t2) => TransactionUtils.roundDouble(t1 + t2));
-  double get totalExpenseAmount => transactions
-      .where((t) => t.category.isAnIncome == false)
-      .map((t) => t.amount)
-      .fold(0, (t1, t2) => TransactionUtils.roundDouble(t1 + t2));
+  static List<ChartTransactionItem> incomeChartTransactions(List<TransactionItem> transactions) => _buildChartTransactionItems(transactions, true);
 
-  List<ChartTransactionItem> get incomeChartTransactions =>
-      _buildChartTransactionItems(true);
-  List<ChartTransactionItem> get expenseChartTransactions =>
-      _buildChartTransactionItems(false);
+  static List<ChartTransactionItem> expenseChartTransactions(List<TransactionItem> transactions) => _buildChartTransactionItems(transactions, false);
 
-  @override
-  List<Object> get props => [
-        currentDate,
-        currentDateString,
-        transactionsPerDate,
-        transactions,
-        language
-      ];
+  static List<ChartTransactionItem> _buildChartTransactionItems(List<TransactionItem> transactions, bool onlyIncomes) {
+    final items = <ChartTransactionItem>[];
+    final cats = transactions.where((t) => t.category.isAnIncome == onlyIncomes).select((element, index) => element.category.id).distinct().toList();
 
-  const LoadedState(
-    this.currentDate,
-    this.currentDateString,
-    this.transactionsPerDate,
-    this.transactions,
-    this.language,
-  );
+    for (var i = 0; i < cats.length; i++) {
+      final catId = cats[i];
+      final category = transactions.firstWhere((t) => t.category.id == catId).category;
+      final double amount = transactions.where((t) => t.category.id == catId).map((e) => e.amount).sum;
+      items.add(ChartTransactionItem(value: amount, order: i, categoryColor: category.iconColor));
+    }
 
-  List<ChartTransactionItem> _buildChartTransactionItems(
-    bool onlyIncomes,
-  ) {
-    return transactions
-        .where((t) => t.category.isAnIncome == onlyIncomes)
-        .map((t) => ChartTransactionItem(
-              value: t.amount,
-              order: transactions.indexOf(t),
-              categoryColor: t.category.iconColor,
-            ))
-        .toList();
+    return items;
   }
 }
+//
+// class LoadedState extends ChartsState {
+//   final DateTime currentDate;
+//   final String currentDateString;
+//   final List<TransactionsSummaryPerDate> transactionsPerDate;
+//   final List<TransactionItem> transactions;
+//   final AppLanguageType language;
+//
+//   double get totalIncomeAmount =>
+//       transactions.where((t) => t.category.isAnIncome == true).map((t) => t.amount).fold(0, (t1, t2) => TransactionUtils.roundDouble(t1 + t2));
+//
+//   double get totalExpenseAmount =>
+//       transactions.where((t) => t.category.isAnIncome == false).map((t) => t.amount).fold(0, (t1, t2) => TransactionUtils.roundDouble(t1 + t2));
+//
+//   List<ChartTransactionItem> get incomeChartTransactions => _buildChartTransactionItems(true);
+//
+//   List<ChartTransactionItem> get expenseChartTransactions => _buildChartTransactionItems(false);
+//
+//   List<ChartTransactionItem> _buildChartTransactionItems(
+//     bool onlyIncomes,
+//   ) {
+//     return transactions
+//         .where((t) => t.category.isAnIncome == onlyIncomes)
+//         .map((t) => ChartTransactionItem(
+//               value: t.amount,
+//               order: transactions.indexOf(t),
+//               categoryColor: t.category.iconColor,
+//             ))
+//         .toList();
+//   }
+// }

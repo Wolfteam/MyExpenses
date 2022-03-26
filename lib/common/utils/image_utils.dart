@@ -15,15 +15,7 @@ class ImageUtils {
   ) async {
     final receivePort = ReceivePort();
 
-    await Isolate.spawn(
-        _resizeImage,
-        _ResizeParams(
-          receivePort.sendPort,
-          input,
-          output,
-          width,
-          height,
-        ));
+    await Isolate.spawn(_resizeImage, _ResizeParams(receivePort.sendPort, input, output, width, height));
 
     await receivePort.first;
   }
@@ -51,10 +43,10 @@ class ImageUtils {
   }
 
   static Future<void> _saveNetworkImage(_SaveNetworkImageParams params) async {
-    final response = await http.get(params.url);
+    final response = await http.get(Uri.parse(params.url));
     final image = decodeImage(response.bodyBytes);
     final thumbnail = copyResize(
-      image,
+      image!,
       width: params.width,
       height: params.height,
     );
@@ -68,7 +60,7 @@ class ImageUtils {
     final image = decodeImage(params.input.readAsBytesSync());
 
     final thumbnail = copyResize(
-      image,
+      image!,
       width: params.width,
       height: params.height,
       interpolation: Interpolation.average,

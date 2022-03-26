@@ -23,7 +23,7 @@ class EstimatesBloc extends Bloc<EstimatesEvent, EstimatesState> {
   final TransactionsDao _transactionsDao;
   EstimatesBloc(this._logger, this._settings, this._usersDao, this._transactionsDao) : super(EstimatesState.loading());
 
-  EstimatesInitialState get currentState => state as EstimatesInitialState;
+  _EstimatesInitialState get currentState => state as _EstimatesInitialState;
 
   @override
   Stream<EstimatesState> mapEventToState(
@@ -72,7 +72,7 @@ class EstimatesBloc extends Bloc<EstimatesEvent, EstimatesState> {
       transactions.addAll(filteredParents);
 
       final incomes = TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: true);
-      final expenses = TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: false);
+      final expenses = TransactionUtils.getTotalTransactionAmounts(transactions);
       final balance = TransactionUtils.roundDouble(incomes + expenses);
       return EstimatesState.loaded(
         selectedTransactionType: transactionType,
@@ -107,7 +107,8 @@ class EstimatesBloc extends Bloc<EstimatesEvent, EstimatesState> {
       }
       final tuple = TransactionUtils.getRecurringTransactionPeriods(
         parent.repetitionCycle,
-        parent.nextRecurringDate,
+        parent.transactionDate,
+        parent.nextRecurringDate!,
         untilDate,
       );
 

@@ -1,13 +1,15 @@
-import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:darq/darq.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/bloc/currency/currency_bloc.dart';
+import 'package:my_expenses/common/extensions/iterable_extensions.dart';
+import 'package:my_expenses/generated/l10n.dart';
 
-import '../../../bloc/currency/currency_bloc.dart';
 import '../../../bloc/transactions_last_7_days/transactions_last_7_days_bloc.dart';
 import '../../../common/enums/transaction_type.dart';
 import '../../../common/styles.dart';
-import '../../../common/utils/date_utils.dart';
-import '../../../generated/i18n.dart';
+import '../../../common/utils/date_utils.dart' as utils;
 import '../../../models/transactions_summary_per_day.dart';
 import 'transaction_popupmenu_type_filter.dart';
 
@@ -17,13 +19,16 @@ class HomeLast7DaysSummary extends StatelessWidget {
   final List<TransactionsSummaryPerDay> expenses;
 
   const HomeLast7DaysSummary({
-    @required this.selectedType,
-    @required this.incomes,
-    @required this.expenses,
+    required this.selectedType,
+    required this.incomes,
+    required this.expenses,
   });
 
   @override
   Widget build(BuildContext context) {
+    final incomesIsChecked = selectedType == TransactionType.incomes;
+    final aspectRatio = MediaQuery.of(context).orientation == Orientation.portrait ? 3 / 2 : 2 / 1;
+
     return Card(
       elevation: Styles.cardElevation,
       margin: Styles.edgeInsetAll10,
@@ -33,56 +38,17 @@ class HomeLast7DaysSummary extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.center,
-          children: _buildPage(context),
+          children: [
+            _buildTitle(incomesIsChecked, context),
+            AspectRatio(aspectRatio: aspectRatio, child: _buildBarChart(incomesIsChecked, context)),
+          ],
         ),
       ),
     );
-  }
-
-  List<Widget> _buildPage(BuildContext context) {
-    final incomesIsChecked = selectedType == TransactionType.incomes;
-
-    return [
-      _buildTitle(incomesIsChecked, context),
-      _buildBarChart(incomesIsChecked, context),
-    ];
-  }
-
-  List<charts.Series<TransactionsSummaryPerDay, String>> _createSampleData(
-    List<TransactionsSummaryPerDay> data,
-    BuildContext context,
-  ) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final labelStyle = charts.TextStyleSpec(
-      fontSize: 10,
-      lineHeight: 1.0,
-      color: charts.ColorUtil.fromDartColor(
-        isDark ? Colors.white : Colors.black,
-      ),
-    );
-
-    final currencyBloc = context.bloc<CurrencyBloc>();
-
-    return [
-      charts.Series<TransactionsSummaryPerDay, String>(
-        id: 'HomeLast7DaysSummary',
-        data: data,
-        colorFn: (item, __) => charts.ColorUtil.fromDartColor(item.color),
-        domainFn: (item, _) => DateUtils.formatDateWithoutLocale(item.date),
-        measureFn: (item, _) => item.totalDayAmount,
-        insideLabelStyleAccessorFn: (item, index) => labelStyle,
-        outsideLabelStyleAccessorFn: (item, index) => labelStyle,
-        labelAccessorFn: (item, _) => currencyBloc.format(
-          item.totalDayAmount,
-          showSymbol: false,
-        ),
-      ),
-    ];
   }
 
   Widget _buildTitle(bool incomesIsChecked, BuildContext context) {
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -96,60 +62,102 @@ class HomeLast7DaysSummary extends StatelessWidget {
         ),
         TransactionPopupMenuTypeFilter(
           selectedValue: selectedType,
-          onSelectedValue: (newValue) => _onSelectedTypeChanged(context, newValue),
+          onSelectedValue: (newValue) => _onSelectedTypeChanged(context, TransactionType.values[newValue]),
         ),
       ],
     );
   }
 
-  Widget _buildBarChart(
-    bool incomesIsChecked,
-    BuildContext context,
-  ) {
+  Widget _buildBarChart(bool incomesIsChecked, BuildContext context) {
     final theme = Theme.of(context);
     final lineColor = theme.brightness == Brightness.dark ? Colors.white : Colors.black;
+    final finalData = incomesIsChecked ? incomes : expenses;
+    final maxWastedValue = finalData.isEmpty ? 0 : finalData.map((e) => e.totalDayAmount.abs()).max();
+    final double maxValue = maxWastedValue == 0 ? 10 : maxWastedValue + 5;
+    final textStyle = TextStyle(color: lineColor, fontSize: 10);
+    final currencyBloc = context.read<CurrencyBloc>();
+    final interval = maxValue / 4;
+    final double reservedSize = maxValue.toStringAsFixed(2).length * 7;
+
     return Container(
-      height: 180,
-      child: charts.BarChart(
-        _createSampleData(incomesIsChecked ? incomes : expenses, context),
-        animate: true,
-        barRendererDecorator: charts.BarLabelDecorator<String>(),
-        domainAxis: charts.OrdinalAxisSpec(
-          showAxisLine: false,
-          renderSpec: charts.SmallTickRendererSpec(
-            labelRotation: 45,
-            axisLineStyle: charts.LineStyleSpec(
-              color: charts.ColorUtil.fromDartColor(
-                Colors.white,
-              ),
-              thickness: 5,
-            ),
-            labelStyle: charts.TextStyleSpec(
-              color: charts.ColorUtil.fromDartColor(
-                incomesIsChecked ? Colors.green : Colors.red,
+      margin: const EdgeInsets.symmetric(vertical: 15),
+      child: BarChart(
+        BarChartData(
+          alignment: BarChartAlignment.spaceEvenly,
+          maxY: incomesIsChecked ? maxValue : 0,
+          minY: incomesIsChecked ? -0 : -maxValue,
+          barTouchData: BarTouchData(
+            enabled: false,
+            touchTooltipData: BarTouchTooltipData(
+              tooltipBgColor: Colors.transparent,
+              tooltipPadding: EdgeInsets.zero,
+              tooltipMargin: 0,
+              getTooltipItem: (group, groupIndex, rod, rodIndex) => BarTooltipItem(
+                currencyBloc.format(rod.y),
+                TextStyle(color: lineColor, fontWeight: FontWeight.bold, fontSize: 11),
               ),
             ),
           ),
-        ),
-        primaryMeasureAxis: charts.NumericAxisSpec(
-          showAxisLine: false,
-          renderSpec: charts.GridlineRendererSpec(
-            axisLineStyle: charts.LineStyleSpec(
-              color: charts.ColorUtil.fromDartColor(lineColor),
+          titlesData: FlTitlesData(
+            bottomTitles: SideTitles(
+              showTitles: true,
+              getTextStyles: (ctx, value) =>
+                  TextStyle(color: incomesIsChecked ? Colors.green : Colors.red, fontSize: 11, fontWeight: FontWeight.bold),
+              rotateAngle: 30,
+              margin: incomesIsChecked ? 20 : 0,
+              getTitles: (value) {
+                final date = finalData.elementAt(value.toInt() - 1);
+                return utils.DateUtils.formatDateWithoutLocale(date.date);
+              },
             ),
-            labelStyle: charts.TextStyleSpec(
-              color: charts.ColorUtil.fromDartColor(lineColor),
+            leftTitles: SideTitles(
+              showTitles: true,
+              reservedSize: reservedSize,
+              getTextStyles: (ctx, value) => textStyle,
+              getTitles: (value) => currencyBloc.format(value, showSymbol: false),
+              interval: interval,
             ),
-            lineStyle: charts.LineStyleSpec(
-              color: charts.ColorUtil.fromDartColor(lineColor),
-            ),
+            rightTitles: SideTitles(showTitles: false),
+            topTitles: SideTitles(showTitles: false),
           ),
+          gridData: FlGridData(
+            show: true,
+            horizontalInterval: interval,
+            checkToShowHorizontalLine: (value) => true,
+            getDrawingHorizontalLine: (value) {
+              final zeroLine = FlLine(color: lineColor, strokeWidth: 2);
+              final otherLine = FlLine(color: lineColor, strokeWidth: 0.8);
+              if (incomesIsChecked) {
+                return value <= 0 ? zeroLine : otherLine;
+              }
+
+              return value >= 0 ? zeroLine : otherLine;
+            },
+          ),
+          borderData: FlBorderData(show: false),
+          barGroups: finalData
+              .mapIndex(
+                (e, i) => BarChartGroupData(
+                  x: i + 1,
+                  showingTooltipIndicators: [0],
+                  barRods: [
+                    BarChartRodData(
+                      y: e.totalDayAmount,
+                      width: 30,
+                      borderRadius: BorderRadius.zero,
+                      rodStackItems: [
+                        BarChartRodStackItem(0, e.totalDayAmount, e.color),
+                      ],
+                    ),
+                  ],
+                ),
+              )
+              .toList(),
         ),
       ),
     );
   }
 
-  void _onSelectedTypeChanged(BuildContext context, int newValue) => context
-      .bloc<TransactionsLast7DaysBloc>()
-      .transactionTypeChanged(TransactionType.values.firstWhere((el) => el.index == newValue));
+  void _onSelectedTypeChanged(BuildContext context, TransactionType newValue) =>
+      context.read<TransactionsLast7DaysBloc>().add(TransactionsLast7DaysEvent.typeChanged(selectedType: newValue));
 }

@@ -1,42 +1,48 @@
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:meta/meta.dart';
 
 import '../../common/enums/transaction_type.dart';
 import '../../models/transactions_summary_per_day.dart';
 
 part 'transactions_last_7_days_bloc.freezed.dart';
+part 'transactions_last_7_days_event.dart';
 part 'transactions_last_7_days_state.dart';
 
-class TransactionsLast7DaysBloc extends Cubit<TransactionsLast7DaysState> {
-  TransactionsLast7DaysBloc() : super(TransactionsLast7DaysState.initial());
+class TransactionsLast7DaysBloc extends Bloc<TransactionsLast7DaysEvent, TransactionsLast7DaysState> {
+  TransactionsLast7DaysBloc() : super(const TransactionsLast7DaysState.loading());
 
-  TransactionsLast7DaysLoadedState get currentState => state as TransactionsLast7DaysLoadedState;
+  _InitialState get currentState => state as _InitialState;
 
-  void transactionsLoaded({
-    TransactionType selectedType,
-    List<TransactionsSummaryPerDay> incomes = const [],
-    List<TransactionsSummaryPerDay> expenses = const [],
-    bool showLast7Days = true,
-  }) {
-    if (state is! TransactionsLast7DaysLoadedState) {
-      emit(TransactionsLast7DaysState.loaded(
+  @override
+  Stream<TransactionsLast7DaysState> mapEventToState(TransactionsLast7DaysEvent event) async* {
+    final s = event.map(
+      init: (e) => _transactionsLoaded(e.selectedType, e.incomes, e.expenses, e.showLast7Days),
+      typeChanged: (e) => currentState.copyWith.call(selectedType: e.selectedType),
+    );
+
+    yield s;
+  }
+
+  TransactionsLast7DaysState _transactionsLoaded(
+    TransactionType? selectedType,
+    List<TransactionsSummaryPerDay> incomes,
+    List<TransactionsSummaryPerDay> expenses,
+    bool showLast7Days,
+  ) {
+    if (state is! _InitialState) {
+      return TransactionsLast7DaysState.initial(
         showLast7Days: showLast7Days,
         selectedType: selectedType ?? TransactionType.incomes,
         incomes: incomes,
         expenses: expenses,
-      ));
-      return;
+      );
     }
 
-    emit(currentState.copyWith.call(
+    return currentState.copyWith.call(
       selectedType: selectedType ?? currentState.selectedType,
       incomes: incomes,
       expenses: expenses,
       showLast7Days: showLast7Days,
-    ));
+    );
   }
-
-  void transactionTypeChanged(TransactionType selectedType) =>
-      emit(currentState.copyWith.call(selectedType: selectedType));
 }

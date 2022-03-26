@@ -1,20 +1,10 @@
 part of 'sign_in_with_google_bloc.dart';
 
-@immutable
-abstract class SignInWithGoogleEvent extends Equatable {
-  const SignInWithGoogleEvent();
-}
+@freezed
+class SignInWithGoogleEvent with _$SignInWithGoogleEvent {
+  const factory SignInWithGoogleEvent.init() = _Init;
 
-class Initialize extends SignInWithGoogleEvent {
-  @override
-  List<Object> get props => [];
-}
-
-class UrlChanged extends SignInWithGoogleEvent {
-  final String url;
-
-  @override
-  List<Object> get props => [url];
-
-  const UrlChanged(this.url);
+  const factory SignInWithGoogleEvent.urlChanged({
+    required String url,
+  }) = _UrlChanged;
 }

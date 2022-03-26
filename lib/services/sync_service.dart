@@ -34,13 +34,13 @@ class SyncServiceImpl implements SyncService {
 
   Future<String> get appFilePath async {
     final dir = await getExternalStorageDirectory();
-    final path = '${dir.path}/$_appFile';
+    final path = '${dir!.path}/$_appFile';
     return path;
   }
 
   Future<String> get readmeFilePath async {
     final dir = await getExternalStorageDirectory();
-    final path = '${dir.path}/$_readmeFile';
+    final path = '${dir!.path}/$_readmeFile';
     return path;
   }
 
@@ -69,7 +69,7 @@ class SyncServiceImpl implements SyncService {
       if (!folderExists) {
         await _onFirstInstall();
       } else {
-        await _onExistingInstall(currentUser);
+        await _onExistingInstall(currentUser!);
       }
     } catch (e, s) {
       _logger.error(
@@ -93,6 +93,13 @@ class SyncServiceImpl implements SyncService {
       final fileId = await _googleService.downloadFile(_appFile, filePath);
       final appFile = await _getLocalAppFile(filePath);
       final user = await _usersDao.getActiveUser();
+      if (user == null) {
+        _logger.info(
+          runtimeType,
+          'downloadAndUpdateFile: There is no user....',
+        );
+        return;
+      }
       _logger.info(
         runtimeType,
         'downloadAndUpdateFile: Performing sync for user = ${user.email} ....',
@@ -174,6 +181,11 @@ class SyncServiceImpl implements SyncService {
       );
       final currentUser = await _usersDao.getActiveUser();
 
+      if (currentUser == null) {
+        _logger.info(runtimeType, 'createAppFile: There is no user....');
+        return;
+      }
+
       final transactions = await _transactionsDao.getAllTransactionsToSync(
         currentUser.id,
       );
@@ -232,6 +244,11 @@ class SyncServiceImpl implements SyncService {
     );
 
     final currentUser = await _usersDao.getActiveUser();
+    if (currentUser == null) {
+      _logger.info(runtimeType, '_onFirstInstall: There is no user....');
+      return;
+    }
+
     _logger.info(
       runtimeType,
       '_onFirstInstall: Updating categories...',
@@ -266,6 +283,10 @@ class SyncServiceImpl implements SyncService {
     final filePath = await appFilePath;
     final fileId = await _googleService.downloadFile(_appFile, filePath);
     final user = await _usersDao.getActiveUser();
+    if (user == null) {
+      _logger.info(runtimeType, '_onExistingInstall: There is no user....');
+      return;
+    }
     await _secureStorageService.save(
       SecureResourceType.currentUserAppFileId,
       currentUser,
@@ -355,11 +376,8 @@ class SyncServiceImpl implements SyncService {
 
     try {
       final imgPath = await AppPathUtils.getUserImgPath(userId);
-      final imgs = await Directory(imgPath)
-          .list()
-          .asyncMap((f) => f.path)
-          .where((path) => path.startsWith(AppPathUtils.transactionImgPrefix))
-          .toList();
+      final imgs =
+          await Directory(imgPath).list().asyncMap((f) => f.path).where((path) => path.startsWith(AppPathUtils.transactionImgPrefix)).toList();
 
       _logger.info(
         runtimeType,
@@ -435,13 +453,9 @@ class SyncServiceImpl implements SyncService {
           .where((path) => path.contains(AppPathUtils.transactionImgPrefix))
           .toList();
 
-      final imgsToDownload = currentImgsMap.entries
-          .where((kvp) => !imgs.contains(kvp.value))
-          .toList();
+      final imgsToDownload = currentImgsMap.entries.where((kvp) => !imgs.contains(kvp.value)).toList();
 
-      final imgsToUpload = imgs
-          .where((filename) => !currentImgsMap.values.contains(filename))
-          .toList();
+      final imgsToUpload = imgs.where((filename) => !currentImgsMap.values.contains(filename)).toList();
 
       _logger.info(
         runtimeType,

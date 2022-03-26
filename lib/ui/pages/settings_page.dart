@@ -1,6 +1,8 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/common/utils/background_utils.dart';
+import 'package:my_expenses/generated/l10n.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../bloc/app/app_bloc.dart' as app_bloc;
@@ -17,8 +19,7 @@ import '../../common/styles.dart';
 import '../../common/utils/bloc_utils.dart';
 import '../../common/utils/currency_utils.dart';
 import '../../common/utils/toast_utils.dart';
-import '../../generated/i18n.dart';
-import '../widgets/settings/password_dialog.dart';
+import '../widgets/settings/password_bottom_sheet.dart';
 import '../widgets/settings/setting_card_subtitle_text.dart';
 import '../widgets/settings/settings_card_title_text.dart';
 
@@ -35,7 +36,7 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    context.bloc<SettingsBloc>().add(const LoadSettings());
+    context.read<SettingsBloc>().add(const SettingsEvent.load());
   }
 
   @override
@@ -53,27 +54,28 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
     );
   }
 
-  List<Widget> _buildPage(
-    BuildContext context,
-    SettingsState state,
-  ) {
-    if (state is SettingsInitialState) {
-      final i18n = I18n.of(context);
-      return [
-        _buildThemeSettings(context, state, i18n),
-        _buildAccentColorSettings(context, state, i18n),
-        _buildLanguageSettings(context, state, i18n),
-        if (state.isUserLoggedIn) _buildSyncSettings(context, state, i18n),
-        _buildOtherSettings(context, state, i18n),
-        _buildAboutSettings(context, state, i18n),
-      ];
-    }
-
-    return [
-      const Center(
-        child: CircularProgressIndicator(),
-      )
-    ];
+  List<Widget> _buildPage(BuildContext context, SettingsState state) {
+    final i18n = S.of(context);
+    return state.map(
+      loading: (_) => [const Center(child: CircularProgressIndicator())],
+      initial: (state) => [
+        _buildThemeSettings(context, state.appTheme, i18n),
+        _buildAccentColorSettings(context, state.accentColor, i18n),
+        _buildLanguageSettings(context, state.appLanguage, i18n),
+        if (state.isUserLoggedIn) _buildSyncSettings(context, state.syncInterval, state.showNotificationAfterFullSync, i18n),
+        _buildOtherSettings(
+          context,
+          state.currencySymbol,
+          state.currencyToTheRight,
+          state.askForPassword,
+          state.canUseFingerPrint,
+          state.askForFingerPrint,
+          state.showNotificationForRecurringTrans,
+          i18n,
+        ),
+        _buildAboutSettings(context, state.appVersion, i18n),
+      ],
+    );
   }
 
   Card _buildSettingsCard(Widget child) {
@@ -85,20 +87,16 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
     );
   }
 
-  Widget _buildThemeSettings(
-    BuildContext context,
-    SettingsInitialState state,
-    I18n i18n,
-  ) {
+  Widget _buildThemeSettings(BuildContext context, AppThemeType appThemeType, S i18n) {
     final dropdown = DropdownButton<AppThemeType>(
       isExpanded: true,
-      hint: Text(i18n.settingsSelectAppTheme),
-      value: state.appTheme,
+      hint: Text(i18n.selectAppTheme),
+      value: appThemeType,
       underline: Container(
         height: 0,
         color: Colors.transparent,
       ),
-      onChanged: _appThemeChanged,
+      onChanged: (v) => _appThemeChanged(v!),
       items: AppThemeType.values
           .map<DropdownMenuItem<AppThemeType>>(
             (theme) => DropdownMenuItem<AppThemeType>(
@@ -112,8 +110,8 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
     final content = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        SettingsCardTitleText(text: i18n.settingsTheme, icon: const Icon(Icons.color_lens)),
-        SettingsCardSubtitleText(text: i18n.settingsChooseAppTheme),
+        SettingsCardTitleText(text: i18n.theme, icon: const Icon(Icons.color_lens)),
+        SettingsCardSubtitleText(text: i18n.chooseAppTheme),
         Padding(padding: Styles.edgeInsetHorizontal16, child: dropdown),
       ],
     );
@@ -121,11 +119,7 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
     return _buildSettingsCard(content);
   }
 
-  Widget _buildAccentColorSettings(
-    BuildContext context,
-    SettingsInitialState state,
-    I18n i18n,
-  ) {
+  Widget _buildAccentColorSettings(BuildContext context, AppAccentColorType accentColorType, S i18n) {
     final accentColors = AppAccentColorType.values.map((accentColor) {
       final color = accentColor.getAccentColor();
 
@@ -134,7 +128,7 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
         child: Container(
           padding: const EdgeInsets.all(8),
           color: color,
-          child: state.accentColor == accentColor ? const Icon(Icons.check, color: Colors.white) : null,
+          child: accentColorType == accentColor ? const Icon(Icons.check, color: Colors.white) : null,
         ),
       );
 
@@ -144,8 +138,8 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
     final content = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        SettingsCardTitleText(text: i18n.settingsAccentColor, icon: const Icon(Icons.colorize)),
-        SettingsCardSubtitleText(text: i18n.settingsChooseAccentColor),
+        SettingsCardTitleText(text: i18n.accentColor, icon: const Icon(Icons.colorize)),
+        SettingsCardSubtitleText(text: i18n.chooseAccentColor),
         GridView.count(
           shrinkWrap: true,
           primary: false,
@@ -161,11 +155,7 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
     return _buildSettingsCard(content);
   }
 
-  Widget _buildLanguageSettings(
-    BuildContext context,
-    SettingsInitialState state,
-    I18n i18n,
-  ) {
+  Widget _buildLanguageSettings(BuildContext context, AppLanguageType languageType, S i18n) {
     final dropdown = [AppLanguageType.english, AppLanguageType.spanish]
         .map<DropdownMenuItem<AppLanguageType>>(
           (lang) => DropdownMenuItem<AppLanguageType>(
@@ -178,16 +168,16 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
     final content = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        SettingsCardTitleText(text: i18n.settingsLanguage, icon: const Icon(Icons.language)),
-        SettingsCardSubtitleText(text: i18n.settingsChooseLanguage),
+        SettingsCardTitleText(text: i18n.language, icon: const Icon(Icons.language)),
+        SettingsCardSubtitleText(text: i18n.chooseLanguage),
         Padding(
           padding: Styles.edgeInsetHorizontal16,
           child: DropdownButton<AppLanguageType>(
             isExpanded: true,
-            hint: Text(i18n.settingsSelectLanguage),
-            value: state.appLanguage,
+            hint: Text(i18n.selectLanguage),
+            value: languageType,
             underline: Container(height: 0, color: Colors.transparent),
-            onChanged: _languageChanged,
+            onChanged: (v) => _languageChanged(v!),
             items: dropdown,
           ),
         ),
@@ -196,18 +186,14 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
     return _buildSettingsCard(content);
   }
 
-  Widget _buildSyncSettings(
-    BuildContext context,
-    SettingsInitialState state,
-    I18n i18n,
-  ) {
+  Widget _buildSyncSettings(BuildContext context, SyncIntervalType syncIntervalType, bool showNotificationAfterFullSync, S i18n) {
     final theme = Theme.of(context);
     final dropdown = DropdownButton<SyncIntervalType>(
       isExpanded: true,
-      hint: Text(i18n.settingsSelectSyncInterval),
-      value: state.syncInterval,
+      hint: Text(i18n.selectSyncInterval),
+      value: syncIntervalType,
       underline: Container(height: 0, color: Colors.transparent),
-      onChanged: _syncIntervalChanged,
+      onChanged: (v) => _syncIntervalChanged(v!),
       items: SyncIntervalType.values
           .map<DropdownMenuItem<SyncIntervalType>>(
             (interval) => DropdownMenuItem<SyncIntervalType>(
@@ -221,15 +207,20 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
     final content = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        SettingsCardTitleText(text: i18n.settingsSync, icon: const Icon(Icons.sync)),
-        SettingsCardSubtitleText(text: i18n.settingsChooseSyncInterval),
+        SettingsCardTitleText(text: i18n.sync, icon: const Icon(Icons.sync)),
+        SettingsCardSubtitleText(text: i18n.chooseSyncInterval),
         Padding(padding: Styles.edgeInsetHorizontal16, child: dropdown),
         SwitchListTile(
-          activeColor: theme.accentColor,
-          value: state.showNotifAfterFullSync,
+          activeColor: theme.colorScheme.secondary,
+          value: showNotificationAfterFullSync,
           title: Text(i18n.showNotificationAfterFullSync),
-          onChanged: _showNotifAfterFullSyncChanged,
+          onChanged: _showNotificationAfterFullSyncChanged,
         ),
+        TextButton.icon(
+          icon: const Icon(Icons.sync),
+          onPressed: () => BackgroundUtils.runSyncTask(),
+          label: Text(i18n.syncNow),
+        )
       ],
     );
     return _buildSettingsCard(content);
@@ -237,34 +228,41 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
 
   Widget _buildOtherSettings(
     BuildContext context,
-    SettingsInitialState state,
-    I18n i18n,
+    CurrencySymbolType currencySymbolType,
+    bool currencyToTheRight,
+    bool askForPassword,
+    bool canUseFingerPrint,
+    bool askForFingerPrint,
+    bool showNotificationForRecurringTrans,
+    S i18n,
   ) {
     final theme = Theme.of(context);
     final currencyDropDown = DropdownButton<CurrencySymbolType>(
       isExpanded: true,
       isDense: true,
       selectedItemBuilder: (ctx) => CurrencySymbolType.values
-          .map((value) => Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text(i18n.currencySimbol),
-                      Container(
-                        margin: const EdgeInsets.only(right: 15),
-                        child: Text(CurrencyUtils.getCurrencySymbol(value)),
-                      ),
-                    ],
-                  ),
-                ],
-              ))
+          .map(
+            (value) => Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(i18n.currencySymbol),
+                    Container(
+                      margin: const EdgeInsets.only(right: 15),
+                      child: Text(CurrencyUtils.getCurrencySymbol(value)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          )
           .toList(),
-      value: state.currencySymbol,
+      value: currencySymbolType,
       underline: Container(height: 0, color: Colors.transparent),
-      onChanged: _currencyChanged,
+      onChanged: (v) => _currencyChanged(v!),
       items: CurrencySymbolType.values
           .map<DropdownMenuItem<CurrencySymbolType>>(
             (symbol) => DropdownMenuItem<CurrencySymbolType>(
@@ -279,36 +277,36 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         SettingsCardTitleText(text: i18n.others, icon: const Icon(Icons.sync)),
-        SettingsCardSubtitleText(text: i18n.settingsOthersSubTitle),
+        SettingsCardSubtitleText(text: i18n.othersSubTitle),
         Container(
           margin: const EdgeInsets.only(top: 10),
           padding: Styles.edgeInsetHorizontal16,
           child: currencyDropDown,
         ),
         SwitchListTile(
-          activeColor: theme.accentColor,
-          value: state.currencyToTheRight,
+          activeColor: theme.colorScheme.secondary,
+          value: currencyToTheRight,
           title: Text(i18n.currencySymbolToRight),
           onChanged: _currencyPlacementChanged,
         ),
         SwitchListTile(
-          activeColor: theme.accentColor,
-          value: state.askForPassword,
+          activeColor: theme.colorScheme.secondary,
+          value: askForPassword,
           title: Text(i18n.askForPassword),
           onChanged: _askForPasswordChanged,
         ),
-        if (state.canUseFingerPrint)
+        if (canUseFingerPrint)
           SwitchListTile(
-            activeColor: theme.accentColor,
-            value: state.askForFingerPrint,
+            activeColor: theme.colorScheme.secondary,
+            value: askForFingerPrint,
             title: Text(i18n.askForFingerPrint),
             onChanged: _askForFingerPrintChanged,
           ),
         SwitchListTile(
-          activeColor: theme.accentColor,
-          value: state.showNotifForRecurringTrans,
+          activeColor: theme.colorScheme.secondary,
+          value: showNotificationForRecurringTrans,
           title: Text(i18n.showNotificationForRecurringTrans),
-          onChanged: _showNotifForRecurringTransChanged,
+          onChanged: _showNotificationForRecurringTransChanged,
         ),
       ],
     );
@@ -316,17 +314,13 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
     return _buildSettingsCard(content);
   }
 
-  Widget _buildAboutSettings(
-    BuildContext context,
-    SettingsInitialState state,
-    I18n i18n,
-  ) {
+  Widget _buildAboutSettings(BuildContext context, String appVersion, S i18n) {
     final textTheme = Theme.of(context).textTheme;
     final content = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        SettingsCardTitleText(text: i18n.settingsAbout, icon: const Icon(Icons.info_outline)),
-        SettingsCardSubtitleText(text: i18n.settingsAboutSubTitle),
+        SettingsCardTitleText(text: i18n.about, icon: const Icon(Icons.info_outline)),
+        SettingsCardSubtitleText(text: i18n.aboutSubTitle),
         Container(
           margin: Styles.edgeInsetHorizontal16,
           child: Column(
@@ -337,20 +331,20 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
                 child: Image.asset(CustomAssets.appIcon, width: 70, height: 70),
               ),
               Text(i18n.appName, textAlign: TextAlign.center, style: textTheme.subtitle2),
-              Text(i18n.appVersion(state.appVersion), textAlign: TextAlign.center, style: textTheme.subtitle2),
-              Text(i18n.settingsAboutSummary, textAlign: TextAlign.center),
+              Text(i18n.appVersion(appVersion), textAlign: TextAlign.center, style: textTheme.subtitle2),
+              Text(i18n.aboutSummary, textAlign: TextAlign.center),
               Container(
                 margin: const EdgeInsets.only(top: 10),
-                child: Text(i18n.settingsDonations, style: textTheme.subtitle1.copyWith(fontWeight: FontWeight.bold)),
+                child: Text(i18n.donations, style: textTheme.subtitle1!.copyWith(fontWeight: FontWeight.bold)),
               ),
-              Text(i18n.settingsDonationsMsg),
+              Text(i18n.donationsMsg),
               Container(
                 margin: const EdgeInsets.only(top: 10),
-                child: Text(i18n.settingsSupport, style: textTheme.subtitle1.copyWith(fontWeight: FontWeight.bold)),
+                child: Text(i18n.support, style: textTheme.subtitle1!.copyWith(fontWeight: FontWeight.bold)),
               ),
               Container(
                 margin: const EdgeInsets.only(top: 5),
-                child: Text(i18n.settingsDonationSupport),
+                child: Text(i18n.donationSupport),
               ),
               Container(
                 margin: const EdgeInsets.only(top: 5),
@@ -367,7 +361,7 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            _lauchUrl('https://github.com/Wolfteam/MyExpenses/Issues');
+                            _launchUrl('https://github.com/Wolfteam/MyExpenses/issues');
                           },
                       ),
                     ],
@@ -383,38 +377,38 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
     return _buildSettingsCard(content);
   }
 
-  Future _lauchUrl(String url) async {
+  Future<void> _launchUrl(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
     }
   }
 
   void _appThemeChanged(AppThemeType newValue) {
-    final i18n = I18n.of(context);
-    showInfoToast(i18n.restartTheAppToApplyChanges);
-    context.bloc<SettingsBloc>().add(AppThemeChanged(newValue));
-    context.bloc<app_bloc.AppBloc>().add(app_bloc.AppThemeChanged(newValue));
+    final i18n = S.of(context);
+    ToastUtils.showInfoToast(context, i18n.restartTheAppToApplyChanges);
+    context.read<SettingsBloc>().add(SettingsEvent.appThemeChanged(selectedAppTheme: newValue));
+    context.read<app_bloc.AppBloc>().add(app_bloc.AppEvent.themeChanged(theme: newValue));
   }
 
   void _accentColorChanged(AppAccentColorType newValue) {
-    context.bloc<SettingsBloc>().add(AppAccentColorChanged(newValue));
-    context.bloc<app_bloc.AppBloc>().add(app_bloc.AppAccentColorChanged(newValue));
+    context.read<SettingsBloc>().add(SettingsEvent.appAccentColorChanged(selectedAccentColor: newValue));
+    context.read<app_bloc.AppBloc>().add(app_bloc.AppEvent.accentColorChanged(accentColor: newValue));
   }
 
   void _syncIntervalChanged(SyncIntervalType newValue) =>
-      context.bloc<SettingsBloc>().add(SyncIntervalChanged(newValue));
+      context.read<SettingsBloc>().add(SettingsEvent.syncIntervalChanged(selectedSyncInterval: newValue));
 
   void _languageChanged(AppLanguageType newValue) {
-    final i18n = I18n.of(context);
-    showInfoToast(i18n.restartTheAppToApplyChanges);
-    context.bloc<SettingsBloc>().add(AppLanguageChanged(newValue));
+    final i18n = S.of(context);
+    ToastUtils.showInfoToast(context, i18n.restartTheAppToApplyChanges);
+    context.read<SettingsBloc>().add(SettingsEvent.appLanguageChanged(selectedLanguage: newValue));
   }
 
-  void _askForFingerPrintChanged(bool ask) => context.bloc<SettingsBloc>().add(AskForFingerPrintChanged(ask: ask));
+  void _askForFingerPrintChanged(bool ask) => context.read<SettingsBloc>().add(SettingsEvent.askForFingerPrintChanged(ask: ask));
 
   Future<void> _askForPasswordChanged(bool ask) async {
     if (!ask) {
-      context.bloc<SettingsBloc>().add(AskForPasswordChanged(ask: ask));
+      context.read<SettingsBloc>().add(SettingsEvent.askForPasswordChanged(ask: ask));
       return;
     }
 
@@ -423,27 +417,31 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
       shape: Styles.modalBottomSheetShape,
       isDismissible: true,
       isScrollControlled: true,
-      builder: (ctx) => const PasswordDialog(),
+      builder: (ctx) => const PasswordBottomSheet(),
     );
 
-    if (result == null) return;
+    if (result == null) {
+      return;
+    }
 
-    context.bloc<SettingsBloc>().add(AskForPasswordChanged(ask: result));
+    if (mounted) {
+      context.read<SettingsBloc>().add(SettingsEvent.askForPasswordChanged(ask: result));
+    }
   }
 
   void _currencyChanged(CurrencySymbolType newValue) {
-    context.bloc<SettingsBloc>().add(CurrencyChanged(newValue));
+    context.read<SettingsBloc>().add(SettingsEvent.currencyChanged(selectedCurrency: newValue));
     BlocUtils.raiseCommonBlocEvents(context, reloadCharts: true, reloadTransactions: true);
   }
 
   void _currencyPlacementChanged(bool newValue) {
-    context.bloc<SettingsBloc>().add(CurrencyPlacementChanged(placeToTheRight: newValue));
+    context.read<SettingsBloc>().add(SettingsEvent.currencyPlacementChanged(placeToTheRight: newValue));
     BlocUtils.raiseCommonBlocEvents(context, reloadTransactions: true, reloadCharts: true);
   }
 
-  void _showNotifAfterFullSyncChanged(bool newValue) =>
-      context.bloc<SettingsBloc>().add(ShowNotifAfterFullSyncChanged(show: newValue));
+  void _showNotificationAfterFullSyncChanged(bool newValue) =>
+      context.read<SettingsBloc>().add(SettingsEvent.showNotificationAfterFullSyncChanged(show: newValue));
 
-  void _showNotifForRecurringTransChanged(bool newValue) =>
-      context.bloc<SettingsBloc>().add(ShowNotifForRecurringTransChanged(show: newValue));
+  void _showNotificationForRecurringTransChanged(bool newValue) =>
+      context.read<SettingsBloc>().add(SettingsEvent.showNotificationForRecurringTransChanged(show: newValue));
 }

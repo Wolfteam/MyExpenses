@@ -391,12 +391,6 @@
       "src": "fontawesome5"
     },
     {
-      "uid": "30dedab0909f0cb62d30161bcaaceae2",
-      "css": "whatsapp-1",
-      "code": 59420,
-      "src": "fontawesome5"
-    },
-    {
       "uid": "a55fa31eee1ffae4153428162fa3fff2",
       "css": "warehouse",
       "code": 62612,
@@ -442,6 +436,174 @@
       "uid": "431225404705c838635b9686c35a2e1c",
       "css": "bread_slice",
       "code": 63468,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "0622a284832ea1d9a3e827b1109969c3",
+      "css": "ice_cream",
+      "code": 63504,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "a2cc456f3ba52b5c60646043836c9cf9",
+      "css": "hamburger",
+      "code": 63493,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "d754679eab2654073eddb7662c987d9b",
+      "css": "bath",
+      "code": 62157,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "30067ab686dfd8b903d0f0f4b83d83b4",
+      "css": "pen_alt",
+      "code": 62213,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "7204819892485792bff5e91e7bd91392",
+      "css": "hand_holding_usd",
+      "code": 62656,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "49a0f68fb4e1d05d0a03ad7fa2a602cb",
+      "css": "theater_masks",
+      "code": 63024,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "6d875a768c329c00f4bc0f591e589731",
+      "css": "passport",
+      "code": 62891,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "aada17dd4f382f501205a4784a7bbdf6",
+      "css": "fingerprint",
+      "code": 62839,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "ac506f8518a272dd7d6f27219d56c9ee",
+      "css": "suitcase_rolling",
+      "code": 62913,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "5c5ede799dfaf2a3bca1236a35b24b67",
+      "css": "skating",
+      "code": 63429,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "63b0505f3d1ba620412afe447e87e322",
+      "css": "skiing",
+      "code": 63433,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "8f9ffd87f030b227c35d38114ec03887",
+      "css": "snowboarding",
+      "code": 63438,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "6c32573b82acb92ef0d2f1fad0dedfbf",
+      "css": "toilet",
+      "code": 63448,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "9b6d7a97232300617e89a8898b12b519",
+      "css": "hotdog",
+      "code": 63503,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "0fbde4879f077e253b605a63420a01a3",
+      "css": "twitch",
+      "code": 61928,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "cb1b238b03c21450ef717fe3d8534d68",
+      "css": "twitter",
+      "code": 61593,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "de0b4c8527be9d491c6b5a201b4b7130",
+      "css": "linkedin_in",
+      "code": 61665,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "298ba4c266a455dabb22e13b22f03e08",
+      "css": "btc",
+      "code": 61786,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "4c0b948ec1240faf561628245c10e8bb",
+      "css": "app_store",
+      "code": 62319,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "990fedfbfce973e093d7885b3f771d21",
+      "css": "discord",
+      "code": 62354,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "37a54526b764b178869cdd21aaac98bb",
+      "css": "docker",
+      "code": 62357,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "f020b4c5c6ace1a5bacbed01d9968fb6",
+      "css": "aws",
+      "code": 62325,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "e7582f10bc6257165f0acef510bdb770",
+      "css": "playstation",
+      "code": 62431,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "fd74a954ee8fab45ffb2fe3652159ddb",
+      "css": "dev",
+      "code": 63180,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "30dedab0909f0cb62d30161bcaaceae2",
+      "css": "whatsapp-1",
+      "code": 59420,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "640c1e80afd5ac6073b18447e851cd97",
+      "css": "xbox",
+      "code": 62482,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "5887a7c7be93fdc58af7a951385eac89",
+      "css": "dog",
+      "code": 63187,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "c900fd055d08348756f7376e274f100d",
+      "css": "cat",
+      "code": 63166,
       "src": "fontawesome5"
     }
   ]

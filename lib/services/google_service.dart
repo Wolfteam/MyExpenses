@@ -54,9 +54,9 @@ class GoogleServiceImpl implements GoogleService {
   final String _tokenUrl = '$_baseGoogleApisUrl/oauth2/v4/token';
   final _redirectUrl = 'http://localhost';
   final _scopes = <String>[
-    people.PeopleApi.UserinfoEmailScope,
-    people.PeopleApi.UserinfoProfileScope,
-    drive.DriveApi.DriveAppdataScope,
+    people.PeopleServiceApi.userinfoEmailScope,
+    people.PeopleServiceApi.userinfoProfileScope,
+    drive.DriveApi.driveAppdataScope,
   ];
 
   @override
@@ -79,12 +79,15 @@ class GoogleServiceImpl implements GoogleService {
         runtimeType,
         'exchangeAuthCodeAndSaveCredentials: Changing code for an auth token...',
       );
-      final response = await http.post(_tokenUrl, body: {
-        'client_id': Secrets.googleClientId,
-        'redirect_uri': '$_redirectUrl',
-        'grant_type': 'authorization_code',
-        'code': code,
-      });
+      final response = await http.post(
+        Uri.parse(_tokenUrl),
+        body: {
+          'client_id': Secrets.googleClientId,
+          'redirect_uri': _redirectUrl,
+          'grant_type': 'authorization_code',
+          'code': code,
+        },
+      );
 
       final json = jsonDecode(response.body);
       final token = json['access_token'] as String;
@@ -124,11 +127,11 @@ class GoogleServiceImpl implements GoogleService {
       );
       final client = await _getAuthClient();
 
-      final response =
-          await client.get('$_baseGoogleApisUrl/oauth2/v3/userinfo');
+      final response = await client.get(Uri.parse('$_baseGoogleApisUrl/oauth2/v3/userinfo'));
       final json = jsonDecode(response.body);
 
       final user = UserItem(
+        id: -1,
         email: json['email'] as String,
         isActive: true,
         googleUserId: json['sub'] as String,
@@ -161,7 +164,7 @@ class GoogleServiceImpl implements GoogleService {
         spaces: _appDataFolder,
       );
 
-      return fileList.files.isNotEmpty;
+      return fileList.files!.isNotEmpty;
     } catch (e, s) {
       _logger.error(
         runtimeType,
@@ -205,13 +208,14 @@ class GoogleServiceImpl implements GoogleService {
         spaces: _appDataFolder,
       );
 
+      final fileId = fileList.files?.first.id;
       _logger.info(
         runtimeType,
-        'downloadFile: Trying to donwload fileId = ${fileList?.files?.first?.id}',
+        'downloadFile: Trying to donwload fileId = $fileId',
       );
       final file = await api.files.get(
-        fileList.files.first.id,
-        downloadOptions: drive.DownloadOptions.FullMedia,
+        fileId!,
+        downloadOptions: drive.DownloadOptions.fullMedia,
       ) as drive.Media;
 
       _logger.info(
@@ -223,7 +227,7 @@ class GoogleServiceImpl implements GoogleService {
         runtimeType,
         'downloadFile: File was successfully saved',
       );
-      return fileList.files.first.id;
+      return fileId;
     } catch (e, s) {
       _logger.error(
         runtimeType,
@@ -260,7 +264,7 @@ class GoogleServiceImpl implements GoogleService {
         'uploadFile: File was successfully uploaded',
       );
 
-      return response.id;
+      return response.id!;
     } catch (e, s) {
       _logger.error(
         runtimeType,
@@ -299,7 +303,7 @@ class GoogleServiceImpl implements GoogleService {
         runtimeType,
         'uploadFile: File was succesfully updated',
       );
-      return response.id;
+      return response.id!;
     } catch (e, s) {
       _logger.error(
         runtimeType,
@@ -317,7 +321,7 @@ class GoogleServiceImpl implements GoogleService {
   ) async {
     try {
       final files = <drive.File>[];
-      String pageToken;
+      String? pageToken;
       do {
         final client = await _getAuthClient();
         final api = drive.DriveApi(client);
@@ -326,11 +330,11 @@ class GoogleServiceImpl implements GoogleService {
           spaces: _appDataFolder,
           pageSize: 1000,
         );
-        files.addAll(result.files);
+        files.addAll(result.files!);
         pageToken = result.nextPageToken;
       } while (pageToken != null);
 
-      return {for (var v in files) v.id: v.name};
+      return {for (var v in files) v.id!: v.name!};
     } catch (e, s) {
       _logger.error(
         runtimeType,
@@ -342,11 +346,15 @@ class GoogleServiceImpl implements GoogleService {
     }
   }
 
-  Future<g_auth.AccessCredentials> _getAccessCredentials() async {
+  Future<g_auth.AccessCredentials?> _getAccessCredentials() async {
     final currentUser = await _secureStorageService.get(
       SecureResourceType.currentUser,
       _secureStorageService.defaultUsername,
     );
+
+    if (currentUser == null) {
+      return null;
+    }
 
     final type = await _secureStorageService.get(
       SecureResourceType.accessTokenType,
@@ -367,10 +375,7 @@ class GoogleServiceImpl implements GoogleService {
       SecureResourceType.refreshToken,
       currentUser,
     );
-    if (type == null ||
-        data == null ||
-        expiricy == null ||
-        refreshToken == null) {
+    if (type == null || data == null || expiricy == null || refreshToken == null) {
       return null;
     }
 
@@ -418,7 +423,7 @@ class GoogleServiceImpl implements GoogleService {
         _secureStorageService.save(
           SecureResourceType.refreshToken,
           _secureStorageService.defaultUsername,
-          refreshToken,
+          refreshToken!,
         ),
         _secureStorageService.save(
           SecureResourceType.currentUser,
@@ -489,8 +494,8 @@ class GoogleServiceImpl implements GoogleService {
       ..parents = [folderId];
 
     final spreadSheet = await api.files.create(driveFile);
-    await _initializeAppSheet(spreadSheet.id);
-    return spreadSheet.id;
+    await _initializeAppSheet(spreadSheet.id!);
+    return spreadSheet.id!;
   }
 
 //NOT USED
@@ -499,18 +504,14 @@ class GoogleServiceImpl implements GoogleService {
     final api = sheets.SheetsApi(client);
 
     final spreadSheet = await api.spreadsheets.get(spreadSheetId);
-    final defaultSheetId = spreadSheet.sheets.first.properties.sheetId;
+    final defaultSheetId = spreadSheet.sheets!.first.properties!.sheetId;
 
     final transSheetProps = sheets.SheetProperties()..title = 'Transactitons';
     final categoriesSheetProps = sheets.SheetProperties()..title = 'Categories';
 
-    final transSheetRequest = sheets.Request()
-      ..addSheet = (sheets.AddSheetRequest()..properties = transSheetProps);
-    final catSheetRequest = sheets.Request()
-      ..addSheet =
-          (sheets.AddSheetRequest()..properties = categoriesSheetProps);
-    final deleteRequest = sheets.Request()
-      ..deleteSheet = (sheets.DeleteSheetRequest()..sheetId = defaultSheetId);
+    final transSheetRequest = sheets.Request()..addSheet = (sheets.AddSheetRequest()..properties = transSheetProps);
+    final catSheetRequest = sheets.Request()..addSheet = (sheets.AddSheetRequest()..properties = categoriesSheetProps);
+    final deleteRequest = sheets.Request()..deleteSheet = (sheets.DeleteSheetRequest()..sheetId = defaultSheetId);
 
     final updateRequest = sheets.BatchUpdateSpreadsheetRequest()
       ..requests = [

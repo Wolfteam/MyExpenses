@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
+import 'package:collection/collection.dart';
+import 'package:darq/darq.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
 
 import '../../common/enums/app_language_type.dart';
@@ -15,8 +17,20 @@ import '../../models/transactions_summary_per_date.dart';
 import '../../services/logging_service.dart';
 import '../../services/settings_service.dart';
 
+part 'charts_bloc.freezed.dart';
 part 'charts_event.dart';
 part 'charts_state.dart';
+
+final _now = DateTime.now();
+final _defaultState = ChartsState.loaded(
+  currentYear: _now.month,
+  currentMonthDate: _now,
+  currentMonthDateString: '',
+  transactionsPerMonth: [],
+  transactionsPerYear: [],
+  transactions: [],
+  language: AppLanguageType.english,
+);
 
 class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
   final LoggingService _logger;
@@ -29,69 +43,52 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
     this._transactionsDao,
     this._usersDao,
     this._settingsService,
-  ) : super(LoadingState());
+  ) : super(_defaultState);
 
   @override
   Stream<ChartsState> mapEventToState(
     ChartsEvent event,
   ) async* {
-    if (event is LoadChart) {
-      yield* _buildLoadedState(event.from);
-    }
+    yield _defaultState;
+    final s = await event.map(loadChart: (e) async => _buildLoadedState(e.selectedMonthDate, e.selectedYear));
+    yield s;
   }
 
-  Stream<ChartsState> _buildLoadedState(DateTime now) async* {
-    final dateString = toBeginningOfSentenceCase(DateUtils.formatAppDate(
-      now,
-      _settingsService.language,
-      DateUtils.fullMonthAndYearFormat,
-    ));
-    final from = DateUtils.getFirstDayDateOfTheMonth(now);
-    final to = DateUtils.getLastDayDateOfTheMonth(now);
+  Future<ChartsState> _buildLoadedState(DateTime selectedMonthDate, int selectedYear) async {
+    final dateString = toBeginningOfSentenceCase(
+      DateUtils.formatAppDate(selectedMonthDate, _settingsService.language, DateUtils.fullMonthAndYearFormat),
+    );
+    final from = DateUtils.getFirstDayDateOfTheMonth(selectedMonthDate);
+    final to = DateUtils.getLastDayDateOfTheMonth(selectedMonthDate);
     var transactions = <TransactionItem>[];
-    var trans = <TransactionsSummaryPerDate>[];
+    var transactionsPerMonth = <TransactionsSummaryPerDate>[];
+    var transactionsPerYear = <TransactionsSummaryPerYear>[];
 
     try {
-      _logger.info(
-        runtimeType,
-        '_buildLoadedState: Trying to get all the transactions from = $from to = $to',
-      );
+      _logger.info(runtimeType, '_buildLoadedState: Trying to get all the transactions from = $from to = $to');
       final currentUser = await _usersDao.getActiveUser();
-      transactions = await _transactionsDao.getAllTransactions(
-        currentUser?.id,
-        from,
-        to,
-      );
+      transactions = await _transactionsDao.getAllTransactions(currentUser?.id, from, to);
       transactions.sort((t1, t2) => t1.transactionDate.compareTo(t2.transactionDate));
 
-      _logger.info(
-        runtimeType,
-        '_buildLoadedState: Mapping the transaction to the corresponding state',
-      );
-      trans = _buildTransactionSummaryPerDate(from, to, transactions);
+      _logger.info(runtimeType, '_buildLoadedState: Mapping the transaction to the corresponding state');
+      transactionsPerMonth = _buildTransactionSummaryPerDate(from, to, transactions);
+      transactionsPerYear = await _buildTransactionSummaryPerYear(selectedYear, userId: currentUser?.id);
     } catch (e, s) {
-      _logger.error(
-        runtimeType,
-        '_buildLoadedState: An unknown error occurred',
-        e,
-        s,
-      );
+      _logger.error(runtimeType, '_buildLoadedState: An unknown error occurred', e, s);
     }
 
-    yield LoadedState(
-      now,
-      dateString,
-      trans,
-      transactions,
-      _settingsService.language,
+    return ChartsState.loaded(
+      currentYear: selectedYear,
+      currentMonthDate: selectedMonthDate,
+      currentMonthDateString: dateString!,
+      transactionsPerMonth: transactionsPerMonth,
+      transactionsPerYear: transactionsPerYear,
+      transactions: transactions,
+      language: _settingsService.language,
     );
   }
 
-  List<TransactionsSummaryPerDate> _buildTransactionSummaryPerDate(
-    DateTime from,
-    DateTime to,
-    List<TransactionItem> transactions,
-  ) {
+  List<TransactionsSummaryPerDate> _buildTransactionSummaryPerDate(DateTime from, DateTime to, List<TransactionItem> transactions) {
     final trans = <TransactionsSummaryPerDate>[];
     final lang = _settingsService.language;
     final days = to.difference(from).inDays;
@@ -104,19 +101,38 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
       final last = DateTime(next.year, next.month, next.day, 23, 59, 59);
 
       final amount = TransactionUtils.getTotalTransactionAmount(
-          transactions.where((t) => t.transactionDate.isAfter(first) && t.transactionDate.isBefore(last)).toList());
+        transactions.where((t) => t.transactionDate.isAfter(first) && t.transactionDate.isBefore(last)).toList(),
+      );
 
       final start = DateUtils.formatAppDate(first, lang);
       final end = DateUtils.formatAppDate(last, lang);
 
       final dateRangeString = '$start - $end';
 
-      trans.add(TransactionsSummaryPerDate(amount, dateRangeString));
+      trans.add(TransactionsSummaryPerDate(totalAmount: amount, dateRangeString: dateRangeString));
 
       i += last.difference(first).inDays;
     }
 
     return trans;
+  }
+
+  Future<List<TransactionsSummaryPerYear>> _buildTransactionSummaryPerYear(int year, {int? userId}) async {
+    final maxMonth = year != _now.year
+        ? DateTime.december
+        : _now.month == DateTime.december
+            ? DateTime.december
+            : _now.month;
+    final from = DateUtils.getFirstDayDateOfTheMonth(DateTime(year));
+    final until = DateUtils.getLastDayDateOfTheMonth(DateTime(year, maxMonth));
+    final transactions = await _transactionsDao.getAllTransactions(userId, from, until);
+    final grouped = <TransactionsSummaryPerYear>[];
+    for (var i = DateTime.january; i <= maxMonth; i++) {
+      final monthlyAmount = transactions.where((el) => el.transactionDate.month == i).map((el) => el.amount).sum;
+      grouped.add(TransactionsSummaryPerYear(month: i, totalAmount: monthlyAmount));
+    }
+
+    return grouped;
   }
 
   DateTime _getNextDate(DateTime from) {

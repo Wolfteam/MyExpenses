@@ -46,6 +46,8 @@ class CategoryUtils {
   static const fish = 'Fish';
   static const glass = 'Glass';
   static const bread = 'Bread';
+  static const iceCream = 'Ice_Cream';
+  static const hotDog = 'Hot_Dog';
 
   //Furniture
   static const seat = 'Seat';
@@ -69,6 +71,8 @@ class CategoryUtils {
   static const discover = 'Discover';
   static const amex = 'Amex';
   static const paypal = 'Paypal';
+  static const donations = 'Donations';
+  static const bitcoin = 'Bitcoin';
 
   //Life
   static const movie = 'Movie';
@@ -80,20 +84,21 @@ class CategoryUtils {
   static const forum = 'Forum';
   static const sms = 'Sms';
   static const games = 'Games';
-  static const bike = 'Bike';
-  static const run = 'Run';
   static const movies = 'Movies';
   static const map = 'Map';
   static const book = 'Book';
-  static const pool = 'Pool';
   static const beach = 'Beach';
   static const music = 'Music';
-  static const fitness = 'Fitness';
   static const cloudsun = 'CloudSun';
   static const sun = 'Sun';
   static const landscape = 'Landscape';
   static const picture = 'Picture';
   static const picture1 = 'Picture1';
+  static const theater = 'Theater';
+  static const paint = 'Paint';
+  static const suitcase = 'Suitcase';
+
+  //Brands
   static const amazon = 'Amazon';
   static const facebook = 'Facebook';
   static const spotify = 'Spotify';
@@ -101,7 +106,6 @@ class CategoryUtils {
   static const soundcloud = 'Soundcloud';
   static const skype = 'Skype';
   static const youtube = 'Youtube';
-  static const soccerBall = 'Sports';
   static const android = 'Android';
   static const apple = 'Apple';
   static const windows = 'Windows';
@@ -109,17 +113,43 @@ class CategoryUtils {
   static const github = 'Github';
   static const whatsapp = 'Whatsapp';
   static const googlePlay = 'Google Play';
+  static const twitch = 'Twitch';
+  static const twitter = 'Twitter';
+  static const linkedin = 'Linkedin';
+  static const appStore = 'App_Store';
+  static const discord = 'Discord';
+  static const docker = 'Docker';
+  static const aws = 'AWS';
+  static const playstation = 'Playstation';
+  static const xbox = 'Xbox';
+
+  //Sports
+  static const fitness = 'Fitness';
+  static const skate = 'Skate';
+  static const ski = 'Ski';
+  static const snowboard = 'Snowboard';
+  static const soccerBall = 'Sports';
+  static const bike = 'Bike';
+  static const pool = 'Pool';
+  static const run = 'Run';
+
+  //Pets
+  static const pets = 'Pets';
+  static const dog = 'Dog';
+  static const cat = 'Cat';
+
+  //Religion
+  static const religious = 'Religious';
+  static const church = 'Church';
 
   //Personal
   static const home = 'Home';
   static const work = 'Work';
-  static const pets = 'Pets';
   static const language = 'Langugage';
   static const build = 'Build';
   static const gas = 'Gas';
   static const tshirt = 'T_Shirt';
   static const laundry = 'Laundry';
-  static const religious = 'Religious';
   static const lgihter = 'Lighter';
   static const chartArea = 'ChartArea';
   static const tools = 'Tools';
@@ -127,6 +157,12 @@ class CategoryUtils {
   static const newspaper = 'Newspaper';
   static const smoke = 'Smoke';
   static const parking = 'Parking';
+  static const bath = 'Bath';
+  static const pen = 'Pen';
+  static const passport = 'Passport';
+  static const fingerprint = 'Fingerprint';
+  static const toilet = 'Toilet';
+  static const dev = 'Dev';
 
   //Shopping
   static const shoppingCart = 'ShoppingCart';
@@ -149,12 +185,14 @@ class CategoryUtils {
   static const motorcycle = 'Motorcycle';
   static const truck = 'Truck';
   static const helicopter = 'Helicopter';
+  static const tram = 'Tram';
 
   //Others
   static const na = 'NA';
   static const tree = 'Tree';
   static const waterDrop = 'Water';
   static const question = 'Help';
+  static const heart = 'Heart';
 
   static const List<CategoryIcon> educationIcons = <CategoryIcon>[
     CategoryIcon(
@@ -326,6 +364,16 @@ class CategoryUtils {
       name: bread,
       type: CategoryIconType.food,
     ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.hotdog),
+      name: hotDog,
+      type: CategoryIconType.food,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.ice_cream),
+      name: iceCream,
+      type: CategoryIconType.food,
+    ),
   ];
 
   static const List<CategoryIcon> furnitureIcons = <CategoryIcon>[
@@ -427,6 +475,208 @@ class CategoryUtils {
       name: paypal,
       type: CategoryIconType.income,
     ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.hand_holding_usd),
+      name: donations,
+      type: CategoryIconType.income,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.btc),
+      name: bitcoin,
+      type: CategoryIconType.income,
+    ),
+  ];
+
+  static const List<CategoryIcon> brands = <CategoryIcon>[
+    CategoryIcon(
+      icon: Icon(CustomIcons.google),
+      name: google,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.apple),
+      name: apple,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.windows),
+      name: windows,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.amazon),
+      name: amazon,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.facebook_official),
+      name: facebook,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.steam_squared),
+      name: steam,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.skype),
+      name: skype,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.youtube_play),
+      name: youtube,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.android),
+      name: android,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.github),
+      name: github,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.whatsapp_1),
+      name: whatsapp,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.google_play),
+      name: googlePlay,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.app_store),
+      name: appStore,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.twitch),
+      name: twitch,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.linkedin_in),
+      name: linkedin,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.discord),
+      name: discord,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.docker),
+      name: docker,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.aws),
+      name: aws,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.playstation),
+      name: playstation,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.xbox),
+      name: xbox,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.internet_explorer),
+      name: internet,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.spotify),
+      name: spotify,
+      type: CategoryIconType.brands,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.soundcloud),
+      name: soundcloud,
+      type: CategoryIconType.brands,
+    ),
+  ];
+
+  static const List<CategoryIcon> sports = <CategoryIcon>[
+    CategoryIcon(
+      icon: Icon(Icons.directions_bike),
+      name: bike,
+      type: CategoryIconType.sports,
+    ),
+    CategoryIcon(
+      icon: Icon(Icons.directions_run),
+      name: run,
+      type: CategoryIconType.sports,
+    ),
+    CategoryIcon(
+      icon: Icon(Icons.pool),
+      name: pool,
+      type: CategoryIconType.sports,
+    ),
+    CategoryIcon(
+      icon: Icon(Icons.fitness_center),
+      name: fitness,
+      type: CategoryIconType.sports,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.soccer_ball),
+      name: soccerBall,
+      type: CategoryIconType.sports,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.skating),
+      name: skate,
+      type: CategoryIconType.sports,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.skiing),
+      name: ski,
+      type: CategoryIconType.sports,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.snowboarding),
+      name: snowboard,
+      type: CategoryIconType.sports,
+    ),
+  ];
+
+  static const List<CategoryIcon> mascots = <CategoryIcon>[
+    CategoryIcon(
+      icon: Icon(Icons.pets),
+      name: pets,
+      type: CategoryIconType.pets,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.dog),
+      name: dog,
+      type: CategoryIconType.pets,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.cat),
+      name: cat,
+      type: CategoryIconType.pets,
+    ),
+  ];
+
+  static const List<CategoryIcon> religion = <CategoryIcon>[
+    CategoryIcon(
+      icon: Icon(CustomIcons.religious_christian),
+      name: religious,
+      type: CategoryIconType.religion,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.church),
+      name: church,
+      type: CategoryIconType.religion,
+    ),
   ];
 
   static const List<CategoryIcon> lifeIcons = <CategoryIcon>[
@@ -471,16 +721,6 @@ class CategoryUtils {
       type: CategoryIconType.life,
     ),
     CategoryIcon(
-      icon: Icon(Icons.directions_bike),
-      name: bike,
-      type: CategoryIconType.life,
-    ),
-    CategoryIcon(
-      icon: Icon(Icons.directions_run),
-      name: run,
-      type: CategoryIconType.life,
-    ),
-    CategoryIcon(
       icon: Icon(Icons.local_movies),
       name: movies,
       type: CategoryIconType.life,
@@ -496,11 +736,6 @@ class CategoryUtils {
       type: CategoryIconType.life,
     ),
     CategoryIcon(
-      icon: Icon(Icons.pool),
-      name: pool,
-      type: CategoryIconType.life,
-    ),
-    CategoryIcon(
       icon: Icon(Icons.beach_access),
       name: beach,
       type: CategoryIconType.life,
@@ -508,11 +743,6 @@ class CategoryUtils {
     CategoryIcon(
       icon: Icon(CustomIcons.music_note),
       name: music,
-      type: CategoryIconType.life,
-    ),
-    CategoryIcon(
-      icon: Icon(Icons.fitness_center),
-      name: fitness,
       type: CategoryIconType.life,
     ),
     CategoryIcon(
@@ -541,83 +771,18 @@ class CategoryUtils {
       type: CategoryIconType.life,
     ),
     CategoryIcon(
-      icon: Icon(CustomIcons.amazon),
-      name: amazon,
+      icon: Icon(CustomIcons.theater_masks),
+      name: theater,
       type: CategoryIconType.life,
     ),
     CategoryIcon(
-      icon: Icon(CustomIcons.facebook_official),
-      name: facebook,
+      icon: Icon(Icons.format_paint),
+      name: paint,
       type: CategoryIconType.life,
     ),
     CategoryIcon(
-      icon: Icon(CustomIcons.spotify),
-      name: spotify,
-      type: CategoryIconType.life,
-    ),
-    CategoryIcon(
-      icon: Icon(CustomIcons.steam_squared),
-      name: steam,
-      type: CategoryIconType.life,
-    ),
-    CategoryIcon(
-      icon: Icon(CustomIcons.soundcloud),
-      name: soundcloud,
-      type: CategoryIconType.life,
-    ),
-    CategoryIcon(
-      icon: Icon(CustomIcons.skype),
-      name: skype,
-      type: CategoryIconType.life,
-    ),
-    CategoryIcon(
-      icon: Icon(CustomIcons.youtube_play),
-      name: youtube,
-      type: CategoryIconType.life,
-    ),
-    CategoryIcon(
-      icon: Icon(CustomIcons.soccer_ball),
-      name: soccerBall,
-      type: CategoryIconType.life,
-    ),
-    CategoryIcon(
-      icon: Icon(CustomIcons.internet_explorer),
-      name: internet,
-      type: CategoryIconType.life,
-    ),
-    CategoryIcon(
-      icon: Icon(CustomIcons.android),
-      name: android,
-      type: CategoryIconType.life,
-    ),
-    CategoryIcon(
-      icon: Icon(CustomIcons.windows),
-      name: windows,
-      type: CategoryIconType.life,
-    ),
-    CategoryIcon(
-      icon: Icon(CustomIcons.apple),
-      name: apple,
-      type: CategoryIconType.life,
-    ),
-    CategoryIcon(
-      icon: Icon(CustomIcons.google),
-      name: google,
-      type: CategoryIconType.life,
-    ),
-    CategoryIcon(
-      icon: Icon(CustomIcons.github),
-      name: github,
-      type: CategoryIconType.life,
-    ),
-    CategoryIcon(
-      icon: Icon(CustomIcons.whatsapp_1),
-      name: whatsapp,
-      type: CategoryIconType.life,
-    ),
-    CategoryIcon(
-      icon: Icon(CustomIcons.google_play),
-      name: googlePlay,
+      icon: Icon(CustomIcons.suitcase_rolling),
+      name: suitcase,
       type: CategoryIconType.life,
     ),
   ];
@@ -631,11 +796,6 @@ class CategoryUtils {
     CategoryIcon(
       icon: Icon(Icons.work),
       name: work,
-      type: CategoryIconType.personal,
-    ),
-    CategoryIcon(
-      icon: Icon(Icons.pets),
-      name: pets,
       type: CategoryIconType.personal,
     ),
     CategoryIcon(
@@ -661,11 +821,6 @@ class CategoryUtils {
     CategoryIcon(
       icon: Icon(Icons.local_laundry_service),
       name: laundry,
-      type: CategoryIconType.personal,
-    ),
-    CategoryIcon(
-      icon: Icon(CustomIcons.religious_christian),
-      name: religious,
       type: CategoryIconType.personal,
     ),
     CategoryIcon(
@@ -701,6 +856,36 @@ class CategoryUtils {
     CategoryIcon(
       icon: Icon(Icons.local_parking),
       name: parking,
+      type: CategoryIconType.personal,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.bath),
+      name: bath,
+      type: CategoryIconType.personal,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.pen_alt),
+      name: pen,
+      type: CategoryIconType.personal,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.passport),
+      name: passport,
+      type: CategoryIconType.personal,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.fingerprint),
+      name: fingerprint,
+      type: CategoryIconType.personal,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.toilet),
+      name: toilet,
+      type: CategoryIconType.personal,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.dev),
+      name: dev,
       type: CategoryIconType.personal,
     ),
   ];
@@ -799,6 +984,11 @@ class CategoryUtils {
       name: helicopter,
       type: CategoryIconType.transportation,
     ),
+    CategoryIcon(
+      icon: Icon(Icons.tram),
+      name: tram,
+      type: CategoryIconType.transportation,
+    ),
   ];
 
   static const List<CategoryIcon> otherIcons = <CategoryIcon>[
@@ -822,6 +1012,11 @@ class CategoryUtils {
       name: question,
       type: CategoryIconType.others,
     ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.heart),
+      name: heart,
+      type: CategoryIconType.others,
+    ),
   ];
 
   static List<CategoryIcon> getAllCategoryIcons() {
@@ -831,12 +1026,21 @@ class CategoryUtils {
         foodIcons +
         furnitureIcons +
         incomeIcons +
+        brands +
         lifeIcons +
+        mascots +
+        religion +
+        sports +
         personalIcons +
         shoppingIcons +
         transportationIcon +
         otherIcons;
     return icons;
+  }
+
+  static List<IconData> getAllIconData() {
+    final icons = getAllCategoryIcons();
+    return icons.map((e) => e.icon.icon!).toList();
   }
 
   static CategoryIcon getByName(String name) => getAllCategoryIcons().firstWhere((c) => c.name == name);
@@ -845,7 +1049,61 @@ class CategoryUtils {
       getAllCategoryIcons().where((i) => i.type == type).firstWhere((c) => c.name == name);
 
   static CategoryIcon getByIconData(IconData iconData) =>
-      getAllCategoryIcons().firstWhere((c) => c.icon.icon == iconData);
+      getAllCategoryIcons().firstWhere((c) => c.icon.icon == iconData, orElse: () => getNotExistingCategoryIcon(iconData));
+
+  ///For some reason some icons are fucked in the new dart version...
+  static CategoryIcon getNotExistingCategoryIcon(IconData iconData) {
+    switch (iconData.codePoint) {
+      case 59471:
+        return getByName(bank);
+      case 58746:
+        return getByName(fastFood);
+      case 58704:
+        return getByName(pharmacy);
+      case 59530:
+        return getByName(home);
+      case 58672:
+        return getByName(bus);
+      case 58689:
+        return getByName(cafe);
+      case 58673:
+        return getByName(car);
+      case 59404:
+        return getByName(school);
+      case 58122:
+        return getByName(laptop);
+      case 58127:
+        return getByName(gamepad);
+      case 58694:
+        return getByName(gas);
+      case 59651:
+        return getByName(seat);
+      case 57425:
+        return getByName(web);
+      case 58701:
+        return getByName(movies);
+      case 58702:
+        return getByName(offer);
+      case 58148:
+        return getByName(smartphone);
+      case 58732:
+        return getByName(restaurant);
+      case 58675:
+        return getByName(na);
+      case 58937:
+        return getByName(tv);
+      case 58713:
+        return getByName(taxi);
+      default:
+        break;
+    }
+    return getByNameAndType(na, CategoryIconType.others);
+  }
+
+  static IconData getIconData(IconData search) {
+    final iconData = getAllIconData();
+    return iconData.firstWhere((i) => i == search, orElse: () => getNotExistingCategoryIcon(search).icon.icon!);
+  }
 
   static String toJSONString(IconData data) {
     final map = <String, dynamic>{};
@@ -858,11 +1116,15 @@ class CategoryUtils {
 
   static IconData fromJSONString(String jsonString) {
     final map = jsonDecode(jsonString);
-    return IconData(
+    final iconData = IconData(
       map['codePoint'] as int,
-      fontFamily: map['fontFamily'] as String,
-      fontPackage: map['fontPackage'] as String,
+      fontFamily: map['fontFamily'] as String?,
+      fontPackage: map['fontPackage'] as String?,
       matchTextDirection: map['matchTextDirection'] as bool,
     );
+
+    final category = getByIconData(iconData);
+
+    return category.icon.icon!;
   }
 }

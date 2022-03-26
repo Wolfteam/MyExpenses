@@ -1,82 +1,83 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
-import 'package:password/password.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:my_expenses/common/enums/secure_resource_type.dart';
+import 'package:steel_crypt/steel_crypt.dart';
 
-import '../../common/enums/secure_resource_type.dart';
 import '../../common/extensions/string_extensions.dart';
 import '../../services/logging_service.dart';
 import '../../services/secure_storage_service.dart';
 
+part 'password_dialog_bloc.freezed.dart';
 part 'password_dialog_event.dart';
 part 'password_dialog_state.dart';
+
+const _initialState = PasswordDialogState.initial(
+  password: '',
+  isPasswordValid: false,
+  isPasswordDirty: false,
+  showPassword: false,
+  confirmPassword: '',
+  isConfirmPasswordValid: false,
+  isConfirmPasswordDirty: false,
+  showConfirmPassword: false,
+  passwordsMatch: true,
+  passwordWasSaved: false,
+);
 
 class PasswordDialogBloc extends Bloc<PasswordDialogEvent, PasswordDialogState> {
   final LoggingService _logger;
   final SecureStorageService _secureStorageService;
 
-  PasswordDialogBloc(this._logger, this._secureStorageService) : super(PasswordDialogState.initial());
+  PasswordDialogBloc(this._logger, this._secureStorageService) : super(_initialState);
 
   @override
   Stream<PasswordDialogState> mapEventToState(
     PasswordDialogEvent event,
   ) async* {
-    if (event is PasswordChanged) {
-      yield state.copyWith(
-        password: event.newValue,
-        isPasswordValid: _isPasswordValid(event.newValue),
+    final s = await event.map(
+      passwordChanged: (e) async => state.copyWith(
+        password: e.newValue,
+        isPasswordValid: _isPasswordValid(e.newValue),
         isPasswordDirty: true,
         isConfirmPasswordValid: _isPasswordValid(state.confirmPassword),
-        passwordsMatch: _passwordMatches(event.newValue, state.confirmPassword),
-      );
-    }
-
-    if (event is ShowPassword) {
-      yield state.copyWith(showPassword: event.show);
-    }
-
-    if (event is ConfirmPasswordChanged) {
-      yield state.copyWith(
+        passwordsMatch: _passwordMatches(e.newValue, state.confirmPassword),
+      ),
+      showPassword: (e) async => state.copyWith(showPassword: e.show),
+      confirmPasswordChanged: (e) async => state.copyWith(
         isPasswordValid: _isPasswordValid(state.password),
-        confirmPassword: event.newValue,
+        confirmPassword: e.newValue,
         isConfirmPasswordDirty: true,
-        isConfirmPasswordValid: _isPasswordValid(event.newValue),
-        passwordsMatch: _passwordMatches(state.password, event.newValue),
-      );
+        isConfirmPasswordValid: _isPasswordValid(e.newValue),
+        passwordsMatch: _passwordMatches(state.password, e.newValue),
+      ),
+      showConfirmPassword: (e) async => state.copyWith(showConfirmPassword: e.show),
+      submit: (e) async {
+        _logger.info(runtimeType, 'Trying to save password...');
+        final hash = _getHashedPassword(state.password);
+        _secureStorageService.save(SecureResourceType.loginPassword, _secureStorageService.defaultUsername, hash);
+
+        _logger.info(runtimeType, 'Password was successfully saved...');
+
+        return state.copyWith(passwordWasSaved: true);
+      },
+      validatePassword: (e) async {
+        final pass = await _secureStorageService.get(SecureResourceType.loginPassword, _secureStorageService.defaultUsername);
+        final hasher = HashCrypt(algo: HashAlgo.Blake2b);
+        final isValid = hasher.check(plain: e.password, hashed: pass!);
+        return state.copyWith(userIsValid: isValid);
+      },
+    );
+
+    yield s;
+
+    if (event is _Submit) {
+      yield _initialState;
     }
 
-    if (event is ShowConfirmPassword) {
-      yield state.copyWith(showConfirmPassword: event.show);
-    }
-
-    if (event is SubmitForm) {
-      _logger.info(runtimeType, 'Trying to save password...');
-      final hash = _getHashedPassword(state.password);
-      _secureStorageService.save(
-        SecureResourceType.loginPassword,
-        _secureStorageService.defaultUsername,
-        hash,
-      );
-
-      _logger.info(runtimeType, 'Password was successfully saved...');
-
-      yield state.copyWith(passwordWasSaved: true);
-      yield PasswordDialogState.initial();
-    }
-
-    if (event is ValidatePassword) {
-      final pass = await _secureStorageService.get(
-        SecureResourceType.loginPassword,
-        _secureStorageService.defaultUsername,
-      );
-      final isValid = Password.verify(event.password, pass);
-      yield state.copyWith(userIsValid: isValid);
-
-      if (isValid) {
-        yield PasswordDialogState.initial();
-      }
+    if (event is _ValidatePassword && state.userIsValid == true) {
+      yield _initialState;
     }
   }
 
@@ -86,8 +87,7 @@ class PasswordDialogBloc extends Bloc<PasswordDialogEvent, PasswordDialogState> 
       _isPasswordValid(password) && _isPasswordValid(confirmPassword) && password == confirmPassword;
 
   String _getHashedPassword(String pass) {
-    final algorithm = PBKDF2(iterationCount: 100);
-
-    return Password.hash(pass, algorithm);
+    final hasher = HashCrypt(algo: HashAlgo.Blake2b);
+    return hasher.hash(inp: pass);
   }
 }

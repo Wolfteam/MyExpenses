@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/generated/l10n.dart';
 import 'package:provider/provider.dart';
 
 import '../../bloc/search/search_bloc.dart';
@@ -10,7 +11,6 @@ import '../../common/enums/transaction_type.dart';
 import '../../common/extensions/scroll_controller_extensions.dart';
 import '../../common/extensions/string_extensions.dart';
 import '../../common/styles.dart';
-import '../../generated/i18n.dart';
 import '../../models/category_item.dart';
 import '../../models/current_selected_category.dart';
 import '../widgets/nothing_found.dart';
@@ -38,9 +38,9 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateMixin {
   final _searchFocusNode = FocusNode();
 
-  ScrollController _scrollController;
-  TextEditingController _searchBoxTextController;
-  AnimationController _hideFabAnimController;
+  late ScrollController _scrollController;
+  late TextEditingController _searchBoxTextController;
+  late AnimationController _hideFabAnimController;
   bool _isLoadingMore = false;
 
   bool get _isBottom {
@@ -54,11 +54,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
     super.initState();
     _scrollController = ScrollController();
     _searchBoxTextController = TextEditingController(text: '');
-    _hideFabAnimController = AnimationController(
-      vsync: this,
-      duration: kThemeAnimationDuration,
-      value: 1, // initially visible
-    );
+    _hideFabAnimController = AnimationController(vsync: this, duration: kThemeAnimationDuration, value: 0);
     _scrollController.addListener(() => _scrollController.handleScrollForFab(_hideFabAnimController));
     _scrollController.addListener(_onScroll);
     _searchBoxTextController.addListener(_onSearchTextChanged);
@@ -84,7 +80,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
 
   List<Widget> _buildPage(SearchState state) {
     final double statusBarHeight = MediaQuery.of(context).padding.top;
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
     return state.map(
       loading: (_) => [
         SliverFillRemaining(
@@ -157,7 +153,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildSearchBox(bool showCleanButton, I18n i18n) {
+  Widget _buildSearchBox(bool showCleanButton, S i18n) {
     final theme = Theme.of(context);
 
     return Card(
@@ -174,7 +170,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
             child: TextField(
               controller: _searchBoxTextController,
               focusNode: _searchFocusNode,
-              cursorColor: theme.accentColor,
+              cursorColor: theme.colorScheme.secondary,
               keyboardType: TextInputType.text,
               textInputAction: TextInputAction.go,
               decoration: InputDecoration(
@@ -195,13 +191,13 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
   }
 
   Widget _buildFilterBar(
-    double currentAmountFilter,
-    CategoryItem category,
+    double? currentAmountFilter,
+    CategoryItem? category,
     TransactionFilterType transactionFilterType,
     SortDirectionType sortDirectionType,
-    TransactionType transactionType,
+    TransactionType? transactionType,
   ) {
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
     return ButtonBar(
       alignment: MainAxisAlignment.spaceEvenly,
       overflowDirection: VerticalDirection.down,
@@ -222,7 +218,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
           onPressed: () => _showCategoriesPage(category),
           tooltip: i18n.category,
         ),
-        TransactionPoupMenuFilter(
+        TransactionPopupMenuFilter(
           selectedValue: transactionFilterType,
           onSelected: _transactionFilterTypeChanged,
           exclude: const [TransactionFilterType.category],
@@ -233,7 +229,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
         ),
         TransactionPopupMenuTypeFilter(
           selectedValue: transactionType,
-          onSelectedValue: _transactionTypeChanged,
+          onSelectedValue: (v) => _transactionTypeChanged(v == nothingSelected ? null : TransactionType.values[v]),
           showNa: true,
         ),
       ],
@@ -246,6 +242,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
       child: ScaleTransition(
         scale: _hideFabAnimController,
         child: FloatingActionButton(
+          mini: true,
           backgroundColor: Theme.of(context).primaryColor,
           onPressed: () => _scrollController.goToTheTop(),
           child: const Icon(Icons.arrow_upward),
@@ -257,13 +254,13 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
   Future<void> _onScroll() async {
     if (_isBottom && !_isLoadingMore) {
       _isLoadingMore = true;
-      await context.bloc<SearchBloc>().loadMore();
+      context.read<SearchBloc>().add(const SearchEvent.loadMore());
+      await Future.delayed(const Duration(milliseconds: 250));
       _isLoadingMore = false;
     }
-    return Future.value();
   }
 
-  Future<void> _onSearchTextChanged() => context.bloc<SearchBloc>().descriptionChanged(_searchBoxTextController.text);
+  void _onSearchTextChanged() => context.read<SearchBloc>().add(SearchEvent.descriptionChanged(newValue: _searchBoxTextController.text));
 
   void _cleanSearchText() {
     _searchFocusNode.requestFocus();
@@ -277,7 +274,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
 
   void _showDateFilterBottomSheet() {
     _removeSearchFocus();
-    context.bloc<SearchBloc>().resetTempDates();
+    context.read<SearchBloc>().add(const SearchEvent.resetTempDates());
     showModalBottomSheet(
       shape: Styles.modalBottomSheetShape,
       isDismissible: true,
@@ -287,9 +284,9 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
     );
   }
 
-  void _showAmountFilterBottomSheet(double initialAmount) {
+  void _showAmountFilterBottomSheet(double? initialAmount) {
     _removeSearchFocus();
-    context.bloc<SearchBloc>().resetTempDates();
+    context.read<SearchBloc>().add(const SearchEvent.resetTempDates());
     showModalBottomSheet(
       shape: Styles.modalBottomSheetShape,
       isDismissible: true,
@@ -299,7 +296,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
     );
   }
 
-  Future<void> _showCategoriesPage(CategoryItem category) async {
+  Future<void> _showCategoriesPage(CategoryItem? category) async {
     _removeSearchFocus();
     final selectedCatProvider = Provider.of<CurrentSelectedCategory>(context, listen: false);
 
@@ -312,21 +309,21 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
     );
     await Navigator.of(context).push(route);
 
-    await context.bloc<SearchBloc>().categoryChanged(selectedCatProvider.currentSelectedItem);
+    context.read<SearchBloc>().add(SearchEvent.categoryChanged(newValue: selectedCatProvider.currentSelectedItem));
   }
 
-  Future<void> _transactionFilterTypeChanged(TransactionFilterType newValue) {
+  void _transactionFilterTypeChanged(TransactionFilterType newValue) {
     _removeSearchFocus();
-    return context.bloc<SearchBloc>().transactionFilterChanged(newValue);
+    context.read<SearchBloc>().add(SearchEvent.transactionFilterChanged(newValue: newValue));
   }
 
-  Future<void> _transactionTypeChanged(int newValue) {
+  void _transactionTypeChanged(TransactionType? newValue) {
     _removeSearchFocus();
-    return context.bloc<SearchBloc>().transactionTypeChanged(newValue);
+    context.read<SearchBloc>().add(SearchEvent.transactionTypeChanged(newValue: newValue));
   }
 
-  Future<void> _sortDirectionChanged(SortDirectionType newValue) {
+  void _sortDirectionChanged(SortDirectionType newValue) {
     _removeSearchFocus();
-    return context.bloc<SearchBloc>().sortDirectionchanged(newValue);
+    context.read<SearchBloc>().add(SearchEvent.sortDirectionChanged(newValue: newValue));
   }
 }

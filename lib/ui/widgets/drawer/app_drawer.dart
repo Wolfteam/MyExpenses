@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/generated/l10n.dart';
 
 import '../../../bloc/drawer/drawer_bloc.dart';
 import '../../../bloc/estimates/estimates_bloc.dart';
@@ -13,7 +14,6 @@ import '../../../common/enums/app_drawer_item_type.dart';
 import '../../../common/presentation/custom_assets.dart';
 import '../../../common/styles.dart';
 import '../../../common/utils/bloc_utils.dart';
-import '../../../generated/i18n.dart';
 import '../../pages/search_page.dart';
 import '../estimates/estimate_bottom_sheet_dialog.dart';
 import '../reports/reports_bottom_sheet_dialog.dart';
@@ -42,8 +42,7 @@ class AppDrawer extends StatelessWidget {
               _buildItem(AppDrawerItemType.search, context, state, (item, ctx) => _showSearchPage(ctx)),
               const Divider(),
               _buildItem(AppDrawerItemType.settings, context, state, (item, ctx) => _onSelectedItem(item, ctx)),
-              if (state.isUserSignedIn)
-                _buildItem(AppDrawerItemType.logout, context, state, (item, ctx) => _showSignOutDialog(ctx)),
+              if (state.isUserSignedIn) _buildItem(AppDrawerItemType.logout, context, state, (item, ctx) => _showSignOutDialog(ctx)),
             ],
           ),
         );
@@ -56,10 +55,10 @@ class AppDrawer extends StatelessWidget {
     DrawerState state,
   ) {
     final theme = Theme.of(context);
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
 
     return DrawerHeader(
-      margin: const EdgeInsets.all(0),
+      margin: EdgeInsets.zero,
       // decoration: BoxDecoration(color: Colors.transparent),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -74,7 +73,7 @@ class AppDrawer extends StatelessWidget {
                       padding: const EdgeInsets.only(bottom: 10),
                       child: CircleAvatar(
                         radius: 40,
-                        backgroundImage: FileImage(File(state.img)),
+                        backgroundImage: FileImage(File(state.img!)),
                       ),
                     )
                   : Image.asset(
@@ -93,16 +92,22 @@ class AppDrawer extends StatelessWidget {
               ),
             if (state.isUserSignedIn)
               Flexible(
-                child: Text(
-                  state.fullName,
-                  style: theme.textTheme.subtitle2,
+                child: Tooltip(
+                  message: state.fullName!,
+                  child: Text(
+                    state.fullName!,
+                    style: theme.textTheme.subtitle2,
+                  ),
                 ),
               ),
             if (state.isUserSignedIn)
               Flexible(
-                child: Text(
-                  state.email,
-                  style: theme.textTheme.caption,
+                child: Tooltip(
+                  message: state.email!,
+                  child: Text(
+                    state.email!,
+                    style: theme.textTheme.caption,
+                  ),
                 ),
               )
           ],
@@ -118,7 +123,7 @@ class AppDrawer extends StatelessWidget {
     Function(AppDrawerItemType, BuildContext) onTap,
   ) {
     final theme = Theme.of(context);
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
     String text;
     Icon icon;
 
@@ -167,7 +172,7 @@ class AppDrawer extends StatelessWidget {
 
     if (state.selectedPage == item) {
       return Ink(
-        color: theme.accentColor.withOpacity(0.35),
+        color: theme.colorScheme.secondary.withOpacity(0.35),
         child: listTitle,
       );
     }
@@ -176,13 +181,13 @@ class AppDrawer extends StatelessWidget {
   }
 
   void _onSelectedItem(AppDrawerItemType selectedPage, BuildContext context) {
-    context.bloc<DrawerBloc>().add(DrawerItemSelectionChanged(selectedPage));
+    context.read<DrawerBloc>().add(DrawerEvent.selectedItemChanged(selectedPage: selectedPage));
     Navigator.pop(context);
   }
 
   Future<void> _showReportSheet(BuildContext context) async {
     Navigator.pop(context);
-    context.bloc<ReportsBloc>().add(const ResetReportSheet());
+    context.read<ReportsBloc>().add(const ReportsEvent.resetReportSheet());
     //TODO: IF THE CONTENT IS TO LARGE, WE CANT CLOSE THE SHEET
     await showModalBottomSheet(
       shape: const RoundedRectangleBorder(
@@ -200,7 +205,7 @@ class AppDrawer extends StatelessWidget {
 
   void _showEstimatesBottomSheet(BuildContext context) {
     Navigator.pop(context);
-    context.bloc<EstimatesBloc>().add(EstimatesEvent.load());
+    context.read<EstimatesBloc>().add(EstimatesEvent.load());
 
     showModalBottomSheet(
       shape: Styles.modalBottomSheetShape,
@@ -213,7 +218,7 @@ class AppDrawer extends StatelessWidget {
 
   void _showSignOutDialog(BuildContext context) {
     final theme = Theme.of(context);
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
 
     Navigator.pop(context);
     showDialog(
@@ -222,7 +227,7 @@ class AppDrawer extends StatelessWidget {
         title: Text(i18n.logout),
         content: Text(i18n.confirmSignOut),
         actions: <Widget>[
-          OutlineButton(
+          OutlinedButton(
             onPressed: () {
               Navigator.pop(ctx);
             },
@@ -231,8 +236,7 @@ class AppDrawer extends StatelessWidget {
               style: TextStyle(color: theme.primaryColor),
             ),
           ),
-          RaisedButton(
-            color: theme.primaryColor,
+          ElevatedButton(
             onPressed: () => _signOut(ctx),
             child: Text(i18n.yes),
           ),
@@ -243,15 +247,12 @@ class AppDrawer extends StatelessWidget {
 
   void _signOut(BuildContext context) {
     Navigator.pop(context);
-    context.bloc<DrawerBloc>().add(const SignOut());
+    context.read<DrawerBloc>().add(const DrawerEvent.signOut());
   }
 
-  Future<void> _signIn(
-    BuildContext context,
-    DrawerState state,
-  ) async {
+  Future<void> _signIn(BuildContext context, DrawerState state) async {
     Navigator.pop(context);
-    context.bloc<UserAccountsBloc>().add(Initialize());
+    context.read<UserAccountsBloc>().add(const UserAccountsEvent.init());
 
     showModalBottomSheet(
       shape: const RoundedRectangleBorder(
@@ -269,7 +270,7 @@ class AppDrawer extends StatelessWidget {
 
   Future<void> _showSearchPage(BuildContext context) async {
     Navigator.pop(context);
-    await context.bloc<SearchBloc>().init();
-    Navigator.push(context, SearchPage.route());
+    context.read<SearchBloc>().add(const SearchEvent.init());
+    await Navigator.push(context, SearchPage.route());
   }
 }

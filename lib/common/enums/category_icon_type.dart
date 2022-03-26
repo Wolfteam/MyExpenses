@@ -10,4 +10,8 @@ enum CategoryIconType {
   shopping,
   transportation,
   others,
+  brands,
+  sports,
+  pets,
+  religion,
 }

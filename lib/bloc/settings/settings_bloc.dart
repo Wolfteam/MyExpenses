@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:package_info/package_info.dart';
+import 'package:my_expenses/bloc/app/app_bloc.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../common/enums/app_accent_color_type.dart';
 import '../../common/enums/app_language_type.dart';
@@ -14,10 +16,10 @@ import '../../common/enums/secure_resource_type.dart';
 import '../../common/enums/sync_intervals_type.dart';
 import '../../common/utils/background_utils.dart';
 import '../../daos/users_dao.dart';
-import '../../generated/i18n.dart';
 import '../../services/secure_storage_service.dart';
 import '../../services/settings_service.dart';
 
+part 'settings_bloc.freezed.dart';
 part 'settings_event.dart';
 part 'settings_state.dart';
 
@@ -26,126 +28,107 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final SecureStorageService _secureStorageService;
   final UsersDao _usersDao;
 
+  final AppBloc _appBloc;
+
   SettingsBloc(
     this._settingsService,
     this._secureStorageService,
     this._usersDao,
-  ) : super(const SettingsLoadingState());
+    this._appBloc,
+  ) : super(const SettingsState.loading());
 
-  SettingsInitialState get currentState => state as SettingsInitialState;
+  _InitialState get currentState => state as _InitialState;
 
   @override
   Stream<SettingsState> mapEventToState(
     SettingsEvent event,
   ) async* {
-    if (event is LoadSettings) {
-      yield* _buildInitialState();
-    }
+    final s = await event.map(
+      load: (_) async => _buildInitialState(),
+      appThemeChanged: (e) async {
+        _settingsService.appTheme = e.selectedAppTheme;
+        return currentState.copyWith(appTheme: e.selectedAppTheme);
+      },
+      appAccentColorChanged: (e) async {
+        _settingsService.accentColor = e.selectedAccentColor;
+        return currentState.copyWith(accentColor: e.selectedAccentColor);
+      },
+      appLanguageChanged: (e) async {
+        _settingsService.language = e.selectedLanguage;
+        _appBloc.add(AppEvent.languageChanged(newValue: e.selectedLanguage));
+        return currentState.copyWith(appLanguage: e.selectedLanguage);
+      },
+      syncIntervalChanged: (e) async {
+        _settingsService.syncInterval = e.selectedSyncInterval;
+        await BackgroundUtils.cancelSyncTask();
+        await BackgroundUtils.registerSyncTask(e.selectedSyncInterval);
+        return currentState.copyWith(syncInterval: e.selectedSyncInterval);
+      },
+      askForPasswordChanged: (e) async {
+        _settingsService.askForPassword = e.ask;
 
-    if (event is AppThemeChanged) {
-      _settingsService.appTheme = event.selectedAppTheme;
-      yield currentState.copyWith(appTheme: event.selectedAppTheme);
-    }
+        if (e.ask) {
+          _settingsService.askForFingerPrint = false;
+          return currentState.copyWith(askForPassword: e.ask, askForFingerPrint: false);
+        }
+        await _secureStorageService.delete(SecureResourceType.loginPassword, _secureStorageService.defaultUsername);
+        return currentState.copyWith(askForPassword: e.ask);
+      },
+      askForFingerPrintChanged: (e) async {
+        _settingsService.askForFingerPrint = e.ask;
 
-    if (event is AppAccentColorChanged) {
-      _settingsService.accentColor = event.selectedAccentColor;
-      yield currentState.copyWith(accentColor: event.selectedAccentColor);
-    }
+        if (e.ask) {
+          await _secureStorageService.delete(SecureResourceType.loginPassword, _secureStorageService.defaultUsername);
+          _settingsService.askForPassword = false;
+          return currentState.copyWith(askForPassword: false, askForFingerPrint: e.ask);
+        }
+        return currentState.copyWith(askForFingerPrint: e.ask);
+      },
+      currencyChanged: (e) async {
+        _settingsService.currencySymbol = e.selectedCurrency;
+        return currentState.copyWith(currencySymbol: e.selectedCurrency);
+      },
+      currencyPlacementChanged: (e) async {
+        _settingsService.currencyToTheRight = e.placeToTheRight;
+        return currentState.copyWith(currencyToTheRight: e.placeToTheRight);
+      },
+      showNotificationAfterFullSyncChanged: (e) async {
+        _settingsService.showNotifAfterFullSync = e.show;
+        return currentState.copyWith(showNotificationAfterFullSync: e.show);
+      },
+      showNotificationForRecurringTransChanged: (e) async {
+        _settingsService.showNotifForRecurringTrans = e.show;
+        return currentState.copyWith(showNotificationForRecurringTrans: e.show);
+      },
+    );
 
-    if (event is AppLanguageChanged) {
-      _settingsService.language = event.selectedLanguage;
-      final locale = I18n.delegate.supportedLocales[event.selectedLanguage.index];
-      I18n.onLocaleChanged(locale);
-      yield currentState.copyWith(appLanguage: event.selectedLanguage);
-    }
-
-    if (event is SyncIntervalChanged) {
-      _settingsService.syncInterval = event.selectedSyncInterval;
-      await BackgroundUtils.cancelSyncTask();
-      await BackgroundUtils.registerSyncTask(event.selectedSyncInterval);
-      yield currentState.copyWith(syncInterval: event.selectedSyncInterval);
-    }
-
-    if (event is AskForPasswordChanged) {
-      _settingsService.askForPassword = event.ask;
-      if (!event.ask) {
-        await _secureStorageService.delete(
-          SecureResourceType.loginPassword,
-          _secureStorageService.defaultUsername,
-        );
-      }
-
-      if (event.ask) {
-        yield currentState.copyWith(
-          askForPassword: event.ask,
-          askForFingerPrint: false,
-        );
-      } else {
-        yield currentState.copyWith(askForPassword: event.ask);
-      }
-    }
-
-    if (event is AskForFingerPrintChanged) {
-      _settingsService.askForFingerPrint = event.ask;
-
-      if (event.ask) {
-        await _secureStorageService.delete(
-          SecureResourceType.loginPassword,
-          _secureStorageService.defaultUsername,
-        );
-        yield currentState.copyWith(
-          askForPassword: false,
-          askForFingerPrint: event.ask,
-        );
-      } else {
-        yield currentState.copyWith(askForFingerPrint: event.ask);
-      }
-    }
-
-    if (event is CurrencyChanged) {
-      _settingsService.currencySymbol = event.selectedCurrency;
-      yield currentState.copyWith(currencySymbol: event.selectedCurrency);
-    }
-
-    if (event is CurrencyPlacementChanged) {
-      _settingsService.currencyToTheRight = event.placeToTheRight;
-      yield currentState.copyWith(currencyToTheRight: event.placeToTheRight);
-    }
-
-    if (event is ShowNotifAfterFullSyncChanged) {
-      _settingsService.showNotifAfterFullSync = event.show;
-      yield currentState.copyWith(showNotifAfterFullSync: event.show);
-    }
-
-    if (event is ShowNotifForRecurringTransChanged) {
-      _settingsService.showNotifForRecurringTrans = event.show;
-      yield currentState.copyWith(showNotifForRecurringTrans: event.show);
-    }
+    yield s;
   }
 
-  Stream<SettingsState> _buildInitialState() async* {
+  Future<SettingsState> _buildInitialState() async {
     final appSettings = _settingsService.appSettings;
     final packageInfo = await PackageInfo.fromPlatform();
     final localAuth = LocalAuthentication();
-    final availableBiometrics = await localAuth.getAvailableBiometrics();
+    final availableBiometrics = Platform.isWindows ? [] : await localAuth.getAvailableBiometrics();
     final currentUser = await _usersDao.getActiveUser();
+    final canUseFingerPrint = await localAuth.canCheckBiometrics && await localAuth.isDeviceSupported();
 
-    yield SettingsInitialState(
+    return SettingsState.initial(
       appTheme: appSettings.appTheme,
       useDarkAmoled: false,
       accentColor: appSettings.accentColor,
       appLanguage: appSettings.appLanguage,
       isUserLoggedIn: currentUser != null,
       syncInterval: appSettings.syncInterval,
-      showNotifAfterFullSync: appSettings.showNotifAfterFullSync,
+      showNotificationAfterFullSync: appSettings.showNotifAfterFullSync,
       askForPassword: appSettings.askForPassword,
-      canUseFingerPrint: availableBiometrics.contains(BiometricType.fingerprint),
+      canUseFingerPrint: canUseFingerPrint && availableBiometrics.contains(BiometricType.fingerprint),
       askForFingerPrint: appSettings.askForFingerPrint,
       appName: packageInfo.appName,
       appVersion: packageInfo.version,
       currencySymbol: appSettings.currencySymbol,
       currencyToTheRight: appSettings.currencyToTheRight,
-      showNotifForRecurringTrans: appSettings.showNotifForRecurringTrans,
+      showNotificationForRecurringTrans: appSettings.showNotifForRecurringTrans,
     );
   }
 }

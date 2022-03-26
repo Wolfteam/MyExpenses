@@ -17,12 +17,9 @@ import 'i18n_utils.dart';
 class TransactionUtils {
   static double getTotalTransactionAmounts(
     List<TransactionItem> transactions, {
-    bool onlyIncomes,
+    bool onlyIncomes = false,
   }) {
-    return transactions
-        .where((t) => t.category.isAnIncome == onlyIncomes)
-        .map((t) => t.amount)
-        .fold(0, (t1, t2) => roundDouble(t1 + t2));
+    return transactions.where((t) => t.category.isAnIncome == onlyIncomes).map((t) => t.amount).fold(0, (t1, t2) => roundDouble(t1 + t2));
   }
 
   static double getTotalTransactionAmount(List<TransactionItem> transactions) =>
@@ -36,6 +33,7 @@ class TransactionUtils {
     switch (cycle) {
       case RepetitionCycleType.eachDay:
       case RepetitionCycleType.eachWeek:
+      case RepetitionCycleType.eachYear:
         return nextRecurringDate.add(Duration(days: daysToAdd));
       case RepetitionCycleType.biweekly:
         return DateUtils.getNextBiweeklyDate(nextRecurringDate);
@@ -90,8 +88,7 @@ class TransactionUtils {
         if (parent.repetitionCycle == RepetitionCycleType.none) {
           logger.warning(
             TransactionUtils,
-            'checkRecurringTransactions: Transaction = ${parent.description} is marked as parent , ' +
-                'but the repetition cycle is none...',
+            'checkRecurringTransactions: Transaction = ${parent.description} is marked as parent , ' + 'but the repetition cycle is none...',
           );
           continue;
         }
@@ -102,7 +99,7 @@ class TransactionUtils {
               'and next recurring date is = ${parent.nextRecurringDate}',
         );
 
-        final tuple = getRecurringTransactionPeriods(parent.repetitionCycle, parent.nextRecurringDate, now);
+        final tuple = getRecurringTransactionPeriods(parent.repetitionCycle, parent.transactionDate, parent.nextRecurringDate!, now);
         final nextRecurringDate = tuple.item1;
         final periods = tuple.item2;
 
@@ -124,6 +121,7 @@ class TransactionUtils {
 
   static Tuple2<DateTime, List<DateTime>> getRecurringTransactionPeriods(
     RepetitionCycleType cycle,
+    DateTime transactionDate,
     DateTime nextRecurringDate,
     DateTime untilDate,
   ) {
@@ -139,6 +137,13 @@ class TransactionUtils {
 
       currentRecurringDate = getNextRecurringDate(cycle, currentRecurringDate);
     }
+
+    if (cycle == RepetitionCycleType.eachMonth &&
+        currentRecurringDate.day != transactionDate.day &&
+        DateUtils.getLastDayDateOfTheMonth(currentRecurringDate).day == transactionDate.day) {
+      currentRecurringDate = DateTime(currentRecurringDate.year, currentRecurringDate.month, transactionDate.day);
+    }
+
     return Tuple2<DateTime, List<DateTime>>(currentRecurringDate, periods);
   }
 
@@ -151,11 +156,11 @@ class TransactionUtils {
     final transPerMonth = <DateTime, List<TransactionItem>>{};
 
     for (final transaction in transactions) {
-      final dateToUse = sortByNextRecurringDate ? transaction.nextRecurringDate : transaction.transactionDate;
+      final dateToUse = (sortByNextRecurringDate ? transaction.nextRecurringDate : transaction.transactionDate)!;
       final date = DateTime(dateToUse.year, dateToUse.month, dateToUse.day);
 
       if (transPerMonth.keys.any((key) => key == date)) {
-        transPerMonth[date].add(transaction);
+        transPerMonth[date]!.add(transaction);
       } else {
         transPerMonth.addAll({
           date: [transaction]
@@ -174,11 +179,7 @@ class TransactionUtils {
 
       final dateSummary = '$dateString ${toBeginningOfSentenceCase(dayString, locale)}';
 
-      models.add(TransactionCardItems(
-        date: kvp.key,
-        dateString: dateSummary,
-        transactions: kvp.value,
-      ));
+      models.add(TransactionCardItems(date: kvp.key, dateString: dateSummary, transactions: kvp.value));
     }
 
     if (sortType == SortDirectionType.asc) {

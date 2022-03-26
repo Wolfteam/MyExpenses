@@ -13,7 +13,7 @@ class CategoryItem extends StatelessWidget {
   final models.CategoryItem category;
 
   const CategoryItem({
-    @required this.category,
+    required this.category,
     this.isInSelectionMode = false,
   });
 
@@ -23,10 +23,8 @@ class CategoryItem extends StatelessWidget {
     bool isAnotherItemSelected = false;
 
     if (isInSelectionMode) {
-      final selectedCatProvider =
-          Provider.of<CurrentSelectedCategory>(context, listen: false);
-      isAnotherItemSelected = selectedCatProvider.currentSelectedItem != null &&
-          selectedCatProvider.currentSelectedItem.id != category.id;
+      final selectedCatProvider = Provider.of<CurrentSelectedCategory>(context, listen: false);
+      isAnotherItemSelected = selectedCatProvider.currentSelectedItem != null && selectedCatProvider.currentSelectedItem!.id != category.id;
     }
 
     final icon = IconTheme(
@@ -34,10 +32,7 @@ class CategoryItem extends StatelessWidget {
       child: Icon(category.icon),
     );
     return Container(
-      decoration:
-          isInSelectionMode && !isAnotherItemSelected && category.isSeleted
-              ? BoxDecoration(color: theme.primaryColorLight)
-              : null,
+      decoration: isInSelectionMode && !isAnotherItemSelected && category.isSelected ? BoxDecoration(color: theme.primaryColorLight) : null,
       child: ListTile(
         leading: icon,
         title: Text(category.name),
@@ -55,32 +50,24 @@ class CategoryItem extends StatelessWidget {
   }
 
   void _handleItemClickOnSelectionMode(BuildContext context) {
-    final selectedCatProvider =
-        Provider.of<CurrentSelectedCategory>(context, listen: false);
+    final selectedCatProvider = Provider.of<CurrentSelectedCategory>(context, listen: false);
     selectedCatProvider.currentSelectedItem = category;
 
     if (category.isAnIncome) {
-      context.bloc<IncomesCategoriesBloc>().add(CategoryWasSelected(
-            wasSelected: true,
-            selectedCategory: category,
-          ));
-      context.bloc<ExpensesCategoriesBloc>().add(UnSelectAllCategories());
+      context.read<IncomesCategoriesBloc>().add(CategoriesListEvent.categoryWasSelected(wasSelected: true, selectedCategory: category));
+      context.read<ExpensesCategoriesBloc>().add(const CategoriesListEvent.unSelectAll());
     } else {
-      context.bloc<ExpensesCategoriesBloc>().add(CategoryWasSelected(
-            wasSelected: true,
-            selectedCategory: category,
-          ));
-      context.bloc<IncomesCategoriesBloc>().add(UnSelectAllCategories());
+      context.read<ExpensesCategoriesBloc>().add(CategoriesListEvent.categoryWasSelected(wasSelected: true, selectedCategory: category));
+      context.read<IncomesCategoriesBloc>().add(const CategoriesListEvent.unSelectAll());
     }
   }
 
   Future _handleItemClick(BuildContext context) async {
-    final route = MaterialPageRoute(
-      builder: (ctx) => AddEditCategoryPage(category),
-    );
+    final route = MaterialPageRoute(builder: (ctx) => AddEditCategoryPage());
 
-    context.bloc<CategoryFormBloc>().add(EditCategory(category));
+    context.read<CategoryFormBloc>().add(CategoryFormEvent.editCategory(category: category));
     await Navigator.of(context).push(route);
-    context.bloc<CategoryFormBloc>().add(FormClosed());
+    await route.completed;
+    context.read<CategoryFormBloc>().add(const CategoryFormEvent.formClosed());
   }
 }

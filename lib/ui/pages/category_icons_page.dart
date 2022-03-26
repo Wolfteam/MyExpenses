@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/generated/l10n.dart';
 
 import '../../bloc/category_icon/category_icon_bloc.dart';
 import '../../common/enums/category_icon_type.dart';
 import '../../common/extensions/i18n_extensions.dart';
 import '../../common/utils/category_utils.dart';
-import '../../generated/i18n.dart';
 import '../../models/category_icon.dart';
 
 class CategoryIconsPage extends StatelessWidget {
@@ -14,41 +14,41 @@ class CategoryIconsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SchedulerBinding.instance.addPostFrameCallback((_) => _animateToIndex());
+    SchedulerBinding.instance!.addPostFrameCallback((_) => _animateToIndex());
 
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
 
     return BlocBuilder<CategoryIconBloc, CategoryIconState>(
-        builder: (ctx, state) => Scaffold(
-              appBar: AppBar(
-                title: Text(i18n.pickIcon),
-                leading: const BackButton(),
-                actions: <Widget>[
-                  IconButton(
-                    icon: const Icon(Icons.check),
-                    onPressed: () => _onIconSelected(context, state),
-                  ),
-                ],
-              ),
-              body: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: _buildCategoryIcons(context, state),
-                ),
-              ),
-            ));
+      builder: (ctx, state) => Scaffold(
+        appBar: AppBar(
+          title: Text(i18n.pickIcon),
+          leading: const BackButton(),
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.check),
+              onPressed: () => _onIconSelected(context, state),
+            ),
+          ],
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: _buildCategoryIcons(context, state),
+          ),
+        ),
+      ),
+    );
   }
 
-  List<Widget> _buildCategoryIcons(
-    BuildContext context,
-    CategoryIconState state,
-  ) {
+  List<Widget> _buildCategoryIcons(BuildContext context, CategoryIconState state) {
     final categoryIcons = <Widget>[];
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
     final icons = CategoryUtils.getAllCategoryIcons();
 
-    for (final type in CategoryIconType.values) {
+    final values = CategoryIconType.values.toList()..sort((x, y) => i18n.getCategoryIconTypeName(x).compareTo(i18n.getCategoryIconTypeName(y)));
+
+    for (final type in values) {
       final filteredIcons = icons.where((i) => i.type == type).toList();
       if (filteredIcons.isEmpty) {
         continue;
@@ -78,7 +78,7 @@ class CategoryIconsPage extends StatelessWidget {
     final grid = GridView.count(
       childAspectRatio: orientation == Orientation.portrait ? 1.5 : 2,
       crossAxisCount: 4,
-      padding: const EdgeInsets.all(0),
+      padding: EdgeInsets.zero,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       children: List.generate(
@@ -96,7 +96,7 @@ class CategoryIconsPage extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 10),
             child: Text(
               categoryType,
-              style: theme.textTheme.headline6.copyWith(fontSize: 17),
+              style: theme.textTheme.headline6!.copyWith(fontSize: 17),
               textAlign: TextAlign.center,
             ),
           ),
@@ -116,21 +116,24 @@ class CategoryIconsPage extends StatelessWidget {
     return IconButton(
       key: isSelected ? _selectedKey : null,
       iconSize: 30,
-      color: isSelected ? theme.primaryColor : theme.brightness == Brightness.dark ? Colors.white : Colors.black87,
+      color: isSelected
+          ? theme.primaryColor
+          : theme.brightness == Brightness.dark
+              ? Colors.white
+              : Colors.black87,
       icon: icon.icon,
       onPressed: () => _onIconClick(icon, context),
     );
   }
 
   void _animateToIndex() => Scrollable.ensureVisible(
-        _selectedKey.currentContext,
+        _selectedKey.currentContext!,
         duration: const Duration(seconds: 1),
         curve: Curves.fastOutSlowIn,
       );
 
   void _onIconClick(CategoryIcon icon, BuildContext context) =>
-      context.bloc<CategoryIconBloc>().add(IconSelectionChanged(icon));
+      context.read<CategoryIconBloc>().add(CategoryIconEvent.selectionChanged(selectedIcon: icon));
 
-  void _onIconSelected(BuildContext context, CategoryIconState state) =>
-      Navigator.of(context).pop<CategoryIcon>(state.selectedIcon);
+  void _onIconSelected(BuildContext context, CategoryIconState state) => Navigator.of(context).pop<CategoryIcon>(state.selectedIcon);
 }

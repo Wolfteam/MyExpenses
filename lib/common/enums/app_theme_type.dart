@@ -1,4 +1,4 @@
-enum AppThemeType{
+enum AppThemeType {
   dark,
   light,
 }

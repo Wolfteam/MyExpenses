@@ -1,29 +1,14 @@
 part of 'user_accounts_bloc.dart';
 
-@immutable
-abstract class UserAccountsEvent extends Equatable {
-  const UserAccountsEvent();
-}
+@freezed
+class UserAccountsEvent with _$UserAccountsEvent {
+  const factory UserAccountsEvent.init() = _Init;
 
-class Initialize extends UserAccountsEvent {
-  @override
-  List<Object> get props => [];
-}
+  const factory UserAccountsEvent.deleteAccount({
+    required int id,
+  }) = _DeleteAccount;
 
-class DeleteAccount extends UserAccountsEvent {
-  final int id;
-
-  @override
-  List<Object> get props => [id];
-
-  const DeleteAccount(this.id);
-}
-
-class ChangeActiveAccount extends UserAccountsEvent {
-  final int newActiveUserId;
-
-  @override
-  List<Object> get props => [newActiveUserId];
-
-  const ChangeActiveAccount(this.newActiveUserId);
+  const factory UserAccountsEvent.changeActiveAccount({
+    required int newActiveUserId,
+  }) = _ChangeActiveAccount;
 }

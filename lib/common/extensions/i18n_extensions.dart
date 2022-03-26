@@ -1,3 +1,5 @@
+import 'package:my_expenses/generated/l10n.dart';
+
 import '../../common/enums/app_language_type.dart';
 import '../../common/enums/app_theme_type.dart';
 import '../../common/enums/category_icon_type.dart';
@@ -6,11 +8,10 @@ import '../../common/enums/report_file_type.dart';
 import '../../common/enums/sort_direction_type.dart';
 import '../../common/enums/sync_intervals_type.dart';
 import '../../common/enums/transaction_type.dart';
-import '../../generated/i18n.dart';
 import '../enums/comparer_type.dart';
 import '../enums/transaction_filter_type.dart';
 
-extension I18nExtensions on I18n {
+extension I18nExtensions on S {
   String translateAppThemeType(AppThemeType theme) {
     switch (theme) {
       case AppThemeType.dark:
@@ -40,13 +41,13 @@ extension I18nExtensions on I18n {
       case RepetitionCycleType.eachDay:
         return eachDay;
       case RepetitionCycleType.eachWeek:
-        return repetitionCycleEachWeek;
+        return eachWeek;
       case RepetitionCycleType.eachMonth:
-        return repetitionCycleEachMonth;
+        return eachMonth;
       case RepetitionCycleType.biweekly:
-        return repetitionCycleBiweekly;
+        return biweekly;
       case RepetitionCycleType.eachYear:
-        return repetitionCycleEachYear;
+        return eachYear;
       default:
         throw Exception('The provided repetition cycle = $cycle is not valid');
     }
@@ -68,13 +69,13 @@ extension I18nExtensions on I18n {
       case SyncIntervalType.none:
         return none;
       case SyncIntervalType.eachHour:
-        return syncIntervalEachHour;
+        return eachHour;
       case SyncIntervalType.each3Hours:
-        return syncIntervalEach3Hours;
+        return each3Hours;
       case SyncIntervalType.each6Hours:
-        return syncIntervalEach6Hours;
+        return each6Hours;
       case SyncIntervalType.each12Hours:
-        return syncIntervalEach12Hours;
+        return each12Hours;
       case SyncIntervalType.eachDay:
         return eachDay;
       default:
@@ -85,27 +86,35 @@ extension I18nExtensions on I18n {
   String getCategoryIconTypeName(CategoryIconType type) {
     switch (type) {
       case CategoryIconType.education:
-        return categoryIconTypeEducation;
+        return education;
       case CategoryIconType.electronics:
-        return categoryIconTypeElectronics;
+        return electronics;
       case CategoryIconType.family:
-        return categoryIconTypeFamily;
+        return family;
       case CategoryIconType.food:
-        return categoryIconTypeFood;
+        return food;
       case CategoryIconType.furniture:
-        return categoryIconTypeFurniture;
+        return furniture;
       case CategoryIconType.income:
         return income;
       case CategoryIconType.life:
-        return categoryIconTypeLife;
+        return life;
       case CategoryIconType.personal:
-        return categoryIconTypePersonal;
+        return personal;
       case CategoryIconType.shopping:
-        return categoryIconTypeShopping;
+        return shopping;
       case CategoryIconType.transportation:
-        return categoryIconTypeTransportation;
+        return transportation;
       case CategoryIconType.others:
         return others;
+      case CategoryIconType.brands:
+        return brands;
+      case CategoryIconType.sports:
+        return sports;
+      case CategoryIconType.religion:
+        return religion;
+      case CategoryIconType.pets:
+        return pets;
       default:
         return na;
     }

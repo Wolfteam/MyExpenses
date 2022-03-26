@@ -1,25 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/generated/l10n.dart';
 
 import '../../../bloc/currency/currency_bloc.dart';
 import '../../../bloc/estimates/estimates_bloc.dart';
 import '../../../common/enums/app_language_type.dart';
 import '../../../common/presentation/custom_icons.dart';
 import '../../../common/utils/i18n_utils.dart';
-import '../../../generated/i18n.dart';
 import '../modal_sheet_separator.dart';
 
 class EstimateBottomSheetDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Container(
-        margin: const EdgeInsets.only(
-          left: 10,
-          right: 10,
-          bottom: 10,
-        ),
+        margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
         padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
         child: BlocBuilder<EstimatesBloc, EstimatesState>(
           builder: (ctx, state) => Column(
@@ -34,7 +29,8 @@ class EstimateBottomSheetDialog extends StatelessWidget {
 
   List<Widget> _buildPage(BuildContext context, EstimatesState state) {
     final theme = Theme.of(context);
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
+    final textColor = theme.brightness == Brightness.dark ? Colors.white : Colors.black;
     return state.map(
       loading: (_) => [],
       loaded: (s) => [
@@ -45,18 +41,18 @@ class EstimateBottomSheetDialog extends StatelessWidget {
         ),
         _buildToggleButtons(context, s.selectedTransactionType),
         Text('${i18n.startDate}:'),
-        FlatButton(
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        TextButton(
+          style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap, primary: textColor),
           onPressed: () => _changeDate(context, s.fromDate, s.currentLanguage, true),
           child: Align(alignment: Alignment.centerLeft, child: Text(s.fromDateString)),
         ),
         Text('${i18n.untilDate}:'),
-        FlatButton(
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        TextButton(
+          style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap, primary: textColor),
           onPressed: () => _changeDate(context, s.untilDate, s.currentLanguage, false),
           child: Align(alignment: Alignment.centerLeft, child: Text(s.untilDateString)),
         ),
-        Divider(color: theme.accentColor),
+        Divider(color: theme.colorScheme.secondary),
         Text('${i18n.period}: ${s.fromDateString} - ${s.untilDateString}'),
         _buildSummary(context, s.selectedTransactionType, s.incomeAmount, s.expenseAmount, s.totalAmount),
         _buildBottomButtonBar(context),
@@ -65,7 +61,7 @@ class EstimateBottomSheetDialog extends StatelessWidget {
   }
 
   Widget _buildToggleButtons(BuildContext context, int selectedTransactionType) {
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
     final selectedButtons = _getSelectedButtons(selectedTransactionType);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -116,16 +112,20 @@ class EstimateBottomSheetDialog extends StatelessWidget {
     double total,
   ) {
     final theme = Theme.of(context);
-    final i18n = I18n.of(context);
-    final currencyBloc = context.bloc<CurrencyBloc>();
+    final i18n = S.of(context);
+    final currencyBloc = context.watch<CurrencyBloc>();
     final selectedButtons = _getSelectedButtons(selectedTransactionType);
     final showTotal = selectedButtons.first;
     final showIncomes = showTotal || selectedButtons[1];
     final showExpenses = showTotal || selectedButtons[2];
 
-    final textStyle = theme.textTheme.subtitle2;
+    final textStyle = theme.textTheme.subtitle2!;
     final expenseTextStyle = textStyle.copyWith(color: Colors.red);
     final incomeTextStyle = textStyle.copyWith(color: Colors.green);
+
+    final formattedIncomes = currencyBloc.format(income);
+    final formattedExpenses = currencyBloc.format(expenses);
+    final formattedTotal = currencyBloc.format(total);
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5),
@@ -169,25 +169,34 @@ class EstimateBottomSheetDialog extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 if (showIncomes)
-                  Text(
-                    currencyBloc.format(income),
-                    textAlign: TextAlign.end,
-                    overflow: TextOverflow.ellipsis,
-                    style: incomeTextStyle,
+                  Tooltip(
+                    message: formattedIncomes,
+                    child: Text(
+                      formattedIncomes,
+                      textAlign: TextAlign.end,
+                      overflow: TextOverflow.ellipsis,
+                      style: incomeTextStyle,
+                    ),
                   ),
                 if (showExpenses)
-                  Text(
-                    currencyBloc.format(expenses),
-                    textAlign: TextAlign.end,
-                    overflow: TextOverflow.ellipsis,
-                    style: expenseTextStyle,
+                  Tooltip(
+                    message: formattedExpenses,
+                    child: Text(
+                      formattedExpenses,
+                      textAlign: TextAlign.end,
+                      overflow: TextOverflow.ellipsis,
+                      style: expenseTextStyle,
+                    ),
                   ),
                 if (showTotal)
-                  Text(
-                    currencyBloc.format(total),
-                    textAlign: TextAlign.end,
-                    overflow: TextOverflow.ellipsis,
-                    style: total >= 0 ? incomeTextStyle : expenseTextStyle,
+                  Tooltip(
+                    message: formattedTotal,
+                    child: Text(
+                      formattedTotal,
+                      textAlign: TextAlign.end,
+                      overflow: TextOverflow.ellipsis,
+                      style: total >= 0 ? incomeTextStyle : expenseTextStyle,
+                    ),
                   ),
               ],
             ),
@@ -199,12 +208,11 @@ class EstimateBottomSheetDialog extends StatelessWidget {
 
   Widget _buildBottomButtonBar(BuildContext context) {
     final theme = Theme.of(context);
-    final i18n = I18n.of(context);
+    final i18n = S.of(context);
     return ButtonBar(
       layoutBehavior: ButtonBarLayoutBehavior.constrained,
-      buttonPadding: const EdgeInsets.symmetric(horizontal: 20),
       children: <Widget>[
-        OutlineButton(
+        OutlinedButton(
           onPressed: () => Navigator.pop(context),
           child: Text(i18n.close, style: TextStyle(color: theme.primaryColor)),
         ),
@@ -231,11 +239,11 @@ class EstimateBottomSheetDialog extends StatelessWidget {
       return;
     }
     if (isFromDate) {
-      context.bloc<EstimatesBloc>().add(EstimatesEvent.fromDateChanged(newDate: selectedDate));
+      context.read<EstimatesBloc>().add(EstimatesEvent.fromDateChanged(newDate: selectedDate));
     } else {
-      context.bloc<EstimatesBloc>().add(EstimatesEvent.untilDateChanged(newDate: selectedDate));
+      context.read<EstimatesBloc>().add(EstimatesEvent.untilDateChanged(newDate: selectedDate));
     }
-    context.bloc<EstimatesBloc>().add(EstimatesEvent.calculate());
+    context.read<EstimatesBloc>().add(EstimatesEvent.calculate());
   }
 
   List<bool> _getSelectedButtons(int selectedTransactionType) {
@@ -251,12 +259,12 @@ class EstimateBottomSheetDialog extends StatelessWidget {
     return selectedButtons;
   }
 
-  String _getSelectedTransactionText(I18n i18n, int value) {
+  String _getSelectedTransactionText(S i18n, int value) {
     if (value == 0) return i18n.all;
     if (value == 1) return i18n.incomes;
     return i18n.expenses;
   }
 
   void _transactionTypeChanged(BuildContext context, int newValue) =>
-      context.bloc<EstimatesBloc>().add(EstimatesEvent.transactionTypeChanged(newValue: newValue));
+      context.read<EstimatesBloc>().add(EstimatesEvent.transactionTypeChanged(newValue: newValue));
 }

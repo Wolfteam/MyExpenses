@@ -1,4 +1,4 @@
-enum SecureResourceType{
+enum SecureResourceType {
   accessTokenType,
   accessTokenData,
   accessTokenExpiricy,

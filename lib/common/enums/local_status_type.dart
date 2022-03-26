@@ -1,4 +1,4 @@
-enum LocalStatusType{
+enum LocalStatusType {
   nothing,
   created,
   updated,

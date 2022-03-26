@@ -10,11 +10,11 @@ import 'add_edit_category_page.dart';
 class CategoriesListPage extends StatefulWidget {
   final bool loadIncomes;
   final bool isInSelectionMode;
-  final CategoryItem selectedCategory;
+  final CategoryItem? selectedCategory;
 
   const CategoriesListPage({
-    Key key,
-    @required this.loadIncomes,
+    Key? key,
+    required this.loadIncomes,
     this.isInSelectionMode = false,
     this.selectedCategory,
   }) : super(key: key);
@@ -23,8 +23,7 @@ class CategoriesListPage extends StatefulWidget {
   _CategoriesListPageState createState() => _CategoriesListPageState();
 }
 
-class _CategoriesListPageState extends State<CategoriesListPage>
-    with AutomaticKeepAliveClientMixin<CategoriesListPage> {
+class _CategoriesListPageState extends State<CategoriesListPage> with AutomaticKeepAliveClientMixin<CategoriesListPage> {
   @override
   bool get wantKeepAlive => true;
 
@@ -58,40 +57,35 @@ class _CategoriesListPageState extends State<CategoriesListPage>
   }
 
   Widget _buildPage(CategoriesListState state) {
-    if (state is CategoriesLoadedState) {
-      return ListView.builder(
+    return state.maybeMap(
+      loaded: (state) => ListView.builder(
         itemCount: state.categories.length,
         itemBuilder: (ctx, index) => cat_item.CategoryItem(
           category: state.categories[index],
           isInSelectionMode: widget.isInSelectionMode,
         ),
-      );
-    } else {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
+      ),
+      orElse: () => const Center(child: CircularProgressIndicator()),
+    );
   }
 
   void _loadCategories() {
-    final event = GetCategories(
-      loadIncomes: widget.loadIncomes,
-      selectedCategory: widget.selectedCategory,
-    );
+    final event = CategoriesListEvent.getCategories(loadIncomes: widget.loadIncomes, selectedCategory: widget.selectedCategory);
     if (widget.loadIncomes) {
-      context.bloc<IncomesCategoriesBloc>().add(event);
+      context.read<IncomesCategoriesBloc>().add(event);
     } else {
-      context.bloc<ExpensesCategoriesBloc>().add(event);
+      context.read<ExpensesCategoriesBloc>().add(event);
     }
   }
 
   Future _gotoAddCategoryPage() async {
-    final route = MaterialPageRoute(
-      builder: (ctx) => const AddEditCategoryPage(null),
-    );
-
-    context.bloc<CategoryFormBloc>().add(AddCategory());
+    final route = MaterialPageRoute(builder: (ctx) => AddEditCategoryPage());
+    context.read<CategoryFormBloc>().add(const CategoryFormEvent.addCategory());
     await Navigator.of(context).push(route);
-    context.bloc<CategoryFormBloc>().add(FormClosed());
+    await route.completed;
+
+    if (mounted) {
+      context.read<CategoryFormBloc>().add(const CategoryFormEvent.formClosed());
+    }
   }
 }

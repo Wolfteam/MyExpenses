@@ -1,47 +1,26 @@
 part of 'app_bloc.dart';
 
-abstract class AppEvent extends Equatable {
-  const AppEvent();
-}
+@freezed
+class AppEvent with _$AppEvent {
+  const factory AppEvent.init({
+    required bool bgTaskIsRunning,
+  }) = _Init;
 
-class InitializeApp extends AppEvent {
-  final bool bgTaskIsRunning;
-  const InitializeApp({this.bgTaskIsRunning});
+  const factory AppEvent.loadTheme() = _LoadTheme;
 
-  @override
-  List<Object> get props => [bgTaskIsRunning];
-}
+  const factory AppEvent.themeChanged({
+    required AppThemeType theme,
+  }) = _ThemeChanged;
 
-class AppThemeChanged extends AppEvent {
-  final AppThemeType theme;
+  const factory AppEvent.accentColorChanged({
+    required AppAccentColorType accentColor,
+  }) = _AccentColorChanged;
 
-  const AppThemeChanged(this.theme);
+  const factory AppEvent.bgTaskIsRunning({
+    required bool isRunning,
+  }) = _BgTaskIsRunning;
 
-  @override
-  List<Object> get props => [theme];
-}
-
-class AppAccentColorChanged extends AppEvent {
-  final AppAccentColorType accentColor;
-
-  const AppAccentColorChanged(this.accentColor);
-
-  @override
-  List<Object> get props => [accentColor];
-}
-
-class AuthenticateUser extends AppEvent {
-  @override
-  List<Object> get props => [];
-
-  const AuthenticateUser();
-}
-
-class BgTaskIsRunning extends AppEvent {
-  final bool isRunning;
-  
-  @override
-  List<Object> get props => [isRunning];
-
-  const BgTaskIsRunning({@required this.isRunning});
+  const factory AppEvent.languageChanged({
+    required AppLanguageType newValue,
+  }) = _LanguageChanged;
 }

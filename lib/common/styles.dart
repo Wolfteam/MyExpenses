@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 
 class Styles {
-  static final RoundedRectangleBorder cardSettingsShape =
-      RoundedRectangleBorder(borderRadius: BorderRadius.circular(10));
-  static final RoundedRectangleBorder floatingCardShape =
-      RoundedRectangleBorder(borderRadius: BorderRadius.circular(20));
+  static final RoundedRectangleBorder cardSettingsShape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(10));
+  static final RoundedRectangleBorder floatingCardShape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(20));
   static final transactionCardShape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(15));
 
   static const double cardElevation = 3;
   static const edgeInsetAll10 = EdgeInsets.all(10);
   static const edgeInsetAll5 = EdgeInsets.all(5);
-  static const edgeInsetAll0 = EdgeInsets.all(0);
+  static const edgeInsetAll0 = EdgeInsets.zero;
   static const edgeInsetHorizontal16 = EdgeInsets.symmetric(horizontal: 16);
 
   static const modalBottomSheetShape = RoundedRectangleBorder(

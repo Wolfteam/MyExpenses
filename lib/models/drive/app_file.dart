@@ -1,27 +1,17 @@
-import 'package:flutter/widgets.dart';
-import 'package:json_annotation/json_annotation.dart';
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'category.dart';
 import 'transaction.dart';
 
+part 'app_file.freezed.dart';
 part 'app_file.g.dart';
 
-@JsonSerializable()
-class AppFile extends Equatable {
-  final List<Transaction> transactions;
+@freezed
+class AppFile with _$AppFile {
+  const factory AppFile({
+    required List<Transaction> transactions,
+    required List<Category> categories,
+  }) = _AppFile;
 
-  final List<Category> categories;
-
-  @override
-  List<Object> get props => [transactions, categories];
-
-  const AppFile({
-    @required this.transactions,
-    @required this.categories,
-  });
-
-  factory AppFile.fromJson(Map<String, dynamic> json) =>
-      _$AppFileFromJson(json);
-  Map<String, dynamic> toJson() => _$AppFileToJson(this);
+  factory AppFile.fromJson(Map<String, dynamic> json) => _$AppFileFromJson(json);
 }

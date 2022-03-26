@@ -1,21 +1,13 @@
 import 'dart:io';
-import 'package:path/path.dart';
 
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 class AppPathUtils {
   //internal memory/android/data/com.miraisoft.my_expenses/files/reports
   static Future<String> get reportsPath async {
     final dir = await getExternalStorageDirectory();
-    final dirPath = '${dir.path}/Reports';
-    await _generateDirectoryIfItDoesntExist(dirPath);
-    return dirPath;
-  }
-
-  //internal memory/android/data/com.miraisoft.my_expenses/files/logs
-  static Future<String> get logsPath async {
-    final dir = await getExternalStorageDirectory();
-    final dirPath = '${dir.path}/Logs';
+    final dirPath = '${dir!.path}/Reports';
     await _generateDirectoryIfItDoesntExist(dirPath);
     return dirPath;
   }
@@ -24,7 +16,7 @@ class AppPathUtils {
 
   static String get userProfileImgPrefix => 'user_profile_img_';
 
-  static Future<String> generateTransactionImgPath(int userId) async {
+  static Future<String> generateTransactionImgPath(int? userId) async {
     final imgPath = await getUserImgPath(userId);
     final now = DateTime.now();
     final filename = '$transactionImgPrefix$now.png';
@@ -39,7 +31,7 @@ class AppPathUtils {
   }
 
   //root/data/data/com.miraisoft.my_expenses/app_flutter/images
-  static Future<String> getUserImgPath(int userId) async {
+  static Future<String> getUserImgPath(int? userId) async {
     final dir = await getApplicationDocumentsDirectory();
     final dirPath = userId == null ? '${dir.path}/Images' : '${dir.path}/Images_$userId';
     await _generateDirectoryIfItDoesntExist(dirPath);
@@ -53,26 +45,9 @@ class AppPathUtils {
     return join(imgPath, filename);
   }
 
-  static Future<String> buildUserImgPath(String filename, int userId) async {
+  static Future<String> buildUserImgPath(String filename, int? userId) async {
     final baseImgPath = await getUserImgPath(userId);
     return join(baseImgPath, filename);
-  }
-
-  static Future<void> deleteOlLogs() async {
-    final maxDate = DateTime.now().subtract(const Duration(days: 3));
-    final path = await logsPath;
-    final dir = Directory(path);
-    final files = dir.listSync();
-    final filesToDelete = <FileSystemEntity>[];
-    for (final file in files) {
-      final stat = await file.stat();
-      if (stat.modified.isBefore(maxDate)) {
-        filesToDelete.add(file);
-      }
-    }
-    if (filesToDelete.isNotEmpty) {
-      await Future.wait(filesToDelete.map((f) => f.delete()).toList());
-    }
   }
 
   static Future<void> _generateDirectoryIfItDoesntExist(String path) async {

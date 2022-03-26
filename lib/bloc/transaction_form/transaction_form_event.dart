@@ -1,102 +1,51 @@
 part of 'transaction_form_bloc.dart';
 
-@immutable
-abstract class TransactionFormEvent extends Equatable {
-  const TransactionFormEvent();
+@freezed
+class TransactionFormEvent with _$TransactionFormEvent {
+  const factory TransactionFormEvent.add() = _Add;
 
-  @override
-  List<Object> get props => [];
+  const factory TransactionFormEvent.edit({
+    required int id,
+  }) = _Edit;
+
+  const factory TransactionFormEvent.amountChanged({
+    required double amount,
+  }) = _AmountChanged;
+
+  const factory TransactionFormEvent.descriptionChanged({
+    required String description,
+  }) = _DescriptionChanged;
+
+  const factory TransactionFormEvent.longDescriptionChanged({
+    required String longDescription,
+  }) = _LongDescriptionChanged;
+
+  const factory TransactionFormEvent.transactionDateChanged({
+    required DateTime transactionDate,
+  }) = _TransactionDateChanged;
+
+  const factory TransactionFormEvent.repetitionCycleChanged({
+    required RepetitionCycleType repetitionCycle,
+  }) = _RepetitionCycleChanged;
+
+  const factory TransactionFormEvent.categoryWasUpdated({
+    required CategoryItem category,
+  }) = _CategoryWasUpdated;
+
+  const factory TransactionFormEvent.imageChanged({
+    required String path,
+    required bool imageExists,
+  }) = _ImageChanged;
+
+  const factory TransactionFormEvent.isRunningChanged({
+    required bool isRunning,
+  }) = _IsRunningChanged;
+
+  const factory TransactionFormEvent.deleteTransaction({
+    required bool keepChildren,
+  }) = _DeleteTransaction;
+
+  const factory TransactionFormEvent.submit() = _Submit;
+
+  const factory TransactionFormEvent.close() = _Close;
 }
-
-class AddTransaction extends TransactionFormEvent {}
-
-class EditTransaction extends TransactionFormEvent {
-  final int id;
-
-  const EditTransaction(this.id);
-
-  @override
-  List<Object> get props => [id];
-}
-
-class AmountChanged extends TransactionFormEvent {
-  final double amount;
-  const AmountChanged(this.amount);
-
-  @override
-  List<Object> get props => [amount];
-}
-
-class DescriptionChanged extends TransactionFormEvent {
-  final String description;
-  const DescriptionChanged(this.description);
-
-  @override
-  List<Object> get props => [description];
-}
-
-class LongDescriptionChanged extends TransactionFormEvent {
-  final String longDescription;
-  const LongDescriptionChanged(this.longDescription);
-
-  @override
-  List<Object> get props => [longDescription];
-}
-
-class TransactionDateChanged extends TransactionFormEvent {
-  final DateTime transactionDate;
-  const TransactionDateChanged(this.transactionDate);
-
-  @override
-  List<Object> get props => [transactionDate];
-}
-
-class RepetitionCycleChanged extends TransactionFormEvent {
-  final RepetitionCycleType repetitionCycle;
-
-  const RepetitionCycleChanged(this.repetitionCycle);
-
-  @override
-  List<Object> get props => [repetitionCycle];
-}
-
-class CategoryWasUpdated extends TransactionFormEvent {
-  final CategoryItem category;
-
-  const CategoryWasUpdated(this.category);
-
-  @override
-  List<Object> get props => [category];
-}
-
-class ImageChanged extends TransactionFormEvent {
-  final String path;
-  final bool imageExists;
-
-  const ImageChanged({
-    @required this.path,
-    @required this.imageExists,
-  });
-
-  @override
-  List<Object> get props => [path, imageExists];
-}
-
-class IsRunningChanged extends TransactionFormEvent {
-  final bool isRunning;
-
-  const IsRunningChanged({@required this.isRunning});
-
-  @override
-  List<Object> get props => [isRunning];
-}
-
-class DeleteTransaction extends TransactionFormEvent {
-  final bool keepChilds;
-
-  const DeleteTransaction({this.keepChilds = false});
-}
-
-class FormSubmitted extends TransactionFormEvent {}
-
-class FormClosed extends TransactionFormEvent {}

@@ -1,31 +1,16 @@
 part of 'chart_details_bloc.dart';
 
-abstract class ChartDetailsEvent extends Equatable {
-  const ChartDetailsEvent();
-}
+@freezed
+class ChartDetailsEvent with _$ChartDetailsEvent {
+  const factory ChartDetailsEvent.initialize({
+    required List<TransactionItem> transactions,
+  }) = _Initialize;
 
-class Initialize extends ChartDetailsEvent {
-  final List<TransactionItem> transactions;
+  const factory ChartDetailsEvent.filterChanged({
+    required TransactionFilterType selectedFilter,
+  }) = _FilterChanged;
 
-  @override
-  List<Object> get props => [transactions];
-
-  const Initialize(this.transactions);
-}
-
-class FilterChanged extends ChartDetailsEvent {
-  final TransactionFilterType selectedFilter;
-  @override
-  List<Object> get props => [];
-
-  const FilterChanged(this.selectedFilter);
-}
-
-class SortDirectionChanged extends ChartDetailsEvent {
-  final SortDirectionType selectedDirection;
-
-  @override
-  List<Object> get props => [selectedDirection];
-
-  const SortDirectionChanged(this.selectedDirection);
+  const factory ChartDetailsEvent.sortDirectionChanged({
+    required SortDirectionType selectedDirection,
+  }) = _SortDirectionChanged;
 }
