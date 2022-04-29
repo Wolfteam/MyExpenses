@@ -204,5 +204,6 @@
   "maybeLater": "Quizás después",
   "yearly": "Anual",
   "monthly": "Mensual",
-  "pickYear": "Selecciona un año"
+  "pickYear": "Selecciona un año",
+  "balanceX": "Balance: {amount}"
 }

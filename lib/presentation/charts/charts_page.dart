@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
@@ -6,6 +7,7 @@ import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/charts/widgets/income_expense_pie_chart.dart';
 import 'package:my_expenses/presentation/charts/widgets/monthly_bar_chart.dart';
 import 'package:my_expenses/presentation/charts/widgets/yearly_chart.dart';
+import 'package:my_expenses/presentation/shared/mixins/transaction_mixin.dart';
 import 'package:my_expenses/presentation/shared/nothing_found.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
 import 'package:my_expenses/presentation/shared/utils/i18n_utils.dart';
@@ -36,70 +38,90 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: state.map(
-            loaded: (state) => [
-              Padding(
-                padding: const EdgeInsets.only(left: 5),
-                child: Text(
-                  '${i18n.incomes} & ${i18n.expenses}',
-                  style: Theme.of(context).textTheme.headline6,
+            loaded: (state) {
+              final totalYearlyBalance = state.transactionsPerYear.map((e) => e.totalAmount).sum;
+              final totalYearlyColor = TransactionMixin().getTransactionColor(isAnIncome: totalYearlyBalance >= 0);
+
+              final monthlyBalance = state.transactionsPerMonth.map((e) => e.totalAmount).sum;
+              final monthlyBalanceColor = TransactionMixin().getTransactionColor(isAnIncome: monthlyBalance >= 0);
+
+              return [
+                Padding(
+                  padding: const EdgeInsets.only(left: 5),
+                  child: Text(
+                    '${i18n.incomes} & ${i18n.expenses}',
+                    style: theme.textTheme.headline6,
+                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 5, top: 10),
-                child: Text(
-                  i18n.yearly,
-                  style: Theme.of(context).textTheme.subtitle1,
+                Padding(
+                  padding: const EdgeInsets.only(left: 5, top: 10),
+                  child: Text(
+                    i18n.yearly,
+                    style: theme.textTheme.subtitle1,
+                  ),
                 ),
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: TextButton.icon(
-                  style: TextButton.styleFrom(primary: textColor),
-                  onPressed: () => _changeCurrentYear(state),
-                  icon: const Icon(Icons.calendar_today),
-                  label: Text('${state.currentYear}'),
-                ),
-              ),
-              YearlyChart(year: state.currentYear, transactions: state.transactionsPerYear),
-              Padding(
-                padding: const EdgeInsets.only(left: 5, top: 10),
-                child: Text(
-                  i18n.monthly,
-                  style: Theme.of(context).textTheme.subtitle1,
-                ),
-              ),
-              if (state.transactionsPerMonth.isNotEmpty)
                 Align(
                   alignment: Alignment.centerLeft,
                   child: TextButton.icon(
                     style: TextButton.styleFrom(primary: textColor),
-                    onPressed: () => _changeCurrentMonthDate(state),
+                    onPressed: () => _changeCurrentYear(state),
                     icon: const Icon(Icons.calendar_today),
-                    label: Text(state.currentMonthDateString),
+                    label: Text('${state.currentYear}'),
                   ),
                 ),
-              if (state.transactionsPerMonth.isNotEmpty) MonthlyBarChart(transactionsPerDate: state.transactionsPerMonth),
-              if (state.transactions.isNotEmpty)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Expanded(
-                      child: IncomeExpensePieChart.income(
-                        transactions: state.transactions,
-                        totalAmount: state.totalIncomeAmount,
-                      ),
+                YearlyChart(year: state.currentYear, transactions: state.transactionsPerYear),
+                _ChartBottomBalance(
+                  amount: totalYearlyBalance,
+                  textColor: totalYearlyColor,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 5, top: 10),
+                  child: Text(
+                    i18n.monthly,
+                    style: theme.textTheme.subtitle1,
+                  ),
+                ),
+                if (state.transactionsPerMonth.isNotEmpty)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton.icon(
+                      style: TextButton.styleFrom(primary: textColor),
+                      onPressed: () => _changeCurrentMonthDate(state),
+                      icon: const Icon(Icons.calendar_today),
+                      label: Text(state.currentMonthDateString),
                     ),
-                    Expanded(
-                      child: IncomeExpensePieChart.expense(
-                        transactions: state.transactions,
-                        totalAmount: state.totalExpenseAmount,
+                  ),
+                if (state.transactionsPerMonth.isNotEmpty)
+                  MonthlyBarChart(
+                    transactionsPerDate: state.transactionsPerMonth,
+                  ),
+                if (state.transactionsPerMonth.isNotEmpty)
+                  _ChartBottomBalance(
+                    amount: monthlyBalance,
+                    textColor: monthlyBalanceColor,
+                  ),
+                if (state.transactions.isNotEmpty)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Expanded(
+                        child: IncomeExpensePieChart.income(
+                          transactions: state.transactions,
+                          totalAmount: state.totalIncomeAmount,
+                        ),
                       ),
-                    )
-                  ],
-                )
-              else
-                NothingFound(msg: i18n.noRecurringTransactionsWereFound)
-            ],
+                      Expanded(
+                        child: IncomeExpensePieChart.expense(
+                          transactions: state.transactions,
+                          totalAmount: state.totalExpenseAmount,
+                        ),
+                      )
+                    ],
+                  )
+                else
+                  NothingFound(msg: i18n.noRecurringTransactionsWereFound)
+              ];
+            },
           ),
         ),
       ),
@@ -141,5 +163,29 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
     if (mounted) {
       context.read<ChartsBloc>().add(ChartsEvent.loadChart(selectedMonthDate: state.currentMonthDate, selectedYear: selectedDate.year));
     }
+  }
+}
+
+class _ChartBottomBalance extends StatelessWidget {
+  final double amount;
+  final Color textColor;
+
+  const _ChartBottomBalance({
+    Key? key,
+    required this.amount,
+    required this.textColor,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final i18n = S.of(context);
+    final currencyBloc = context.read<CurrencyBloc>();
+    final formattedAmount = currencyBloc.format(amount);
+    return Text(
+      i18n.balanceX(formattedAmount),
+      textAlign: TextAlign.end,
+      style: theme.textTheme.subtitle1!.copyWith(color: textColor),
+    );
   }
 }

@@ -28,7 +28,7 @@ class HomeLast7DaysSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     final incomesIsChecked = selectedType == TransactionType.incomes;
     final aspectRatio = MediaQuery.of(context).orientation == Orientation.portrait ? 3 / 2 : 2 / 1;
-
+    final i18n = S.of(context);
     return Card(
       elevation: Styles.cardElevation,
       margin: Styles.edgeInsetAll10,
@@ -39,41 +39,55 @@ class HomeLast7DaysSummary extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildTitle(incomesIsChecked, context),
-            AspectRatio(aspectRatio: aspectRatio, child: _buildBarChart(incomesIsChecked, context)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(left: 5),
+                  child: Text(
+                    i18n.last7Days,
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                ),
+                TransactionPopupMenuTypeFilter(
+                  selectedValue: selectedType,
+                  onSelectedValue: (newValue) => _onSelectedTypeChanged(context, TransactionType.values[newValue]),
+                ),
+              ],
+            ),
+            AspectRatio(
+              aspectRatio: aspectRatio,
+              child: _BarChart(
+                incomesIsChecked: incomesIsChecked,
+                data: incomesIsChecked ? incomes : expenses,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTitle(bool incomesIsChecked, BuildContext context) {
-    final i18n = S.of(context);
+  void _onSelectedTypeChanged(BuildContext context, TransactionType newValue) =>
+      context.read<TransactionsLast7DaysBloc>().add(TransactionsLast7DaysEvent.typeChanged(selectedType: newValue));
+}
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(left: 5),
-          child: Text(
-            i18n.last7Days,
-            style: Theme.of(context).textTheme.headline6,
-          ),
-        ),
-        TransactionPopupMenuTypeFilter(
-          selectedValue: selectedType,
-          onSelectedValue: (newValue) => _onSelectedTypeChanged(context, TransactionType.values[newValue]),
-        ),
-      ],
-    );
-  }
+class _BarChart extends StatelessWidget {
+  final bool incomesIsChecked;
+  final List<TransactionsSummaryPerDay> data;
 
-  Widget _buildBarChart(bool incomesIsChecked, BuildContext context) {
+  const _BarChart({
+    Key? key,
+    required this.incomesIsChecked,
+    required this.data,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final lineColor = theme.brightness == Brightness.dark ? Colors.white : Colors.black;
-    final finalData = incomesIsChecked ? incomes : expenses;
-    final maxWastedValue = finalData.isEmpty ? 0 : finalData.map((e) => e.totalDayAmount.abs()).max();
-    final double maxValue = maxWastedValue == 0 ? 10 : maxWastedValue + 5;
+    final maxWastedValue = data.isEmpty ? 0 : data.map((e) => e.totalDayAmount.abs()).max();
+    final double maxValue = maxWastedValue == 0 ? 10 : maxWastedValue + maxWastedValue * 0.15;
     final textStyle = TextStyle(color: lineColor, fontSize: 10);
     final currencyBloc = context.read<CurrencyBloc>();
     final interval = maxValue / 4;
@@ -107,7 +121,7 @@ class HomeLast7DaysSummary extends StatelessWidget {
                   child: Container(
                     margin: const EdgeInsets.only(top: 10),
                     child: Text(
-                      utils.DateUtils.formatDateWithoutLocale(finalData.elementAt(value.toInt() - 1).date),
+                      utils.DateUtils.formatDateWithoutLocale(data.elementAt(value.toInt() - 1).date),
                       style: TextStyle(color: incomesIsChecked ? Colors.green : Colors.red, fontSize: 11, fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -141,7 +155,7 @@ class HomeLast7DaysSummary extends StatelessWidget {
             },
           ),
           borderData: FlBorderData(show: false),
-          barGroups: finalData
+          barGroups: data
               .mapIndex(
                 (e, i) => BarChartGroupData(
                   x: i + 1,
@@ -163,7 +177,4 @@ class HomeLast7DaysSummary extends StatelessWidget {
       ),
     );
   }
-
-  void _onSelectedTypeChanged(BuildContext context, TransactionType newValue) =>
-      context.read<TransactionsLast7DaysBloc>().add(TransactionsLast7DaysEvent.typeChanged(selectedType: newValue));
 }
