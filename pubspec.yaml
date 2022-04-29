@@ -54,11 +54,15 @@ dependencies:
   package_info_plus: ^1.4.0
   path: ^1.8.0
   path_provider: ^2.0.9
+  # WORKAROUND FOR https://github.com/flutter/flutter/issues/98473
+  path_provider_android: ^2.0.13
   pdf: ^3.7.3
   permission_handler: ^9.2.0
   photo_view: ^0.13.0
   rate_my_app: ^1.1.2
   shared_preferences: ^2.0.13
+  # WORKAROUND FOR https://github.com/flutter/flutter/issues/98473
+  shared_preferences_android: ^2.0.11
   sprintf: ^6.0.0
   sqlite3_flutter_libs: ^0.5.4
   steel_crypt: ^3.0.0+1

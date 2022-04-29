@@ -11,12 +11,19 @@ import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/domain/services/services.dart';
 import 'package:my_expenses/infrastructure/db/database.dart';
 import 'package:my_expenses/injection.dart';
+import 'package:path_provider_android/path_provider_android.dart';
+import 'package:shared_preferences_android/shared_preferences_android.dart';
 import 'package:workmanager/workmanager.dart';
 
 void _callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     try {
       WidgetsFlutterBinding.ensureInitialized();
+      //WORKAROUND FOR https://github.com/flutter/flutter/issues/98473
+      if (Platform.isAndroid) {
+        SharedPreferencesAndroid.registerWith();
+        PathProviderAndroid.registerWith();
+      }
       final bgService = await Injection.getBackgroundService(forBgTask: true);
       await bgService.handleBackgroundTask(task, BackgroundTranslations.fromJson(inputData!), calledFromBg: true);
     } catch (e, s) {
