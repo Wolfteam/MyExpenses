@@ -10,11 +10,19 @@ import 'package:tuple/tuple.dart';
 
 class TransactionUtils {
   static double getTotalTransactionAmounts(List<TransactionItem> transactions, {bool onlyIncomes = false}) {
-    return transactions.where((t) => t.category.isAnIncome == onlyIncomes).map((t) => t.amount).fold(0, (t1, t2) => roundDouble(t1 + t2));
+    final amounts = transactions.where((t) => t.category.isAnIncome == onlyIncomes).map((t) => t.amount);
+    return getTotalAmounts(amounts);
   }
 
-  static double getTotalTransactionAmount(List<TransactionItem> transactions) =>
-      transactions.map((t) => t.amount).fold(0, (t1, t2) => roundDouble(t1 + t2));
+  static double getTotalAmounts(Iterable<double> amounts) {
+    final double amount = amounts.fold(0, (t1, t2) => roundDouble(t1 + t2));
+    return roundDouble(amount);
+  }
+
+  static double getTotalTransactionAmount(List<TransactionItem> transactions) {
+    final amounts = transactions.map((t) => t.amount);
+    return getTotalAmounts(amounts);
+  }
 
   static DateTime getNextRecurringDate(RepetitionCycleType cycle, DateTime nextRecurringDate) {
     final daysToAdd = getRepetitionCycleInDays(cycle);

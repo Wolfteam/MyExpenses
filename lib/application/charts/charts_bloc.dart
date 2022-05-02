@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
+import 'package:my_expenses/domain/extensions/datetime_extensions.dart';
 import 'package:my_expenses/domain/models/entities/daos/transactions_dao.dart';
 import 'package:my_expenses/domain/models/entities/daos/users_dao.dart';
 import 'package:my_expenses/domain/models/models.dart';
@@ -93,7 +94,7 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
       final last = DateTime(next.year, next.month, next.day, 23, 59, 59);
 
       final amount = TransactionUtils.getTotalTransactionAmount(
-        transactions.where((t) => t.transactionDate.isAfter(first) && t.transactionDate.isBefore(last)).toList(),
+        transactions.where((t) => t.transactionDate.isBetweenInclusive(first, last)).toList(),
       );
 
       final start = DateUtils.formatAppDate(first, lang);

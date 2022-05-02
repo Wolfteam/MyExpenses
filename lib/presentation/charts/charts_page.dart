@@ -1,8 +1,8 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:my_expenses/application/bloc.dart';
+import 'package:my_expenses/domain/utils/transaction_utils.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/charts/widgets/income_expense_pie_chart.dart';
 import 'package:my_expenses/presentation/charts/widgets/monthly_bar_chart.dart';
@@ -39,10 +39,10 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: state.map(
             loaded: (state) {
-              final totalYearlyBalance = state.transactionsPerYear.map((e) => e.totalAmount).sum;
+              final totalYearlyBalance = TransactionUtils.getTotalAmounts(state.transactionsPerYear.map((e) => e.totalAmount));
               final totalYearlyColor = TransactionMixin().getTransactionColor(isAnIncome: totalYearlyBalance >= 0);
 
-              final monthlyBalance = state.transactionsPerMonth.map((e) => e.totalAmount).sum;
+              final monthlyBalance = TransactionUtils.getTotalAmounts(state.transactionsPerMonth.map((e) => e.totalAmount));
               final monthlyBalanceColor = TransactionMixin().getTransactionColor(isAnIncome: monthlyBalance >= 0);
 
               return [
@@ -182,10 +182,14 @@ class _ChartBottomBalance extends StatelessWidget {
     final i18n = S.of(context);
     final currencyBloc = context.read<CurrencyBloc>();
     final formattedAmount = currencyBloc.format(amount);
-    return Text(
-      i18n.balanceX(formattedAmount),
-      textAlign: TextAlign.end,
-      style: theme.textTheme.subtitle1!.copyWith(color: textColor),
+    return Tooltip(
+      message: i18n.balanceX(formattedAmount),
+      child: Text(
+        i18n.balanceX(formattedAmount),
+        textAlign: TextAlign.end,
+        overflow: TextOverflow.ellipsis,
+        style: theme.textTheme.subtitle1!.copyWith(color: textColor),
+      ),
     );
   }
 }
