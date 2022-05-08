@@ -93,6 +93,7 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation "com.jakewharton.threetenabp:threetenabp:1.2.3"
+    implementation 'androidx.work:work-runtime-ktx:2.7.0'
 
     def appCenterSdkVersion = '4.0.0'
     implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"
