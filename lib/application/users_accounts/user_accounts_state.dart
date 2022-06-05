@@ -2,17 +2,14 @@ part of 'user_accounts_bloc.dart';
 
 @freezed
 class UserAccountsState with _$UserAccountsState {
+  const factory UserAccountsState.loading() = _LoadingState;
+
   const factory UserAccountsState.initial({
     required List<UserItem> users,
-    required bool userWasDeleted,
-    required bool errorOccurred,
-    required bool activeUserChanged,
+    required bool isNetworkAvailable,
+    @Default(false) bool userWasDeleted,
+    @Default(false) bool errorOccurred,
+    @Default(false) bool activeUserChanged,
+    @Default(false) bool accountWasAdded,
   }) = _InitialState;
-
-  static UserAccountsState loading() => const UserAccountsState.initial(
-        users: [],
-        userWasDeleted: false,
-        errorOccurred: false,
-        activeUserChanged: false,
-      );
 }

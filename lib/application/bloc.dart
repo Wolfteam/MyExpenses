@@ -12,7 +12,6 @@ export 'password_dialog/password_dialog_bloc.dart';
 export 'reports/reports_bloc.dart';
 export 'search/search_bloc.dart';
 export 'settings/settings_bloc.dart';
-export 'sign_in_with_google/sign_in_with_google_bloc.dart';
 export 'splash_screen/splash_screen_bloc.dart';
 export 'transaction_form/transaction_form_bloc.dart';
 export 'transactions/transactions_bloc.dart';

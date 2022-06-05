@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:googleapis/people/v1.dart' as people;
 import 'package:googleapis/sheets/v4.dart' as sheets;
@@ -16,6 +17,7 @@ import 'package:path/path.dart';
 class GoogleServiceImpl implements GoogleService {
   final LoggingService _logger;
   final SecureStorageService _secureStorageService;
+  late final GoogleSignIn _googleSignIn;
 
   static const _baseGoogleApisUrl = 'https://www.googleapis.com';
   static const _folderMimeType = 'application/vnd.google-apps.folder';
@@ -23,70 +25,43 @@ class GoogleServiceImpl implements GoogleService {
   static const _spreadSheetMimeType = 'application/vnd.google-apps.spreadsheet';
   static const _appDataFolder = 'appDataFolder';
 
-  final _authUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
-  final String _tokenUrl = '$_baseGoogleApisUrl/oauth2/v4/token';
-  final _redirectUrl = 'http://localhost';
   final _scopes = <String>[
     people.PeopleServiceApi.userinfoEmailScope,
     people.PeopleServiceApi.userinfoProfileScope,
     drive.DriveApi.driveAppdataScope,
   ];
 
-  @override
-  String get redirectUrl => _redirectUrl;
-
-  GoogleServiceImpl(this._logger, this._secureStorageService);
-
-  @override
-  String getAuthUrl() {
-    final clientId = Uri.encodeQueryComponent(Secrets.googleClientId);
-    final scopes = Uri.encodeQueryComponent(_scopes.join(' '));
-    final redirectUrl = Uri.encodeQueryComponent(_redirectUrl);
-    return '$_authUrl?client_id=$clientId&scope=$scopes&redirect_uri=$redirectUrl&response_type=code&include_granted_scopes=true';
+  GoogleServiceImpl(this._logger, this._secureStorageService) {
+    _googleSignIn = GoogleSignIn(clientId: Secrets.googleClientId, scopes: _scopes);
   }
 
   @override
-  Future<bool> exchangeAuthCodeAndSaveCredentials(String code) async {
+  Future<bool> signIn() async {
     try {
-      _logger.info(
-        runtimeType,
-        'exchangeAuthCodeAndSaveCredentials: Changing code for an auth token...',
-      );
-      final response = await http.post(
-        Uri.parse(_tokenUrl),
-        body: {
-          'client_id': Secrets.googleClientId,
-          'redirect_uri': _redirectUrl,
-          'grant_type': 'authorization_code',
-          'code': code,
-        },
-      );
+      final account = await _googleSignIn.signIn();
+      if (account == null) {
+        return false;
+      }
 
-      final json = jsonDecode(response.body);
-      final token = json['access_token'] as String;
-      final refreshToken = json['refresh_token'] as String;
-      final type = json['token_type'] as String;
-      final expiresIn = json['expires_in'] as int;
-
-      final accessToken = g_auth.AccessToken(
-        type,
-        token,
-        DateTime.now().toUtc().add(Duration(seconds: expiresIn)),
-      );
-
-      final credentials = g_auth.AccessCredentials(
-        accessToken,
-        refreshToken,
-        _scopes,
-      );
+      final accessToken = await _getAccessToken(account);
+      final credentials = g_auth.AccessCredentials(accessToken, null, _scopes);
       return await _saveAccessCredentials(credentials);
     } catch (e, s) {
-      _logger.error(
-        runtimeType,
-        'exchangeAuthCodeAndSaveCredentials: Unknown error occurred',
-        e,
-        s,
-      );
+      _logger.error(runtimeType, 'signIn: Unknown error occurred', e, s);
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> signOut() async {
+    try {
+      if (await _googleSignIn.isSignedIn()) {
+        await _googleSignIn.signOut();
+      }
+
+      return true;
+    } catch (e, s) {
+      _logger.error(runtimeType, 'signOut: Unknown error occurred', e, s);
       return false;
     }
   }
@@ -321,14 +296,13 @@ class GoogleServiceImpl implements GoogleService {
     final type = await _secureStorageService.get(SecureResourceType.accessTokenType, currentUser);
     final data = await _secureStorageService.get(SecureResourceType.accessTokenData, currentUser);
     final expiricy = await _secureStorageService.get(SecureResourceType.accessTokenExpiricy, currentUser);
-    final refreshToken = await _secureStorageService.get(SecureResourceType.refreshToken, currentUser);
 
-    if (type == null || data == null || expiricy == null || refreshToken == null) {
+    if (type == null || data == null || expiricy == null) {
       return null;
     }
 
     final accessToken = g_auth.AccessToken(type, data, DateTime.parse(expiricy));
-    final credentials = g_auth.AccessCredentials(accessToken, refreshToken, _scopes);
+    final credentials = g_auth.AccessCredentials(accessToken, null, _scopes);
     return credentials;
   }
 
@@ -336,12 +310,10 @@ class GoogleServiceImpl implements GoogleService {
     try {
       _logger.info(runtimeType, '_saveAccessCredentials: Trying to save access credentials...');
       final accessToken = credentials.accessToken;
-      final refreshToken = credentials.refreshToken;
       await Future.wait([
         _secureStorageService.save(SecureResourceType.accessTokenData, _secureStorageService.defaultUsername, accessToken.data),
         _secureStorageService.save(SecureResourceType.accessTokenExpiricy, _secureStorageService.defaultUsername, accessToken.expiry.toString()),
         _secureStorageService.save(SecureResourceType.accessTokenType, _secureStorageService.defaultUsername, accessToken.type),
-        _secureStorageService.save(SecureResourceType.refreshToken, _secureStorageService.defaultUsername, refreshToken!),
         _secureStorageService.save(SecureResourceType.currentUser, _secureStorageService.defaultUsername, _secureStorageService.defaultUsername),
       ]);
 
@@ -364,7 +336,12 @@ class GoogleServiceImpl implements GoogleService {
 
     if (credentials.accessToken.hasExpired) {
       _logger.info(runtimeType, '_getAuthClient: Token expired, updating it...');
-      credentials = await g_auth.refreshCredentials(g_auth.ClientId(Secrets.googleClientId, ''), credentials, http.Client());
+      final account = await _googleSignIn.signInSilently(reAuthenticate: true);
+      if (account == null) {
+        throw Exception('Could not sign in silently');
+      }
+      final accessToken = await _getAccessToken(account);
+      credentials = g_auth.AccessCredentials(accessToken, null, _scopes);
 
       _logger.info(runtimeType, '_getAuthClient: Token was updated, saving it...');
       await _saveAccessCredentials(credentials);
@@ -413,5 +390,14 @@ class GoogleServiceImpl implements GoogleService {
       ];
 
     await api.spreadsheets.batchUpdate(updateRequest, spreadSheetId);
+  }
+
+  Future<g_auth.AccessToken> _getAccessToken(GoogleSignInAccount account) async {
+    final auth = await account.authentication;
+    return g_auth.AccessToken(
+      'Bearer',
+      auth.accessToken!,
+      DateTime.now().toUtc().add(const Duration(seconds: 3600)),
+    );
   }
 }

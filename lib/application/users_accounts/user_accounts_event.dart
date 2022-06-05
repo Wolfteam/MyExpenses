@@ -11,4 +11,6 @@ class UserAccountsEvent with _$UserAccountsEvent {
   const factory UserAccountsEvent.changeActiveAccount({
     required int newActiveUserId,
   }) = _ChangeActiveAccount;
+
+  const factory UserAccountsEvent.signIn() = _SignIn;
 }

@@ -29,6 +29,7 @@ if (keystorePropertiesFile.exists()) {
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.google.gms.google-services'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
@@ -94,6 +95,7 @@ dependencies {
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation "com.jakewharton.threetenabp:threetenabp:1.2.3"
     implementation 'androidx.work:work-runtime-ktx:2.7.0'
+    implementation platform('com.google.firebase:firebase-bom:29.3.1')
 
     def appCenterSdkVersion = '4.0.0'
     implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"

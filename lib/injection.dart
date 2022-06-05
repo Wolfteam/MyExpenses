@@ -32,7 +32,22 @@ class Injection {
     final usersDao = getIt<UsersDao>();
     final secureStorage = getIt<SecureStorageService>();
     final pathService = getIt<PathService>();
-    return UserAccountsBloc(logger, categoriesDao, transactionsDao, usersDao, secureStorage, pathService);
+    final googleService = getIt<GoogleService>();
+    final imageService = getIt<ImageService>();
+    final syncService = getIt<SyncService>();
+    final networkService = getIt<NetworkService>();
+    return UserAccountsBloc(
+      logger,
+      categoriesDao,
+      transactionsDao,
+      usersDao,
+      secureStorage,
+      pathService,
+      googleService,
+      imageService,
+      syncService,
+      networkService,
+    );
   }
 
   static CategoryFormBloc get categoryFormBloc {
@@ -56,17 +71,6 @@ class Injection {
     final usersDao = getIt<UsersDao>();
     final transactionsDao = getIt<TransactionsDao>();
     return SearchBloc(logger, transactionsDao, usersDao, settingsService);
-  }
-
-  static SignInWithGoogleBloc get signInWithGoogleBloc {
-    final logger = getIt<LoggingService>();
-    final googleService = getIt<GoogleService>();
-    final usersDao = getIt<UsersDao>();
-    final networkService = getIt<NetworkService>();
-    final secureStorage = getIt<SecureStorageService>();
-    final syncService = getIt<SyncService>();
-    final imgService = getIt<ImageService>();
-    return SignInWithGoogleBloc(logger, usersDao, googleService, networkService, secureStorage, syncService, imgService);
   }
 
   static ReportsBloc getReportsBloc(CurrencyBloc currencyBloc) {

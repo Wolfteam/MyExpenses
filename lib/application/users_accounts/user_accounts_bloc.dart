@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
+import 'package:my_expenses/domain/extensions/string_extensions.dart';
 import 'package:my_expenses/domain/models/entities/daos/categories_dao.dart';
 import 'package:my_expenses/domain/models/entities/daos/transactions_dao.dart';
 import 'package:my_expenses/domain/models/entities/daos/users_dao.dart';
@@ -21,6 +22,10 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
   final UsersDao _usersDao;
   final SecureStorageService _secureStorageService;
   final PathService _pathService;
+  final GoogleService _googleService;
+  final ImageService _imageService;
+  final SyncService _syncService;
+  final NetworkService _networkService;
 
   UserAccountsBloc(
     this._logger,
@@ -29,33 +34,53 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
     this._usersDao,
     this._secureStorageService,
     this._pathService,
-  ) : super(UserAccountsState.loading());
+    this._googleService,
+    this._imageService,
+    this._syncService,
+    this._networkService,
+  ) : super(const UserAccountsState.loading());
 
   @override
   Stream<UserAccountsState> mapEventToState(UserAccountsEvent event) async* {
     try {
       final s = await event.map(
         init: (_) => _initialize(),
-        deleteAccount: (e) => _deleteUser(e.id),
-        changeActiveAccount: (e) => _changeActiveUser(e.newActiveUserId),
+        deleteAccount: (e) => state.maybeMap(
+          initial: (state) => _deleteUser(e.id, state),
+          orElse: () => throw Exception('Invalid State'),
+        ),
+        changeActiveAccount: (e) => state.maybeMap(
+          initial: (state) => _changeActiveUser(e.newActiveUserId, state),
+          orElse: () => throw Exception('Invalid state'),
+        ),
+        signIn: (_) => state.maybeMap(
+          initial: (state) => _signIn(state),
+          orElse: () => throw Exception('Invalid state'),
+        ),
       );
 
       yield s;
     } catch (e, s) {
       _logger.error(runtimeType, 'Unknown error occurred', e, s);
-      yield state.copyWith(errorOccurred: true);
+      yield state.maybeMap(
+        initial: (state) => state.copyWith(errorOccurred: true),
+        orElse: () => state,
+      );
     }
 
-    yield state.copyWith(userWasDeleted: false, activeUserChanged: false, errorOccurred: false);
+    yield state.maybeMap(
+      initial: (state) => state.copyWith(userWasDeleted: false, activeUserChanged: false, errorOccurred: false, accountWasAdded: false),
+      orElse: () => state,
+    );
   }
 
   Future<UserAccountsState> _initialize() async {
     _logger.info(runtimeType, '_initialize: Getting all users in db...');
     final users = await _usersDao.getAllUsers();
-    return state.copyWith(users: users);
+    return UserAccountsState.initial(users: users, isNetworkAvailable: true);
   }
 
-  Future<UserAccountsState> _deleteUser(int id) async {
+  Future<UserAccountsState> _deleteUser(int id, _InitialState state) async {
     try {
       _logger.info(runtimeType, '_deleteUser: Trying to delete userId = $id');
       _logger.info(runtimeType, '_deleteUser: Deleting all transactions for userId = $id');
@@ -89,7 +114,7 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
     }
   }
 
-  Future<UserAccountsState> _changeActiveUser(int id) async {
+  Future<UserAccountsState> _changeActiveUser(int id, _InitialState state) async {
     try {
       //This is to give enough time for the button effect
       await Future.delayed(const Duration(milliseconds: 250));
@@ -106,6 +131,52 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
       _logger.error(runtimeType, '_changeActiveUser: An error occurred while trying to change active user to userId = $id', e, s);
       rethrow;
     }
+  }
+
+  Future<UserAccountsState> _signIn(_InitialState state) async {
+    final isInternetAvailable = await _networkService.isInternetAvailable();
+    if (isInternetAvailable) {
+      _logger.warning(runtimeType, '_signIn: Network is not available');
+      return state.copyWith(errorOccurred: true, isNetworkAvailable: false);
+    }
+
+    final isSignedIn = await _googleService.signIn();
+    if (!isSignedIn) {
+      _logger.warning(runtimeType, '_signIn: Failed');
+      return state.copyWith(errorOccurred: true);
+    }
+
+    _logger.info(runtimeType, '_signIn: Getting user info...');
+    var user = await _googleService.getUserInfo();
+
+    _logger.info(runtimeType, '_signIn: Saving logged user into secure storage...');
+
+    //This needs to be saved here before making any authenticated request
+    await Future.wait([
+      _secureStorageService.save(SecureResourceType.currentUser, _secureStorageService.defaultUsername, user.email),
+      _secureStorageService.update(SecureResourceType.accessTokenData, _secureStorageService.defaultUsername, true, user.email),
+      _secureStorageService.update(SecureResourceType.accessTokenExpiricy, _secureStorageService.defaultUsername, true, user.email),
+      _secureStorageService.update(SecureResourceType.accessTokenType, _secureStorageService.defaultUsername, true, user.email),
+    ]);
+
+    if (!user.pictureUrl.isNullEmptyOrWhitespace) {
+      _logger.info(runtimeType, '_signIn: Saving user img...');
+      final imgPath = await _imageService.saveNetworkImage(user.pictureUrl!);
+      user = user.copyWith(pictureUrl: imgPath);
+    }
+
+    _logger.info(runtimeType, '_signIn: Saving user into db...');
+    await _usersDao.saveUser(user.googleUserId, user.name, user.email, user.pictureUrl!);
+
+    _logger.info(runtimeType, '_signIn: User was successfully saved...');
+
+    await _syncService.initializeAppFolderAndFiles();
+
+    if (state.users.any((el) => el.googleUserId == user.googleUserId)) {
+      return state;
+    }
+    final updatedUsers = [...state.users, user]..sort((x, y) => x.name.compareTo(y.name));
+    return state.copyWith(users: updatedUsers, accountWasAdded: true);
   }
 
   Future<void> _updateSecureStorageUsername(List<UserItem> users) async {

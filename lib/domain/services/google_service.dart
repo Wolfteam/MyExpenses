@@ -1,11 +1,9 @@
 import 'package:my_expenses/domain/models/models.dart';
 
 abstract class GoogleService {
-  String get redirectUrl;
+  Future<bool> signIn();
 
-  String getAuthUrl();
-
-  Future<bool> exchangeAuthCodeAndSaveCredentials(String code);
+  Future<bool> signOut();
 
   Future<UserItem> getUserInfo();
 
