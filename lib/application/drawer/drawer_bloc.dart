@@ -16,12 +16,14 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
   final UsersDao _usersDao;
   final CategoriesDao _categoriesDao;
   final BackgroundService _backgroundService;
+  final GoogleService _googleService;
 
   DrawerBloc(
     this._logger,
     this._usersDao,
     this._categoriesDao,
     this._backgroundService,
+    this._googleService,
   ) : super(const DrawerState.loaded(selectedPage: AppDrawerItemType.transactions));
 
   @override
@@ -59,9 +61,14 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
 
   Future<DrawerState> _signOut() async {
     _logger.info(runtimeType, '_signIn: Signing out...');
-    await _categoriesDao.onUserSignedOut();
-    await _usersDao.deleteAll();
-    await _backgroundService.cancelSyncTask();
-    return state.copyWith(isUserSignedIn: false, userSignedOut: true);
+    final signedOut = await _googleService.signOut();
+    if (signedOut) {
+      _logger.info(runtimeType, '_signIn: Signing out of all the daos...');
+      await _categoriesDao.onUserSignedOut();
+      await _usersDao.deleteAll();
+      await _backgroundService.cancelSyncTask();
+    }
+
+    return state.copyWith(isUserSignedIn: !signedOut, userSignedOut: signedOut);
   }
 }
