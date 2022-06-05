@@ -4,6 +4,7 @@
 *.g.dart
 *.freezed.dart
 /lib/generated/**
+google-services.json
 
 # Miscellaneous
 *.class
