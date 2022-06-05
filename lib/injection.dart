@@ -25,7 +25,7 @@ class Injection {
     return PasswordDialogBloc(logger, secureStorage);
   }
 
-  static UserAccountsBloc get userAccountsBloc {
+  static UserAccountsBloc getUserAccountsBloc(AppBloc appBloc) {
     final logger = getIt<LoggingService>();
     final categoriesDao = getIt<CategoriesDao>();
     final transactionsDao = getIt<TransactionsDao>();
@@ -47,6 +47,7 @@ class Injection {
       imageService,
       syncService,
       networkService,
+      appBloc,
     );
   }
 

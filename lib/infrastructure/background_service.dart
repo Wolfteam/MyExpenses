@@ -99,7 +99,7 @@ class BackgroundServiceImpl implements BackgroundService {
 
     switch (interval) {
       case SyncIntervalType.eachHour:
-        duration = const Duration(minutes: 10);
+        duration = const Duration(minutes: 60);
         break;
       case SyncIntervalType.each3Hours:
         duration = const Duration(hours: 3);

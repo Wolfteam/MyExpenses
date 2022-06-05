@@ -13,5 +13,6 @@ class AppState with _$AppState {
     required AppAccentColorType accentColor,
     required bool bgTaskIsRunning,
     required LanguageModel language,
+    @Default(false) bool forcedSignOut,
   }) = _LoadedState;
 }

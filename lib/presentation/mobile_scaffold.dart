@@ -7,6 +7,7 @@ import 'package:my_expenses/presentation/categories/categories_page.dart';
 import 'package:my_expenses/presentation/charts/charts_page.dart';
 import 'package:my_expenses/presentation/drawer/app_drawer.dart';
 import 'package:my_expenses/presentation/settings/settings_page.dart';
+import 'package:my_expenses/presentation/shared/utils/bloc_utils.dart';
 import 'package:my_expenses/presentation/transaction/add_edit_transaction_page.dart';
 import 'package:my_expenses/presentation/transactions/transactions_page.dart';
 
@@ -59,34 +60,32 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
         child: const Icon(Icons.add),
       ),
       bottomNavigationBar: BlocConsumer<DrawerBloc, DrawerState>(
-        listener: (ctx, state) => _onPageSelected(state.selectedPage),
-        builder: (ctx, state) {
-          return BottomNavigationBar(
-            showUnselectedLabels: true,
-            selectedItemColor: Theme.of(context).primaryColor,
-            type: BottomNavigationBarType.fixed,
-            currentIndex: _index,
-            onTap: _changeCurrentTab,
-            items: [
-              BottomNavigationBarItem(
-                label: i18n.transactions,
-                icon: const Icon(Icons.account_balance),
-              ),
-              BottomNavigationBarItem(
-                label: i18n.charts,
-                icon: const Icon(Icons.pie_chart),
-              ),
-              BottomNavigationBarItem(
-                label: i18n.categories,
-                icon: const Icon(Icons.category),
-              ),
-              BottomNavigationBarItem(
-                label: i18n.config,
-                icon: const Icon(Icons.settings),
-              ),
-            ],
-          );
-        },
+        listener: (ctx, state) => _onDrawerStateChanged(state),
+        builder: (ctx, state) => BottomNavigationBar(
+          showUnselectedLabels: true,
+          selectedItemColor: Theme.of(context).primaryColor,
+          type: BottomNavigationBarType.fixed,
+          currentIndex: _index,
+          onTap: _changeCurrentTab,
+          items: [
+            BottomNavigationBarItem(
+              label: i18n.transactions,
+              icon: const Icon(Icons.account_balance),
+            ),
+            BottomNavigationBarItem(
+              label: i18n.charts,
+              icon: const Icon(Icons.pie_chart),
+            ),
+            BottomNavigationBarItem(
+              label: i18n.categories,
+              icon: const Icon(Icons.category),
+            ),
+            BottomNavigationBarItem(
+              label: i18n.config,
+              icon: const Icon(Icons.settings),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -113,6 +112,14 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
     return index;
   }
 
+  void _onDrawerStateChanged(DrawerState state) {
+    if (state.userSignedOut) {
+      BlocUtils.raiseAllCommonBlocEvents(context);
+    }
+
+    _onPageSelected(state.selectedPage);
+  }
+
   void _onPageSelected(AppDrawerItemType page) {
     final index = _getSelectedIndex(page);
     widget.tabController.animateTo(index);
@@ -121,6 +128,9 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
 
   void _changeCurrentTab(int index) {
     final item = _getSelectedDrawerItem(index);
+    if (widget.tabController.index == index && _index == index) {
+      return;
+    }
     widget.tabController.index = index;
     context.read<DrawerBloc>().add(DrawerEvent.selectedItemChanged(selectedPage: item));
     setState(() {

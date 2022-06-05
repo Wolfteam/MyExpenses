@@ -33,10 +33,11 @@ class _AppWidgetState extends State<AppWidget> {
         state.maybeMap(
           loaded: (state) async {
             final locale = _getLocale(state.language);
-            if (_currentLocale != null &&
-                (_currentLocale!.languageCode != locale.languageCode || _currentLocale!.countryCode != locale.countryCode)) {
+            final localeChanged =
+                _currentLocale != null && (_currentLocale!.languageCode != locale.languageCode || _currentLocale!.countryCode != locale.countryCode);
+            final bloc = ctx.read<AppBloc>();
+            if (localeChanged) {
               debugPrint('Language changed');
-              final bloc = ctx.read<AppBloc>();
               final s = await S.delegate.load(locale);
               final translations = s.getBackgroundTranslations();
               bloc.add(AppEvent.registerRecurringBackgroundTask(translations: translations));
@@ -55,14 +56,14 @@ class _AppWidgetState extends State<AppWidget> {
               theme: theme,
               localizationsDelegates: delegates,
               supportedLocales: S.delegate.supportedLocales,
-              home: Loading(),
+              home: const Loading(),
               scrollBehavior: MyCustomScrollBehavior(),
             );
           }
 
           final locale = _getLocale(state.language);
           return MaterialApp(
-            home: MainPage(),
+            home: MainPage(showGoogleLoginChangesExplanation: state.forcedSignOut),
             theme: theme,
             //Without this, the lang won't be reloaded
             locale: locale,

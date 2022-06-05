@@ -17,6 +17,7 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
   final CategoriesDao _categoriesDao;
   final BackgroundService _backgroundService;
   final GoogleService _googleService;
+  final SettingsService _settingsService;
 
   DrawerBloc(
     this._logger,
@@ -24,17 +25,18 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
     this._categoriesDao,
     this._backgroundService,
     this._googleService,
+    this._settingsService,
   ) : super(const DrawerState.loaded(selectedPage: AppDrawerItemType.transactions));
 
   @override
   Stream<DrawerState> mapEventToState(DrawerEvent event) async* {
     final s = await event.map(
-      init: (_) async => _initialize(),
+      init: (_) => _initialize(),
       selectedItemChanged: (e) async => state.copyWith(
         selectedPage: e.selectedPage,
         userSignedOut: false,
       ),
-      signOut: (_) async => _signOut(),
+      signOut: (_) => _signOut(),
     );
 
     yield s;
@@ -60,15 +62,21 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
   }
 
   Future<DrawerState> _signOut() async {
-    _logger.info(runtimeType, '_signIn: Signing out...');
+    _logger.info(runtimeType, '_signOut: Signing out...');
     final signedOut = await _googleService.signOut();
     if (signedOut) {
-      _logger.info(runtimeType, '_signIn: Signing out of all the daos...');
+      _logger.info(runtimeType, '_signOut: Signing out of all the daos...');
       await _categoriesDao.onUserSignedOut();
       await _usersDao.deleteAll();
       await _backgroundService.cancelSyncTask();
+      _settingsService.syncInterval = SyncIntervalType.none;
     }
 
-    return state.copyWith(isUserSignedIn: !signedOut, userSignedOut: signedOut, email: null, fullName: null, img: null);
+    _logger.info(runtimeType, '_signOut: User was signed out');
+    return DrawerState.loaded(
+      selectedPage: AppDrawerItemType.transactions,
+      isUserSignedIn: !signedOut,
+      userSignedOut: signedOut,
+    );
   }
 }

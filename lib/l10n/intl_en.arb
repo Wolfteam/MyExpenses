@@ -205,5 +205,7 @@
   "yearly": "Yearly",
   "monthly": "Monthly",
   "pickYear": "Pick a year",
-  "balanceX": "Balance: {amount}"
+  "balanceX": "Balance: {amount}",
+  "information": "Information",
+  "googleLoginChangesExplanation": "Due to changes in the google login logic, you must sign in again."
 }

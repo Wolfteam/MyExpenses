@@ -13,6 +13,7 @@ import 'package:my_expenses/domain/services/services.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/injection.dart';
 import 'package:my_expenses/presentation/mobile_scaffold.dart';
+import 'package:my_expenses/presentation/shared/dialogs/info_dialog.dart';
 import 'package:my_expenses/presentation/shared/utils/i18n_utils.dart';
 import 'package:my_expenses/presentation/shared/utils/toast_utils.dart';
 import 'package:my_expenses/presentation/transaction/add_edit_transaction_page.dart';
@@ -21,6 +22,13 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:rate_my_app/rate_my_app.dart';
 
 class MainPage extends StatefulWidget {
+  final bool showGoogleLoginChangesExplanation;
+
+  const MainPage({
+    Key? key,
+    required this.showGoogleLoginChangesExplanation,
+  }) : super(key: key);
+
   @override
   _MainPageState createState() => _MainPageState();
 }
@@ -31,6 +39,12 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
   @override
   void initState() {
     _tabController = TabController(length: 4, vsync: this);
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      if (widget.showGoogleLoginChangesExplanation) {
+        final s = S.of(context);
+        showDialog(context: context, builder: (_) => InfoDialog(explanations: [s.googleLoginChangesExplanation]));
+      }
+    });
     super.initState();
   }
 

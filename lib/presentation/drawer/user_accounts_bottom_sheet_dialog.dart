@@ -19,7 +19,7 @@ class UserAccountsBottomSheetDialog extends StatelessWidget {
         margin: Styles.modalBottomSheetContainerMargin,
         padding: Styles.modalBottomSheetContainerPadding,
         child: BlocProvider(
-          create: (ctx) => Injection.userAccountsBloc..add(const UserAccountsEvent.init()),
+          create: (ctx) => Injection.getUserAccountsBloc(context.read<AppBloc>())..add(const UserAccountsEvent.init()),
           child: const _Content(),
         ),
       ),

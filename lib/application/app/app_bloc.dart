@@ -33,26 +33,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   @override
   Stream<AppState> mapEventToState(AppEvent event) async* {
     final s = await event.map(
-      init: (e) async {
-        // If the user comes from this version,
-        // we need to re register the background task due to all the changes made in 1.2.0
-        if (_deviceInfoService.versionChanged && _deviceInfoService.previousBuildVersion < 39) {
-          await _backgroundService.cancelSyncTask();
-          await _registerRecurringBackgroundTask(e.translations);
-          await _backgroundService.registerSyncTask(_settingsService.syncInterval, e.translations);
-        }
-
-        if (!_settingsService.isRecurringTransTaskRegistered) {
-          _logger.info(runtimeType, 'Recurring trans task is not registered, registering it...');
-          await _registerRecurringBackgroundTask(e.translations);
-        }
-
-        _logger.info(runtimeType, 'Current settings are: ${_settingsService.appSettings.toJson()}');
-
-        await Future.delayed(const Duration(milliseconds: 500));
-
-        return _loadThemeData(_settingsService.appTheme, _settingsService.accentColor, _settingsService.language);
-      },
+      init: (e) async => _init(e.translations),
       themeChanged: (e) async {
         _logger.info(runtimeType, 'App theme changed, the selected theme is: ${e.theme}');
         return _loadThemeData(e.theme, _settingsService.accentColor, _settingsService.language);
@@ -85,12 +66,42 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     await super.close();
   }
 
+  Future<AppState> _init(BackgroundTranslations translations) async {
+    // If the user comes from this version,
+    // we need to do a log out due to the changes made in the 1.2.3
+    final forceSignOut = _deviceInfoService.versionChanged && _deviceInfoService.previousBuildVersion < 46;
+    if (forceSignOut) {
+      await _registerRecurringBackgroundTask(translations);
+      _drawerBloc.add(const DrawerEvent.signOut());
+    }
+
+    // If the user comes from this version,
+    // we need to re register the background task due to all the changes made in 1.2.0
+    if (_deviceInfoService.versionChanged && _deviceInfoService.previousBuildVersion < 39) {
+      await _backgroundService.cancelSyncTask();
+      await _registerRecurringBackgroundTask(translations);
+      await _backgroundService.registerSyncTask(_settingsService.syncInterval, translations);
+    }
+
+    if (!_settingsService.isRecurringTransTaskRegistered) {
+      _logger.info(runtimeType, 'Recurring trans task is not registered, registering it...');
+      await _registerRecurringBackgroundTask(translations);
+    }
+
+    _logger.info(runtimeType, 'Current settings are: ${_settingsService.appSettings.toJson()}');
+
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    return _loadThemeData(_settingsService.appTheme, _settingsService.accentColor, _settingsService.language, forceSignOut: forceSignOut);
+  }
+
   AppState _loadThemeData(
     AppThemeType theme,
     AppAccentColorType accentColor,
     AppLanguageType language, {
     bool isInitialized = true,
     bool bgTaskIsRunning = false,
+    bool forceSignOut = false,
   }) {
     return AppState.loaded(
       isInitialized: isInitialized,
@@ -98,6 +109,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       accentColor: accentColor,
       bgTaskIsRunning: bgTaskIsRunning,
       language: _settingsService.getLanguageModel(language),
+      forcedSignOut: forceSignOut,
     );
   }
 

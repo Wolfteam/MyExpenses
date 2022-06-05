@@ -4,17 +4,11 @@ import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/presentation/drawer/widgets/app_drawer_header.dart';
 import 'package:my_expenses/presentation/drawer/widgets/app_drawer_item.dart';
-import 'package:my_expenses/presentation/shared/utils/bloc_utils.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<DrawerBloc, DrawerState>(
-      listener: (ctx, state) {
-        if (state.userSignedOut) {
-          BlocUtils.raiseAllCommonBlocEvents(ctx);
-        }
-      },
+    return BlocBuilder<DrawerBloc, DrawerState>(
       builder: (ctx, state) => Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -33,7 +27,11 @@ class AppDrawer extends StatelessWidget {
             AppDrawerItem(type: AppDrawerItemType.search, isSelected: state.selectedPage == AppDrawerItemType.search),
             const Divider(),
             AppDrawerItem(type: AppDrawerItemType.settings, isSelected: state.selectedPage == AppDrawerItemType.settings),
-            if (state.isUserSignedIn) AppDrawerItem(type: AppDrawerItemType.logout, isSelected: state.selectedPage == AppDrawerItemType.logout),
+            if (state.isUserSignedIn)
+              AppDrawerItem(
+                type: AppDrawerItemType.logout,
+                isSelected: state.selectedPage == AppDrawerItemType.logout,
+              ),
           ],
         ),
       ),

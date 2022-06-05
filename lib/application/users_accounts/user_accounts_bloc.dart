@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/extensions/string_extensions.dart';
 import 'package:my_expenses/domain/models/entities/daos/categories_dao.dart';
@@ -26,6 +27,7 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
   final ImageService _imageService;
   final SyncService _syncService;
   final NetworkService _networkService;
+  final AppBloc _appBloc;
 
   UserAccountsBloc(
     this._logger,
@@ -38,6 +40,7 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
     this._imageService,
     this._syncService,
     this._networkService,
+    this._appBloc,
   ) : super(const UserAccountsState.loading());
 
   @override
@@ -158,6 +161,7 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
       return state.copyWith(errorOccurred: true);
     }
 
+    _appBloc.add(const AppEvent.bgTaskIsRunning(isRunning: true));
     _logger.info(runtimeType, '_signIn: Getting user info...');
     var user = await _googleService.getUserInfo();
 
@@ -184,6 +188,7 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
 
     await _syncService.initializeAppFolderAndFiles();
 
+    _appBloc.add(const AppEvent.bgTaskIsRunning(isRunning: false));
     if (state.users.any((el) => el.googleUserId == user.googleUserId)) {
       return state;
     }

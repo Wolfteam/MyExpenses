@@ -73,7 +73,8 @@ class MyApp extends StatelessWidget {
               final categoriesDao = getIt<CategoriesDao>();
               final bgService = getIt<BackgroundService>();
               final googleService = getIt<GoogleService>();
-              return DrawerBloc(logger, usersDao, categoriesDao, bgService, googleService)..add(const DrawerEvent.init());
+              final settingsService = getIt<SettingsService>();
+              return DrawerBloc(logger, usersDao, categoriesDao, bgService, googleService, settingsService)..add(const DrawerEvent.init());
             },
           ),
           BlocProvider(
