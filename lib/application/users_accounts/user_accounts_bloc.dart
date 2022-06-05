@@ -42,20 +42,26 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
 
   @override
   Stream<UserAccountsState> mapEventToState(UserAccountsEvent event) async* {
+    if (event is _SignIn) {
+      yield state.maybeMap(
+        initial: (state) => state.copyWith(signInInProcess: true),
+        orElse: () => state,
+      );
+    }
+
     try {
       final s = await event.map(
         init: (_) => _initialize(),
-        deleteAccount: (e) => state.maybeMap(
-          initial: (state) => _deleteUser(e.id, state),
-          orElse: () => throw Exception('Invalid State'),
+        deleteAccount: (e) => _deleteUser(
+          e.id,
+          state.maybeMap(initial: (state) => state, orElse: () => throw Exception('Invalid state')),
         ),
-        changeActiveAccount: (e) => state.maybeMap(
-          initial: (state) => _changeActiveUser(e.newActiveUserId, state),
-          orElse: () => throw Exception('Invalid state'),
+        changeActiveAccount: (e) => _changeActiveUser(
+          e.newActiveUserId,
+          state.maybeMap(initial: (state) => state, orElse: () => throw Exception('Invalid state')),
         ),
-        signIn: (_) => state.maybeMap(
-          initial: (state) => _signIn(state),
-          orElse: () => throw Exception('Invalid state'),
+        signIn: (_) => _signIn(
+          state.maybeMap(initial: (state) => state, orElse: () => throw Exception('Invalid state')),
         ),
       );
 
@@ -69,7 +75,13 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
     }
 
     yield state.maybeMap(
-      initial: (state) => state.copyWith(userWasDeleted: false, activeUserChanged: false, errorOccurred: false, accountWasAdded: false),
+      initial: (state) => state.copyWith(
+        userWasDeleted: false,
+        activeUserChanged: false,
+        errorOccurred: false,
+        accountWasAdded: false,
+        signInInProcess: false,
+      ),
       orElse: () => state,
     );
   }
@@ -135,7 +147,7 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
 
   Future<UserAccountsState> _signIn(_InitialState state) async {
     final isInternetAvailable = await _networkService.isInternetAvailable();
-    if (isInternetAvailable) {
+    if (!isInternetAvailable) {
       _logger.warning(runtimeType, '_signIn: Network is not available');
       return state.copyWith(errorOccurred: true, isNetworkAvailable: false);
     }

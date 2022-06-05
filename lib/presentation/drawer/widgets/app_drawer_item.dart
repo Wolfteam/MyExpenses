@@ -139,13 +139,8 @@ class AppDrawerItem extends StatelessWidget {
         title: i18n.logout,
         content: i18n.confirmSignOut,
         okText: i18n.yes,
-        onOk: () => _signOut(ctx),
+        onOk: () => ctx.read<DrawerBloc>().add(const DrawerEvent.signOut()),
       ),
     );
-  }
-
-  void _signOut(BuildContext context) {
-    Navigator.pop(context);
-    context.read<DrawerBloc>().add(const DrawerEvent.signOut());
   }
 }

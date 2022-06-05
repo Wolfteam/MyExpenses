@@ -69,6 +69,6 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
       await _backgroundService.cancelSyncTask();
     }
 
-    return state.copyWith(isUserSignedIn: !signedOut, userSignedOut: signedOut);
+    return state.copyWith(isUserSignedIn: !signedOut, userSignedOut: signedOut, email: null, fullName: null, img: null);
   }
 }

@@ -42,7 +42,7 @@ class _Content extends StatelessWidget {
             if (state.userWasDeleted) {
               ToastUtils.showSucceedToast(ctx, i18n.userWasSuccessfullyDeleted);
               ctx.read<DrawerBloc>().add(const DrawerEvent.init());
-            } else if (state.activeUserChanged) {
+            } else if (state.activeUserChanged || state.accountWasAdded) {
               BlocUtils.raiseAllCommonBlocEvents(ctx);
             } else if (!state.isNetworkAvailable) {
               ToastUtils.showWarningToast(ctx, i18n.networkIsNotAvailable);
@@ -54,60 +54,62 @@ class _Content extends StatelessWidget {
         );
       },
       builder: (ctx, state) => state.maybeMap(
-        initial: (state) => Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ModalSheetSeparator(),
-            Text(
-              i18n.accounts,
-              style: Theme.of(context).textTheme.headline6,
-            ),
-            if (state.users.isNotEmpty)
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: state.users.length,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: EdgeInsets.zero,
-                itemBuilder: (ctx, index) {
-                  final user = state.users[index];
-                  final canBeDeleted = state.users.length > 1;
-                  return UserAccountItem(
-                    id: user.id,
-                    fullname: user.name,
-                    email: user.email,
-                    imgUrl: user.pictureUrl!,
-                    isActive: user.isActive,
-                    canBeDeleted: canBeDeleted,
-                  );
-                },
-              )
-            else
-              NothingFound(
-                msg: i18n.noUserAccountsFound,
-                padding: const EdgeInsets.only(right: 20, left: 20, top: 10),
+        initial: (state) => state.signInInProcess
+            ? const Loading(useScaffold: false)
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ModalSheetSeparator(),
+                  Text(
+                    i18n.accounts,
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                  if (state.users.isNotEmpty)
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: state.users.length,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: EdgeInsets.zero,
+                      itemBuilder: (ctx, index) {
+                        final user = state.users[index];
+                        final canBeDeleted = state.users.length > 1;
+                        return UserAccountItem(
+                          id: user.id,
+                          fullname: user.name,
+                          email: user.email,
+                          imgUrl: user.pictureUrl!,
+                          isActive: user.isActive,
+                          canBeDeleted: canBeDeleted,
+                        );
+                      },
+                    )
+                  else
+                    NothingFound(
+                      msg: i18n.noUserAccountsFound,
+                      padding: const EdgeInsets.only(right: 20, left: 20, top: 10),
+                    ),
+                  ButtonBar(
+                    children: <Widget>[
+                      OutlinedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          i18n.close,
+                          style: TextStyle(color: theme.primaryColor),
+                        ),
+                      ),
+                      if (state.users.isEmpty)
+                        ElevatedButton(
+                          onPressed: () => context.read<UserAccountsBloc>().add(const UserAccountsEvent.signIn()),
+                          child: Text(i18n.add),
+                        ),
+                    ],
+                  )
+                ],
               ),
-            ButtonBar(
-              children: <Widget>[
-                OutlinedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    i18n.close,
-                    style: TextStyle(color: theme.primaryColor),
-                  ),
-                ),
-                if (state.users.isEmpty)
-                  ElevatedButton(
-                    onPressed: () => context.read<UserAccountsBloc>().add(const UserAccountsEvent.signIn()),
-                    child: Text(i18n.add),
-                  ),
-              ],
-            )
-          ],
-        ),
-        orElse: () => Loading(),
+        orElse: () => const Loading(useScaffold: false),
       ),
     );
   }

@@ -11,5 +11,6 @@ class UserAccountsState with _$UserAccountsState {
     @Default(false) bool errorOccurred,
     @Default(false) bool activeUserChanged,
     @Default(false) bool accountWasAdded,
+    @Default(false) bool signInInProcess,
   }) = _InitialState;
 }
