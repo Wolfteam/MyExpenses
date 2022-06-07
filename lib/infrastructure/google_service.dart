@@ -11,13 +11,12 @@ import 'package:http/http.dart' as http;
 import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/domain/services/services.dart';
-import 'package:my_expenses/infrastructure/secrets.dart';
 import 'package:path/path.dart';
 
 class GoogleServiceImpl implements GoogleService {
   final LoggingService _logger;
   final SecureStorageService _secureStorageService;
-  late final GoogleSignIn _googleSignIn;
+  final GoogleSignIn _googleSignIn;
 
   static const _baseGoogleApisUrl = 'https://www.googleapis.com';
   static const _folderMimeType = 'application/vnd.google-apps.folder';
@@ -25,15 +24,13 @@ class GoogleServiceImpl implements GoogleService {
   static const _spreadSheetMimeType = 'application/vnd.google-apps.spreadsheet';
   static const _appDataFolder = 'appDataFolder';
 
-  final _scopes = <String>[
+  static const _scopes = <String>[
     people.PeopleServiceApi.userinfoEmailScope,
     people.PeopleServiceApi.userinfoProfileScope,
     drive.DriveApi.driveAppdataScope,
   ];
 
-  GoogleServiceImpl(this._logger, this._secureStorageService) {
-    _googleSignIn = GoogleSignIn(clientId: Secrets.googleClientId, scopes: _scopes);
-  }
+  GoogleServiceImpl(this._logger, this._secureStorageService) : _googleSignIn = GoogleSignIn(scopes: _scopes);
 
   @override
   Future<bool> signIn() async {

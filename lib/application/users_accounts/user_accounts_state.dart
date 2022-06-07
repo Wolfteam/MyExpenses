@@ -8,9 +8,9 @@ class UserAccountsState with _$UserAccountsState {
     required List<UserItem> users,
     required bool isNetworkAvailable,
     @Default(false) bool userWasDeleted,
-    @Default(false) bool errorOccurred,
     @Default(false) bool activeUserChanged,
     @Default(false) bool accountWasAdded,
     @Default(false) bool signInInProcess,
+    @Default(null) bool? signInResult,
   }) = _InitialState;
 }

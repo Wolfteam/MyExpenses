@@ -46,8 +46,13 @@ class _Content extends StatelessWidget {
               BlocUtils.raiseAllCommonBlocEvents(ctx);
             } else if (!state.isNetworkAvailable) {
               ToastUtils.showWarningToast(ctx, i18n.networkIsNotAvailable);
-            } else if (state.errorOccurred) {
-              ToastUtils.showErrorToast(ctx, i18n.unknownErrorOcurred);
+            } else if (state.signInResult != null) {
+              if (state.signInResult == true) {
+                final msg = '${i18n.syncing}\n${i18n.doNotCloseTheAppWhileAppSyncsData}';
+                ToastUtils.showInfoToast(ctx, msg);
+              } else {
+                ToastUtils.showErrorToast(ctx, i18n.logInCancelledOrFailed);
+              }
             }
           },
           orElse: () {},

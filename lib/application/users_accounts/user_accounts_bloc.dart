@@ -43,45 +43,51 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
     this._appBloc,
   ) : super(const UserAccountsState.loading());
 
+  _InitialState get currentState => state.maybeMap(
+        initial: (state) => state,
+        orElse: () => throw Exception('Invalid state'),
+      );
+
   @override
   Stream<UserAccountsState> mapEventToState(UserAccountsEvent event) async* {
     if (event is _SignIn) {
-      yield state.maybeMap(
-        initial: (state) => state.copyWith(signInInProcess: true),
-        orElse: () => state,
-      );
+      yield currentState.copyWith(signInInProcess: true);
+
+      final isInternetAvailable = await _networkService.isInternetAvailable();
+      if (!isInternetAvailable) {
+        _logger.warning(runtimeType, '_signIn: Network is not available');
+        yield currentState.copyWith(signInInProcess: false, isNetworkAvailable: false);
+        return;
+      }
+
+      final isSignedIn = await _googleService.signIn();
+      if (!isSignedIn) {
+        _logger.warning(runtimeType, '_signIn: Failed');
+        yield currentState.copyWith(signInInProcess: false, signInResult: false);
+        return;
+      }
+
+      yield currentState.copyWith(signInResult: true);
     }
 
     try {
       final s = await event.map(
         init: (_) => _initialize(),
-        deleteAccount: (e) => _deleteUser(
-          e.id,
-          state.maybeMap(initial: (state) => state, orElse: () => throw Exception('Invalid state')),
-        ),
-        changeActiveAccount: (e) => _changeActiveUser(
-          e.newActiveUserId,
-          state.maybeMap(initial: (state) => state, orElse: () => throw Exception('Invalid state')),
-        ),
-        signIn: (_) => _signIn(
-          state.maybeMap(initial: (state) => state, orElse: () => throw Exception('Invalid state')),
-        ),
+        deleteAccount: (e) => _deleteUser(e.id, currentState),
+        changeActiveAccount: (e) => _changeActiveUser(e.newActiveUserId, currentState),
+        signIn: (_) => _sync(currentState),
       );
 
       yield s;
     } catch (e, s) {
       _logger.error(runtimeType, 'Unknown error occurred', e, s);
-      yield state.maybeMap(
-        initial: (state) => state.copyWith(errorOccurred: true),
-        orElse: () => state,
-      );
     }
 
     yield state.maybeMap(
       initial: (state) => state.copyWith(
         userWasDeleted: false,
         activeUserChanged: false,
-        errorOccurred: false,
+        signInResult: null,
         accountWasAdded: false,
         signInInProcess: false,
       ),
@@ -148,21 +154,9 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
     }
   }
 
-  Future<UserAccountsState> _signIn(_InitialState state) async {
-    final isInternetAvailable = await _networkService.isInternetAvailable();
-    if (!isInternetAvailable) {
-      _logger.warning(runtimeType, '_signIn: Network is not available');
-      return state.copyWith(errorOccurred: true, isNetworkAvailable: false);
-    }
-
-    final isSignedIn = await _googleService.signIn();
-    if (!isSignedIn) {
-      _logger.warning(runtimeType, '_signIn: Failed');
-      return state.copyWith(errorOccurred: true);
-    }
-
-    _appBloc.add(const AppEvent.bgTaskIsRunning(isRunning: true));
+  Future<UserAccountsState> _sync(_InitialState state) async {
     _logger.info(runtimeType, '_signIn: Getting user info...');
+    _appBloc.add(const AppEvent.bgTaskIsRunning(isRunning: true));
     var user = await _googleService.getUserInfo();
 
     _logger.info(runtimeType, '_signIn: Saving logged user into secure storage...');
