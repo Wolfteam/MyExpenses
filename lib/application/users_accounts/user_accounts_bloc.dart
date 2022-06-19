@@ -50,7 +50,8 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
 
   @override
   Stream<UserAccountsState> mapEventToState(UserAccountsEvent event) async* {
-    if (event is _SignIn) {
+    final isSignIn = event is _SignIn;
+    if (isSignIn) {
       yield currentState.copyWith(signInInProcess: true);
 
       final isInternetAvailable = await _networkService.isInternetAvailable();
@@ -60,6 +61,7 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
         return;
       }
 
+      await _googleService.signOut();
       final isSignedIn = await _googleService.signIn();
       if (!isSignedIn) {
         _logger.warning(runtimeType, '_signIn: Failed');
@@ -81,6 +83,9 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
       yield s;
     } catch (e, s) {
       _logger.error(runtimeType, 'Unknown error occurred', e, s);
+      if (isSignIn) {
+        yield currentState.copyWith(signInResult: false);
+      }
     }
 
     yield state.maybeMap(
@@ -155,39 +160,45 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
   }
 
   Future<UserAccountsState> _sync(_InitialState state) async {
-    _logger.info(runtimeType, '_signIn: Getting user info...');
-    _appBloc.add(const AppEvent.bgTaskIsRunning(isRunning: true));
-    var user = await _googleService.getUserInfo();
+    try {
+      _logger.info(runtimeType, '_signIn: Getting user info...');
+      _appBloc.add(const AppEvent.bgTaskIsRunning(isRunning: true));
+      var user = await _googleService.getUserInfo();
 
-    _logger.info(runtimeType, '_signIn: Saving logged user into secure storage...');
+      _logger.info(runtimeType, '_signIn: Saving logged user into secure storage...');
 
-    //This needs to be saved here before making any authenticated request
-    await Future.wait([
-      _secureStorageService.save(SecureResourceType.currentUser, _secureStorageService.defaultUsername, user.email),
-      _secureStorageService.update(SecureResourceType.accessTokenData, _secureStorageService.defaultUsername, true, user.email),
-      _secureStorageService.update(SecureResourceType.accessTokenExpiricy, _secureStorageService.defaultUsername, true, user.email),
-      _secureStorageService.update(SecureResourceType.accessTokenType, _secureStorageService.defaultUsername, true, user.email),
-    ]);
+      //This needs to be saved here before making any authenticated request
+      await Future.wait([
+        _secureStorageService.save(SecureResourceType.currentUser, _secureStorageService.defaultUsername, user.email),
+        _secureStorageService.update(SecureResourceType.accessTokenData, _secureStorageService.defaultUsername, true, user.email),
+        _secureStorageService.update(SecureResourceType.accessTokenExpiricy, _secureStorageService.defaultUsername, true, user.email),
+        _secureStorageService.update(SecureResourceType.accessTokenType, _secureStorageService.defaultUsername, true, user.email),
+      ]);
 
-    if (!user.pictureUrl.isNullEmptyOrWhitespace) {
-      _logger.info(runtimeType, '_signIn: Saving user img...');
-      final imgPath = await _imageService.saveNetworkImage(user.pictureUrl!);
-      user = user.copyWith(pictureUrl: imgPath);
+      if (!user.pictureUrl.isNullEmptyOrWhitespace) {
+        _logger.info(runtimeType, '_signIn: Saving user img...');
+        final imgPath = await _imageService.saveNetworkImage(user.pictureUrl!);
+        user = user.copyWith(pictureUrl: imgPath);
+      }
+
+      _logger.info(runtimeType, '_signIn: Saving user into db...');
+      await _usersDao.saveUser(user.googleUserId, user.name, user.email, user.pictureUrl!);
+
+      _logger.info(runtimeType, '_signIn: User was successfully saved...');
+
+      await _syncService.initializeAppFolderAndFiles();
+
+      _appBloc.add(const AppEvent.bgTaskIsRunning(isRunning: false));
+      if (state.users.any((el) => el.googleUserId == user.googleUserId)) {
+        return state;
+      }
+      final updatedUsers = [...state.users, user]..sort((x, y) => x.name.compareTo(y.name));
+      return state.copyWith(users: updatedUsers, accountWasAdded: true);
+    } catch (e, s) {
+      _logger.error(runtimeType, '_signIn: Unknown error occurred', e, s);
+      _appBloc.add(const AppEvent.bgTaskIsRunning(isRunning: false));
+      rethrow;
     }
-
-    _logger.info(runtimeType, '_signIn: Saving user into db...');
-    await _usersDao.saveUser(user.googleUserId, user.name, user.email, user.pictureUrl!);
-
-    _logger.info(runtimeType, '_signIn: User was successfully saved...');
-
-    await _syncService.initializeAppFolderAndFiles();
-
-    _appBloc.add(const AppEvent.bgTaskIsRunning(isRunning: false));
-    if (state.users.any((el) => el.googleUserId == user.googleUserId)) {
-      return state;
-    }
-    final updatedUsers = [...state.users, user]..sort((x, y) => x.name.compareTo(y.name));
-    return state.copyWith(users: updatedUsers, accountWasAdded: true);
   }
 
   Future<void> _updateSecureStorageUsername(List<UserItem> users) async {
