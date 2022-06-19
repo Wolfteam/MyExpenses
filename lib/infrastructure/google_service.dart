@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:googleapis/people/v1.dart' as people;
-import 'package:googleapis/sheets/v4.dart' as sheets;
 import 'package:googleapis_auth/auth_io.dart' as g_auth;
 import 'package:http/http.dart' as http;
 import 'package:my_expenses/domain/enums/enums.dart';
@@ -19,9 +18,6 @@ class GoogleServiceImpl implements GoogleService {
   final GoogleSignIn _googleSignIn;
 
   static const _baseGoogleApisUrl = 'https://www.googleapis.com';
-  static const _folderMimeType = 'application/vnd.google-apps.folder';
-  static const _spreadSheetName = 'Default SpreadSheet';
-  static const _spreadSheetMimeType = 'application/vnd.google-apps.spreadsheet';
   static const _appDataFolder = 'appDataFolder';
 
   static const _scopes = <String>[
@@ -66,14 +62,11 @@ class GoogleServiceImpl implements GoogleService {
   @override
   Future<UserItem> getUserInfo() async {
     try {
-      _logger.info(
-        runtimeType,
-        'getUserInfo: Trying to get user info...',
-      );
+      _logger.info(runtimeType, 'getUserInfo: Trying to get user info...');
       final client = await _getAuthClient();
 
       final response = await client.get(Uri.parse('$_baseGoogleApisUrl/oauth2/v3/userinfo'));
-      final json = jsonDecode(response.body);
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
 
       final user = UserItem(
         id: -1,
@@ -85,12 +78,7 @@ class GoogleServiceImpl implements GoogleService {
       );
       return user;
     } catch (e, s) {
-      _logger.error(
-        runtimeType,
-        'getUserInfo: Unknown error occurred...',
-        e,
-        s,
-      );
+      _logger.error(runtimeType, 'getUserInfo: Unknown error occurred...', e, s);
       rethrow;
     }
   }
@@ -98,25 +86,15 @@ class GoogleServiceImpl implements GoogleService {
   @override
   Future<bool> appFolderExist() async {
     try {
-      _logger.info(
-        runtimeType,
-        'appFolderExist: Trying to check if app folder exists',
-      );
+      _logger.info(runtimeType, 'appFolderExist: Trying to check if app folder exists');
 
       final client = await _getAuthClient();
       final api = drive.DriveApi(client);
-      final fileList = await api.files.list(
-        spaces: _appDataFolder,
-      );
+      final fileList = await api.files.list(spaces: _appDataFolder);
 
       return fileList.files!.isNotEmpty;
     } catch (e, s) {
-      _logger.error(
-        runtimeType,
-        'appFolderExist: Unknown error occurred...',
-        e,
-        s,
-      );
+      _logger.error(runtimeType, 'appFolderExist: Unknown error occurred...', e, s);
       rethrow;
     }
   }
@@ -127,23 +105,14 @@ class GoogleServiceImpl implements GoogleService {
       final fileToSave = File(filePath);
       final fileExists = await fileToSave.exists();
       if (fileExists) {
-        _logger.info(
-          runtimeType,
-          'downloadFile: A file with the same name exists on disk, deleting it...',
-        );
+        _logger.info(runtimeType, 'downloadFile: A file with the same name exists on disk, deleting it...');
         await fileToSave.delete();
       }
 
-      _logger.info(
-        runtimeType,
-        'downloadFile: Getting an auth client',
-      );
+      _logger.info(runtimeType, 'downloadFile: Getting an auth client');
       final client = await _getAuthClient();
 
-      _logger.info(
-        runtimeType,
-        'downloadFile: Downloading file = $fileName from drive...',
-      );
+      _logger.info(runtimeType, 'downloadFile: Downloading file = $fileName from drive...');
       final api = drive.DriveApi(client);
       final fileList = await api.files.list(
         q: "name='$fileName'",
@@ -151,32 +120,18 @@ class GoogleServiceImpl implements GoogleService {
       );
 
       final fileId = fileList.files?.first.id;
-      _logger.info(
-        runtimeType,
-        'downloadFile: Trying to donwload fileId = $fileId',
-      );
+      _logger.info(runtimeType, 'downloadFile: Trying to download fileId = $fileId');
       final file = await api.files.get(
         fileId!,
         downloadOptions: drive.DownloadOptions.fullMedia,
       ) as drive.Media;
 
-      _logger.info(
-        runtimeType,
-        'downloadFile: Saving downloaded file  to disk...',
-      );
+      _logger.info(runtimeType, 'downloadFile: Saving downloaded file  to disk...');
       await fileToSave.openWrite().addStream(file.stream);
-      _logger.info(
-        runtimeType,
-        'downloadFile: File was successfully saved',
-      );
+      _logger.info(runtimeType, 'downloadFile: File was successfully saved');
       return fileId;
     } catch (e, s) {
-      _logger.error(
-        runtimeType,
-        'downloadFile: Unknown error occurred...',
-        e,
-        s,
-      );
+      _logger.error(runtimeType, 'downloadFile: Unknown error occurred...', e, s);
       rethrow;
     }
   }
@@ -186,10 +141,7 @@ class GoogleServiceImpl implements GoogleService {
     try {
       final localFile = File(filePath);
       final name = basename(localFile.path);
-      _logger.info(
-        runtimeType,
-        'uploadFile: Trying to upload file = $name...',
-      );
+      _logger.info(runtimeType, 'uploadFile: Trying to upload file = $name...');
 
       final client = await _getAuthClient();
       final api = drive.DriveApi(client);
@@ -201,19 +153,11 @@ class GoogleServiceImpl implements GoogleService {
 
       final response = await api.files.create(driveFile, uploadMedia: media);
 
-      _logger.info(
-        runtimeType,
-        'uploadFile: File was successfully uploaded',
-      );
+      _logger.info(runtimeType, 'uploadFile: File was successfully uploaded');
 
       return response.id!;
     } catch (e, s) {
-      _logger.error(
-        runtimeType,
-        'uploadFile: Unknown error occurred...',
-        e,
-        s,
-      );
+      _logger.error(runtimeType, 'uploadFile: Unknown error occurred...', e, s);
       rethrow;
     }
   }
@@ -222,10 +166,7 @@ class GoogleServiceImpl implements GoogleService {
   Future<String> updateFile(String fileId, String filePath) async {
     try {
       final localFile = File(filePath);
-      _logger.info(
-        runtimeType,
-        'uploadFile: Trying to update file = ${basename(localFile.path)}',
-      );
+      _logger.info(runtimeType, 'uploadFile: Trying to update file = ${basename(localFile.path)}');
 
       final client = await _getAuthClient();
       final api = drive.DriveApi(client);
@@ -238,18 +179,10 @@ class GoogleServiceImpl implements GoogleService {
         uploadMedia: media,
       );
 
-      _logger.info(
-        runtimeType,
-        'uploadFile: File was succesfully updated',
-      );
+      _logger.info(runtimeType, 'uploadFile: File was successfully updated');
       return response.id!;
     } catch (e, s) {
-      _logger.error(
-        runtimeType,
-        'updateFile: Unknown error occurred...',
-        e,
-        s,
-      );
+      _logger.error(runtimeType, 'updateFile: Unknown error occurred...', e, s);
       rethrow;
     }
   }
@@ -273,12 +206,7 @@ class GoogleServiceImpl implements GoogleService {
 
       return {for (var v in files) v.id!: v.name!};
     } catch (e, s) {
-      _logger.error(
-        runtimeType,
-        'getAllImgs: Unknown error occurred...',
-        e,
-        s,
-      );
+      _logger.error(runtimeType, 'getAllImages: Unknown error occurred...', e, s);
       rethrow;
     }
   }
@@ -335,6 +263,7 @@ class GoogleServiceImpl implements GoogleService {
       _logger.info(runtimeType, '_getAuthClient: Token expired, updating it...');
       final account = await _googleSignIn.signInSilently(reAuthenticate: true);
       if (account == null) {
+        _logger.warning(runtimeType, '_getAuthClient: Could not sign in silently');
         throw Exception('Could not sign in silently');
       }
       final accessToken = await _getAccessToken(account);
@@ -348,45 +277,6 @@ class GoogleServiceImpl implements GoogleService {
 
     _logger.info(runtimeType, '_getAuthClient: Returning auth client...');
     return client;
-  }
-
-//NOT USED
-  Future<String> _createAppSheet(String folderId) async {
-    final client = await _getAuthClient();
-    final api = drive.DriveApi(client);
-    final driveFile = drive.File()
-      ..name = _spreadSheetName
-      ..mimeType = _spreadSheetMimeType
-      ..parents = [folderId];
-
-    final spreadSheet = await api.files.create(driveFile);
-    await _initializeAppSheet(spreadSheet.id!);
-    return spreadSheet.id!;
-  }
-
-//NOT USED
-  Future<void> _initializeAppSheet(String spreadSheetId) async {
-    final client = await _getAuthClient();
-    final api = sheets.SheetsApi(client);
-
-    final spreadSheet = await api.spreadsheets.get(spreadSheetId);
-    final defaultSheetId = spreadSheet.sheets!.first.properties!.sheetId;
-
-    final transSheetProps = sheets.SheetProperties()..title = 'Transactitons';
-    final categoriesSheetProps = sheets.SheetProperties()..title = 'Categories';
-
-    final transSheetRequest = sheets.Request()..addSheet = (sheets.AddSheetRequest()..properties = transSheetProps);
-    final catSheetRequest = sheets.Request()..addSheet = (sheets.AddSheetRequest()..properties = categoriesSheetProps);
-    final deleteRequest = sheets.Request()..deleteSheet = (sheets.DeleteSheetRequest()..sheetId = defaultSheetId);
-
-    final updateRequest = sheets.BatchUpdateSpreadsheetRequest()
-      ..requests = [
-        transSheetRequest,
-        catSheetRequest,
-        deleteRequest,
-      ];
-
-    await api.spreadsheets.batchUpdate(updateRequest, spreadSheetId);
   }
 
   Future<g_auth.AccessToken> _getAccessToken(GoogleSignInAccount account) async {
