@@ -181,15 +181,14 @@ class BackgroundServiceImpl implements BackgroundService {
     if (!Platform.isAndroid) {
       return Future.value();
     }
+
+    final sendPort = IsolateNameServer.lookupPortByName(_portName);
+    sendPort?.send([true]);
     try {
       switch (task) {
         case _syncTaskName:
-          final sendPort = IsolateNameServer.lookupPortByName(_portName);
-
-          sendPort?.send([true]);
           _logger.info(runtimeType, 'bgSync: Checking if internet is available...');
           await _runSyncTask(translations);
-          sendPort?.send([false]);
           break;
         case _recurringTransName:
           await _runRecurringTransTask(translations);
@@ -210,6 +209,7 @@ class BackgroundServiceImpl implements BackgroundService {
         );
       }
     } finally {
+      sendPort?.send([false]);
       if (calledFromBg) {
         _logger.info(runtimeType, 'bgSync: Closing db connection...');
         await _db.close();
