@@ -1,4 +1,5 @@
 import 'package:my_expenses/domain/enums/enums.dart';
+import 'package:my_expenses/domain/extensions/string_extensions.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/domain/services/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,6 +22,7 @@ class SettingsServiceImpl implements SettingsService {
   final _showNotifForRecurringTransKey = 'ShowNotificationForRecurringTransactions';
   final _recurringTransTaskIsRegisteredKey = 'RecurringTransIsRegistered';
   final _usesVersionOnePointTwoKey = 'UsesVersionOnePointTwoKey';
+  final _nextSyncDateKey = 'LastSyncDateKey';
 
   final LoggingService _logger;
 
@@ -66,7 +68,10 @@ class SettingsServiceImpl implements SettingsService {
   SyncIntervalType get syncInterval => SyncIntervalType.values[_prefs.getInt(_syncIntervalKey)!];
 
   @override
-  set syncInterval(SyncIntervalType interval) => _prefs.setInt(_syncIntervalKey, interval.index);
+  set syncInterval(SyncIntervalType interval) {
+    _prefs.setInt(_syncIntervalKey, interval.index);
+    nextSyncDate = getLastSyncDateToUse(interval);
+  }
 
   @override
   bool get showNotifAfterFullSync => _prefs.getBool(_showNotifAfterFullSyncKey)!;
@@ -113,6 +118,32 @@ class SettingsServiceImpl implements SettingsService {
   bool get usesVersionOnePointTwo => _prefs.getBool(_usesVersionOnePointTwoKey)!;
 
   set usesVersionOnePointTwo(bool itUsesIt) => _prefs.setBool(_usesVersionOnePointTwoKey, itUsesIt);
+
+  @override
+  bool get shouldTriggerSync =>
+      (nextSyncDate == null && syncInterval != SyncIntervalType.none) || (nextSyncDate != null && nextSyncDate!.isBefore(DateTime.now()));
+
+  @override
+  DateTime? get nextSyncDate {
+    final current = _prefs.getString(_nextSyncDateKey);
+    if (current.isNullEmptyOrWhitespace) {
+      return null;
+    }
+
+    return DateTime.parse(current!);
+  }
+
+  @override
+  set nextSyncDate(DateTime? val) {
+    if (val == null) {
+      _prefs.setString(_nextSyncDateKey, '');
+      return;
+    }
+
+    final dateString = val.toString();
+    _prefs.setString(_nextSyncDateKey, dateString);
+    return;
+  }
 
   SettingsServiceImpl(this._logger);
 
@@ -191,4 +222,28 @@ class SettingsServiceImpl implements SettingsService {
 
   @override
   LanguageModel getCurrentLanguageModel() => _languagesMap.entries.firstWhere((kvp) => kvp.key == language).value;
+
+  @override
+  DateTime? getLastSyncDateToUse(SyncIntervalType interval) {
+    final now = DateTime.now();
+    switch (interval) {
+      case SyncIntervalType.none:
+        return null;
+      case SyncIntervalType.eachHour:
+        return now.add(const Duration(minutes: 60));
+      case SyncIntervalType.each3Hours:
+        return now.add(const Duration(minutes: 60 * 3));
+      case SyncIntervalType.each6Hours:
+        return now.add(const Duration(minutes: 60 * 6));
+      case SyncIntervalType.each12Hours:
+        return now.add(const Duration(minutes: 60 * 12));
+      case SyncIntervalType.eachDay:
+        return now.add(const Duration(minutes: 60 * 24));
+    }
+  }
+
+  @override
+  void setNextSyncDate() {
+    nextSyncDate = getLastSyncDateToUse(syncInterval);
+  }
 }

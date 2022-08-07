@@ -90,7 +90,6 @@ class BackgroundServiceImpl implements BackgroundService {
     IsolateNameServer.removePortNameMapping(_portName);
   }
 
-  @override
   Future<void> registerSyncTask(SyncIntervalType interval, BackgroundTranslations translations) {
     Duration duration;
     if (!Platform.isAndroid) {
@@ -172,8 +171,9 @@ class BackgroundServiceImpl implements BackgroundService {
   }
 
   @override
-  Future<void> runSyncTask(BackgroundTranslations translations) {
-    return handleBackgroundTask(_syncTaskName, translations);
+  Future<void> runSyncTask(BackgroundTranslations translations) async {
+    await handleBackgroundTask(_syncTaskName, translations);
+    _settingsService.setNextSyncDate();
   }
 
   @override

@@ -50,8 +50,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       },
       syncIntervalChanged: (e) async {
         _settingsService.syncInterval = e.selectedSyncInterval;
+        _settingsService.nextSyncDate = null;
         await _backgroundService.cancelSyncTask();
-        await _backgroundService.registerSyncTask(e.selectedSyncInterval, e.translations);
         return currentState.copyWith(syncInterval: e.selectedSyncInterval);
       },
       askForPasswordChanged: (e) async {

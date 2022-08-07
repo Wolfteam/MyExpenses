@@ -37,9 +37,18 @@ abstract class SettingsService {
   bool get isRecurringTransTaskRegistered;
   set isRecurringTransTaskRegistered(bool itIs);
 
+  DateTime? get nextSyncDate;
+  set nextSyncDate(DateTime? val);
+
+  bool get shouldTriggerSync;
+
   Future init();
 
   LanguageModel getLanguageModel(AppLanguageType lang);
 
   LanguageModel getCurrentLanguageModel();
+
+  DateTime? getLastSyncDateToUse(SyncIntervalType interval);
+
+  void setNextSyncDate();
 }

@@ -28,6 +28,12 @@ class GoogleServiceImpl implements GoogleService {
 
   GoogleServiceImpl(this._logger, this._secureStorageService) : _googleSignIn = GoogleSignIn(scopes: _scopes);
 
+  Future<bool> _afterSignIn(GoogleSignInAccount account) async {
+    final accessToken = await _getAccessToken(account);
+    final credentials = g_auth.AccessCredentials(accessToken, null, _scopes);
+    return _saveAccessCredentials(credentials);
+  }
+
   @override
   Future<bool> signIn() async {
     try {
@@ -35,13 +41,27 @@ class GoogleServiceImpl implements GoogleService {
       if (account == null) {
         return false;
       }
-
-      final accessToken = await _getAccessToken(account);
-      final credentials = g_auth.AccessCredentials(accessToken, null, _scopes);
-      return await _saveAccessCredentials(credentials);
+      return _afterSignIn(account);
     } catch (e, s) {
       _logger.error(runtimeType, 'signIn: Unknown error occurred', e, s);
       return false;
+    }
+  }
+
+  @override
+  Future<void> signInSilently() async {
+    try{
+      final isSignedIn = await _googleSignIn.isSignedIn();
+      if (!isSignedIn){
+        return;
+      }
+      final account = await _googleSignIn.signInSilently(reAuthenticate: true);
+      if (account == null) {
+        return;
+      }
+      await _afterSignIn(account);
+    } catch (e, s) {
+      _logger.error(runtimeType, 'signInSilently: Unknown error occurred', e, s);
     }
   }
 

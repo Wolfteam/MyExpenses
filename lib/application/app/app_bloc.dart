@@ -17,8 +17,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final DrawerBloc _drawerBloc;
   final BackgroundService _backgroundService;
   final DeviceInfoService _deviceInfoService;
+  final GoogleService _googleService;
 
   late StreamSubscription _portSubscription;
+  StreamSubscription? _syncSubscription;
 
   AppBloc(
     this._logger,
@@ -26,6 +28,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     this._drawerBloc,
     this._backgroundService,
     this._deviceInfoService,
+    this._googleService,
   ) : super(const AppState.loading()) {
     _listenBgPort();
   }
@@ -63,6 +66,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   Future<void> close() async {
     _backgroundService.removePortNameMapping();
     await _portSubscription.cancel();
+    await _syncSubscription?.cancel();
     await super.close();
   }
 
@@ -73,6 +77,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     if (forceSignOut) {
       await _registerRecurringBackgroundTask(translations);
       _drawerBloc.add(const DrawerEvent.signOut());
+    } else {
+      await _googleService.signInSilently();
     }
 
     // If the user comes from this version,
@@ -80,12 +86,25 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     if (_deviceInfoService.versionChanged && _deviceInfoService.previousBuildVersion < 39) {
       await _backgroundService.cancelSyncTask();
       await _registerRecurringBackgroundTask(translations);
-      await _backgroundService.registerSyncTask(_settingsService.syncInterval, translations);
     }
 
     if (!_settingsService.isRecurringTransTaskRegistered) {
       _logger.info(runtimeType, 'Recurring trans task is not registered, registering it...');
       await _registerRecurringBackgroundTask(translations);
+    }
+
+    //Due to google changes, we no longer have access to a refresh token...
+    //so sync on background does not work anymore
+    if (_deviceInfoService.versionChanged && _deviceInfoService.previousBuildVersion < 46) {
+      await _backgroundService.cancelSyncTask();
+      _settingsService.syncInterval = _settingsService.syncInterval;
+    }
+
+    if (_settingsService.shouldTriggerSync) {
+      await _syncSubscription?.cancel();
+      _syncSubscription = Future.delayed(const Duration(seconds: 2)).asStream().listen((event) async {
+        await _backgroundService.runSyncTask(translations);
+      });
     }
 
     _logger.info(runtimeType, 'Current settings are: ${_settingsService.appSettings.toJson()}');

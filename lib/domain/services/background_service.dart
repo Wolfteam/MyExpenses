@@ -12,8 +12,6 @@ abstract class BackgroundService {
 
   void removePortNameMapping();
 
-  Future<void> registerSyncTask(SyncIntervalType interval, BackgroundTranslations translations);
-
   Future<void> registerRecurringTransactionsTask(BackgroundTranslations translations);
 
   Future<void> cancelSyncTask();
