@@ -3,7 +3,7 @@ import 'package:my_expenses/domain/models/models.dart';
 abstract class GoogleService {
   Future<bool> signIn();
 
-  Future<void> signInSilently();
+  Future<bool?> signInSilently();
 
   Future<bool> signOut();
 

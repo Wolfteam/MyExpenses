@@ -50,7 +50,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       },
       syncIntervalChanged: (e) async {
         _settingsService.syncInterval = e.selectedSyncInterval;
-        _settingsService.nextSyncDate = null;
         await _backgroundService.cancelSyncTask();
         return currentState.copyWith(syncInterval: e.selectedSyncInterval);
       },

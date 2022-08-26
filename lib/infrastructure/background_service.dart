@@ -90,48 +90,6 @@ class BackgroundServiceImpl implements BackgroundService {
     IsolateNameServer.removePortNameMapping(_portName);
   }
 
-  Future<void> registerSyncTask(SyncIntervalType interval, BackgroundTranslations translations) {
-    Duration duration;
-    if (!Platform.isAndroid) {
-      return Future.value();
-    }
-
-    switch (interval) {
-      case SyncIntervalType.eachHour:
-        duration = const Duration(minutes: 60);
-        break;
-      case SyncIntervalType.each3Hours:
-        duration = const Duration(hours: 3);
-        break;
-      case SyncIntervalType.each6Hours:
-        duration = const Duration(hours: 6);
-        break;
-      case SyncIntervalType.each12Hours:
-        duration = const Duration(hours: 12);
-        break;
-      case SyncIntervalType.eachDay:
-        duration = const Duration(hours: 24);
-        break;
-      case SyncIntervalType.none:
-        return Future.value();
-      default:
-        throw Exception('Cant register sync task with the provided value = $interval');
-    }
-
-    return Workmanager().registerPeriodicTask(
-      _syncTaskId,
-      _syncTaskName,
-      frequency: duration,
-      existingWorkPolicy: ExistingWorkPolicy.replace,
-      constraints: Constraints(
-        networkType: NetworkType.connected,
-        requiresBatteryNotLow: true,
-        requiresDeviceIdle: false,
-      ),
-      inputData: translations.toJson(),
-    );
-  }
-
   @override
   Future<void> registerRecurringTransactionsTask(BackgroundTranslations translations) {
     //The minutes part is to avoid an overlap with the sync task
@@ -187,7 +145,10 @@ class BackgroundServiceImpl implements BackgroundService {
     try {
       switch (task) {
         case _syncTaskName:
-          _logger.info(runtimeType, 'bgSync: Checking if internet is available...');
+          if (calledFromBg) {
+            _logger.error(runtimeType, 'bgSync: Task = $task was called from bg and this is no longer supported');
+            return;
+          }
           await _runSyncTask(translations);
           break;
         case _recurringTransName:

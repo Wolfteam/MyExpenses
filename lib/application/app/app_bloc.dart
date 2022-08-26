@@ -95,12 +95,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     //Due to google changes, we no longer have access to a refresh token...
     //so sync on background does not work anymore
-    if (_deviceInfoService.versionChanged && _deviceInfoService.previousBuildVersion < 46) {
+    if (forceSignOut) {
       await _backgroundService.cancelSyncTask();
       _settingsService.syncInterval = _settingsService.syncInterval;
     }
 
-    if (_settingsService.shouldTriggerSync) {
+    if (_settingsService.shouldTriggerSync && !forceSignOut) {
       await _syncSubscription?.cancel();
       _syncSubscription = Future.delayed(const Duration(seconds: 2)).asStream().listen((event) async {
         await _backgroundService.runSyncTask(translations);

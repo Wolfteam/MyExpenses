@@ -29,6 +29,7 @@ class GoogleServiceImpl implements GoogleService {
   GoogleServiceImpl(this._logger, this._secureStorageService) : _googleSignIn = GoogleSignIn(scopes: _scopes);
 
   Future<bool> _afterSignIn(GoogleSignInAccount account) async {
+    _logger.info(runtimeType, '_afterSignIn: Getting access token and saving it..');
     final accessToken = await _getAccessToken(account);
     final credentials = g_auth.AccessCredentials(accessToken, null, _scopes);
     return _saveAccessCredentials(credentials);
@@ -39,8 +40,10 @@ class GoogleServiceImpl implements GoogleService {
     try {
       final account = await _googleSignIn.signIn();
       if (account == null) {
+        _logger.error(runtimeType, 'signIn: Could retrieve account details');
         return false;
       }
+      _logger.info(runtimeType, 'signIn: Successfully retrieved account details');
       return _afterSignIn(account);
     } catch (e, s) {
       _logger.error(runtimeType, 'signIn: Unknown error occurred', e, s);
@@ -49,20 +52,25 @@ class GoogleServiceImpl implements GoogleService {
   }
 
   @override
-  Future<void> signInSilently() async {
-    try{
+  Future<bool?> signInSilently() async {
+    try {
       final isSignedIn = await _googleSignIn.isSignedIn();
-      if (!isSignedIn){
-        return;
+      if (!isSignedIn) {
+        _logger.info(runtimeType, 'signInSilently: User is not signed in');
+        return null;
       }
-      final account = await _googleSignIn.signInSilently(reAuthenticate: true);
+      _logger.info(runtimeType, 'User is signed in, doing a silent sign in...');
+      final account = await _googleSignIn.signInSilently(reAuthenticate: true, suppressErrors: false);
       if (account == null) {
-        return;
+        _logger.error(runtimeType, 'signInSilently: Was not able to do a sign in silently even when the user was previously signed in');
+        return false;
       }
       await _afterSignIn(account);
+      return true;
     } catch (e, s) {
       _logger.error(runtimeType, 'signInSilently: Unknown error occurred', e, s);
     }
+    return false;
   }
 
   @override
@@ -281,13 +289,18 @@ class GoogleServiceImpl implements GoogleService {
 
     if (credentials.accessToken.hasExpired) {
       _logger.info(runtimeType, '_getAuthClient: Token expired, updating it...');
-      final account = await _googleSignIn.signInSilently(reAuthenticate: true);
-      if (account == null) {
-        _logger.warning(runtimeType, '_getAuthClient: Could not sign in silently');
-        throw Exception('Could not sign in silently');
+      try {
+        final account = await _googleSignIn.signInSilently(reAuthenticate: true, suppressErrors: false);
+        if (account == null) {
+          _logger.warning(runtimeType, '_getAuthClient: Could not sign in silently');
+          throw Exception('Could not sign in silently');
+        }
+        final accessToken = await _getAccessToken(account);
+        credentials = g_auth.AccessCredentials(accessToken, null, _scopes);
+      } catch (e, s) {
+        _logger.warning(runtimeType, '_getAuthClient: Unknown error while signing in silently', e, s);
+        rethrow;
       }
-      final accessToken = await _getAccessToken(account);
-      credentials = g_auth.AccessCredentials(accessToken, null, _scopes);
 
       _logger.info(runtimeType, '_getAuthClient: Token was updated, saving it...');
       await _saveAccessCredentials(credentials);
