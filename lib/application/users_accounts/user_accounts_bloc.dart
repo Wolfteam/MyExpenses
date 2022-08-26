@@ -77,7 +77,7 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
         init: (_) => _initialize(),
         deleteAccount: (e) => _deleteUser(e.id, currentState),
         changeActiveAccount: (e) => _changeActiveUser(e.newActiveUserId, currentState),
-        signIn: (_) => _sync(currentState),
+        signIn: (_) => _signIn(currentState),
       );
 
       yield s;
@@ -159,7 +159,7 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
     }
   }
 
-  Future<UserAccountsState> _sync(_InitialState state) async {
+  Future<UserAccountsState> _signIn(_InitialState state) async {
     try {
       _logger.info(runtimeType, '_signIn: Getting user info...');
       _appBloc.add(const AppEvent.bgTaskIsRunning(isRunning: true));

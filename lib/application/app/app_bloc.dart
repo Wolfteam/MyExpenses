@@ -73,7 +73,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   Future<AppState> _init(BackgroundTranslations translations) async {
     // If the user comes from this version,
     // we need to do a log out due to the changes made in the 1.2.3
-    final forceSignOut = _deviceInfoService.versionChanged && _deviceInfoService.previousBuildVersion < 46;
+    final forceSignOut = true;//_deviceInfoService.versionChanged && _deviceInfoService.previousBuildVersion < 46;
     if (forceSignOut) {
       await _registerRecurringBackgroundTask(translations);
       _drawerBloc.add(const DrawerEvent.signOut());
@@ -91,13 +91,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     if (!_settingsService.isRecurringTransTaskRegistered) {
       _logger.info(runtimeType, 'Recurring trans task is not registered, registering it...');
       await _registerRecurringBackgroundTask(translations);
-    }
-
-    //Due to google changes, we no longer have access to a refresh token...
-    //so sync on background does not work anymore
-    if (forceSignOut) {
-      await _backgroundService.cancelSyncTask();
-      _settingsService.syncInterval = _settingsService.syncInterval;
     }
 
     if (_settingsService.shouldTriggerSync && !forceSignOut) {

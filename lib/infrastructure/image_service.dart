@@ -38,7 +38,13 @@ class ImageServiceImpl implements ImageService {
     final thumbnail = copyResize(image!, width: params.width, height: params.height);
     final png = encodePng(thumbnail);
 
-    File(params.filePath).writeAsBytesSync(png);
+    final file = File(params.filePath);
+
+    if (await file.exists()) {
+      await file.delete();
+    }
+
+    await file.writeAsBytes(png);
     params.sendPort.send(params.filePath);
   }
 

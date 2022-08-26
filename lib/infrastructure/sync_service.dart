@@ -186,9 +186,7 @@ class SyncServiceImpl implements SyncService {
     await _uploadAllLocalImgs(currentUser.id);
   }
 
-  Future<void> _onExistingInstall(
-    String currentUser,
-  ) async {
+  Future<void> _onExistingInstall(String currentUser) async {
     _logger.info(runtimeType, '_onExistingInstall: Getting appfile...');
     final filePath = await appFilePath;
     final fileId = await _googleService.downloadFile(_appFile, filePath);
@@ -205,8 +203,9 @@ class SyncServiceImpl implements SyncService {
     final appFile = await _getLocalAppFile(filePath);
 
     _logger.info(runtimeType, '_onExistingInstall: Deleting all existing categories and transactions...');
-    await _categoriesDao.deleteAll(null);
+    //The order here matters
     await _transactionsDao.deleteAll(null);
+    await _categoriesDao.deleteAll(null);
 
     await _performSyncDown(user.id, appFile);
   }
