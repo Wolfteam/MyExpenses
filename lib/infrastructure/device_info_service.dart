@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:device_info_plus_windows/device_info_plus_windows.dart' as device_info_plus_windows;
-import 'package:flutter_user_agentx/flutter_user_agent.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:my_expenses/domain/services/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -31,10 +30,6 @@ class DeviceInfoServiceImpl implements DeviceInfoService {
   @override
   bool get versionChanged => _versionChanged;
 
-  //TODO: COMPLETE THIS
-  @override
-  String? get userAgent => Platform.isWindows ? null : FlutterUserAgent.webViewUserAgent!.replaceAll(RegExp(r'wv'), '');
-
   @override
   bool get canUseFingerPrint => _canUseFingerPrint;
 
@@ -49,7 +44,6 @@ class DeviceInfoServiceImpl implements DeviceInfoService {
     try {
       //TODO: BUILDNUMBER NOT SHOWING UP ON WINDOWS
       //TODO: VERSION DOES NOT MATCH THE ONE ON THE PUBSPEC
-      await FlutterUserAgent.init();
       final packageInfo = await PackageInfo.fromPlatform();
       _appName = packageInfo.appName;
       _version = Platform.isWindows ? packageInfo.version : '${packageInfo.version}+${packageInfo.buildNumber}';
@@ -62,10 +56,6 @@ class DeviceInfoServiceImpl implements DeviceInfoService {
 
       if (Platform.isWindows) {
         await _initForWindows();
-      }
-
-      if (!Platform.isWindows) {
-        await FlutterUserAgent.init();
       }
     } catch (ex) {
       _deviceInfo = {

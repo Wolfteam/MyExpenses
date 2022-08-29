@@ -73,7 +73,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   Future<AppState> _init(BackgroundTranslations translations) async {
     // If the user comes from this version,
     // we need to do a log out due to the changes made in the 1.2.3
-    final forceSignOut = true;//_deviceInfoService.versionChanged && _deviceInfoService.previousBuildVersion < 46;
+    final forceSignOut = _deviceInfoService.versionChanged && _deviceInfoService.previousBuildVersion < 46;
     if (forceSignOut) {
       await _registerRecurringBackgroundTask(translations);
       _drawerBloc.add(const DrawerEvent.signOut());

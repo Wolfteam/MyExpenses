@@ -7,8 +7,6 @@ abstract class DeviceInfoService {
 
   bool get versionChanged;
 
-  String? get userAgent;
-
   bool get canUseFingerPrint;
 
   String get previousVersion;
