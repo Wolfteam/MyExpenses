@@ -54,6 +54,7 @@ class BackgroundServiceImpl implements BackgroundService {
   final AppDatabase _db;
 
   final ReceivePort _port = ReceivePort();
+  final _isPlatformSupported = [Platform.isAndroid, Platform.isIOS].any((el) => el);
 
   @override
   ReceivePort get port => _port;
@@ -71,7 +72,7 @@ class BackgroundServiceImpl implements BackgroundService {
 
   @override
   Future<void> init() {
-    if (Platform.isAndroid) {
+    if (_isPlatformSupported) {
       return Workmanager().initialize(_callbackDispatcher);
     }
 
@@ -94,7 +95,12 @@ class BackgroundServiceImpl implements BackgroundService {
   Future<void> registerRecurringTransactionsTask(BackgroundTranslations translations) {
     //The minutes part is to avoid an overlap with the sync task
     const duration = Duration(hours: 8, minutes: 20);
-    if (!Platform.isAndroid) {
+    if (!_isPlatformSupported) {
+      return Future.value();
+    }
+
+    //TODO: IOS SHOULD WORK ON THE NEWEST VERSION OF THE PACKAGE
+    if (Platform.isIOS) {
       return Future.value();
     }
 
@@ -114,7 +120,10 @@ class BackgroundServiceImpl implements BackgroundService {
 
   @override
   Future<void> cancelSyncTask() {
-    if (!Platform.isAndroid) {
+    if (Platform.isIOS) {
+      return Future.value();
+    }
+    if (!_isPlatformSupported) {
       return Future.value();
     }
     return Workmanager().cancelByUniqueName(_syncTaskId);
@@ -122,7 +131,10 @@ class BackgroundServiceImpl implements BackgroundService {
 
   @override
   Future<void> cancelRecurringTransactionsTask() {
-    if (!Platform.isAndroid) {
+    if (Platform.isIOS) {
+      return Future.value();
+    }
+    if (!_isPlatformSupported) {
       return Future.value();
     }
     return Workmanager().cancelByUniqueName(_recurringTransId);
@@ -136,7 +148,7 @@ class BackgroundServiceImpl implements BackgroundService {
 
   @override
   Future<void> handleBackgroundTask(String task, BackgroundTranslations translations, {bool calledFromBg = false}) async {
-    if (!Platform.isAndroid) {
+    if (!_isPlatformSupported) {
       return Future.value();
     }
 

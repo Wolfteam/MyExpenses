@@ -22,14 +22,21 @@ class SyncServiceImpl implements SyncService {
   static const _appFile = 'app_file.json';
   static const _readmeFile = 'README.md';
 
+  Future<Directory?> get _appDir async {
+    if (Platform.isIOS) {
+      return getApplicationDocumentsDirectory();
+    }
+    return getExternalStorageDirectory();
+  }
+
   Future<String> get appFilePath async {
-    final dir = await getExternalStorageDirectory();
+    final dir = await _appDir;
     final path = '${dir!.path}/$_appFile';
     return path;
   }
 
   Future<String> get readmeFilePath async {
-    final dir = await getExternalStorageDirectory();
+    final dir = await _appDir;
     final path = '${dir!.path}/$_readmeFile';
     return path;
   }
