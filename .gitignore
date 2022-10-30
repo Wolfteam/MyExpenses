@@ -5,6 +5,8 @@
 *.freezed.dart
 /lib/generated/**
 google-services.json
+GoogleService-Info.plist
+.fvm/flutter_sdk
 
 # Miscellaneous
 *.class
