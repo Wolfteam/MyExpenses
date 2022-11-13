@@ -9,6 +9,10 @@ import workmanager
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    if #available(iOS 10.0, *) {
+      UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate
+    }
+    
     GeneratedPluginRegistrant.register(with: self)
     //WorkmanagerPlugin.registerTask(withIdentifier: "my_expenses_sync_task")
     //WorkmanagerPlugin.registerTask(withIdentifier: "my_expenses_recurring_trans_task")
