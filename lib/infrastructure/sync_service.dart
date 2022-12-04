@@ -103,6 +103,21 @@ class SyncServiceImpl implements SyncService {
     }
   }
 
+  @override
+  Future<bool> downloadRemoteImg(int userId, String img) async {
+    try {
+      _logger.info(runtimeType, 'downloadRemoteImg: Trying to download imgs = $img...');
+      final imgPath = await _pathService.getUserImgPath(userId);
+      final filePath = join(imgPath, img);
+      await _googleService.downloadFile(img, filePath);
+      _logger.info(runtimeType, 'downloadRemoteImg: Downloads completed');
+      return true;
+    } catch (e, s) {
+      _logger.error(runtimeType, 'downloadRemoteImg: Unknown error occurred', e, s);
+      return false;
+    }
+  }
+
   Future<void> _uploadAppFile(
     String currentUser,
   ) async {
@@ -203,9 +218,6 @@ class SyncServiceImpl implements SyncService {
       return;
     }
     await _secureStorageService.save(SecureResourceType.currentUserAppFileId, currentUser, fileId);
-
-    _logger.info(runtimeType, '_onExistingInstall: Getting remote imgs...');
-    await _downloadAllRemoteImgs(user.id);
 
     final appFile = await _getLocalAppFile(filePath);
 

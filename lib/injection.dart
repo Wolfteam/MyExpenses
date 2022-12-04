@@ -90,7 +90,8 @@ class Injection {
     final settingsService = getIt<SettingsService>();
     final usersDao = getIt<UsersDao>();
     final pathService = getIt<PathService>();
-    return TransactionFormBloc(logger, transactionsDao, usersDao, settingsService, pathService);
+    final syncService = getIt<SyncService>();
+    return TransactionFormBloc(logger, transactionsDao, usersDao, settingsService, pathService, syncService);
   }
 
   static Future<void> init() async {
