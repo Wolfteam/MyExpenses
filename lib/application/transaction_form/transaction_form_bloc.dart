@@ -25,6 +25,7 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
   final UsersDao _usersDao;
   final SettingsService _settingsService;
   final PathService _pathService;
+  final SyncService _syncService;
 
   static int maxDescriptionLength = 50;
   static int minDescriptionLength = 3;
@@ -40,6 +41,7 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
     this._usersDao,
     this._settingsService,
     this._pathService,
+    this._syncService,
   ) : super(const TransactionFormState.loading());
 
   _InitialState get currentState => state as _InitialState;
@@ -160,8 +162,14 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
       final user = await _usersDao.getActiveUser();
       imgPath = await _pathService.buildUserImgPath(transaction.imagePath!, user?.id);
       imageExists = await File(imgPath).exists();
-      if (!imageExists) {
+      if (!imageExists && user == null) {
         imgPath = null;
+      } else if (!imageExists && user != null) {
+        final downloaded = await _syncService.downloadRemoteImg(user.id, transaction.imagePath!);
+        imageExists = await File(imgPath).exists();
+        if (!downloaded) {
+          imgPath = null;
+        }
       }
     }
 
