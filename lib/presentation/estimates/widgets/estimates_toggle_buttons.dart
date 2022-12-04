@@ -7,7 +7,7 @@ import 'package:my_expenses/presentation/shared/custom_icons.dart';
 class EstimatesToggleButtons extends StatelessWidget {
   final List<bool> selectedButtons;
 
-  const EstimatesToggleButtons({Key? key, required this.selectedButtons}) : super(key: key);
+  const EstimatesToggleButtons({super.key, required this.selectedButtons});
 
   @override
   Widget build(BuildContext context) {

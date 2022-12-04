@@ -11,7 +11,7 @@ import 'package:my_expenses/presentation/shared/extensions/app_theme_type_extens
 class AccentColorSettingsCard extends StatelessWidget {
   final AppAccentColorType accentColorType;
 
-  const AccentColorSettingsCard({Key? key, required this.accentColorType}) : super(key: key);
+  const AccentColorSettingsCard({super.key, required this.accentColorType});
 
   @override
   Widget build(BuildContext context) {
@@ -47,10 +47,9 @@ class _Item extends StatelessWidget {
   final bool isSelected;
 
   const _Item({
-    Key? key,
     required this.accentColor,
     required this.isSelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

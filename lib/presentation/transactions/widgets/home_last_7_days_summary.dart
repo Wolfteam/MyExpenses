@@ -77,10 +77,9 @@ class _BarChart extends StatelessWidget {
   final List<TransactionsSummaryPerDay> data;
 
   const _BarChart({
-    Key? key,
     required this.incomesIsChecked,
     required this.data,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

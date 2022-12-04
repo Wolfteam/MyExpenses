@@ -11,9 +11,9 @@ class FormImagePreview extends StatelessWidget {
   final String imagePath;
 
   const FormImagePreview({
-    Key? key,
+    super.key,
     required this.imagePath,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -56,9 +56,8 @@ class _ImageDialog extends StatelessWidget {
   final String imagePath;
 
   const _ImageDialog({
-    Key? key,
     required this.imagePath,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +112,7 @@ class _ImageDialog extends StatelessWidget {
 }
 
 class _DeleteImageDialog extends StatelessWidget {
-  const _DeleteImageDialog({Key? key}) : super(key: key);
+  const _DeleteImageDialog();
 
   @override
   Widget build(BuildContext context) {

@@ -11,11 +11,11 @@ class CategoriesListPage extends StatefulWidget {
   final models.CategoryItem? selectedCategory;
 
   const CategoriesListPage({
-    Key? key,
+    super.key,
     required this.loadIncomes,
     this.isInSelectionMode = false,
     this.selectedCategory,
-  }) : super(key: key);
+  });
 
   @override
   _CategoriesListPageState createState() => _CategoriesListPageState();
@@ -77,10 +77,9 @@ class _List extends StatelessWidget {
   final bool isInSelectionMode;
 
   const _List({
-    Key? key,
     required this.categories,
     required this.isInSelectionMode,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

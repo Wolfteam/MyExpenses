@@ -14,7 +14,7 @@ final _icons = CategoryUtils.getAllCategoryIcons();
 class CategoryIconsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    SchedulerBinding.instance!.addPostFrameCallback((_) => _animateToIndex());
+    SchedulerBinding.instance.addPostFrameCallback((_) => _animateToIndex());
 
     final i18n = S.of(context);
     final icons = CategoryUtils.getAllCategoryIcons();
@@ -59,10 +59,9 @@ class _CategoryIconsPerType extends StatelessWidget {
   final CategoryIcon selectedIcon;
 
   const _CategoryIconsPerType({
-    Key? key,
     required this.type,
     required this.selectedIcon,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -108,10 +107,9 @@ class _Icon extends StatelessWidget {
   final bool isSelected;
 
   const _Icon({
-    Key? key,
     required this.icon,
     required this.isSelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

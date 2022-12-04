@@ -24,7 +24,7 @@ class SplashScreen extends StatelessWidget {
 }
 
 class _Body extends StatefulWidget {
-  const _Body({Key? key}) : super(key: key);
+  const _Body();
 
   @override
   _BodyState createState() => _BodyState();
@@ -48,7 +48,7 @@ class _BodyState extends State<_Body> {
           },
         );
       },
-      child: Container(
+      child: ColoredBox(
         color: Colors.orange,
         child: Center(
           child: Column(

@@ -9,10 +9,10 @@ class SortDirectionPopupMenuFilter extends StatelessWidget {
   final Function(SortDirectionType) onSelected;
 
   const SortDirectionPopupMenuFilter({
-    Key? key,
+    super.key,
     required this.selectedSortDirection,
     required this.onSelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

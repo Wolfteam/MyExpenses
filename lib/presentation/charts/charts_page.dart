@@ -63,7 +63,7 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
                 Align(
                   alignment: Alignment.centerLeft,
                   child: TextButton.icon(
-                    style: TextButton.styleFrom(primary: textColor),
+                    style: TextButton.styleFrom(foregroundColor: textColor),
                     onPressed: () => _changeCurrentYear(state),
                     icon: const Icon(Icons.calendar_today),
                     label: Text('${state.currentYear}'),
@@ -85,7 +85,7 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
                   Align(
                     alignment: Alignment.centerLeft,
                     child: TextButton.icon(
-                      style: TextButton.styleFrom(primary: textColor),
+                      style: TextButton.styleFrom(foregroundColor: textColor),
                       onPressed: () => _changeCurrentMonthDate(state),
                       icon: const Icon(Icons.calendar_today),
                       label: Text(state.currentMonthDateString),
@@ -171,10 +171,9 @@ class _ChartBottomBalance extends StatelessWidget {
   final Color textColor;
 
   const _ChartBottomBalance({
-    Key? key,
     required this.amount,
     required this.textColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

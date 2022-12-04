@@ -13,18 +13,16 @@ class IncomeExpensePieChart extends StatelessWidget {
   final double totalAmount;
 
   const IncomeExpensePieChart.income({
-    Key? key,
+    super.key,
     required this.transactions,
     required this.totalAmount,
-  })  : incomes = true,
-        super(key: key);
+  }) : incomes = true;
 
   const IncomeExpensePieChart.expense({
-    Key? key,
+    super.key,
     required this.transactions,
     required this.totalAmount,
-  })  : incomes = false,
-        super(key: key);
+  }) : incomes = false;
 
   @override
   Widget build(BuildContext context) {

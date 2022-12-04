@@ -16,10 +16,10 @@ class SyncSettingsCard extends StatelessWidget {
   final bool showNotificationAfterFullSync;
 
   const SyncSettingsCard({
-    Key? key,
+    super.key,
     required this.syncIntervalType,
     required this.showNotificationAfterFullSync,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

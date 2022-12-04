@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
-
-import 'base_entity.dart';
-import 'converters/db_converters.dart';
+import 'package:my_expenses/domain/models/entities/base_entity.dart';
+import 'package:my_expenses/domain/models/entities/converters/db_converters.dart';
 
 @DataClassName('Category')
 class Categories extends BaseEntity {

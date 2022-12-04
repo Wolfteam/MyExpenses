@@ -179,16 +179,16 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
 
   Future _changeCurrentDate(BuildContext context) async {
     final now = DateTime.now();
-    final selectedDate = await showMonthPicker(
+    await showMonthPicker(
       context: context,
       initialDate: currentDate,
       lastDate: DateTime(now.year + 1),
       locale: locale,
-    );
-
-    if (selectedDate == null) {
-      return;
-    }
-    context.read<TransactionsBloc>().add(TransactionsEvent.loadTransactions(inThisDate: selectedDate));
+    ).then((selectedDate) {
+      if (selectedDate == null) {
+        return;
+      }
+      context.read<TransactionsBloc>().add(TransactionsEvent.loadTransactions(inThisDate: selectedDate));
+    });
   }
 }

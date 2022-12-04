@@ -7,16 +7,16 @@ class ConfirmDialog extends StatelessWidget {
 
   final String? cancelText;
   final String? okText;
-  final Function onOk;
+  final VoidCallback onOk;
 
   const ConfirmDialog({
-    Key? key,
+    super.key,
     required this.title,
     required this.content,
     required this.onOk,
     this.cancelText,
     this.okText,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

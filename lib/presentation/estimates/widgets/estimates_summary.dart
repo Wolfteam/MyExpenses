@@ -10,12 +10,12 @@ class EstimatesSummary extends StatelessWidget {
   final double total;
 
   const EstimatesSummary({
-    Key? key,
+    super.key,
     required this.selectedButtons,
     required this.income,
     required this.expenses,
     required this.total,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

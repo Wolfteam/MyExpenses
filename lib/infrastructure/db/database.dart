@@ -104,7 +104,7 @@ void _startBackground(_IsolateStartRequest request) {
   // background isolate. If we used MoorIsolate.spawn, a third isolate would be
   // started which is not what we want!
   final moorIsolate = DriftIsolate.inCurrent(
-    () => DatabaseConnection.fromExecutor(executor),
+    () => DatabaseConnection(executor),
   );
   // inform the starting isolate about this, so that it can call .connect()
   request.sendMoorIsolate.send(moorIsolate);

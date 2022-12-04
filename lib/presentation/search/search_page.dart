@@ -86,7 +86,7 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
 class _Body extends StatefulWidget {
   final ScrollController scrollController;
 
-  const _Body({Key? key, required this.scrollController}) : super(key: key);
+  const _Body({required this.scrollController});
 
   @override
   _BodyState createState() => _BodyState();

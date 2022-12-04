@@ -15,7 +15,7 @@ import 'package:my_expenses/presentation/shared/utils/toast_utils.dart';
 class ThemeSettingsCard extends StatelessWidget {
   final AppThemeType appThemeType;
 
-  const ThemeSettingsCard({Key? key, required this.appThemeType}) : super(key: key);
+  const ThemeSettingsCard({super.key, required this.appThemeType});
 
   @override
   Widget build(BuildContext context) {

@@ -21,13 +21,13 @@ class SearchFilterBar extends StatelessWidget {
   final TransactionType? transactionType;
 
   const SearchFilterBar({
-    Key? key,
+    super.key,
     this.currentAmountFilter,
     this.category,
     required this.transactionFilterType,
     required this.sortDirectionType,
     this.transactionType,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -118,9 +118,9 @@ class SearchFilterBar extends StatelessWidget {
     final route = MaterialPageRoute<CategoryItem>(
       builder: (ctx) => CategoriesPage(isInSelectionMode: true, showDeselectButton: true, selectedCategory: category),
     );
-    await Navigator.of(context).push(route);
-
-    context.read<SearchBloc>().add(SearchEvent.categoryChanged(newValue: selectedCatProvider.currentSelectedItem));
+    await Navigator.of(context).push(route).then((_) {
+      context.read<SearchBloc>().add(SearchEvent.categoryChanged(newValue: selectedCatProvider.currentSelectedItem));
+    });
   }
 
   void _transactionFilterTypeChanged(TransactionFilterType newValue, BuildContext context) {

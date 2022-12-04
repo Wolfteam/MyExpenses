@@ -6,7 +6,7 @@ class LocalStatusConverter extends TypeConverter<LocalStatusType, int> {
 
   @override
   LocalStatusType fromSql(int fromDb) {
-    return LocalStatusType.values[fromDb!];
+    return LocalStatusType.values[fromDb];
   }
 
   @override

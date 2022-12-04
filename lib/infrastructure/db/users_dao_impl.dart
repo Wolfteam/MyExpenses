@@ -9,7 +9,7 @@ part 'users_dao_impl.g.dart';
 
 @DriftAccessor(tables: [Users])
 class UsersDaoImpl extends DatabaseAccessor<AppDatabase> with _$UsersDaoImplMixin implements UsersDao {
-  UsersDaoImpl(AppDatabase db) : super(db);
+  UsersDaoImpl(super.db);
 
   @override
   Future<List<UserItem>> getAllUsers() {

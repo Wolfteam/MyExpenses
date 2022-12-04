@@ -12,7 +12,7 @@ class YearlyChart extends StatelessWidget {
   final int year;
   final List<TransactionsSummaryPerYear> transactions;
 
-  const YearlyChart({Key? key, required this.year, required this.transactions}) : super(key: key);
+  const YearlyChart({super.key, required this.year, required this.transactions});
 
   @override
   Widget build(BuildContext context) {

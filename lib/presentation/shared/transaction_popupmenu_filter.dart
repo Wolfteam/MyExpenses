@@ -11,11 +11,11 @@ class TransactionPopupMenuFilter extends StatelessWidget {
   final List<TransactionFilterType>? exclude;
 
   const TransactionPopupMenuFilter({
-    Key? key,
+    super.key,
     required this.selectedValue,
     required this.onSelected,
     this.exclude,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

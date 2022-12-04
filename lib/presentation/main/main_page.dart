@@ -25,9 +25,9 @@ class MainPage extends StatefulWidget {
   final bool showGoogleLoginChangesExplanation;
 
   const MainPage({
-    Key? key,
+    super.key,
     required this.showGoogleLoginChangesExplanation,
-  }) : super(key: key);
+  });
 
   @override
   _MainPageState createState() => _MainPageState();
@@ -39,7 +39,7 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
   @override
   void initState() {
     _tabController = TabController(length: 4, vsync: this);
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (widget.showGoogleLoginChangesExplanation) {
         final s = S.of(context);
         showDialog(context: context, builder: (_) => InfoDialog(explanations: [s.googleLoginChangesExplanation]));

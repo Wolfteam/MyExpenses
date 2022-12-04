@@ -7,10 +7,10 @@ class InputSuffixIcon extends StatelessWidget {
   final FocusNode focusNode;
 
   const InputSuffixIcon({
-    Key? key,
+    super.key,
     required this.controller,
     required this.focusNode,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

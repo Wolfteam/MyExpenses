@@ -27,7 +27,7 @@ class ReportsBottomSheetDialog extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({Key? key}) : super(key: key);
+  const _Body();
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +70,7 @@ class _Body extends StatelessWidget {
               ModalSheetTitle(title: i18n.exportFrom),
               Text('${i18n.startDate}:'),
               TextButton(
-                style: TextButton.styleFrom(primary: textColor),
+                style: TextButton.styleFrom(foregroundColor: textColor),
                 onPressed: () => _showDatePicker(context, state.from, true),
                 child: Align(
                   alignment: Alignment.centerLeft,
@@ -79,7 +79,7 @@ class _Body extends StatelessWidget {
               ),
               Text('${i18n.endDate}:'),
               TextButton(
-                style: TextButton.styleFrom(primary: textColor),
+                style: TextButton.styleFrom(foregroundColor: textColor),
                 onPressed: () => _showDatePicker(context, state.to, false),
                 child: Align(
                   alignment: Alignment.centerLeft,
@@ -128,22 +128,22 @@ class _Body extends StatelessWidget {
 
   Future _showDatePicker(BuildContext context, DateTime initialDate, bool isFromDate) async {
     final now = DateTime.now();
-    final selectedDate = await showDatePicker(
+    await showDatePicker(
       context: context,
       initialDate: initialDate,
       firstDate: DateTime(now.year - 10),
       lastDate: DateTime(now.year, now.month, now.day, 23, 59, 59),
-    );
+    ).then((selectedDate) {
+      if (selectedDate == null) {
+        return;
+      }
 
-    if (selectedDate == null) {
-      return;
-    }
-
-    if (isFromDate) {
-      context.read<ReportsBloc>().add(ReportsEvent.fromDateChanged(selectedDate: selectedDate));
-    } else {
-      context.read<ReportsBloc>().add(ReportsEvent.toDateChanged(selectedDate: selectedDate));
-    }
+      if (isFromDate) {
+        context.read<ReportsBloc>().add(ReportsEvent.fromDateChanged(selectedDate: selectedDate));
+      } else {
+        context.read<ReportsBloc>().add(ReportsEvent.toDateChanged(selectedDate: selectedDate));
+      }
+    });
   }
 
   void _reportFileTypeChanged(BuildContext context, ReportFileType newValue) =>

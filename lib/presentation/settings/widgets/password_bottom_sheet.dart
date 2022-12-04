@@ -32,7 +32,7 @@ class PasswordBottomSheet extends StatelessWidget {
 class _Form extends StatefulWidget {
   final bool promptForPassword;
 
-  const _Form({Key? key, required this.promptForPassword}) : super(key: key);
+  const _Form({required this.promptForPassword});
 
   @override
   _FormState createState() => _FormState();

@@ -11,7 +11,7 @@ part 'categories_dao_impl.g.dart';
 
 @DriftAccessor(tables: [Categories, Transactions])
 class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesDaoImplMixin implements CategoriesDao {
-  CategoriesDaoImpl(AppDatabase db) : super(db);
+  CategoriesDaoImpl(super.db);
 
   @override
   Future<List<CategoryItem>> getAll(int? userId) {
