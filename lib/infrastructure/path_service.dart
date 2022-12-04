@@ -8,7 +8,7 @@ class PathServiceImpl implements PathService {
   //internal memory/android/data/com.miraisoft.my_expenses/files/reports
   @override
   Future<String> get reportsPath async {
-    final dir = await getExternalStorageDirectory();
+    final dir = Platform.isIOS ? await getApplicationDocumentsDirectory() : await getExternalStorageDirectory();
     final dirPath = '${dir!.path}/Reports';
     await _generateDirectoryIfItDoesntExist(dirPath);
     return dirPath;

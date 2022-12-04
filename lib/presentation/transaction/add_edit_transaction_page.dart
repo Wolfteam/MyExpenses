@@ -597,7 +597,7 @@ class _AmountInput extends StatelessWidget {
             maxLengthEnforcement: MaxLengthEnforcement.enforced,
             focusNode: amountFocus,
             textInputAction: TextInputAction.next,
-            keyboardType: TextInputType.number,
+            keyboardType: const TextInputType.numberWithOptions(signed: true, decimal: true),
             decoration: InputDecoration(
               suffixIcon: InputSuffixIcon(controller: amountController, focusNode: amountFocus),
               alignLabelWithHint: true,
