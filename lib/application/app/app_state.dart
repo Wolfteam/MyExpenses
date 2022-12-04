@@ -2,10 +2,7 @@ part of 'app_bloc.dart';
 
 @freezed
 class AppState with _$AppState {
-  const factory AppState.loading({
-    AppThemeType? theme,
-    AppAccentColorType? accentColor,
-  }) = _LoadingState;
+  const factory AppState.loading() = _LoadingState;
 
   const factory AppState.loaded({
     required bool isInitialized,

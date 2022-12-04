@@ -5,12 +5,12 @@ class ColorConverter extends TypeConverter<Color, int> {
   const ColorConverter();
 
   @override
-  Color mapToDart(int? fromDb) {
+  Color fromSql(int? fromDb) {
     return Color(fromDb!);
   }
 
   @override
-  int mapToSql(Color? value) {
+  int toSql(Color? value) {
     return value!.value;
   }
 }

@@ -10,6 +10,6 @@ class TransactionsLast7DaysEvent with _$TransactionsLast7DaysEvent {
   }) = _Init;
 
   const factory TransactionsLast7DaysEvent.typeChanged({
-    required TransactionType selectedType,
+    required TransactionType newValue,
   }) = _TypeChanged;
 }

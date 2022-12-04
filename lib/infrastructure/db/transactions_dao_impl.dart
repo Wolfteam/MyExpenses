@@ -529,7 +529,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
     final cats = await (select(categories)..where((c) => c.createdHash.isIn(updatedCatsHash))).get();
 
     final parentsHash =
-        existingTransToUse.where((t) => t.parentTransactionCreatedHash != null).map((t) => t.parentTransactionCreatedHash).toSet().toList();
+        existingTransToUse.where((t) => t.parentTransactionCreatedHash != null).map((t) => t.parentTransactionCreatedHash!).toSet().toList();
 
     final parents = await (select(transactions)..where((t) => t.createdHash.isIn(parentsHash))).get();
 
@@ -760,7 +760,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
 
     int? parentId;
     if (transaction.parentTransactionCreatedHash != null) {
-      final parent = await (select(transactions)..where((t) => t.createdHash.equals(transaction.parentTransactionCreatedHash))).getSingle();
+      final parent = await (select(transactions)..where((t) => t.createdHash.equals(transaction.parentTransactionCreatedHash!))).getSingle();
       parentId = parent.id;
     }
     return TransactionsCompanion.insert(

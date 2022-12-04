@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:darq/darq.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
@@ -121,7 +122,7 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
     final transactions = await _transactionsDao.getAllTransactions(userId, from, until);
     final grouped = <TransactionsSummaryPerYear>[];
     for (var i = DateTime.january; i <= maxMonth; i++) {
-      final monthlyAmount = transactions.where((el) => el.transactionDate.month == i).map((el) => el.amount).sum;
+      final double monthlyAmount = transactions.where((el) => el.transactionDate.month == i).map((el) => el.amount).sum();
       grouped.add(TransactionsSummaryPerYear(month: i, totalAmount: monthlyAmount));
     }
 

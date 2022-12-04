@@ -17,7 +17,7 @@ class TransactionsLast7DaysBloc extends Bloc<TransactionsLast7DaysEvent, Transac
   Stream<TransactionsLast7DaysState> mapEventToState(TransactionsLast7DaysEvent event) async* {
     final s = event.map(
       init: (e) => _transactionsLoaded(e.selectedType, e.incomes, e.expenses, e.showLast7Days),
-      typeChanged: (e) => currentState.copyWith.call(selectedType: e.selectedType),
+      typeChanged: (e) => currentState.copyWith.call(selectedType: e.newValue),
     );
 
     yield s;

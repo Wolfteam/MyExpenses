@@ -9,7 +9,7 @@ class Categories extends BaseEntity {
 
   BoolColumn get isAnIncome => boolean()();
 
-  TextColumn get icon => text().map(const IconDataConverter())();
+  TextColumn get icon => text().nullable().map(const IconDataConverter())();
 
   IntColumn get iconColor => integer().map(const ColorConverter())();
 

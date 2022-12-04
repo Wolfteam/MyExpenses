@@ -69,7 +69,7 @@ class HomeLast7DaysSummary extends StatelessWidget {
   }
 
   void _onSelectedTypeChanged(BuildContext context, TransactionType newValue) =>
-      context.read<TransactionsLast7DaysBloc>().add(TransactionsLast7DaysEvent.typeChanged(selectedType: newValue));
+      context.read<TransactionsLast7DaysBloc>().add(TransactionsLast7DaysEvent.typeChanged(newValue: newValue));
 }
 
 class _BarChart extends StatelessWidget {
