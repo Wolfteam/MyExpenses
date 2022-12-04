@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:device_info_plus_windows/device_info_plus_windows.dart' as device_info_plus_windows;
 import 'package:local_auth/local_auth.dart';
 import 'package:my_expenses/domain/services/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -68,9 +67,9 @@ class DeviceInfoServiceImpl implements DeviceInfoService {
   }
 
   Future<void> _initForWindows() async {
-    final deviceInfo = device_info_plus_windows.DeviceInfoWindows();
+    final deviceInfo = DeviceInfoPlugin();
     //TODO: DeviceInfoPlugin CRASHES ON WINDOWS
-    final info = await deviceInfo.windowsInfo();
+    final info = await deviceInfo.windowsInfo;
     final model = info.computerName;
     _deviceInfo = {
       'Model': model,
@@ -87,7 +86,7 @@ class DeviceInfoServiceImpl implements DeviceInfoService {
     final canCheckBiometrics = await localAuth.canCheckBiometrics && await localAuth.isDeviceSupported();
     _canUseFingerPrint = canCheckBiometrics && availableBiometrics.contains(BiometricType.fingerprint);
     _deviceInfo = {
-      'Model': info.model ?? _na,
+      'Model': info.model,
       'OsVersion': '${info.version.sdkInt}',
       'AppVersion': _version,
     };

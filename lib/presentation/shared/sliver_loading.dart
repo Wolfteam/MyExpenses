@@ -4,9 +4,9 @@ class SliverLoading extends StatelessWidget {
   final List<Widget> children;
 
   const SliverLoading({
-    Key? key,
+    super.key,
     this.children = const [CircularProgressIndicator()],
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

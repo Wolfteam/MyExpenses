@@ -15,7 +15,7 @@ import 'package:my_expenses/presentation/shared/utils/toast_utils.dart';
 class LanguageSettingsCard extends StatelessWidget {
   final AppLanguageType language;
 
-  const LanguageSettingsCard({Key? key, required this.language}) : super(key: key);
+  const LanguageSettingsCard({super.key, required this.language});
 
   @override
   Widget build(BuildContext context) {

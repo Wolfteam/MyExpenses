@@ -14,9 +14,9 @@ class SearchAmountFilterBottomSheetDialog extends StatefulWidget {
   final double? initialAmount;
 
   const SearchAmountFilterBottomSheetDialog({
-    Key? key,
+    super.key,
     required this.initialAmount,
-  }) : super(key: key);
+  });
 
   @override
   _SearchAmountFilterBottomSheetDialogState createState() => _SearchAmountFilterBottomSheetDialogState();

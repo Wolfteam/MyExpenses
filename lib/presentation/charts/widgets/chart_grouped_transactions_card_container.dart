@@ -13,10 +13,10 @@ class ChartGroupedTransactionsCardContainer extends StatelessWidget {
   double get percentage => grouped.total * 100 / transactionsTotalAmount;
 
   const ChartGroupedTransactionsCardContainer({
-    Key? key,
+    super.key,
     required this.grouped,
     required this.transactionsTotalAmount,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

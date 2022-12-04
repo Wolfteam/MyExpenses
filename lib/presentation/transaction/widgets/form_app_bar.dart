@@ -13,14 +13,14 @@ class FormAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String description;
 
   const FormAppBar({
-    Key? key,
+    super.key,
     required this.toEditTransaction,
     required this.isChildTransaction,
     required this.isNewTransaction,
     required this.isParentTransaction,
     required this.isFormValid,
     required this.description,
-  }) : super(key: key);
+  });
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);

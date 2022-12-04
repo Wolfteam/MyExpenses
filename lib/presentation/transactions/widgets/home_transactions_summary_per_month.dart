@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:month_picker_dialog/month_picker_dialog.dart';
+import 'package:month_picker_dialog_2/month_picker_dialog_2.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/generated/l10n.dart';
@@ -179,16 +179,16 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
 
   Future _changeCurrentDate(BuildContext context) async {
     final now = DateTime.now();
-    final selectedDate = await showMonthPicker(
+    await showMonthPicker(
       context: context,
       initialDate: currentDate,
       lastDate: DateTime(now.year + 1),
       locale: locale,
-    );
-
-    if (selectedDate == null) {
-      return;
-    }
-    context.read<TransactionsBloc>().add(TransactionsEvent.loadTransactions(inThisDate: selectedDate));
+    ).then((selectedDate) {
+      if (selectedDate == null) {
+        return;
+      }
+      context.read<TransactionsBloc>().add(TransactionsEvent.loadTransactions(inThisDate: selectedDate));
+    });
   }
 }

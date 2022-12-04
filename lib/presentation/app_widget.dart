@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:my_expenses/application/app/app_bloc.dart';
+import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/main/main_page.dart';
@@ -73,14 +74,10 @@ class _AppWidgetState extends State<AppWidget> {
           );
         },
         loading: (state) {
-          final theme = state.accentColor != null && state.theme != null ? state.accentColor!.getThemeData(state.theme!) : null;
-          if (state.theme == null) {
-            context.read<AppBloc>().add(const AppEvent.loadTheme());
-          }
-
           return MaterialApp(
             home: SplashScreen(),
-            theme: theme,
+            theme: AppAccentColorType.orange.getThemeData(AppThemeType.dark),
+            themeMode: ThemeMode.dark,
             localizationsDelegates: delegates,
             supportedLocales: S.delegate.supportedLocales,
             scrollBehavior: MyCustomScrollBehavior(),

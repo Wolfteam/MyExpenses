@@ -105,7 +105,7 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
 class _TabBar extends StatelessWidget implements PreferredSizeWidget {
   final TabController tabController;
 
-  const _TabBar({Key? key, required this.tabController}) : super(key: key);
+  const _TabBar({required this.tabController});
 
   @override
   Widget build(BuildContext context) {
@@ -132,11 +132,10 @@ class _TabBarView extends StatelessWidget {
   final TabController tabController;
 
   const _TabBarView({
-    Key? key,
     required this.tabController,
     required this.isInSelectionMode,
     required this.selectedCategory,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

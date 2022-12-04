@@ -1,6 +1,5 @@
 import 'dart:isolate';
 
-import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/models/models.dart';
 
 abstract class BackgroundService {

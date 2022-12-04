@@ -19,7 +19,7 @@ class FormDateButton extends StatefulWidget {
   final DateTime lastDate;
 
   const FormDateButton({
-    Key? key,
+    super.key,
     required this.isChildTransaction,
     required this.repetitionCycle,
     required this.transactionDate,
@@ -28,7 +28,7 @@ class FormDateButton extends StatefulWidget {
     required this.language,
     required this.firstDate,
     required this.lastDate,
-  }) : super(key: key);
+  });
 
   @override
   State<FormDateButton> createState() => _FormDateButtonState();

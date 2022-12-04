@@ -15,12 +15,12 @@ class CategoryHeader extends StatelessWidget {
   final Color iconColor;
 
   const CategoryHeader({
-    Key? key,
+    super.key,
     required this.name,
     required this.type,
     required this.iconData,
     required this.iconColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -138,13 +138,13 @@ class CategoryHeader extends StatelessWidget {
     final currentIcon = CategoryUtils.getByIconData(iconData);
     context.read<CategoryIconBloc>().add(CategoryIconEvent.selectionChanged(selectedIcon: currentIcon));
 
-    final selectedIcon = await Navigator.of(context).push(route);
+    await Navigator.of(context).push(route).then((selectedIcon) {
+      if (selectedIcon == null) {
+        return;
+      }
 
-    if (selectedIcon == null) {
-      return;
-    }
-
-    _iconChanged(context, selectedIcon.icon.icon!);
+      _iconChanged(context, selectedIcon.icon.icon!);
+    });
   }
 
   void _iconChanged(BuildContext context, IconData icon) => context.read<CategoryFormBloc>().add(CategoryFormEvent.iconChanged(selectedIcon: icon));

@@ -22,14 +22,14 @@ class OtherSettingsCard extends StatelessWidget {
   final bool showNotificationForRecurringTrans;
 
   const OtherSettingsCard({
-    Key? key,
+    super.key,
     required this.currencySymbolType,
     required this.currencyToTheRight,
     required this.askForPassword,
     required this.canUseFingerPrint,
     required this.askForFingerPrint,
     required this.showNotificationForRecurringTrans,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -93,19 +93,18 @@ class OtherSettingsCard extends StatelessWidget {
       return;
     }
 
-    final result = await showModalBottomSheet<bool>(
+    await showModalBottomSheet<bool>(
       context: context,
       shape: Styles.modalBottomSheetShape,
-      isDismissible: true,
       isScrollControlled: true,
       builder: (ctx) => const PasswordBottomSheet(),
-    );
+    ).then((result) {
+      if (result == null) {
+        return;
+      }
 
-    if (result == null) {
-      return;
-    }
-
-    context.read<SettingsBloc>().add(SettingsEvent.askForPasswordChanged(ask: result));
+      context.read<SettingsBloc>().add(SettingsEvent.askForPasswordChanged(ask: result));
+    });
   }
 
   void _showNotificationForRecurringTransChanged(bool newValue, BuildContext context) =>
@@ -125,7 +124,7 @@ class OtherSettingsCard extends StatelessWidget {
 class _CurrencyItem extends StatelessWidget {
   final CurrencySymbolType value;
 
-  const _CurrencyItem({Key? key, required this.value}) : super(key: key);
+  const _CurrencyItem({required this.value});
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,5 @@
 import 'package:drift/drift.dart';
-
-import 'base_entity.dart';
+import 'package:my_expenses/domain/models/entities/base_entity.dart';
 
 class Users extends BaseEntity {
   TextColumn get googleUserId => text()();

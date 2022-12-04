@@ -25,13 +25,13 @@ class FormRepetitionCycleDropDown extends StatelessWidget {
   final DateTime transactionDate;
 
   const FormRepetitionCycleDropDown({
-    Key? key,
+    super.key,
     required this.isChildTransaction,
     required this.isParentTransaction,
     required this.repetitionCycle,
     required this.language,
     required this.transactionDate,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

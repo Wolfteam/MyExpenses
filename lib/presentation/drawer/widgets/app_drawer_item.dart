@@ -14,10 +14,10 @@ class AppDrawerItem extends StatelessWidget {
   final bool isSelected;
 
   const AppDrawerItem({
-    Key? key,
+    super.key,
     required this.type,
     required this.isSelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -245,19 +245,13 @@ CategoriesCompanion _buildCategory(
     localStatus: LocalStatusType.nothing,
     name: name,
     isAnIncome: isAnIncome,
-    icon: icon,
+    icon: Value(icon),
     iconColor: color,
     createdBy: createdBy,
     createdAt: now,
-    createdHash: createdHash([
-      name,
-      isAnIncome,
-      const IconDataConverter().mapToSql(icon)!,
-      const ColorConverter().mapToSql(color),
-      createdBy,
-      now,
-      LocalStatusType.nothing
-    ]),
+    createdHash: createdHash(
+      [name, isAnIncome, const IconDataConverter().toSql(icon)!, const ColorConverter().toSql(color), createdBy, now, LocalStatusType.nothing],
+    ),
   );
 }
 

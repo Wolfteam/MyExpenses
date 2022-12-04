@@ -11,7 +11,7 @@ import 'package:my_expenses/domain/models/models.dart';
 class MonthlyBarChart extends StatelessWidget {
   final List<TransactionsSummaryPerDate> transactionsPerDate;
 
-  const MonthlyBarChart({Key? key, required this.transactionsPerDate}) : super(key: key);
+  const MonthlyBarChart({super.key, required this.transactionsPerDate});
 
   @override
   Widget build(BuildContext context) {

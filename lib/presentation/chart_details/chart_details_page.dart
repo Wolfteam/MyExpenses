@@ -45,10 +45,9 @@ class _Body extends StatelessWidget {
   final List<ChartTransactionItem> chartData;
 
   const _Body({
-    Key? key,
     required this.onlyIncomes,
     required this.chartData,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

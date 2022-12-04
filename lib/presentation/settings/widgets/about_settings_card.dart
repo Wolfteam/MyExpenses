@@ -10,7 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class AboutSettingsCard extends StatelessWidget {
   final String appVersion;
-  const AboutSettingsCard({Key? key, required this.appVersion}) : super(key: key);
+  const AboutSettingsCard({super.key, required this.appVersion});
 
   @override
   Widget build(BuildContext context) {
@@ -78,8 +78,9 @@ class AboutSettingsCard extends StatelessWidget {
   }
 
   Future<void> _launchUrl(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
 }

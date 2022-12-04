@@ -13,12 +13,12 @@ class AppDrawerHeader extends StatelessWidget {
   final String? email;
 
   const AppDrawerHeader({
-    Key? key,
+    super.key,
     required this.isUserSignedIn,
     this.image,
     this.fullName,
     this.email,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

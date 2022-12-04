@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:local_auth/auth_strings.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:local_auth_android/types/auth_messages_android.dart';
+import 'package:local_auth_platform_interface/types/auth_messages.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/generated/l10n.dart';
@@ -23,7 +24,7 @@ class SplashScreen extends StatelessWidget {
 }
 
 class _Body extends StatefulWidget {
-  const _Body({Key? key}) : super(key: key);
+  const _Body();
 
   @override
   _BodyState createState() => _BodyState();
@@ -47,7 +48,7 @@ class _BodyState extends State<_Body> {
           },
         );
       },
-      child: Container(
+      child: ColoredBox(
         color: Colors.orange,
         child: Center(
           child: Column(
@@ -81,18 +82,20 @@ class _BodyState extends State<_Body> {
     final localAuth = LocalAuthentication();
     try {
       final isAuthenticated = await localAuth.authenticate(
-        biometricOnly: true,
         localizedReason: i18n.fingerprintRequired,
-        androidAuthStrings: AndroidAuthMessages(
-          biometricHint: i18n.fingerprintHint,
-          biometricNotRecognized: i18n.fingerprintNotRecognized,
-          biometricSuccess: i18n.fingerprintSuccess,
-          cancelButton: i18n.cancel,
-          signInTitle: i18n.signInTitle,
-          biometricRequiredTitle: i18n.fingerprintRequired,
-          goToSettingsButton: i18n.goToSettings,
-          goToSettingsDescription: i18n.goToSettingDescription,
-        ),
+        options: const AuthenticationOptions(biometricOnly: true),
+        authMessages: <AuthMessages>[
+          AndroidAuthMessages(
+            biometricHint: i18n.fingerprintHint,
+            biometricNotRecognized: i18n.fingerprintNotRecognized,
+            biometricSuccess: i18n.fingerprintSuccess,
+            cancelButton: i18n.cancel,
+            signInTitle: i18n.signInTitle,
+            biometricRequiredTitle: i18n.fingerprintRequired,
+            goToSettingsButton: i18n.goToSettings,
+            goToSettingsDescription: i18n.goToSettingDescription,
+          ),
+        ],
       );
       _handleAuthenticationResult(isAuthenticated, translations);
     } catch (e) {

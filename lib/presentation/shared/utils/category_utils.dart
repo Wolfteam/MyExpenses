@@ -1115,7 +1115,7 @@ class CategoryUtils {
   }
 
   static IconData fromJSONString(String jsonString) {
-    final map = jsonDecode(jsonString);
+    final map = jsonDecode(jsonString) as Map<String, dynamic>;
     final iconData = IconData(
       map['codePoint'] as int,
       fontFamily: map['fontFamily'] as String?,

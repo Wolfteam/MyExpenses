@@ -1,4 +1,4 @@
-import 'package:collection/src/iterable_extensions.dart';
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/extensions/string_extensions.dart';
@@ -14,7 +14,7 @@ part 'transactions_dao_impl.g.dart';
 
 @DriftAccessor(tables: [Transactions, Categories])
 class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$TransactionsDaoImplMixin implements TransactionsDao {
-  TransactionsDaoImpl(AppDatabase db) : super(db);
+  TransactionsDaoImpl(super.db);
 
   @override
   Future<List<TransactionItem>> getAllTransactions(
@@ -529,7 +529,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
     final cats = await (select(categories)..where((c) => c.createdHash.isIn(updatedCatsHash))).get();
 
     final parentsHash =
-        existingTransToUse.where((t) => t.parentTransactionCreatedHash != null).map((t) => t.parentTransactionCreatedHash).toSet().toList();
+        existingTransToUse.where((t) => t.parentTransactionCreatedHash != null).map((t) => t.parentTransactionCreatedHash!).toSet().toList();
 
     final parents = await (select(transactions)..where((t) => t.createdHash.isIn(parentsHash))).get();
 
@@ -760,7 +760,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
 
     int? parentId;
     if (transaction.parentTransactionCreatedHash != null) {
-      final parent = await (select(transactions)..where((t) => t.createdHash.equals(transaction.parentTransactionCreatedHash))).getSingle();
+      final parent = await (select(transactions)..where((t) => t.createdHash.equals(transaction.parentTransactionCreatedHash!))).getSingle();
       parentId = parent.id;
     }
     return TransactionsCompanion.insert(

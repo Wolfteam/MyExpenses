@@ -3,14 +3,13 @@ import 'dart:collection';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as image_lib;
 import 'package:my_expenses/domain/models/models.dart';
+import 'package:my_expenses/presentation/reports/pdf_footer.dart';
+import 'package:my_expenses/presentation/reports/pdf_header.dart';
+import 'package:my_expenses/presentation/reports/pdf_summary.dart';
+import 'package:my_expenses/presentation/reports/pdf_transaction_table.dart';
 import 'package:my_expenses/presentation/shared/custom_assets.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
-
-import 'pdf_footer.dart';
-import 'pdf_header.dart';
-import 'pdf_summary.dart';
-import 'pdf_transaction_table.dart';
 
 Future<Document> buildPdf(
   String Function(double) formatter,

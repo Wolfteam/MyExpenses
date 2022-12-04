@@ -27,7 +27,7 @@ class EstimateBottomSheetDialog extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  const _Body({Key? key}) : super(key: key);
+  const _Body();
 
   @override
   Widget build(BuildContext context) {
@@ -51,13 +51,13 @@ class _Body extends StatelessWidget {
             ),
             Text('${i18n.startDate}:'),
             TextButton(
-              style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap, primary: textColor),
+              style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap, foregroundColor: textColor),
               onPressed: () => _changeDate(context, s.fromDate, s.currentLanguage, true),
               child: Align(alignment: Alignment.centerLeft, child: Text(s.fromDateString)),
             ),
             Text('${i18n.untilDate}:'),
             TextButton(
-              style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap, primary: textColor),
+              style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap, foregroundColor: textColor),
               onPressed: () => _changeDate(context, s.untilDate, s.currentLanguage, false),
               child: Align(alignment: Alignment.centerLeft, child: Text(s.untilDateString)),
             ),
@@ -86,23 +86,23 @@ class _Body extends StatelessWidget {
 
   Future<void> _changeDate(BuildContext context, DateTime initialDate, AppLanguageType language, bool isFromDate) async {
     final now = DateTime.now();
-    final selectedDate = await showDatePicker(
+    await showDatePicker(
       context: context,
       locale: currentLocale(language),
       firstDate: DateTime(now.year - 1),
       initialDate: initialDate,
       lastDate: DateTime(now.year + 1),
-    );
-
-    if (selectedDate == null) {
-      return;
-    }
-    if (isFromDate) {
-      context.read<EstimatesBloc>().add(EstimatesEvent.fromDateChanged(newDate: selectedDate));
-    } else {
-      context.read<EstimatesBloc>().add(EstimatesEvent.untilDateChanged(newDate: selectedDate));
-    }
-    context.read<EstimatesBloc>().add(EstimatesEvent.calculate());
+    ).then((selectedDate) {
+      if (selectedDate == null) {
+        return;
+      }
+      if (isFromDate) {
+        context.read<EstimatesBloc>().add(EstimatesEvent.fromDateChanged(newDate: selectedDate));
+      } else {
+        context.read<EstimatesBloc>().add(EstimatesEvent.untilDateChanged(newDate: selectedDate));
+      }
+      context.read<EstimatesBloc>().add(EstimatesEvent.calculate());
+    });
   }
 
   List<bool> _getSelectedButtons(int selectedTransactionType) {

@@ -4,10 +4,10 @@ class SettingsCardTitleText extends StatelessWidget {
   final String text;
   final Icon icon;
   const SettingsCardTitleText({
-    Key? key,
+    super.key,
     required this.text,
     required this.icon,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

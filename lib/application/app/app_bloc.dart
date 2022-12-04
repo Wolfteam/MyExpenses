@@ -52,7 +52,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         bgTaskIsRunning: e.isRunning,
       ),
       languageChanged: (e) async => _loadThemeData(_settingsService.appTheme, _settingsService.accentColor, e.newValue),
-      loadTheme: (e) async => AppState.loading(theme: _settingsService.appTheme, accentColor: _settingsService.accentColor),
       registerRecurringBackgroundTask: (e) async {
         await _registerRecurringBackgroundTask(e.translations);
         return state;

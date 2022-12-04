@@ -9,10 +9,10 @@ class ColorPickerDialog extends StatefulWidget {
   final OnColorSelected? onColorSelected;
 
   const ColorPickerDialog({
-    Key? key,
+    super.key,
     required this.iconColor,
     this.onColorSelected,
-  }) : super(key: key);
+  });
 
   @override
   State<ColorPickerDialog> createState() => _ColorPickerDialogState();

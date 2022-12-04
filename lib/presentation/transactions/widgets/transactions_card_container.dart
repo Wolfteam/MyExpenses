@@ -10,9 +10,9 @@ class TransactionsCardContainer extends StatelessWidget {
   final models.TransactionCardItems model;
 
   const TransactionsCardContainer({
-    Key? key,
+    super.key,
     required this.model,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

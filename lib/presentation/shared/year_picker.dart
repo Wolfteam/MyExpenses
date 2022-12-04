@@ -19,7 +19,7 @@ class _YearPickerDialog extends StatefulWidget {
   final DateTime firstDate;
   final DateTime lastDate;
 
-  const _YearPickerDialog({Key? key, required this.selectedDate, required this.firstDate, required this.lastDate}) : super(key: key);
+  const _YearPickerDialog({required this.selectedDate, required this.firstDate, required this.lastDate});
 
   @override
   _YearPickerDialogState createState() => _YearPickerDialogState();
@@ -84,7 +84,6 @@ class _YearPicker extends StatefulWidget {
   /// Rarely used directly. Instead, typically used as part of the dialog shown
   /// by [showDatePicker].
   _YearPicker({
-    Key? key,
     required this.selectedDate,
     required this.onChanged,
     required this.firstDate,
@@ -92,8 +91,7 @@ class _YearPicker extends StatefulWidget {
     this.fontFamily,
     this.dragStartBehavior = DragStartBehavior.start,
     this.style,
-  })  : assert(!firstDate.isAfter(lastDate)),
-        super(key: key);
+  }) : assert(!firstDate.isAfter(lastDate));
 
   /// The currently selected date.
   ///

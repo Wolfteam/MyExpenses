@@ -1,6 +1,5 @@
 import 'package:drift/drift.dart';
-
-import 'converters/local_status_converter.dart';
+import 'package:my_expenses/domain/models/entities/converters/local_status_converter.dart';
 
 class BaseEntity extends Table {
   // autoIncrement automatically sets this to be the primary key

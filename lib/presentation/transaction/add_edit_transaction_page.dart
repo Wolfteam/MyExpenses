@@ -327,7 +327,7 @@ class AddEditTransactionHeader extends StatelessWidget {
   final OnCategoryChanged onCategoryChanged;
 
   const AddEditTransactionHeader({
-    Key? key,
+    super.key,
     required this.isParentTransaction,
     this.nextRecurringDate,
     required this.isRecurringTransactionRunning,
@@ -338,7 +338,7 @@ class AddEditTransactionHeader extends StatelessWidget {
     required this.isChildTransaction,
     required this.category,
     required this.onCategoryChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -517,9 +517,8 @@ class _RecurringSwitch extends StatelessWidget {
   final bool isRecurringTransactionRunning;
 
   const _RecurringSwitch({
-    Key? key,
     required this.isRecurringTransactionRunning,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -566,14 +565,13 @@ class _AmountInput extends StatelessWidget {
   final OnInputSubmit onSubmit;
 
   const _AmountInput({
-    Key? key,
     required this.amountController,
     required this.amountFocus,
     required this.isChildTransaction,
     required this.isAmountValid,
     required this.isAmountDirty,
     required this.onSubmit,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -623,14 +621,13 @@ class _DescriptionInput extends StatelessWidget {
   final OnInputSubmit onSubmit;
 
   const _DescriptionInput({
-    Key? key,
     required this.descriptionController,
     required this.descriptionFocus,
     required this.isChildTransaction,
     required this.isDescriptionDirty,
     required this.isDescriptionValid,
     required this.onSubmit,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -677,14 +674,13 @@ class _LongDescriptionInput extends StatelessWidget {
   final OnInputSubmit onSubmit;
 
   const _LongDescriptionInput({
-    Key? key,
     required this.longDescriptionController,
     required this.longDescriptionFocus,
     required this.isChildTransaction,
     required this.isLongDescriptionDirty,
     required this.isLongDescriptionValid,
     required this.onSubmit,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

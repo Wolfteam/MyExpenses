@@ -8,19 +8,17 @@ import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/isolate.dart';
 import 'package:drift/native.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart' show Color, IconData;
 import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/models/entities.dart';
 import 'package:my_expenses/domain/models/entities/converters/db_converters.dart';
 import 'package:my_expenses/domain/utils/db_seed_util.dart';
+import 'package:my_expenses/infrastructure/db/categories_dao_impl.dart';
+import 'package:my_expenses/infrastructure/db/transactions_dao_impl.dart';
 import 'package:my_expenses/infrastructure/db/users_dao_impl.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/open.dart';
-
-import 'categories_dao_impl.dart';
-import 'transactions_dao_impl.dart';
 
 part 'database.g.dart';
 
@@ -106,7 +104,7 @@ void _startBackground(_IsolateStartRequest request) {
   // background isolate. If we used MoorIsolate.spawn, a third isolate would be
   // started which is not what we want!
   final moorIsolate = DriftIsolate.inCurrent(
-    () => DatabaseConnection.fromExecutor(executor),
+    () => DatabaseConnection(executor),
   );
   // inform the starting isolate about this, so that it can call .connect()
   request.sendMoorIsolate.send(moorIsolate);
@@ -138,7 +136,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   // this constructor is used by the isolates
-  AppDatabase.connect(DatabaseConnection connection) : super.connect(connection);
+  AppDatabase.connect(super.connection) : super.connect();
 
   @override
   int get schemaVersion => 2;

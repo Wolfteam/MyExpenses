@@ -11,7 +11,7 @@ part 'categories_dao_impl.g.dart';
 
 @DriftAccessor(tables: [Categories, Transactions])
 class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesDaoImplMixin implements CategoriesDao {
-  CategoriesDaoImpl(AppDatabase db) : super(db);
+  CategoriesDaoImpl(super.db);
 
   @override
   Future<List<CategoryItem>> getAll(int? userId) {
@@ -89,7 +89,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
         CategoriesCompanion.insert(
           localStatus: LocalStatusType.created,
           userId: Value(userId),
-          icon: category.icon!,
+          icon: Value(category.icon),
           iconColor: category.iconColor!,
           isAnIncome: category.isAnIncome,
           name: category.name,
@@ -100,8 +100,8 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
             now,
             createdBy,
             category.isAnIncome,
-            const ColorConverter().mapToSql(category.iconColor),
-            const IconDataConverter().mapToSql(category.icon) ?? '',
+            const ColorConverter().toSql(category.iconColor),
+            const IconDataConverter().toSql(category.icon) ?? '',
           ]),
         ),
       );
@@ -110,7 +110,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
       final currentCat = await (select(categories)..where((c) => c.id.equals(id))).getSingle();
 
       final updatedFields = CategoriesCompanion(
-        icon: Value(category.icon!),
+        icon: Value(category.icon),
         iconColor: Value(category.iconColor!),
         isAnIncome: Value(category.isAnIncome),
         name: Value(category.name),
@@ -193,8 +193,8 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
             createdAt: row.createdAt,
             createdBy: row.createdBy,
             createdHash: row.createdHash,
-            icon: const IconDataConverter().mapToSql(row.icon)!,
-            iconColor: const ColorConverter().mapToSql(row.iconColor),
+            icon: const IconDataConverter().toSql(row.icon)!,
+            iconColor: const ColorConverter().toSql(row.iconColor),
             isAnIncome: row.isAnIncome,
             name: row.name,
             updatedAt: row.updatedAt,
@@ -251,8 +251,8 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
             createdAt: c.createdAt,
             createdBy: c.createdBy,
             createdHash: c.createdHash,
-            icon: const IconDataConverter().mapToDart(c.icon)!,
-            iconColor: const ColorConverter().mapToDart(c.iconColor),
+            icon: Value(const IconDataConverter().fromSql(c.icon)),
+            iconColor: const ColorConverter().fromSql(c.iconColor),
             isAnIncome: c.isAnIncome,
             name: c.name,
             updatedAt: Value(c.updatedAt),
@@ -301,9 +301,9 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
           categories,
           CategoriesCompanion(
             localStatus: const Value(LocalStatusType.nothing),
-            icon: Value(const IconDataConverter().mapToDart(updatedCat.icon)!),
+            icon: Value(const IconDataConverter().fromSql(updatedCat.icon)),
             iconColor: Value(
-              const ColorConverter().mapToDart(updatedCat.iconColor),
+              const ColorConverter().fromSql(updatedCat.iconColor),
             ),
             isAnIncome: Value(updatedCat.isAnIncome),
             name: Value(updatedCat.name),

@@ -9,11 +9,11 @@ class SearchBoxCard extends StatelessWidget {
   final TextEditingController controller;
 
   const SearchBoxCard({
-    Key? key,
+    super.key,
     required this.showCleanButton,
     required this.focusNode,
     required this.controller,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -12,7 +12,7 @@ class CommonDropdownButton<T> extends StatelessWidget {
   final DropdownButtonBuilder? selectedItemBuilder;
 
   const CommonDropdownButton({
-    Key? key,
+    super.key,
     required this.hint,
     required this.currentValue,
     required this.values,
@@ -21,7 +21,7 @@ class CommonDropdownButton<T> extends StatelessWidget {
     this.withoutUnderLine = true,
     this.isDense = false,
     this.selectedItemBuilder,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

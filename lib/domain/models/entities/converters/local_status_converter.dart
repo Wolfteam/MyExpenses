@@ -5,12 +5,12 @@ class LocalStatusConverter extends TypeConverter<LocalStatusType, int> {
   const LocalStatusConverter();
 
   @override
-  LocalStatusType? mapToDart(int? fromDb) {
-    return LocalStatusType.values[fromDb!];
+  LocalStatusType fromSql(int fromDb) {
+    return LocalStatusType.values[fromDb];
   }
 
   @override
-  int? mapToSql(LocalStatusType? value) {
-    return value!.index;
+  int toSql(LocalStatusType value) {
+    return value.index;
   }
 }

@@ -16,10 +16,10 @@ class MobileScaffold extends StatefulWidget {
   final TabController tabController;
 
   const MobileScaffold({
-    Key? key,
+    super.key,
     required this.defaultIndex,
     required this.tabController,
-  }) : super(key: key);
+  });
 
   @override
   State<MobileScaffold> createState() => _MobileScaffoldState();

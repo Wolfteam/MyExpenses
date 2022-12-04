@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:my_expenses/domain/models/transaction_item.dart';
 import 'package:my_expenses/domain/utils/transaction_utils.dart';
-
-import 'transaction_item.dart';
 
 part 'transaction_card_items.freezed.dart';
 

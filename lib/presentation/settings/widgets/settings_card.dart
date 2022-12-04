@@ -4,7 +4,7 @@ import 'package:my_expenses/presentation/shared/styles.dart';
 class SettingsCard extends StatelessWidget {
   final Widget child;
 
-  const SettingsCard({Key? key, required this.child}) : super(key: key);
+  const SettingsCard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

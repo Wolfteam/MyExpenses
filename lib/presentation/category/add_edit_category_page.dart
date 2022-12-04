@@ -14,9 +14,9 @@ class AddEditCategoryPage extends StatelessWidget {
   final models.CategoryItem? category;
 
   const AddEditCategoryPage({
-    Key? key,
+    super.key,
     this.category,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class AddEditCategoryPage extends StatelessWidget {
 }
 
 class _Scaffold extends StatelessWidget {
-  const _Scaffold({Key? key}) : super(key: key);
+  const _Scaffold();
 
   @override
   Widget build(BuildContext context) {
@@ -103,11 +103,10 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isFormValid;
 
   const _AppBar({
-    Key? key,
     required this.name,
     required this.isNewCategory,
     required this.isFormValid,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

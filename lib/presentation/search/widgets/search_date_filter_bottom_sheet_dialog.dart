@@ -36,7 +36,7 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
                 ModalSheetTitle(title: i18n.filterByX(i18n.date.toLowerCase())),
                 Text('${i18n.startDate}:'),
                 TextButton(
-                  style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap, primary: textColor),
+                  style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap, foregroundColor: textColor),
                   onPressed: () => _changeDate(context, state.tempFrom ?? now, state.currentLanguage, true),
                   child: Align(
                     alignment: Alignment.centerLeft,
@@ -45,7 +45,7 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
                 ),
                 Text('${i18n.untilDate}:'),
                 TextButton(
-                  style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap, primary: textColor),
+                  style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap, foregroundColor: textColor),
                   onPressed: () => _changeDate(context, state.tempUntil ?? now, state.currentLanguage, false),
                   child: Align(
                     alignment: Alignment.centerLeft,
@@ -80,22 +80,22 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
 
   Future<void> _changeDate(BuildContext context, DateTime initialDate, AppLanguageType language, bool isFromDate) async {
     final now = DateTime.now();
-    final selectedDate = await showDatePicker(
+    await showDatePicker(
       context: context,
       locale: currentLocale(language),
       firstDate: DateTime(now.year - 1),
       initialDate: initialDate,
       lastDate: DateTime(now.year + 1),
-    );
-
-    if (selectedDate == null) {
-      return;
-    }
-    if (isFromDate) {
-      context.read<SearchBloc>().add(SearchEvent.tempFromDateChanged(newValue: selectedDate));
-    } else {
-      context.read<SearchBloc>().add(SearchEvent.tempToDateChanged(newValue: selectedDate));
-    }
+    ).then((selectedDate) {
+      if (selectedDate == null) {
+        return;
+      }
+      if (isFromDate) {
+        context.read<SearchBloc>().add(SearchEvent.tempFromDateChanged(newValue: selectedDate));
+      } else {
+        context.read<SearchBloc>().add(SearchEvent.tempToDateChanged(newValue: selectedDate));
+      }
+    });
   }
 
   void _closeModal(BuildContext context) {

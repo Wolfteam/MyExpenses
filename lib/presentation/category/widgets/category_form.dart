@@ -15,22 +15,21 @@ class CategoryForm extends StatelessWidget {
   final Color iconColor;
 
   const CategoryForm.create({
-    Key? key,
+    super.key,
     required this.type,
     required this.iconData,
     required this.iconColor,
   })  : id = 0,
-        name = '',
-        super(key: key);
+        name = '';
 
   const CategoryForm.edit({
-    Key? key,
+    super.key,
     required this.id,
     required this.name,
     required this.type,
     required this.iconData,
     required this.iconColor,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +43,10 @@ class CategoryForm extends StatelessWidget {
             Row(
               children: <Widget>[
                 Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    shape: BoxShape.circle,
+                  ),
                   margin: const EdgeInsets.only(right: 10),
                   child: IconButton(
                     splashRadius: 28,
@@ -106,7 +109,7 @@ class CategoryForm extends StatelessWidget {
 class _NameInput extends StatefulWidget {
   final String name;
 
-  const _NameInput({Key? key, required this.name}) : super(key: key);
+  const _NameInput({required this.name});
 
   @override
   State<_NameInput> createState() => _NameInputState();

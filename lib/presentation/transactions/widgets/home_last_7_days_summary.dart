@@ -69,7 +69,7 @@ class HomeLast7DaysSummary extends StatelessWidget {
   }
 
   void _onSelectedTypeChanged(BuildContext context, TransactionType newValue) =>
-      context.read<TransactionsLast7DaysBloc>().add(TransactionsLast7DaysEvent.typeChanged(selectedType: newValue));
+      context.read<TransactionsLast7DaysBloc>().add(TransactionsLast7DaysEvent.typeChanged(newValue: newValue));
 }
 
 class _BarChart extends StatelessWidget {
@@ -77,10 +77,9 @@ class _BarChart extends StatelessWidget {
   final List<TransactionsSummaryPerDay> data;
 
   const _BarChart({
-    Key? key,
     required this.incomesIsChecked,
     required this.data,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

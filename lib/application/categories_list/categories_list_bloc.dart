@@ -100,10 +100,10 @@ abstract class _CategoriesListBloc extends Bloc<CategoriesListEvent, CategoriesL
 
 class IncomesCategoriesBloc extends _CategoriesListBloc {
   IncomesCategoriesBloc(
-    LoggingService logger,
-    CategoriesDao categoriesDao,
-    UsersDao usersDao,
-  ) : super(logger, categoriesDao, usersDao);
+    super.logger,
+    super.categoriesDao,
+    super.usersDao,
+  );
 
   @override
   CategoriesListState buildCategoriesLoadedState(List<CategoryItem> categories) {
@@ -113,10 +113,10 @@ class IncomesCategoriesBloc extends _CategoriesListBloc {
 
 class ExpensesCategoriesBloc extends _CategoriesListBloc {
   ExpensesCategoriesBloc(
-    LoggingService logger,
-    CategoriesDao categoriesDao,
-    UsersDao usersDao,
-  ) : super(logger, categoriesDao, usersDao);
+    super.logger,
+    super.categoriesDao,
+    super.usersDao,
+  );
 
   @override
   CategoriesListState buildCategoriesLoadedState(List<CategoryItem> categories) {
