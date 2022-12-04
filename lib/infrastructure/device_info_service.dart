@@ -56,6 +56,10 @@ class DeviceInfoServiceImpl implements DeviceInfoService {
       if (Platform.isWindows) {
         await _initForWindows();
       }
+
+      if (Platform.isIOS) {
+        await _initForIOS();
+      }
     } catch (ex) {
       _deviceInfo = {
         'Model': _na,
@@ -88,6 +92,20 @@ class DeviceInfoServiceImpl implements DeviceInfoService {
     _deviceInfo = {
       'Model': info.model,
       'OsVersion': '${info.version.sdkInt}',
+      'AppVersion': _version,
+    };
+  }
+
+  Future<void> _initForIOS() async {
+    final deviceInfo = DeviceInfoPlugin();
+    final info = await deviceInfo.iosInfo;
+    final localAuth = LocalAuthentication();
+    final availableBiometrics = await localAuth.getAvailableBiometrics();
+    final canCheckBiometrics = await localAuth.canCheckBiometrics && await localAuth.isDeviceSupported();
+    _canUseFingerPrint = canCheckBiometrics && availableBiometrics.contains(BiometricType.fingerprint);
+    _deviceInfo = {
+      'Model': info.model ?? _na,
+      'OsVersion': info.systemVersion ?? _na,
       'AppVersion': _version,
     };
   }

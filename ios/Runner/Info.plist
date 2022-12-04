@@ -63,5 +63,9 @@
 	<false/>
 	<key>CFBundleDisplayName</key>
 	<string>MyExpenses</string>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>NSFaceIDUsageDescription</key>
+    <string>To lock app access to unauthenticated users</string>
 </dict>
 </plist>

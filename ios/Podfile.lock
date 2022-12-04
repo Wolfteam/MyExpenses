@@ -12,54 +12,51 @@ PODS:
     - Flutter
   - flutter_native_timezone (0.0.1):
     - Flutter
-  - flutter_secure_storage (3.3.1):
+  - flutter_secure_storage (6.0.0):
     - Flutter
   - fluttertoast (0.0.2):
     - Flutter
     - Toast
   - google_sign_in_ios (0.0.1):
     - Flutter
-    - GoogleSignIn (~> 5.0)
-  - GoogleSignIn (5.0.2):
-    - AppAuth (~> 1.2)
-    - GTMAppAuth (~> 1.0)
-    - GTMSessionFetcher/Core (~> 1.1)
+    - GoogleSignIn (~> 6.2)
+  - GoogleSignIn (6.2.4):
+    - AppAuth (~> 1.5)
+    - GTMAppAuth (~> 1.3)
+    - GTMSessionFetcher/Core (< 3.0, >= 1.1)
   - GTMAppAuth (1.3.1):
     - AppAuth/Core (~> 1.6)
     - GTMSessionFetcher/Core (< 3.0, >= 1.5)
-  - GTMSessionFetcher/Core (1.7.2)
+  - GTMSessionFetcher/Core (2.3.0)
   - image_picker_ios (0.0.1):
     - Flutter
-  - local_auth (0.0.1):
+  - local_auth_ios (0.0.1):
     - Flutter
-  - open_file (0.0.1):
+  - open_filex (0.0.2):
     - Flutter
   - package_info_plus (0.4.5):
     - Flutter
   - path_provider_ios (0.0.1):
     - Flutter
-  - permission_handler_apple (9.0.2):
+  - permission_handler_apple (9.0.4):
     - Flutter
-  - rate_my_app (1.1.2):
+  - rate_my_app (1.1.3):
     - Flutter
   - shared_preferences_ios (0.0.1):
     - Flutter
-  - sqlite3 (3.38.5):
-    - sqlite3/common (= 3.38.5)
-  - sqlite3/common (3.38.5)
-  - sqlite3/fts5 (3.38.5):
+  - sqlite3 (3.40.0):
+    - sqlite3/common (= 3.40.0)
+  - sqlite3/common (3.40.0)
+  - sqlite3/fts5 (3.40.0):
     - sqlite3/common
-  - sqlite3/json1 (3.38.5):
+  - sqlite3/perf-threadsafe (3.40.0):
     - sqlite3/common
-  - sqlite3/perf-threadsafe (3.38.5):
-    - sqlite3/common
-  - sqlite3/rtree (3.38.5):
+  - sqlite3/rtree (3.40.0):
     - sqlite3/common
   - sqlite3_flutter_libs (0.0.1):
     - Flutter
-    - sqlite3 (~> 3.38.0)
+    - sqlite3 (~> 3.40.0)
     - sqlite3/fts5
-    - sqlite3/json1
     - sqlite3/perf-threadsafe
     - sqlite3/rtree
   - Toast (4.0.0)
@@ -77,8 +74,8 @@ DEPENDENCIES:
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - google_sign_in_ios (from `.symlinks/plugins/google_sign_in_ios/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
-  - local_auth (from `.symlinks/plugins/local_auth/ios`)
-  - open_file (from `.symlinks/plugins/open_file/ios`)
+  - local_auth_ios (from `.symlinks/plugins/local_auth_ios/ios`)
+  - open_filex (from `.symlinks/plugins/open_filex/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_ios (from `.symlinks/plugins/path_provider_ios/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
@@ -114,10 +111,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/google_sign_in_ios/ios"
   image_picker_ios:
     :path: ".symlinks/plugins/image_picker_ios/ios"
-  local_auth:
-    :path: ".symlinks/plugins/local_auth/ios"
-  open_file:
-    :path: ".symlinks/plugins/open_file/ios"
+  local_auth_ios:
+    :path: ".symlinks/plugins/local_auth_ios/ios"
+  open_filex:
+    :path: ".symlinks/plugins/open_filex/ios"
   package_info_plus:
     :path: ".symlinks/plugins/package_info_plus/ios"
   path_provider_ios:
@@ -138,25 +135,25 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   AppAuth: 8fca6b5563a5baef2c04bee27538025e4ceb2add
   device_info_plus: e5c5da33f982a436e103237c0c85f9031142abed
-  Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
   flutter_native_timezone: 5f05b2de06c9776b4cc70e1839f03de178394d22
-  flutter_secure_storage: 7953c38a04c3fdbb00571bcd87d8e3b5ceb9daec
-  fluttertoast: 16fbe6039d06a763f3533670197d01fc73459037
-  google_sign_in_ios: ed71c0dbddfba8b1ea9aa210dbda695f46bf51bd
-  GoogleSignIn: 7137d297ddc022a7e0aa4619c86d72c909fa7213
+  flutter_secure_storage: 23fc622d89d073675f2eaa109381aefbcf5a49be
+  fluttertoast: 74526702fea2c060ea55dde75895b7e1bde1c86b
+  google_sign_in_ios: 4f85eb9f937450765c8573bb85fd8cd6a5af675c
+  GoogleSignIn: 5651ce3a61e56ca864160e79b484cd9ed3f49b7a
   GTMAppAuth: 0ff230db599948a9ad7470ca667337803b3fc4dd
-  GTMSessionFetcher: 5595ec75acf5be50814f81e9189490412bad82ba
+  GTMSessionFetcher: 3a63d75eecd6aa32c2fc79f578064e1214dfdec2
   image_picker_ios: b786a5dcf033a8336a657191401bfdf12017dabb
-  local_auth: 1740f55d7af0a2e2a8684ce225fe79d8931e808c
-  open_file: 02eb5cb6b21264bd3a696876f5afbfb7ca4f4b7d
+  local_auth_ios: 0d333dde7780f669e66f19d2ff6005f3ea84008d
+  open_filex: 6e26e659846ec990262224a12ef1c528bb4edbe4
   package_info_plus: 6c92f08e1f853dc01228d6f553146438dafcd14e
   path_provider_ios: 14f3d2fd28c4fdb42f44e0f751d12861c43cee02
-  permission_handler_apple: d21b38e1a4b2e041c63af9568f9165e114e507a6
-  rate_my_app: 5c11c00c864fdb2d0d6d4529b1692a2e78a64d0b
+  permission_handler_apple: 44366e37eaf29454a1e7b1b7d736c2cceaeb17ce
+  rate_my_app: 96f658ddb7f0a8d2f46d54452583f084760aef57
   shared_preferences_ios: 548a61f8053b9b8a49ac19c1ffbc8b92c50d68ad
-  sqlite3: 93442daab2ab1825bc9c05faa85814a1996f5b65
-  sqlite3_flutter_libs: 14a93fdcff62c6a346356df0b8e1b3f35fbab8f2
+  sqlite3: 88dd99ef4ac3945f5a15facdd752933c52fd93bf
+  sqlite3_flutter_libs: c00751e981228acb63595236703da79d31282b63
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   url_launcher_ios: 839c58cdb4279282219f5e248c3321761ff3c4de
   workmanager: 0afdcf5628bbde6924c21af7836fed07b42e30e6
