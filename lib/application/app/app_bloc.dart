@@ -56,6 +56,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         await _registerRecurringBackgroundTask(e.translations);
         return state;
       },
+      restart: (_) async => const AppState.loading(),
     );
 
     yield s;

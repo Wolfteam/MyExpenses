@@ -26,4 +26,6 @@ class AppEvent with _$AppEvent {
   const factory AppEvent.registerRecurringBackgroundTask({
     required BackgroundTranslations translations,
   }) = _RegisterRecurringBackgroundTask;
+
+  const factory AppEvent.restart() = _Restart;
 }

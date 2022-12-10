@@ -33,8 +33,9 @@ class MainPage extends StatefulWidget {
   _MainPageState createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin {
+class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late TabController _tabController;
+  DateTime? _pausedAt;
 
   @override
   void initState() {
@@ -46,12 +47,31 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
       }
     });
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void didChangeDependencies() {
     context.read<MainTabBloc>().add(const MainTabEvent.init());
     super.didChangeDependencies();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _pausedAt = DateTime.now();
+      return;
+    }
+    if (state != AppLifecycleState.resumed) {
+      return;
+    }
+    if (_pausedAt == null) {
+      return;
+    }
+    if (DateTime.now().weekday != _pausedAt!.weekday) {
+      _pausedAt = null;
+      context.read<AppBloc>().add(const AppEvent.restart());
+    }
   }
 
   @override
