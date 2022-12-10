@@ -18,6 +18,7 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
   final BackgroundService _backgroundService;
   final GoogleService _googleService;
   final SettingsService _settingsService;
+  final PathService _pathService;
 
   DrawerBloc(
     this._logger,
@@ -26,6 +27,7 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
     this._backgroundService,
     this._googleService,
     this._settingsService,
+    this._pathService,
   ) : super(const DrawerState.loaded(selectedPage: AppDrawerItemType.transactions));
 
   @override
@@ -51,11 +53,11 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
     }
 
     _logger.info(runtimeType, '_initialize: User is signed in');
-
+    final imgPath = await _pathService.getDynamicUserImg(user.pictureUrl);
     return state.copyWith(
       email: user.email,
       fullName: user.name,
-      img: user.pictureUrl,
+      img: imgPath,
       isUserSignedIn: true,
       userSignedOut: false,
     );

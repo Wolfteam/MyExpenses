@@ -103,7 +103,12 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
   Future<UserAccountsState> _initialize() async {
     _logger.info(runtimeType, '_initialize: Getting all users in db...');
     final users = await _usersDao.getAllUsers();
-    return UserAccountsState.initial(users: users, isNetworkAvailable: true);
+    final updatedUsers = <UserItem>[];
+    for (final user in users) {
+      final imgPath = await _pathService.getDynamicUserImg(user.pictureUrl);
+      updatedUsers.add(user.copyWith(pictureUrl: imgPath));
+    }
+    return UserAccountsState.initial(users: updatedUsers, isNetworkAvailable: true);
   }
 
   Future<UserAccountsState> _deleteUser(int id, _InitialState state) async {
