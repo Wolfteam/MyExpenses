@@ -96,7 +96,7 @@ class SyncServiceImpl implements SyncService {
 
       await _updateLocalStatus(LocalStatusType.nothing);
 
-      await _updateImgFiles(user.id);
+      await _uploadPendingImgs(user.id);
     } catch (e, s) {
       _logger.error(runtimeType, 'updateFile: An error occurred while trying to update file', e, s);
       rethrow;
@@ -317,7 +317,7 @@ class SyncServiceImpl implements SyncService {
     }
   }
 
-  Future<void> _updateImgFiles(int userId) async {
+  Future<void> _uploadPendingImgs(int userId) async {
     try {
       _logger.info(runtimeType, '_updateImgFiles: Getting all remote imgs...');
       final currentImgsMap = await _googleService.getAllImages(
@@ -333,17 +333,7 @@ class SyncServiceImpl implements SyncService {
           .where((path) => path.contains(_pathService.transactionImgPrefix))
           .toList();
 
-      final imgsToDownload = currentImgsMap.entries.where((kvp) => !imgs.contains(kvp.value)).toList();
-
       final imgsToUpload = imgs.where((filename) => !currentImgsMap.values.contains(filename)).toList();
-
-      _logger.info(runtimeType, '_updateImgFiles: We will download ${imgsToDownload.length} imgs...');
-      //TODO: CREATE MULTIPLE FUTURES
-      for (final kvp in imgsToDownload) {
-        final filePath = join(imgPath, kvp.value);
-        await _googleService.downloadFile(kvp.value, filePath);
-      }
-
       _logger.info(runtimeType, '_updateImgFiles: We will upload ${imgsToUpload.length} imgs...');
       for (final filename in imgsToUpload) {
         final filePath = join(imgPath, filename);

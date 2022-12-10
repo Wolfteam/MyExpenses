@@ -15,5 +15,9 @@ abstract class PathService {
 
   Future<String> buildUserImgPath(String filename, int? userId);
 
+  Future<String> buildUserProfileImgPath(String filename);
+
   Future<void> moveFile(String currentPath, String finalPath);
+
+  Future<String?> getDynamicUserImg(String? currentFullPath);
 }
