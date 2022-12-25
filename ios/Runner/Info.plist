@@ -7,8 +7,12 @@
 		<string>my_expenses_sync_task</string>
 		<string>my_expenses_recurring_trans_task</string>
 	</array>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>MyExpenses</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -38,8 +42,13 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Access to the camera is required</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>You need to authenticate to use the app</string>
 	<key>UIBackgroundModes</key>
 	<array>
+		<string>fetch</string>
 		<string>processing</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
@@ -61,11 +70,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>CFBundleDisplayName</key>
-	<string>MyExpenses</string>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>NSFaceIDUsageDescription</key>
-    <string>To lock app access to unauthenticated users</string>
 </dict>
 </plist>
