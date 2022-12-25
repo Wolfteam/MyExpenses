@@ -298,6 +298,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         source: fromGallery ? ImageSource.gallery : ImageSource.camera,
         maxHeight: 600,
         maxWidth: 600,
+        requestFullMetadata: false,
       );
       if (image == null) {
         return;
