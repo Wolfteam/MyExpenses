@@ -17,8 +17,8 @@ import workmanager
         if #available(iOS 10.0, *) {
             UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate
         }
-        //Each 30 min
-        UIApplication.shared.setMinimumBackgroundFetchInterval(60 * 30)
+        //Each 720 min aka 12 hrs
+        UIApplication.shared.setMinimumBackgroundFetchInterval(60 * 720)
         WorkmanagerPlugin.registerTask(withIdentifier: "my_expenses_sync_task")
         WorkmanagerPlugin.registerTask(withIdentifier: "my_expenses_recurring_trans_task")
         

@@ -95,6 +95,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     if (_settingsService.shouldTriggerSync && !forceSignOut) {
       await _syncSubscription?.cancel();
+      await _backgroundService.registerOneOffRecurringTransactionsTask(translations);
       _syncSubscription = Future.delayed(const Duration(seconds: 2)).asStream().listen((event) async {
         await _backgroundService.runSyncTask(translations);
       });

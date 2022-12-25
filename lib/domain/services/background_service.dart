@@ -13,6 +13,8 @@ abstract class BackgroundService {
 
   Future<void> registerRecurringTransactionsTask(BackgroundTranslations translations);
 
+  Future<void> registerOneOffRecurringTransactionsTask(BackgroundTranslations translations);
+
   Future<void> cancelSyncTask();
 
   Future<void> cancelRecurringTransactionsTask();

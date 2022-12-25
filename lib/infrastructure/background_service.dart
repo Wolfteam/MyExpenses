@@ -11,21 +11,28 @@ import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/domain/services/services.dart';
 import 'package:my_expenses/infrastructure/db/database.dart';
 import 'package:my_expenses/injection.dart';
-import 'package:path_provider_android/path_provider_android.dart';
-import 'package:shared_preferences_android/shared_preferences_android.dart';
 import 'package:workmanager/workmanager.dart';
 
+@pragma('vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
 void _callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     try {
       WidgetsFlutterBinding.ensureInitialized();
-      //WORKAROUND FOR https://github.com/flutter/flutter/issues/98473
-      if (Platform.isAndroid) {
-        SharedPreferencesAndroid.registerWith();
-        PathProviderAndroid.registerWith();
-      }
+      DartPluginRegistrant.ensureInitialized();
       final bgService = await Injection.getBackgroundService(forBgTask: true);
-      await bgService.handleBackgroundTask(task, BackgroundTranslations.fromJson(inputData!), calledFromBg: true);
+      final translations = inputData != null
+          ? BackgroundTranslations.fromJson(inputData)
+          : const BackgroundTranslations(
+              automaticSync: 'Automatic Sync',
+              recurringTransactions: 'Recurring transactions',
+              syncWasSuccessfullyPerformed: 'Sync was successfully performed',
+              unknownErrorOccurred: 'Unknown error occurred',
+            );
+
+      final iosTasks = [_recurringTransId, Workmanager.iOSBackgroundTask];
+      final taskName = iosTasks.contains(task) ? _recurringTransName : task;
+
+      await bgService.handleBackgroundTask(taskName, translations, calledFromBg: true);
     } catch (e, s) {
       debugPrint(e.toString());
       debugPrintStack(stackTrace: s);
@@ -99,9 +106,8 @@ class BackgroundServiceImpl implements BackgroundService {
       return Future.value();
     }
 
-    //TODO: IOS SHOULD WORK ON THE NEWEST VERSION OF THE PACKAGE
     if (Platform.isIOS) {
-      return Future.value();
+      return registerOneOffRecurringTransactionsTask(translations);
     }
 
     return Workmanager().registerPeriodicTask(
@@ -119,10 +125,25 @@ class BackgroundServiceImpl implements BackgroundService {
   }
 
   @override
-  Future<void> cancelSyncTask() {
+  Future<void> registerOneOffRecurringTransactionsTask(BackgroundTranslations translations) {
     if (Platform.isIOS) {
-      return Future.value();
+      return Workmanager().registerOneOffTask(
+        _recurringTransId,
+        _recurringTransName,
+        existingWorkPolicy: ExistingWorkPolicy.replace,
+        constraints: Constraints(
+          networkType: NetworkType.not_required,
+          requiresBatteryNotLow: true,
+          requiresDeviceIdle: false,
+        ),
+        inputData: translations.toJson(),
+      );
     }
+    return Future.value();
+  }
+
+  @override
+  Future<void> cancelSyncTask() {
     if (!_isPlatformSupported) {
       return Future.value();
     }
@@ -131,9 +152,6 @@ class BackgroundServiceImpl implements BackgroundService {
 
   @override
   Future<void> cancelRecurringTransactionsTask() {
-    if (Platform.isIOS) {
-      return Future.value();
-    }
     if (!_isPlatformSupported) {
       return Future.value();
     }

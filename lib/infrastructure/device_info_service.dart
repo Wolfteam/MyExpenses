@@ -88,7 +88,8 @@ class DeviceInfoServiceImpl implements DeviceInfoService {
     final localAuth = LocalAuthentication();
     final availableBiometrics = await localAuth.getAvailableBiometrics();
     final canCheckBiometrics = await localAuth.canCheckBiometrics && await localAuth.isDeviceSupported();
-    _canUseFingerPrint = canCheckBiometrics && availableBiometrics.contains(BiometricType.fingerprint);
+    final validTypes = [BiometricType.face, BiometricType.fingerprint];
+    _canUseFingerPrint = canCheckBiometrics && validTypes.any((type) => availableBiometrics.contains(type));
     _deviceInfo = {
       'Model': info.model,
       'OsVersion': '${info.version.sdkInt}',
@@ -102,7 +103,8 @@ class DeviceInfoServiceImpl implements DeviceInfoService {
     final localAuth = LocalAuthentication();
     final availableBiometrics = await localAuth.getAvailableBiometrics();
     final canCheckBiometrics = await localAuth.canCheckBiometrics && await localAuth.isDeviceSupported();
-    _canUseFingerPrint = canCheckBiometrics && availableBiometrics.contains(BiometricType.fingerprint);
+    final validTypes = [BiometricType.face, BiometricType.fingerprint];
+    _canUseFingerPrint = canCheckBiometrics && validTypes.any((type) => availableBiometrics.contains(type));
     _deviceInfo = {
       'Model': info.model ?? _na,
       'OsVersion': info.systemVersion ?? _na,
