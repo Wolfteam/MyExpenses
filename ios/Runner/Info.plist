@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>my_expenses_sync_task</string>
@@ -44,6 +46,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Access to the camera is required</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Access to the camera is required</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>You need to authenticate to use the app</string>
 	<key>UIBackgroundModes</key>
@@ -70,5 +74,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
 </dict>
 </plist>
