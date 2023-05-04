@@ -30,17 +30,17 @@ class AboutSettingsCard extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(vertical: 10),
                 child: Image.asset(CustomAssets.appIcon, width: 70, height: 70),
               ),
-              Text(i18n.appName, textAlign: TextAlign.center, style: textTheme.subtitle2),
-              Text(i18n.appVersion(appVersion), textAlign: TextAlign.center, style: textTheme.subtitle2),
+              Text(i18n.appName, textAlign: TextAlign.center, style: textTheme.titleSmall),
+              Text(i18n.appVersion(appVersion), textAlign: TextAlign.center, style: textTheme.titleSmall),
               Text(i18n.aboutSummary, textAlign: TextAlign.center),
               Container(
                 margin: const EdgeInsets.only(top: 10),
-                child: Text(i18n.donations, style: textTheme.subtitle1!.copyWith(fontWeight: FontWeight.bold)),
+                child: Text(i18n.donations, style: textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold)),
               ),
               Text(i18n.donationsMsg),
               Container(
                 margin: const EdgeInsets.only(top: 10),
-                child: Text(i18n.support, style: textTheme.subtitle1!.copyWith(fontWeight: FontWeight.bold)),
+                child: Text(i18n.support, style: textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold)),
               ),
               Container(
                 margin: const EdgeInsets.only(top: 5),

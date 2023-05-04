@@ -138,7 +138,7 @@ class _YearPickerState extends State<_YearPicker> {
   Widget build(BuildContext context) {
     assert(debugCheckHasMaterial(context));
     final ThemeData themeData = Theme.of(context);
-    final TextStyle style = themeData.textTheme.bodyText2!.copyWith(fontFamily: widget.fontFamily);
+    final TextStyle style = themeData.textTheme.bodyMedium!.copyWith(fontFamily: widget.fontFamily);
 
     return ListView.builder(
       dragStartBehavior: widget.dragStartBehavior,
@@ -149,7 +149,7 @@ class _YearPickerState extends State<_YearPicker> {
         final int year = widget.firstDate.year + index;
         final bool isSelected = year == widget.selectedDate.year;
         final TextStyle itemStyle = isSelected
-            ? (widget.style ?? themeData.textTheme.headline5!.copyWith(color: themeData.colorScheme.secondary, fontFamily: widget.fontFamily))
+            ? (widget.style ?? themeData.textTheme.headlineSmall!.copyWith(color: themeData.colorScheme.secondary, fontFamily: widget.fontFamily))
             : (widget.style ?? style);
         return InkWell(
           key: ValueKey<int>(year),

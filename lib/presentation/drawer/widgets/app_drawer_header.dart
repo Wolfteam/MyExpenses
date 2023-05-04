@@ -50,7 +50,7 @@ class AppDrawerHeader extends StatelessWidget {
                 margin: const EdgeInsets.only(top: 10),
                 child: Text(
                   i18n.tapToSignIn,
-                  style: theme.textTheme.subtitle1,
+                  style: theme.textTheme.titleMedium,
                 ),
               ),
             if (isUserSignedIn)
@@ -59,7 +59,7 @@ class AppDrawerHeader extends StatelessWidget {
                   message: fullName,
                   child: Text(
                     fullName!,
-                    style: theme.textTheme.subtitle2,
+                    style: theme.textTheme.titleSmall,
                   ),
                 ),
               ),
@@ -69,7 +69,7 @@ class AppDrawerHeader extends StatelessWidget {
                   message: email,
                   child: Text(
                     email!,
-                    style: theme.textTheme.caption,
+                    style: theme.textTheme.bodySmall,
                   ),
                 ),
               )

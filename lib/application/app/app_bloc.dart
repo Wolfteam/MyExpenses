@@ -138,8 +138,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   Future<void> _registerRecurringBackgroundTask(BackgroundTranslations translations) async {
-    await _backgroundService.cancelRecurringTransactionsTask();
-    await _backgroundService.registerRecurringTransactionsTask(translations);
-    _settingsService.isRecurringTransTaskRegistered = true;
+    try {
+      await _backgroundService.cancelRecurringTransactionsTask();
+      await _backgroundService.registerRecurringTransactionsTask(translations);
+      _settingsService.isRecurringTransTaskRegistered = true;
+    } catch (e, s) {
+      _logger.error(runtimeType, '_registerRecurringBackgroundTask: Unknown error', e, s);
+    }
   }
 }

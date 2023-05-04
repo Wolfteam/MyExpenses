@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:month_picker_dialog_2/month_picker_dialog_2.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/utils/transaction_utils.dart';
 import 'package:my_expenses/generated/l10n.dart';
@@ -50,14 +50,14 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
                   padding: const EdgeInsets.only(left: 5),
                   child: Text(
                     '${i18n.incomes} & ${i18n.expenses}',
-                    style: theme.textTheme.headline6,
+                    style: theme.textTheme.titleLarge,
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: 5, top: 10),
                   child: Text(
                     i18n.yearly,
-                    style: theme.textTheme.subtitle1,
+                    style: theme.textTheme.titleMedium,
                   ),
                 ),
                 Align(
@@ -78,7 +78,7 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
                   padding: const EdgeInsets.only(left: 5, top: 10),
                   child: Text(
                     i18n.monthly,
-                    style: theme.textTheme.subtitle1,
+                    style: theme.textTheme.titleMedium,
                   ),
                 ),
                 if (state.transactionsPerMonth.isNotEmpty)
@@ -187,7 +187,7 @@ class _ChartBottomBalance extends StatelessWidget {
         i18n.balanceX(formattedAmount),
         textAlign: TextAlign.end,
         overflow: TextOverflow.ellipsis,
-        style: theme.textTheme.subtitle1!.copyWith(color: textColor),
+        style: theme.textTheme.titleMedium!.copyWith(color: textColor),
       ),
     );
   }

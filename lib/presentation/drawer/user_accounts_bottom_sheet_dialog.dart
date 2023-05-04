@@ -68,7 +68,7 @@ class _Content extends StatelessWidget {
                   ModalSheetSeparator(),
                   Text(
                     i18n.accounts,
-                    style: Theme.of(context).textTheme.headline6,
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                   if (state.users.isNotEmpty)
                     ListView.builder(

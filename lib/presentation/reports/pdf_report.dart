@@ -45,7 +45,7 @@ Future<Document> buildPdf(
   final resizedImg = image_lib.copyResize(img!, width: 120, height: 120);
   final image = PdfImage(
     pdf.document,
-    image: resizedImg.data.buffer.asUint8List(),
+    image: resizedImg.data!.buffer.asUint8List(),
     width: resizedImg.width,
     height: resizedImg.height,
   );

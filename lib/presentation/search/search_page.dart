@@ -155,7 +155,7 @@ class _BodyState extends State<_Body> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: Styles.edgeInsetAll10,
-                  child: Text(i18n.transactions, textAlign: TextAlign.start, style: Theme.of(context).textTheme.headline6),
+                  child: Text(i18n.transactions, textAlign: TextAlign.start, style: Theme.of(context).textTheme.titleLarge),
                 ),
               ),
             if (s.transactions.isNotEmpty)

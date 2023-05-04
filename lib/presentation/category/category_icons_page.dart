@@ -78,7 +78,7 @@ class _CategoryIconsPerType extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 10),
             child: Text(
               i18n.getCategoryIconTypeName(type),
-              style: theme.textTheme.headline6!.copyWith(fontSize: 17),
+              style: theme.textTheme.titleLarge!.copyWith(fontSize: 17),
               textAlign: TextAlign.center,
             ),
           ),

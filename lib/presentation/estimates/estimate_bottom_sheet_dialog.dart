@@ -44,7 +44,7 @@ class _Body extends StatelessWidget {
             ModalSheetSeparator(),
             Text(
               '${i18n.estimates} - ${_getSelectedTransactionText(i18n, s.selectedTransactionType)}',
-              style: theme.textTheme.headline6,
+              style: theme.textTheme.titleLarge,
             ),
             EstimatesToggleButtons(
               selectedButtons: _getSelectedButtons(s.selectedTransactionType),

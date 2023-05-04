@@ -26,7 +26,7 @@ class EstimatesSummary extends StatelessWidget {
     final showIncomes = showTotal || selectedButtons[1];
     final showExpenses = showTotal || selectedButtons[2];
 
-    final textStyle = theme.textTheme.subtitle2!;
+    final textStyle = theme.textTheme.titleSmall!;
     final expenseTextStyle = textStyle.copyWith(color: Colors.red);
     final incomeTextStyle = textStyle.copyWith(color: Colors.green);
 

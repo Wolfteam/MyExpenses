@@ -121,7 +121,7 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
                   Text(
                     state.showParentTransactions ? i18n.recurringTransactions : i18n.transactions,
                     textAlign: TextAlign.start,
-                    style: Theme.of(context).textTheme.headline6,
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                   IconButton(
                     icon: const Icon(Icons.swap_horiz),

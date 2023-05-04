@@ -147,7 +147,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                 if (isChildTransaction)
                   Text(
                     i18n.childTransactionCantBeDeleted,
-                    style: theme.textTheme.caption!.copyWith(color: theme.primaryColorDark),
+                    style: theme.textTheme.bodySmall!.copyWith(color: theme.primaryColorDark),
                   ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -383,14 +383,14 @@ class AddEditTransactionHeader extends StatelessWidget {
                   ),
                   Text(
                     description,
-                    style: Theme.of(context).textTheme.headline6,
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(
                     height: 5.0,
                   ),
                   Text(
                     dateString,
-                    style: theme.textTheme.subtitle2,
+                    style: theme.textTheme.titleSmall,
                   ),
                   const SizedBox(
                     height: 16.0,
@@ -408,13 +408,13 @@ class AddEditTransactionHeader extends StatelessWidget {
                                 formattedAmount,
                                 textAlign: TextAlign.center,
                                 overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.headline6,
+                                style: theme.textTheme.titleLarge,
                               ),
                             ),
                             subtitle: Text(
                               i18n.amount.toUpperCase(),
                               textAlign: TextAlign.center,
-                              style: theme.textTheme.caption,
+                              style: theme.textTheme.bodySmall,
                             ),
                           ),
                         ),
@@ -426,13 +426,13 @@ class AddEditTransactionHeader extends StatelessWidget {
                                 categoryType,
                                 textAlign: TextAlign.center,
                                 overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.headline6,
+                                style: theme.textTheme.titleLarge,
                               ),
                             ),
                             subtitle: Text(
                               i18n.category.toUpperCase(),
                               textAlign: TextAlign.center,
-                              style: theme.textTheme.caption,
+                              style: theme.textTheme.bodySmall,
                             ),
                           ),
                         ),
@@ -444,13 +444,13 @@ class AddEditTransactionHeader extends StatelessWidget {
                                 repetitionCycleType,
                                 textAlign: TextAlign.center,
                                 overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.headline6,
+                                style: theme.textTheme.titleLarge,
                               ),
                             ),
                             subtitle: Text(
                               i18n.repetitions.toUpperCase(),
                               textAlign: TextAlign.center,
-                              style: theme.textTheme.caption,
+                              style: theme.textTheme.bodySmall,
                             ),
                           ),
                         ),
