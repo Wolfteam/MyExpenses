@@ -37,9 +37,11 @@ class DateUtils {
       (from.month < 12) ? DateTime(from.year, from.month + 1, 0, 23, 59, 59) : DateTime(from.year + 1, 1, 0, 23, 59, 59);
 
   static DateTime getNextMonthDate(DateTime from) {
-    var tentativeDate = from.add(const Duration(days: 30));
+    DateTime tentativeDate = DateTime(from.year, from.month + 1, from.day);
     final monthsDiff = tentativeDate.month - from.month;
-    if (tentativeDate.day == from.day) return tentativeDate;
+    if (tentativeDate.day == from.day) {
+      return tentativeDate;
+    }
 
     //If monthsDiff > 1 that means that we are in february
     if (monthsDiff > 1) {
