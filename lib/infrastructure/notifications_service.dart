@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:enum_to_string/enum_to_string.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/services/services.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
