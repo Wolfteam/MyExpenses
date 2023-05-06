@@ -92,7 +92,9 @@ class MyApp extends StatelessWidget {
               final bgService = getIt<BackgroundService>();
               final deviceInfoService = getIt<DeviceInfoService>();
               final googleService = getIt<GoogleService>();
-              return AppBloc(logger, settingsService, drawerBloc, bgService, deviceInfoService, googleService);
+              final transactionsDao = getIt<TransactionsDao>();
+              final usersDao = getIt<UsersDao>();
+              return AppBloc(logger, settingsService, drawerBloc, bgService, deviceInfoService, googleService, transactionsDao, usersDao);
             },
           ),
           BlocProvider(

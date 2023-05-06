@@ -4,11 +4,15 @@ import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
+import 'package:my_expenses/domain/models/entities/daos/transactions_dao.dart';
+import 'package:my_expenses/domain/models/entities/daos/users_dao.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/domain/services/services.dart';
 
 part 'app_bloc.freezed.dart';
+
 part 'app_event.dart';
+
 part 'app_state.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
@@ -18,6 +22,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final BackgroundService _backgroundService;
   final DeviceInfoService _deviceInfoService;
   final GoogleService _googleService;
+  final TransactionsDao _transactionsDao;
+  final UsersDao _usersDao;
 
   late StreamSubscription _portSubscription;
   StreamSubscription? _syncSubscription;
@@ -29,6 +35,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     this._backgroundService,
     this._deviceInfoService,
     this._googleService,
+    this._transactionsDao,
+    this._usersDao,
   ) : super(const AppState.loading()) {
     _listenBgPort();
   }
@@ -100,6 +108,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         await _backgroundService.runSyncTask(translations);
       });
     }
+
+    final now = DateTime.now();
+    final currentUser = await _usersDao.getActiveUser();
+    await _transactionsDao.saveRecurringTransactions(now, currentUser?.id);
 
     _logger.info(runtimeType, 'Current settings are: ${_settingsService.appSettings.toJson()}');
 

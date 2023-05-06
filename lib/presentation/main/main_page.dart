@@ -68,7 +68,8 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
     if (_pausedAt == null) {
       return;
     }
-    if (DateTime.now().weekday != _pausedAt!.weekday) {
+    final currentWeekDay = DateTime.now().weekday;
+    if (currentWeekDay != _pausedAt!.weekday) {
       _pausedAt = null;
       context.read<AppBloc>().add(const AppEvent.restart());
     }
@@ -124,6 +125,7 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
   @override
   void dispose() {
     _tabController.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
