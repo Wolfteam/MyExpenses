@@ -17,11 +17,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
   TransactionsDaoImpl(super.db);
 
   @override
-  Future<List<TransactionItem>> getAllTransactions(
-    int? userId,
-    DateTime from,
-    DateTime to,
-  ) {
+  Future<List<TransactionItem>> getAllTransactions(int? userId, DateTime from, DateTime to) async {
     final query = (select(transactions)
           ..where(
             (t) =>
@@ -30,10 +26,14 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
         .join([
       innerJoin(categories, categories.id.equalsExp(transactions.categoryId)),
     ]);
+    var results = <TypedResult>[];
     if (userId == null) {
-      return (query..where((categories.userId.isNull()))).map(_mapToTransactionItem).get();
+      results = await (query..where((categories.userId.isNull()))).get();
+    } else {
+      results = await (query..where(categories.userId.equals(userId))).get();
     }
-    return (query..where(categories.userId.equals(userId))).map(_mapToTransactionItem).get();
+
+    return results.map(_mapToTransactionItem).toList();
   }
 
   @override
@@ -153,7 +153,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
   }
 
   @override
-  Future<List<TransactionItem>> getAllParentTransactions(int? userId) {
+  Future<List<TransactionItem>> getAllParentTransactions(int? userId) async {
     final query = (select(transactions)
           ..where(
             (t) =>
@@ -168,15 +168,18 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
       ),
     ]);
 
+    var results = <TypedResult>[];
     if (userId == null) {
-      return (query..where((categories.userId.isNull()))).map(_mapToTransactionItem).get();
+      results = await (query..where((categories.userId.isNull()))).get();
+    }else {
+      results = await (query..where(categories.userId.equals(userId))).get();
     }
 
-    return (query..where(categories.userId.equals(userId))).map(_mapToTransactionItem).get();
+    return results.map(_mapToTransactionItem).toList();
   }
 
   @override
-  Future<List<TransactionItem>> getAllParentTransactionsUntil(int? userId, DateTime until) {
+  Future<List<TransactionItem>> getAllParentTransactionsUntil(int? userId, DateTime until) async {
     final query = (select(transactions)
           ..where(
             (t) =>
@@ -193,11 +196,14 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
       ),
     ]);
 
+    var results = <TypedResult>[];
     if (userId == null) {
-      return (query..where((categories.userId.isNull()))).map(_mapToTransactionItem).get();
+      results = await (query..where((categories.userId.isNull()))).get();
+    } else {
+      results = await (query..where(categories.userId.equals(userId))).get();
     }
 
-    return (query..where(categories.userId.equals(userId))).map(_mapToTransactionItem).get();
+    return results.map(_mapToTransactionItem).toList();
   }
 
   @override
@@ -206,7 +212,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
     DateTime from,
     DateTime to,
   ) async {
-    final query = (select(transactions)
+    final results = await (select(transactions)
           ..where(
             (t) =>
                 t.localStatus.equals(LocalStatusType.deleted.index).not() &
@@ -219,9 +225,9 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
         categories,
         categories.id.equalsExp(transactions.categoryId),
       ),
-    ]).map(_mapToTransactionItem);
+    ]).get();
 
-    return query.get();
+    return results.map(_mapToTransactionItem).toList();
   }
 
   @override
@@ -259,7 +265,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
       );
     });
 
-    return (select(transactions)
+    final results = await (select(transactions)
           ..where(
             (t) => t.parentTransactionId.isNotNull() & t.parentTransactionId.equals(parent.id) & t.transactionDate.isIn(periods),
           ))
@@ -269,8 +275,9 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
             categories.id.equalsExp(transactions.categoryId),
           )
         ])
-        .map(_mapToTransactionItem)
         .get();
+
+    return results.map(_mapToTransactionItem).toList();
   }
 
   @override
@@ -592,7 +599,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
     SortDirectionType sortDirectionType,
     int take,
     int skip,
-  ) {
+  ) async {
     var query = (select(transactions)
           ..where(
             (t) => t.localStatus.equals(LocalStatusType.deleted.index).not() & t.isParentTransaction.not(),
@@ -661,7 +668,8 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
     }
     query = query..orderBy([orderingTerm]);
 
-    return (query..limit(take, offset: skip)).map(_mapToTransactionItem).get();
+    final results = await (query..limit(take, offset: skip)).get();
+    return results.map(_mapToTransactionItem).toList();
   }
 
   @override

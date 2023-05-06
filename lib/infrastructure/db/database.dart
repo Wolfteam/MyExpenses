@@ -8,6 +8,7 @@ import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/isolate.dart';
 import 'package:drift/native.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart' show Color, IconData;
 import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/models/entities.dart';
@@ -56,7 +57,7 @@ LazyDatabase _openConnection() {
     //   debugPrint('********Db path =  ${dbFolder.path}');
     //   await file.delete();
     // }
-    return NativeDatabase(file);
+    return NativeDatabase(file, logStatements: kDebugMode);
   });
 }
 
@@ -71,7 +72,7 @@ DynamicLibrary _openOnWindows() {
 
 Future<DatabaseConnection> _connectAsync() async {
   final isolate = await _createMoorIsolate();
-  return isolate.connect();
+  return isolate.connect(isolateDebugLog: kDebugMode);
 }
 
 AppDatabase getIsolateDatabase() {
@@ -99,7 +100,7 @@ Future<DriftIsolate> _createMoorIsolate() async {
 void _startBackground(_IsolateStartRequest request) {
   // this is the entry point from the background isolate! Let's create
   // the database from the path we received
-  final executor = NativeDatabase(File(request.targetPath));
+  final executor = NativeDatabase(File(request.targetPath), logStatements: kDebugMode);
   // we're using MoorIsolate.inCurrent here as this method already runs on a
   // background isolate. If we used MoorIsolate.spawn, a third isolate would be
   // started which is not what we want!
