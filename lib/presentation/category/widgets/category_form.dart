@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/extensions/string_extensions.dart';
@@ -49,8 +50,10 @@ class CategoryForm extends StatelessWidget {
                   ),
                   margin: const EdgeInsets.only(right: 10),
                   child: IconButton(
-                    splashRadius: 28,
-                    icon: Icon(iconData, size: 30, color: iconColor),
+                    splashRadius: 30,
+                    color: iconColor,
+                    iconSize: 45,
+                    icon: FaIcon(iconData, size: 30),
                     onPressed: () => _showColorPicker(context),
                   ),
                 ),

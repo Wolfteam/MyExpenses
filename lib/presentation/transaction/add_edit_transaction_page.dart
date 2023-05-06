@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
@@ -462,31 +463,19 @@ class AddEditTransactionHeader extends StatelessWidget {
             ),
           ),
           Container(
-            margin: const EdgeInsets.only(top: 5),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Material(
-                  elevation: 10,
-                  color: theme.cardColor.withOpacity(0.8),
-                  type: MaterialType.circle,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: !isChildTransaction
-                        ? IconButton(
-                            iconSize: 60,
-                            icon: Icon(category.icon),
-                            color: category.iconColor,
-                            onPressed: () => _changeCategory(context),
-                          )
-                        : Icon(
-                            category.icon,
-                            size: 75,
-                            color: category.iconColor,
-                          ),
-                  ),
-                ),
-              ],
+            margin: const EdgeInsets.only(top: 15),
+            alignment: Alignment.topCenter,
+            child: Material(
+              elevation: 10,
+              color: theme.cardColor.withOpacity(0.8),
+              type: MaterialType.circle,
+              child: IconButton(
+                iconSize: 75,
+                icon: FaIcon(category.icon, size: 60),
+                color: category.iconColor,
+                onPressed: !isChildTransaction ? () => _changeCategory(context) : null,
+                disabledColor: category.iconColor,
+              ),
             ),
           ),
         ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/models/models.dart';
@@ -107,22 +108,17 @@ class CategoryHeader extends StatelessWidget {
           ),
           Container(
             margin: const EdgeInsets.only(top: 5),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Material(
-                  elevation: 10,
-                  clipBehavior: Clip.hardEdge,
-                  color: theme.cardColor.withOpacity(0.8),
-                  type: MaterialType.circle,
-                  child: IconButton(
-                    iconSize: 65,
-                    icon: Icon(iconData),
-                    color: iconColor,
-                    onPressed: () => _gotoIconsPage(context),
-                  ),
-                ),
-              ],
+            alignment: Alignment.topCenter,
+            child: Material(
+              elevation: 10,
+              color: theme.cardColor.withOpacity(0.8),
+              type: MaterialType.circle,
+              child: IconButton(
+                iconSize: 65,
+                icon: FaIcon(iconData, size: 50),
+                color: iconColor,
+                onPressed: () => _gotoIconsPage(context),
+              ),
             ),
           ),
         ],
