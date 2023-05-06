@@ -33,16 +33,31 @@ apply plugin: 'com.google.gms.google-services'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion localProperties.getProperty('flutter.compileSdkVersion').toInteger()
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
+    // Temporary workaround as per https://issuetracker.google.com/issues/158060799
+    lintOptions {
+        disable 'InvalidPackage'
+        checkReleaseBuilds false
+    }
+
     defaultConfig {
         applicationId "com.miraisoft.my_expenses"
-        minSdkVersion 27
-        targetSdkVersion 33
+        minSdkVersion localProperties.getProperty('flutter.minSdkVersion').toInteger()
+        targetSdkVersion localProperties.getProperty('flutter.targetSdkVersion').toInteger()
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -78,11 +93,6 @@ android {
                     'proguard-rules.pro'
         }
     }
-
-    // Temporary workaround as per https://issuetracker.google.com/issues/158060799
-    lintOptions {
-        checkReleaseBuilds false
-    }
 }
 
 flutter {
@@ -92,12 +102,12 @@ flutter {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'androidx.annotation:annotation:1.6.0'
     implementation "com.jakewharton.threetenabp:threetenabp:1.2.3"
-    implementation 'androidx.work:work-runtime-ktx:2.7.0'
+    implementation 'androidx.work:work-runtime-ktx:2.8.1'
     implementation platform('com.google.firebase:firebase-bom:29.3.1')
 
-    def appCenterSdkVersion = '4.0.0'
+    def appCenterSdkVersion = '4.4.5'
     implementation "com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}"
     implementation "com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}"
 }
