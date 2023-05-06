@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:my_expenses/domain/models/entities/base_entity.dart';
+import 'package:my_expenses/domain/models/entities.dart';
 import 'package:my_expenses/domain/models/entities/converters/db_converters.dart';
 
 class Transactions extends BaseEntity {
@@ -21,5 +21,5 @@ class Transactions extends BaseEntity {
 
   TextColumn get imagePath => text().nullable()();
 
-  IntColumn get categoryId => integer().customConstraint('REFERENCES categories(id)')();
+  IntColumn get categoryId => integer().references(Categories, #id)();
 }
