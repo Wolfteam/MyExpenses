@@ -147,6 +147,8 @@ class AppDatabase extends _$AppDatabase {
           return m.createAll();
         },
         beforeOpen: (details) async {
+          await customStatement('PRAGMA foreign_keys = ON');
+
           if (details.wasCreated) {
             final defaultCats = getDefaultCategories();
             await batch((b) {
@@ -155,6 +157,9 @@ class AppDatabase extends _$AppDatabase {
           }
         },
         onUpgrade: (Migrator m, int from, int to) async {
+          // disable foreign_keys before migrations
+          await customStatement('PRAGMA foreign_keys = OFF');
+
           if (from == 1) {
             //long description was added in v2
             await m.addColumn(transactions, transactions.longDescription);
