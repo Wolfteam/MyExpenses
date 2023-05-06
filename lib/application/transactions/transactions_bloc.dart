@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:darq/darq.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
 import 'package:my_expenses/application/bloc.dart';
@@ -72,12 +73,9 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
       final monthBalance = _buildMonthBalance(incomes, expenses, transactions);
 
       _logger.info(runtimeType, '_buildInitialState: Generating incomes / expenses transactions per week...');
-
-      final incomeTransPerWeek = await _buildTransactionSummaryPerDay(true);
-      final expenseTransPerWeek = await _buildTransactionSummaryPerDay(false);
+      final transPerWeek = await _buildTransactionSummaryPerDay(currentUser?.id);
 
       _logger.info(runtimeType, '_buildInitialState: Generating transactions per month..');
-
       final transPerMonth = TransactionUtils.buildTransactionsPerMonth(_settingsService.getCurrentLanguageModel(), transactions);
 
       _transactionsPerMonthBloc.add(
@@ -96,8 +94,8 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         _transactionsLast7DaysBloc.add(
           TransactionsLast7DaysEvent.init(
             selectedType: TransactionType.incomes,
-            incomes: incomeTransPerWeek,
-            expenses: expenseTransPerWeek,
+            incomes: transPerWeek.item0,
+            expenses: transPerWeek.item1,
             showLast7Days: showLast7Days,
           ),
         );
@@ -111,8 +109,8 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
 
       _transactionsLast7DaysBloc.add(
         TransactionsLast7DaysEvent.init(
-          incomes: incomeTransPerWeek,
-          expenses: expenseTransPerWeek,
+          incomes: transPerWeek.item0,
+          expenses: transPerWeek.item1,
           showLast7Days: showLast7Days,
         ),
       );
@@ -188,52 +186,57 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     ];
   }
 
-  Future<List<TransactionsSummaryPerDay>> _buildTransactionSummaryPerDay(bool onlyIncomes) async {
+  Future<Tuple2<List<TransactionsSummaryPerDay>, List<TransactionsSummaryPerDay>>> _buildTransactionSummaryPerDay(int? userId) async {
     final now = DateTime.now();
     final sevenDaysAgo = now.subtract(const Duration(days: 6));
     final from = DateTime(sevenDaysAgo.year, sevenDaysAgo.month, sevenDaysAgo.day);
-
     final to = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
     _logger.info(
       runtimeType,
-      '_buildTransactionSummaryPerDay: Getting ${onlyIncomes ? "income" : "expense"} transactions summary from = $from to = $to',
+      '_buildTransactionSummaryPerDay: Getting income + expenses transactions summary from = $from to = $to',
     );
 
     try {
-      final currentUser = await _usersDao.getActiveUser();
-      final transactions =
-          (await _transactionsDao.getAllTransactions(currentUser?.id, from, to)).where((t) => t.category.isAnIncome == onlyIncomes).toList();
+      final allTransactions = await _transactionsDao.getAllTransactions(userId, from, to);
+      final incomes = _buildTransactionSummaryPerDayFor(from, allTransactions, true);
+      final expenses = _buildTransactionSummaryPerDayFor(from, allTransactions, false);
 
-      final map = <DateTime, double>{};
-      for (final transaction in transactions) {
-        final date = DateTime(
-          transaction.transactionDate.year,
-          transaction.transactionDate.month,
-          transaction.transactionDate.day,
-        );
-
-        if (map.keys.any((key) => key == date)) {
-          map[date] = transaction.amount + map[date]!;
-        } else {
-          map.addAll({date: transaction.amount});
-        }
-      }
-
-      for (var i = 0; i <= 6; i++) {
-        final mustExistDate = from.add(Duration(days: i));
-        if (map.containsKey(mustExistDate)) continue;
-
-        map.addAll({mustExistDate: 0.0});
-      }
-
-      final models = map.entries.map((kvp) => TransactionsSummaryPerDay(date: kvp.key, totalDayAmount: kvp.value)).toList();
-
-      models.sort((t1, t2) => t1.date.compareTo(t2.date));
-      return models;
+      return Tuple2(incomes, expenses);
     } catch (e, s) {
       _logger.error(runtimeType, '_buildTransactionSummaryPerDay: Unknown error occurred', e, s);
-      return [];
+      return const Tuple2([], []);
     }
+  }
+
+  List<TransactionsSummaryPerDay> _buildTransactionSummaryPerDayFor(DateTime from,  List<TransactionItem> allTransactions, bool onlyIncomes) {
+    final transactions = allTransactions.where((t) => t.category.isAnIncome == onlyIncomes).toList();
+    final map = <DateTime, double>{};
+    for (final transaction in transactions) {
+      final date = DateTime(
+        transaction.transactionDate.year,
+        transaction.transactionDate.month,
+        transaction.transactionDate.day,
+      );
+
+      if (map.keys.any((key) => key == date)) {
+        map[date] = transaction.amount + map[date]!;
+      } else {
+        map.addAll({date: transaction.amount});
+      }
+    }
+
+    for (var i = 0; i <= 6; i++) {
+      final mustExistDate = from.add(Duration(days: i));
+      if (map.containsKey(mustExistDate)) {
+        continue;
+      }
+      map.addAll({mustExistDate: 0.0});
+    }
+
+    final models = map.entries.map((kvp) => TransactionsSummaryPerDay(date: kvp.key, totalDayAmount: kvp.value)).toList();
+
+    models.sort((t1, t2) => t1.date.compareTo(t2.date));
+    return models;
   }
 }
