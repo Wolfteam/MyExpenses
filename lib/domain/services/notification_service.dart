@@ -1,12 +1,16 @@
-import 'package:my_expenses/domain/enums/enums.dart';
+import 'dart:async';
 
-typedef IosCallBack = Function(int id, String? title, String? body, String? payload);
-typedef AndroidCallBack = Function(String? payload);
+import 'package:my_expenses/domain/enums/enums.dart';
+import 'package:my_expenses/domain/models/models.dart';
 
 abstract class NotificationService {
-  void init();
+  StreamController<AppNotification> get selectNotificationStream;
 
-  Future<void> registerCallBacks({IosCallBack? onIosReceiveLocalNotification, AndroidCallBack? onSelectNotification});
+  Future<void> init();
+
+  Future<void> dispose();
+
+  Future<void> registerCallBacks();
 
   Future<bool> requestIOSPermissions();
 

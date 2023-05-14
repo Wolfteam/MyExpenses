@@ -34,6 +34,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+  final notificationService = getIt<NotificationService>();
   late TabController _tabController;
   DateTime? _pausedAt;
 
@@ -79,18 +80,14 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     return BlocListener<MainTabBloc, MainTabState>(
       listener: (ctx, state) async {
-        final notificationService = getIt<NotificationService>();
         if (Platform.isIOS) {
           await notificationService.requestIOSPermissions();
         }
         if (!mounted) {
           return;
         }
-
-        await notificationService.registerCallBacks(
-          onIosReceiveLocalNotification: _onDidReceiveLocalNotification,
-          onSelectNotification: _onSelectNotification,
-        );
+        notificationService.selectNotificationStream.stream.listen((notification) => _onSelectNotification(notification));
+        await notificationService.registerCallBacks();
       },
       //TODO: DESKTOP SCAFFOLD
       child: Platform.isWindows
@@ -126,6 +123,7 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
   void dispose() {
     _tabController.dispose();
     WidgetsBinding.instance.removeObserver(this);
+    notificationService.dispose();
     super.dispose();
   }
 
@@ -149,18 +147,12 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
     );
   }
 
-  Future<void> _onSelectNotification(String? json) async {
-    if (json.isNullEmptyOrWhitespace) {
-      return;
-    }
-
+  Future<void> _onSelectNotification(AppNotification notification) async {
     final settingsService = getIt<SettingsService>();
     final logger = getIt<LoggingService>();
 //TODO: IF YOU OPEN THE NOTIFICATION WHILE THE APP IS CLOSED, NOTHING HAPPENS
     try {
       WidgetsFlutterBinding.ensureInitialized();
-      final notification = AppNotification.fromJson(jsonDecode(json!) as Map<String, dynamic>);
-
       final i18n = await getI18n(settingsService.language);
       switch (notification.type) {
         case NotificationType.openCsv:
