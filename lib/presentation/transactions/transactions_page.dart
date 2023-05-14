@@ -32,6 +32,13 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final now = DateTime.now();
+    context.read<TransactionsBloc>().add(TransactionsEvent.loadTransactions(inThisDate: now));
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
 
