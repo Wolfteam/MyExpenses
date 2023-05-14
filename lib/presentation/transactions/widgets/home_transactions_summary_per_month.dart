@@ -178,12 +178,14 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
   }
 
   Future _changeCurrentDate(BuildContext context) async {
+    final darkTheme = Theme.of(context).brightness == Brightness.dark;
     final now = DateTime.now();
     await showMonthPicker(
       context: context,
       initialDate: currentDate,
       lastDate: DateTime(now.year + 1),
       locale: locale,
+      unselectedMonthTextColor: darkTheme ? Colors.white : Colors.black,
     ).then((selectedDate) {
       if (selectedDate == null) {
         return;

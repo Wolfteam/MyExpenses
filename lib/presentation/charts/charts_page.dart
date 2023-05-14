@@ -129,6 +129,7 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
   }
 
   Future<void> _changeCurrentMonthDate(ChartsState state) async {
+    final darkTheme = Theme.of(context).brightness == Brightness.dark;
     final now = DateTime.now();
     final selectedDate = await showMonthPicker(
       context: context,
@@ -136,6 +137,7 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
       // firstDate: state.currentDate,
       lastDate: DateTime(now.year + 1),
       locale: currentLocale(state.language),
+      unselectedMonthTextColor: darkTheme ? Colors.white : Colors.black,
     );
 
     if (selectedDate == null) {

@@ -48,7 +48,6 @@ extension AppThemeTypeExtensions on AppAccentColorType {
           primaryColor: color,
           primaryColorLight: color.withOpacity(0.5),
           primaryColorDark: color,
-          accentColor: color,
           colorScheme: ColorScheme.dark(primary: color, secondary: color),
         );
       case AppThemeType.light:
@@ -56,7 +55,6 @@ extension AppThemeTypeExtensions on AppAccentColorType {
           primaryColor: color,
           primaryColorLight: color.withOpacity(0.8),
           primaryColorDark: color,
-          accentColor: color,
           colorScheme: ColorScheme.light(primary: color, secondary: color),
         );
       default:
