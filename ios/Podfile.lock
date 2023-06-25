@@ -39,7 +39,7 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - permission_handler_apple (9.0.4):
+  - permission_handler_apple (9.1.0):
     - Flutter
   - rate_my_app (2.0.0):
     - Flutter
@@ -141,7 +141,7 @@ SPEC CHECKSUMS:
   flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
   flutter_native_timezone_updated_gradle: d144a6b4980d61d022c539d090ab39bb390aac90
   flutter_secure_storage: 23fc622d89d073675f2eaa109381aefbcf5a49be
-  fluttertoast: eb263d302cc92e04176c053d2385237e9f43fad0
+  fluttertoast: fafc4fa4d01a6a9e4f772ecd190ffa525e9e2d9c
   google_sign_in_ios: 1256ff9d941db546373826966720b0c24804bcdd
   GoogleSignIn: 5651ce3a61e56ca864160e79b484cd9ed3f49b7a
   GTMAppAuth: 0ff230db599948a9ad7470ca667337803b3fc4dd
@@ -150,10 +150,10 @@ SPEC CHECKSUMS:
   local_auth_ios: c6cf091ded637a88f24f86a8875d8b0f526e2605
   open_filex: 6e26e659846ec990262224a12ef1c528bb4edbe4
   package_info_plus: fd030dabf36271f146f1f3beacd48f564b0f17f7
-  path_provider_foundation: c68054786f1b4f3343858c1e1d0caaded73f0be9
-  permission_handler_apple: 44366e37eaf29454a1e7b1b7d736c2cceaeb17ce
+  path_provider_foundation: eaf5b3e458fc0e5fbb9940fb09980e853fe058b8
+  permission_handler_apple: 8f116445eff3c0e7c65ad60f5fef5490aa94b4e4
   rate_my_app: 80fba94c4885cd31738231b7b1f51c1ad726f5c7
-  shared_preferences_foundation: 986fc17f3d3251412d18b0265f9c64113a8c2472
+  shared_preferences_foundation: e2dae3258e06f44cc55f49d42024fd8dd03c590c
   sqlite3: fd89671d969f3e73efe503ce203e28b016b58f68
   sqlite3_flutter_libs: 04ba0d14a04335a2fbf9a331e8664f401fbccdd5
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
