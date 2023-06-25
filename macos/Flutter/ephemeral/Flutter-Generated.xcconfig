@@ -1,10 +1,10 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=/Users/ebastidas/fvm/versions/3.10.0
+FLUTTER_ROOT=/Users/ebastidas/fvm/versions/3.10.5
 FLUTTER_APPLICATION_PATH=/Users/ebastidas/Documents/MyExpenses
 COCOAPODS_PARALLEL_CODE_SIGN=true
 FLUTTER_BUILD_DIR=build
 FLUTTER_BUILD_NAME=1.2.3
-FLUTTER_BUILD_NUMBER=52
+FLUTTER_BUILD_NUMBER=54
 DART_OBFUSCATION=false
 TRACK_WIDGET_CREATION=true
 TREE_SHAKE_ICONS=false

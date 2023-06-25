@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class TransactionMixin {
+mixin TransactionMixin {
   bool isTransactionAnIncome(double amount) {
     return amount >= 0;
   }

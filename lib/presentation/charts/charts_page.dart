@@ -19,7 +19,7 @@ class ChartsPage extends StatefulWidget {
 }
 
 //TODO: MAYBE IMPROVE THIS BLOC AND THE DETAILS ONE
-class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMixin<ChartsPage> {
+class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMixin<ChartsPage>, TransactionMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -40,10 +40,10 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
           children: state.map(
             loaded: (state) {
               final totalYearlyBalance = TransactionUtils.getTotalAmounts(state.transactionsPerYear.map((e) => e.totalAmount));
-              final totalYearlyColor = TransactionMixin().getTransactionColor(isAnIncome: totalYearlyBalance >= 0);
+              final totalYearlyColor = getTransactionColor(isAnIncome: totalYearlyBalance >= 0);
 
               final monthlyBalance = TransactionUtils.getTotalAmounts(state.transactionsPerMonth.map((e) => e.totalAmount));
-              final monthlyBalanceColor = TransactionMixin().getTransactionColor(isAnIncome: monthlyBalance >= 0);
+              final monthlyBalanceColor = getTransactionColor(isAnIncome: monthlyBalance >= 0);
 
               return [
                 Padding(
