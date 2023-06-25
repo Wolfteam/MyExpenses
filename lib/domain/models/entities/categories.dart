@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:my_expenses/domain/models/entities/base_entity.dart';
+import 'package:my_expenses/domain/models/entities.dart';
 import 'package:my_expenses/domain/models/entities/converters/db_converters.dart';
 
 @DataClassName('Category')
@@ -12,5 +12,5 @@ class Categories extends BaseEntity {
 
   IntColumn get iconColor => integer().map(const ColorConverter())();
 
-  IntColumn get userId => integer().nullable().customConstraint('REFERENCES users(id)')();
+  IntColumn get userId => integer().nullable().references(Users, #id)();
 }

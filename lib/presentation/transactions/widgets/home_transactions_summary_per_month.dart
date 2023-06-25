@@ -1,7 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:month_picker_dialog_2/month_picker_dialog_2.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/generated/l10n.dart';
@@ -57,7 +57,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
         children: <Widget>[
           Text(
             month,
-            style: Theme.of(context).textTheme.headline6,
+            style: Theme.of(context).textTheme.titleLarge,
           ),
           IconButton(
             icon: const Icon(Icons.swap_horiz),
@@ -101,7 +101,7 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
   Widget _buildSummary(BuildContext context) {
     final theme = Theme.of(context);
     final i18n = S.of(context);
-    final textStyle = theme.textTheme.subtitle1!.copyWith(fontWeight: FontWeight.bold);
+    final textStyle = theme.textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold);
     final expenseTextStyle = textStyle.copyWith(color: Colors.red);
     final incomeTextStyle = textStyle.copyWith(color: Colors.green);
 
@@ -178,12 +178,14 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
   }
 
   Future _changeCurrentDate(BuildContext context) async {
+    final darkTheme = Theme.of(context).brightness == Brightness.dark;
     final now = DateTime.now();
     await showMonthPicker(
       context: context,
       initialDate: currentDate,
       lastDate: DateTime(now.year + 1),
       locale: locale,
+      unselectedMonthTextColor: darkTheme ? Colors.white : Colors.black,
     ).then((selectedDate) {
       if (selectedDate == null) {
         return;

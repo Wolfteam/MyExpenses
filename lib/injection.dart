@@ -127,6 +127,7 @@ class Injection {
 
     if (!getIt.isRegistered<NotificationService>()) {
       final impl = NotificationServiceImpl(getIt<LoggingService>());
+      await impl.init();
       getIt.registerSingleton<NotificationService>(impl);
     }
 
@@ -212,6 +213,8 @@ class Injection {
     await settingsService.init();
 
     final notificationService = NotificationServiceImpl(loggingService);
+    await notificationService.init();
+
     final pathService = PathServiceImpl();
     final db = getIsolateDatabase();
     final transactionsDao = TransactionsDaoImpl(db);

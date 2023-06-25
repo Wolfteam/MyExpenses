@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 import 'package:googleapis/people/v1.dart' as people;
@@ -305,11 +306,10 @@ class GoogleServiceImpl implements GoogleService {
       _logger.info(runtimeType, '_getAuthClient: Token was updated, saving it...');
       await _saveAccessCredentials(credentials);
     }
-
-    final client = g_auth.authenticatedClient(http.Client(), credentials);
+    final client = await _googleSignIn.authenticatedClient();
 
     _logger.info(runtimeType, '_getAuthClient: Returning auth client...');
-    return client;
+    return client!;
   }
 
   Future<g_auth.AccessToken> _getAccessToken(GoogleSignInAccount account) async {

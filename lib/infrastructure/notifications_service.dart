@@ -1,10 +1,14 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:enum_to_string/enum_to_string.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
+import 'package:my_expenses/domain/extensions/string_extensions.dart';
+import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/domain/services/services.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -19,9 +23,14 @@ const _fallbackTimeZone = 'Africa/Accra';
 
 class NotificationServiceImpl implements NotificationService {
   final LoggingService _loggingService;
-
   final _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  final StreamController<AppNotification> _selectNotificationStream = StreamController<AppNotification>.broadcast();
+
   late tz.Location _location;
+
+  @override
+  StreamController<AppNotification> get selectNotificationStream => _selectNotificationStream;
 
   NotificationServiceImpl(this._loggingService);
 
@@ -47,15 +56,47 @@ class NotificationServiceImpl implements NotificationService {
   }
 
   @override
-  Future<void> registerCallBacks({IosCallBack? onIosReceiveLocalNotification, AndroidCallBack? onSelectNotification}) async {
+  Future<void> dispose() async {
+    await selectNotificationStream.close();
+  }
+
+  @override
+  Future<void> registerCallBacks() async {
     try {
       if (Platform.isWindows) {
         return Future.value();
       }
       const initializationSettingsAndroid = AndroidInitializationSettings('ic_notification');
-      final initializationSettingsIOS = IOSInitializationSettings(onDidReceiveLocalNotification: onIosReceiveLocalNotification);
+      final initializationSettingsIOS = DarwinInitializationSettings(
+        onDidReceiveLocalNotification: (int id, String? title, String? body, String? payload) async {
+          // didReceiveLocalNotificationStream.add(
+          //   ReceivedNotification(
+          //     id: id,
+          //     title: title,
+          //     body: body,
+          //     payload: payload,
+          //   ),
+          // );
+        },
+      );
       final initializationSettings = InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
-      await _flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: onSelectNotification);
+      await _flutterLocalNotificationsPlugin.initialize(
+        initializationSettings,
+        onDidReceiveNotificationResponse: (NotificationResponse notificationResponse) {
+          if (notificationResponse.payload.isNullEmptyOrWhitespace) {
+            return;
+          }
+
+          final notification = AppNotification.fromJson(jsonDecode(notificationResponse.payload!) as Map<String, dynamic>);
+          switch (notificationResponse.notificationResponseType) {
+            case NotificationResponseType.selectedNotification:
+              selectNotificationStream.add(notification);
+              break;
+            default:
+              break;
+          }
+        },
+      );
     } catch (e, s) {
       _loggingService.error(runtimeType, 'registerCallBacks: Unknown error occurred', e, s);
     }
@@ -127,7 +168,7 @@ class NotificationServiceImpl implements NotificationService {
       scheduledDate,
       specifics,
       uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-      androidAllowWhileIdle: true,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       payload: payload,
     );
   }
@@ -151,7 +192,7 @@ class NotificationServiceImpl implements NotificationService {
       largeIcon: const DrawableResourceAndroidBitmap(_largeIcon),
       tag: _getTagFromNotificationType(type),
     );
-    const iOS = IOSNotificationDetails();
+    const iOS = DarwinNotificationDetails();
 
     return NotificationDetails(android: android, iOS: iOS);
   }

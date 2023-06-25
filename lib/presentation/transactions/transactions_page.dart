@@ -18,7 +18,6 @@ class TransactionsPage extends StatefulWidget {
 class _TransactionsPageState extends State<TransactionsPage> with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late ScrollController _scrollController;
   late AnimationController _hideFabAnimController;
-  bool _didChangeDependencies = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -35,16 +34,10 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-//TODO: Once this is fixed, this should not be required anymore  https://github.com/flutter/flutter/issues/39872
-    if (_didChangeDependencies) return;
     final now = DateTime.now();
     context.read<TransactionsBloc>().add(TransactionsEvent.loadTransactions(inThisDate: now));
-
-    _didChangeDependencies = true;
   }
 
-//TODO: https://github.com/flutter/flutter/issues/55170
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -121,7 +114,7 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
                   Text(
                     state.showParentTransactions ? i18n.recurringTransactions : i18n.transactions,
                     textAlign: TextAlign.start,
-                    style: Theme.of(context).textTheme.headline6,
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                   IconButton(
                     icon: const Icon(Icons.swap_horiz),

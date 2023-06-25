@@ -76,7 +76,7 @@ Future<DatabaseConnection> _connectAsync() async {
 }
 
 AppDatabase getIsolateDatabase() {
-  return AppDatabase.connect(DatabaseConnection.delayed(_connectAsync()));
+  return AppDatabase.forIsolate(DatabaseConnection.delayed(_connectAsync()));
 }
 
 Future<DriftIsolate> _createMoorIsolate() async {
@@ -136,8 +136,7 @@ class _IsolateStartRequest {
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
-  // this constructor is used by the isolates
-  AppDatabase.connect(super.connection) : super.connect();
+  AppDatabase.forIsolate(super.executor);
 
   @override
   int get schemaVersion => 2;
@@ -148,6 +147,8 @@ class AppDatabase extends _$AppDatabase {
           return m.createAll();
         },
         beforeOpen: (details) async {
+          await customStatement('PRAGMA foreign_keys = ON');
+
           if (details.wasCreated) {
             final defaultCats = getDefaultCategories();
             await batch((b) {
@@ -156,6 +157,9 @@ class AppDatabase extends _$AppDatabase {
           }
         },
         onUpgrade: (Migrator m, int from, int to) async {
+          // disable foreign_keys before migrations
+          await customStatement('PRAGMA foreign_keys = OFF');
+
           if (from == 1) {
             //long description was added in v2
             await m.addColumn(transactions, transactions.longDescription);

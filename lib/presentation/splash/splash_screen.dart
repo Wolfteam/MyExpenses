@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:local_auth_android/types/auth_messages_android.dart';
-import 'package:local_auth_platform_interface/types/auth_messages.dart';
+import 'package:local_auth_android/local_auth_android.dart';
+import 'package:local_auth_ios/local_auth_ios.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/generated/l10n.dart';
@@ -92,6 +92,11 @@ class _BodyState extends State<_Body> {
             cancelButton: i18n.cancel,
             signInTitle: i18n.signInTitle,
             biometricRequiredTitle: i18n.fingerprintRequired,
+            goToSettingsButton: i18n.goToSettings,
+            goToSettingsDescription: i18n.goToSettingDescription,
+          ),
+          IOSAuthMessages(
+            cancelButton: i18n.cancel,
             goToSettingsButton: i18n.goToSettings,
             goToSettingsDescription: i18n.goToSettingDescription,
           ),

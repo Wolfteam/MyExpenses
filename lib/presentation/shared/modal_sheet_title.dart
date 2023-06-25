@@ -13,7 +13,7 @@ class ModalSheetTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: padding,
-      child: Text(title, style: Theme.of(context).textTheme.headline6),
+      child: Text(title, style: Theme.of(context).textTheme.titleLarge),
     );
   }
 }

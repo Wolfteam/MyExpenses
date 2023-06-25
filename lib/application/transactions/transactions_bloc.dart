@@ -51,16 +51,11 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     final month = toBeginningOfSentenceCase(
       DateUtils.formatAppDate(inThisDate, _settingsService.getCurrentLanguageModel(), DateUtils.fullMonthFormat),
     );
-    final now = DateTime.now();
     final from = DateUtils.getFirstDayDateOfTheMonth(inThisDate);
     final to = DateUtils.getLastDayDateOfTheMonth(from);
 
     try {
       final currentUser = await _usersDao.getActiveUser();
-      if (from.isBefore(now) || from.isAtSameMomentAs(now)) {
-        _transactionsDao.saveRecurringTransactions(now, currentUser?.id);
-      }
-
       _logger.info(runtimeType, '_buildInitialState: Getting all the transactions from = $from to = $to');
 
       final transactions = await _transactionsDao.getAllTransactions(currentUser?.id, from, to);

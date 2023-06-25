@@ -81,14 +81,14 @@ class _PortraitLayout extends StatelessWidget {
             margin: const EdgeInsets.only(left: 20),
             child: Text(
               onlyIncomes ? i18n.incomes : i18n.expenses,
-              style: theme.textTheme.headline6,
+              style: theme.textTheme.titleLarge,
             ),
           ),
           Container(
             margin: const EdgeInsets.only(left: 20),
             child: Text(
               '${state.transactionsTotalAmount} \$',
-              style: theme.textTheme.headline6!.copyWith(color: onlyIncomes ? Colors.green : Colors.red),
+              style: theme.textTheme.titleLarge!.copyWith(color: onlyIncomes ? Colors.green : Colors.red),
             ),
           ),
           AspectRatio(aspectRatio: 3 / 2, child: PieChartTransactionsPerMonths(chartData, 45)),
@@ -140,14 +140,14 @@ class _LandscapeLayout extends StatelessWidget {
                   margin: const EdgeInsets.only(left: 20),
                   child: Text(
                     onlyIncomes ? i18n.incomes : i18n.expenses,
-                    style: theme.textTheme.headline6,
+                    style: theme.textTheme.titleLarge,
                   ),
                 ),
                 Container(
                   margin: const EdgeInsets.only(left: 20),
                   child: Text(
                     '${state.transactionsTotalAmount} \$',
-                    style: theme.textTheme.headline6!.copyWith(color: onlyIncomes ? Colors.green : Colors.red),
+                    style: theme.textTheme.titleLarge!.copyWith(color: onlyIncomes ? Colors.green : Colors.red),
                   ),
                 ),
                 Expanded(child: PieChartTransactionsPerMonths(chartData, 30)),
@@ -205,7 +205,7 @@ class _FilterRow extends StatelessWidget {
         children: <Widget>[
           Text(
             i18n.transactions,
-            style: theme.textTheme.headline6,
+            style: theme.textTheme.titleLarge,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,

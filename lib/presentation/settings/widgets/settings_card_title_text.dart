@@ -16,7 +16,7 @@ class SettingsCardTitleText extends StatelessWidget {
         icon,
         Container(
           margin: const EdgeInsets.only(left: 5),
-          child: Text(text, style: Theme.of(context).textTheme.headline6),
+          child: Text(text, style: Theme.of(context).textTheme.titleLarge),
         ),
       ],
     );

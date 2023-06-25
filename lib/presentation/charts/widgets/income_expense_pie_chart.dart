@@ -29,8 +29,8 @@ class IncomeExpensePieChart extends StatelessWidget {
     final theme = Theme.of(context);
     final i18n = S.of(context);
     final isDarkTheme = theme.brightness == Brightness.dark;
-    final titleStyle = theme.textTheme.subtitle2;
-    final textStyle = theme.textTheme.headline6;
+    final titleStyle = theme.textTheme.titleSmall;
+    final textStyle = theme.textTheme.titleLarge;
     final dataToUse = TransactionUtils.buildChartTransactionItems(transactions, onlyIncomes: incomes);
 
     final currencyBloc = context.read<CurrencyBloc>();

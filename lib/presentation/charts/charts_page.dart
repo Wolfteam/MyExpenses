@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:month_picker_dialog_2/month_picker_dialog_2.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/utils/transaction_utils.dart';
 import 'package:my_expenses/generated/l10n.dart';
@@ -19,7 +19,7 @@ class ChartsPage extends StatefulWidget {
 }
 
 //TODO: MAYBE IMPROVE THIS BLOC AND THE DETAILS ONE
-class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMixin<ChartsPage> {
+class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMixin<ChartsPage>, TransactionMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -40,24 +40,24 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
           children: state.map(
             loaded: (state) {
               final totalYearlyBalance = TransactionUtils.getTotalAmounts(state.transactionsPerYear.map((e) => e.totalAmount));
-              final totalYearlyColor = TransactionMixin().getTransactionColor(isAnIncome: totalYearlyBalance >= 0);
+              final totalYearlyColor = getTransactionColor(isAnIncome: totalYearlyBalance >= 0);
 
               final monthlyBalance = TransactionUtils.getTotalAmounts(state.transactionsPerMonth.map((e) => e.totalAmount));
-              final monthlyBalanceColor = TransactionMixin().getTransactionColor(isAnIncome: monthlyBalance >= 0);
+              final monthlyBalanceColor = getTransactionColor(isAnIncome: monthlyBalance >= 0);
 
               return [
                 Padding(
                   padding: const EdgeInsets.only(left: 5),
                   child: Text(
                     '${i18n.incomes} & ${i18n.expenses}',
-                    style: theme.textTheme.headline6,
+                    style: theme.textTheme.titleLarge,
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: 5, top: 10),
                   child: Text(
                     i18n.yearly,
-                    style: theme.textTheme.subtitle1,
+                    style: theme.textTheme.titleMedium,
                   ),
                 ),
                 Align(
@@ -78,7 +78,7 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
                   padding: const EdgeInsets.only(left: 5, top: 10),
                   child: Text(
                     i18n.monthly,
-                    style: theme.textTheme.subtitle1,
+                    style: theme.textTheme.titleMedium,
                   ),
                 ),
                 if (state.transactionsPerMonth.isNotEmpty)
@@ -129,6 +129,7 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
   }
 
   Future<void> _changeCurrentMonthDate(ChartsState state) async {
+    final darkTheme = Theme.of(context).brightness == Brightness.dark;
     final now = DateTime.now();
     final selectedDate = await showMonthPicker(
       context: context,
@@ -136,6 +137,7 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
       // firstDate: state.currentDate,
       lastDate: DateTime(now.year + 1),
       locale: currentLocale(state.language),
+      unselectedMonthTextColor: darkTheme ? Colors.white : Colors.black,
     );
 
     if (selectedDate == null) {
@@ -187,7 +189,7 @@ class _ChartBottomBalance extends StatelessWidget {
         i18n.balanceX(formattedAmount),
         textAlign: TextAlign.end,
         overflow: TextOverflow.ellipsis,
-        style: theme.textTheme.subtitle1!.copyWith(color: textColor),
+        style: theme.textTheme.titleMedium!.copyWith(color: textColor),
       ),
     );
   }

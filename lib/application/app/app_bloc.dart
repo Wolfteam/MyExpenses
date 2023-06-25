@@ -4,11 +4,15 @@ import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
+import 'package:my_expenses/domain/models/entities/daos/transactions_dao.dart';
+import 'package:my_expenses/domain/models/entities/daos/users_dao.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/domain/services/services.dart';
 
 part 'app_bloc.freezed.dart';
+
 part 'app_event.dart';
+
 part 'app_state.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
@@ -18,6 +22,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   final BackgroundService _backgroundService;
   final DeviceInfoService _deviceInfoService;
   final GoogleService _googleService;
+  final TransactionsDao _transactionsDao;
+  final UsersDao _usersDao;
 
   late StreamSubscription _portSubscription;
   StreamSubscription? _syncSubscription;
@@ -29,6 +35,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     this._backgroundService,
     this._deviceInfoService,
     this._googleService,
+    this._transactionsDao,
+    this._usersDao,
   ) : super(const AppState.loading()) {
     _listenBgPort();
   }
@@ -101,6 +109,10 @@ class AppBloc extends Bloc<AppEvent, AppState> {
       });
     }
 
+    final now = DateTime.now();
+    final currentUser = await _usersDao.getActiveUser();
+    await _transactionsDao.saveRecurringTransactions(now, currentUser?.id);
+
     _logger.info(runtimeType, 'Current settings are: ${_settingsService.appSettings.toJson()}');
 
     await Future.delayed(const Duration(milliseconds: 500));
@@ -138,8 +150,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   }
 
   Future<void> _registerRecurringBackgroundTask(BackgroundTranslations translations) async {
-    await _backgroundService.cancelRecurringTransactionsTask();
-    await _backgroundService.registerRecurringTransactionsTask(translations);
-    _settingsService.isRecurringTransTaskRegistered = true;
+    try {
+      await _backgroundService.cancelRecurringTransactionsTask();
+      await _backgroundService.registerRecurringTransactionsTask(translations);
+      _settingsService.isRecurringTransTaskRegistered = true;
+    } catch (e, s) {
+      _logger.error(runtimeType, '_registerRecurringBackgroundTask: Unknown error', e, s);
+    }
   }
 }
