@@ -30,35 +30,27 @@ class AppDrawerItem extends StatelessWidget {
       case AppDrawerItemType.transactions:
         icon = const Icon(Icons.account_balance);
         text = i18n.transactions;
-        break;
       case AppDrawerItemType.reports:
         icon = const Icon(Icons.insert_drive_file);
         text = i18n.reports;
-        break;
       case AppDrawerItemType.charts:
         icon = const Icon(Icons.pie_chart);
         text = i18n.charts;
-        break;
       case AppDrawerItemType.categories:
         icon = const Icon(Icons.category);
         text = i18n.categories;
-        break;
       case AppDrawerItemType.settings:
         icon = const Icon(Icons.settings);
         text = i18n.config;
-        break;
       case AppDrawerItemType.logout:
         icon = const Icon(Icons.arrow_back);
         text = i18n.logout;
-        break;
       case AppDrawerItemType.estimates:
         icon = const Icon(Icons.attach_money);
         text = i18n.estimates;
-        break;
       case AppDrawerItemType.search:
         icon = const Icon(Icons.search);
         text = i18n.search;
-        break;
       default:
         throw Exception('Invalid drawer item type = $type');
     }

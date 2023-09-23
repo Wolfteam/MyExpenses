@@ -106,8 +106,8 @@ class DeviceInfoServiceImpl implements DeviceInfoService {
     final validTypes = [BiometricType.face, BiometricType.fingerprint];
     _canUseFingerPrint = canCheckBiometrics && validTypes.any((type) => availableBiometrics.contains(type));
     _deviceInfo = {
-      'Model': info.model ?? _na,
-      'OsVersion': info.systemVersion ?? _na,
+      'Model': info.model,
+      'OsVersion': info.systemVersion,
       'AppVersion': _version,
     };
   }

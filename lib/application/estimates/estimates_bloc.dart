@@ -110,7 +110,7 @@ class EstimatesBloc extends Bloc<EstimatesEvent, EstimatesState> {
         untilDate,
       );
 
-      final periods = tuple.item2.where((period) => period.isAfter(now)).toList();
+      final periods = tuple.$2.where((period) => period.isAfter(now)).toList();
       for (var i = 0; i < periods.length; i++) {
         transactions.add(parent);
       }

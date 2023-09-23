@@ -113,13 +113,13 @@ class _BodyState extends State<_Body> {
         controller: widget.scrollController,
         slivers: state.map(
           loading: (_) => [
-            SliverFillRemaining(
+            const SliverFillRemaining(
               hasScrollBody: false,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [CircularProgressIndicator()],
+                children: [CircularProgressIndicator()],
               ),
-            )
+            ),
           ],
           initial: (s) => [
             SliverAppBar(
@@ -182,7 +182,7 @@ class _BodyState extends State<_Body> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [NothingFound(msg: i18n.noTransactionsForThisPeriod)],
                 ),
-              )
+              ),
           ],
         ),
       ),

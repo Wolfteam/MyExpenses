@@ -149,7 +149,7 @@ class _FormState extends State<_Form> {
                   child: Text(i18n.ok),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),

@@ -135,16 +135,15 @@ class _BarChart extends StatelessWidget {
                 interval: interval,
               ),
             ),
-            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: const AxisTitles(),
+            topTitles: const AxisTitles(),
           ),
           gridData: FlGridData(
-            show: true,
             drawVerticalLine: false,
             horizontalInterval: interval,
             checkToShowHorizontalLine: (value) => true,
             getDrawingHorizontalLine: (value) {
-              final zeroLine = FlLine(color: lineColor, strokeWidth: 2);
+              final zeroLine = FlLine(color: lineColor);
               final otherLine = FlLine(color: lineColor, strokeWidth: 0.8);
               if (incomesIsChecked) {
                 return value <= 0 ? zeroLine : otherLine;

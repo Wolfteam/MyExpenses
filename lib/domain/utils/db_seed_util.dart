@@ -230,7 +230,7 @@ List<TransactionsCompanion> getDefaultRecurringTransactions() {
       repetitions: 1,
       cycle: RepetitionCycleType.eachDay,
       nextRecurringDate: transDate,
-    )
+    ),
   ];
 }
 

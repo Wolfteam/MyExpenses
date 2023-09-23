@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -6,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
-import 'package:my_expenses/domain/extensions/string_extensions.dart';
 import 'package:my_expenses/domain/models/entities/daos/transactions_dao.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/domain/services/services.dart';
@@ -141,7 +139,7 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
               Navigator.of(context, rootNavigator: true).pop();
             },
             child: Text(i18n.ok),
-          )
+          ),
         ],
       ),
     );
@@ -182,19 +180,14 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
                 break;
               case ResultType.fileNotFound:
                 ToastUtils.showInfoToast(context, i18n.fileNotFound(notification.payload!));
-                break;
               case ResultType.noAppToOpen:
                 ToastUtils.showInfoToast(context, i18n.noAppToOpenFile);
-                break;
               case ResultType.permissionDenied:
                 ToastUtils.showWarningToast(context, i18n.openFilePermissionRequestFailedMsg);
-                break;
               case ResultType.error:
                 ToastUtils.showErrorToast(context, i18n.unknownErrorOcurred);
-                break;
             }
           }
-          break;
         case NotificationType.openTransactionDetails:
           final transDao = getIt<TransactionsDao>();
           final transaction = await transDao.getTransaction(int.parse(notification.payload!));
@@ -204,7 +197,6 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
           final route = AddEditTransactionPage.editRoute(transaction, context);
           await Navigator.push(context, route);
           await route.completed;
-          break;
         case NotificationType.msg:
           break;
       }

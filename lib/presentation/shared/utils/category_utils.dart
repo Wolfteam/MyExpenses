@@ -310,7 +310,7 @@ class CategoryUtils {
       icon: Icon(CustomIcons.wheelchair),
       name: wheelchair,
       type: CategoryIconType.family,
-    )
+    ),
   ];
 
   static const List<CategoryIcon> foodIcons = <CategoryIcon>[

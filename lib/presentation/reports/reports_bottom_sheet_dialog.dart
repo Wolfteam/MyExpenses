@@ -59,7 +59,7 @@ class _Body extends StatelessWidget {
                   child: Center(
                     child: CircularProgressIndicator(),
                   ),
-                )
+                ),
               ];
             }
             final fromDateString = utils.DateUtils.formatDateWithoutLocale(state.from, utils.DateUtils.monthDayAndYearFormat);
@@ -117,7 +117,7 @@ class _Body extends StatelessWidget {
                     child: Text(i18n.generate),
                   ),
                 ],
-              )
+              ),
             ];
           },
           generated: (_) => [],

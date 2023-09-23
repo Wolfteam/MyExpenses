@@ -457,7 +457,7 @@ class AddEditTransactionHeader extends StatelessWidget {
                         ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
             ),

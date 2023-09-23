@@ -30,7 +30,7 @@ class TransactionsCardContainer extends StatelessWidget {
             shrinkWrap: true,
             itemCount: model.transactions.length,
             itemBuilder: (context, index) => TransactionItem(item: model.transactions[index]),
-          )
+          ),
         ],
       ),
     );

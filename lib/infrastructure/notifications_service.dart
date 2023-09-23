@@ -91,7 +91,6 @@ class NotificationServiceImpl implements NotificationService {
           switch (notificationResponse.notificationResponseType) {
             case NotificationResponseType.selectedNotification:
               selectNotificationStream.add(notification);
-              break;
             default:
               break;
           }

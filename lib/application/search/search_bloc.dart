@@ -113,12 +113,12 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
   SearchState _tempFromDateChanged(DateTime? newValue) {
     final correctedDates = DateUtils.correctDates(newValue, currentState.tempUntil);
-    return _tempDatesChanged(correctedDates.item1, correctedDates.item2);
+    return _tempDatesChanged(correctedDates.$1, correctedDates.$2);
   }
 
   SearchState _tempToDateChanged(DateTime? newValue) {
     final correctedDates = DateUtils.correctDates(currentState.tempFrom, newValue, fromHasPriority: false);
-    return _tempDatesChanged(correctedDates.item1, correctedDates.item2);
+    return _tempDatesChanged(correctedDates.$1, correctedDates.$2);
   }
 
   SearchState _resetTempDates() => _tempDatesChanged(currentState.from, currentState.until);

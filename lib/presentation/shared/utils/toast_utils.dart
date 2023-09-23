@@ -32,19 +32,15 @@ class ToastUtils {
       case _ToastType.info:
         bgColor = Colors.blue;
         icon = const Icon(Icons.info, color: Colors.white);
-        break;
       case _ToastType.succeed:
         bgColor = Colors.green;
         icon = const Icon(Icons.check, color: Colors.white);
-        break;
       case _ToastType.warning:
         bgColor = Colors.orange;
         icon = const Icon(Icons.warning, color: Colors.white);
-        break;
       case _ToastType.error:
         bgColor = Colors.red;
         icon = const Icon(Icons.dangerous, color: Colors.white);
-        break;
       default:
         throw Exception('Invalid toast type = $type');
     }

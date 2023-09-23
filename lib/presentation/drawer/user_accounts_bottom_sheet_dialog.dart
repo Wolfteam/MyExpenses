@@ -111,7 +111,7 @@ class _Content extends StatelessWidget {
                           child: Text(i18n.add),
                         ),
                     ],
-                  )
+                  ),
                 ],
               ),
         orElse: () => const Loading(useScaffold: false),

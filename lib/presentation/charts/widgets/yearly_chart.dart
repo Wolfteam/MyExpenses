@@ -36,15 +36,12 @@ class YearlyChart extends StatelessWidget {
         child: LineChart(
           LineChartData(
             gridData: FlGridData(
-              show: true,
-              drawVerticalLine: true,
               getDrawingHorizontalLine: (value) => FlLine(color: gridColor, strokeWidth: 0.5),
               getDrawingVerticalLine: (value) => FlLine(color: gridColor, strokeWidth: 0.5),
             ),
             titlesData: FlTitlesData(
-              show: true,
-              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles: const AxisTitles(),
+              topTitles: const AxisTitles(),
               bottomTitles: AxisTitles(
                 sideTitles: SideTitles(
                   showTitles: true,
@@ -102,13 +99,11 @@ class YearlyChart extends StatelessWidget {
             lineBarsData: [
               LineChartBarData(
                 spots: spots,
-                isCurved: false,
                 gradient: LinearGradient(colors: gradientColors),
                 barWidth: 3,
                 isStrokeCapRound: true,
                 shadow: Shadow(color: accentColor),
                 dotData: FlDotData(
-                  show: true,
                   getDotPainter: (x, y, z, w) => FlDotCirclePainter(color: Colors.white, strokeColor: Colors.black),
                 ),
                 belowBarData: BarAreaData(

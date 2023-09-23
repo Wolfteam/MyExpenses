@@ -59,21 +59,18 @@ class ChartDetailsBloc extends Bloc<ChartDetailsEvent, ChartDetailsState> {
         } else {
           transactions.sort((t1, t2) => t2.description.compareTo(t1.description));
         }
-        break;
       case TransactionFilterType.amount:
         if (sortDirection == SortDirectionType.asc) {
           transactions.sort((t1, t2) => t1.amount.abs().compareTo(t2.amount.abs()));
         } else {
           transactions.sort((t1, t2) => t2.amount.abs().compareTo(t1.amount.abs()));
         }
-        break;
       case TransactionFilterType.date:
         if (sortDirection == SortDirectionType.asc) {
           transactions.sort((t1, t2) => t1.transactionDate.compareTo(t2.transactionDate));
         } else {
           transactions.sort((t1, t2) => t2.transactionDate.compareTo(t1.transactionDate));
         }
-        break;
       case TransactionFilterType.category:
         break;
       default:

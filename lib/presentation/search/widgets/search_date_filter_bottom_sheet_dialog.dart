@@ -24,7 +24,7 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
         padding: Styles.modalBottomSheetContainerPadding,
         child: BlocBuilder<SearchBloc, SearchState>(
           builder: (ctx, state) => state.map(
-            loading: (_) => Column(
+            loading: (_) => const Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             ),

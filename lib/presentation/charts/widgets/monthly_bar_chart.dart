@@ -70,17 +70,16 @@ class MonthlyBarChart extends StatelessWidget {
                   interval: interval,
                 ),
               ),
-              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles: const AxisTitles(),
+              topTitles: const AxisTitles(),
             ),
             gridData: FlGridData(
-              show: true,
               drawVerticalLine: false,
               horizontalInterval: interval,
               checkToShowHorizontalLine: (value) => true,
               getDrawingHorizontalLine: (value) {
                 if (value == 0) {
-                  return FlLine(color: lineColor, strokeWidth: 2);
+                  return FlLine(color: lineColor);
                 }
                 return FlLine(color: lineColor, strokeWidth: 0.8);
               },

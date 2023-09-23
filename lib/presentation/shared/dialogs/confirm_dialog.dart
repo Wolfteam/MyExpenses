@@ -36,7 +36,7 @@ class ConfirmDialog extends StatelessWidget {
             Navigator.pop(context);
           },
           child: Text(okText ?? s.ok),
-        )
+        ),
       ],
     );
   }

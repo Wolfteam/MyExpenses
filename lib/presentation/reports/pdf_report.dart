@@ -147,7 +147,7 @@ Map<DateTime, List<TransactionItem>> _buildTransactionsPerMonth(List<Transaction
       transPerMonth[date]!.add(transaction);
     } else {
       transPerMonth.addAll({
-        date: [transaction]
+        date: [transaction],
       });
     }
   }

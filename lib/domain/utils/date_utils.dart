@@ -1,6 +1,5 @@
 import 'package:intl/intl.dart';
 import 'package:my_expenses/domain/models/models.dart';
-import 'package:tuple/tuple.dart';
 
 class DateUtils {
   static const String fullMonthFormat = 'MMMM';
@@ -80,12 +79,12 @@ class DateUtils {
     }
   }
 
-  static Tuple2<DateTime?, DateTime?> correctDates(DateTime? from, DateTime? to, {bool fromHasPriority = true}) {
+  static (DateTime?, DateTime?) correctDates(DateTime? from, DateTime? to, {bool fromHasPriority = true}) {
     var start = from;
     var until = to;
 
     if (from == null || to == null) {
-      return Tuple2(start, until);
+      return (start, until);
     }
 
     if (fromHasPriority) {
@@ -97,6 +96,6 @@ class DateUtils {
         start = to.add(const Duration(days: -1));
       }
     }
-    return Tuple2(start, until);
+    return (start, until);
   }
 }

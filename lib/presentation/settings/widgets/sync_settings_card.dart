@@ -51,7 +51,7 @@ class SyncSettingsCard extends StatelessWidget {
             icon: const Icon(Icons.sync),
             onPressed: () => _triggerSyncTask(context),
             label: Text(i18n.syncNow),
-          )
+          ),
         ],
       ),
     );

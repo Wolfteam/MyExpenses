@@ -180,10 +180,8 @@ class BackgroundServiceImpl implements BackgroundService {
             return;
           }
           await _runSyncTask(translations);
-          break;
         case _recurringTransName:
           await _runRecurringTransTask(translations);
-          break;
         default:
           _logger.warning(runtimeType, 'bgSync: Task = $task is not valid');
           throw Exception('Bg task = $task is invalid');

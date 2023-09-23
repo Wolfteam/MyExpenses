@@ -47,7 +47,7 @@ class SettingsServiceImpl implements SettingsService {
       );
 
   @override
-  AppThemeType get appTheme => AppThemeType.values[(_prefs.getInt(_appThemeKey))!];
+  AppThemeType get appTheme => AppThemeType.values[_prefs.getInt(_appThemeKey)!];
 
   @override
   set appTheme(AppThemeType theme) => _prefs.setInt(_appThemeKey, theme.index);

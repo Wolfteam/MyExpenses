@@ -95,16 +95,12 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
     switch (item) {
       case AppDrawerItemType.transactions:
         index = 0;
-        break;
       case AppDrawerItemType.charts:
         index = 1;
-        break;
       case AppDrawerItemType.categories:
         index = 2;
-        break;
       case AppDrawerItemType.settings:
         index = 3;
-        break;
       default:
         throw Exception('The selected drawer item = $item is not valid in the bottom nav bar items');
     }

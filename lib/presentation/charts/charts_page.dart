@@ -115,11 +115,11 @@ class _ChartsPageState extends State<ChartsPage> with AutomaticKeepAliveClientMi
                           transactions: state.transactions,
                           totalAmount: state.totalExpenseAmount,
                         ),
-                      )
+                      ),
                     ],
                   )
                 else
-                  NothingFound(msg: i18n.noRecurringTransactionsWereFound)
+                  NothingFound(msg: i18n.noRecurringTransactionsWereFound),
               ];
             },
           ),

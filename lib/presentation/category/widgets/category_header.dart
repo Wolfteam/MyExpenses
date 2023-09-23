@@ -101,7 +101,7 @@ class CategoryHeader extends StatelessWidget {
                         ),
                       ],
                     ),
-                  )
+                  ),
                 ],
               ),
             ),

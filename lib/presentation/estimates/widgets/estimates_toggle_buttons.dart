@@ -27,7 +27,7 @@ class EstimatesToggleButtons extends StatelessWidget {
                 children: <Widget>[
                   const Icon(Icons.select_all, size: 16.0, color: Colors.blue),
                   const SizedBox(width: 4.0),
-                  Text(i18n.all, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.blue))
+                  Text(i18n.all, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.blue)),
                 ],
               ),
               Row(
@@ -35,7 +35,7 @@ class EstimatesToggleButtons extends StatelessWidget {
                 children: <Widget>[
                   const Icon(CustomIcons.money, size: 16.0, color: Colors.green),
                   const SizedBox(width: 4.0),
-                  Text(i18n.incomes, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.green))
+                  Text(i18n.incomes, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.green)),
                 ],
               ),
               Row(
@@ -43,7 +43,7 @@ class EstimatesToggleButtons extends StatelessWidget {
                 children: <Widget>[
                   const Icon(Icons.money_off, size: 16.0, color: Colors.red),
                   const SizedBox(width: 4.0),
-                  Text(i18n.expenses, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.red))
+                  Text(i18n.expenses, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.red)),
                 ],
               ),
             ],

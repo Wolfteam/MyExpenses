@@ -32,7 +32,7 @@ class PdfTransactionTable extends StatelessWidget {
       //headers
       _buildRowHeader(context, translations),
       //rows
-      ...transactions.asMap().map((index, t) => MapEntry(index, _buildRowItem(context, index + 1, t, translations, formatter))).values
+      ...transactions.asMap().map((index, t) => MapEntry(index, _buildRowItem(context, index + 1, t, translations, formatter))).values,
     ];
 
     return Container(

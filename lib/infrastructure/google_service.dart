@@ -233,7 +233,7 @@ class GoogleServiceImpl implements GoogleService {
         pageToken = result.nextPageToken;
       } while (pageToken != null);
 
-      return {for (var v in files) v.id!: v.name!};
+      return {for (final v in files) v.id!: v.name!};
     } catch (e, s) {
       _logger.error(runtimeType, 'getAllImages: Unknown error occurred...', e, s);
       rethrow;

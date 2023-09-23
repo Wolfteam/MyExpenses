@@ -72,7 +72,7 @@ class AppDrawerHeader extends StatelessWidget {
                     style: theme.textTheme.bodySmall,
                   ),
                 ),
-              )
+              ),
           ],
         ),
       ),

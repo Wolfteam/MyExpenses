@@ -8,10 +8,8 @@ extension ScrollControllerExtensions on ScrollController {
         break;
       case ScrollDirection.forward:
         hideFabController.forward();
-        break;
       case ScrollDirection.reverse:
         hideFabController.reverse();
-        break;
     }
 
     if (position.pixels == 0 && position.atEdge) {

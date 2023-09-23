@@ -151,7 +151,7 @@ class _TabBarView extends StatelessWidget {
           loadIncomes: false,
           isInSelectionMode: isInSelectionMode,
           selectedCategory: selectedCategory,
-        )
+        ),
       ],
     );
   }

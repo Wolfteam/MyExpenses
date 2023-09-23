@@ -28,7 +28,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
     ]);
     var results = <TypedResult>[];
     if (userId == null) {
-      results = await (query..where((categories.userId.isNull()))).get();
+      results = await (query..where(categories.userId.isNull())).get();
     } else {
       results = await (query..where(categories.userId.equals(userId))).get();
     }
@@ -170,8 +170,8 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
 
     var results = <TypedResult>[];
     if (userId == null) {
-      results = await (query..where((categories.userId.isNull()))).get();
-    }else {
+      results = await (query..where(categories.userId.isNull())).get();
+    } else {
       results = await (query..where(categories.userId.equals(userId))).get();
     }
 
@@ -198,7 +198,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
 
     var results = <TypedResult>[];
     if (userId == null) {
-      results = await (query..where((categories.userId.isNull()))).get();
+      results = await (query..where(categories.userId.isNull())).get();
     } else {
       results = await (query..where(categories.userId.equals(userId))).get();
     }
@@ -270,12 +270,11 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
             (t) => t.parentTransactionId.isNotNull() & t.parentTransactionId.equals(parent.id) & t.transactionDate.isIn(periods),
           ))
         .join([
-          innerJoin(
-            categories,
-            categories.id.equalsExp(transactions.categoryId),
-          )
-        ])
-        .get();
+      innerJoin(
+        categories,
+        categories.id.equalsExp(transactions.categoryId),
+      ),
+    ]).get();
 
     return results.map(_mapToTransactionItem).toList();
   }
@@ -608,7 +607,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
       innerJoin(categories, categories.id.equalsExp(transactions.categoryId)),
     ]);
     if (userId == null) {
-      query = query..where((categories.userId.isNull()));
+      query = query..where(categories.userId.isNull());
     } else {
       query = query..where(categories.userId.equals(userId));
     }
@@ -629,13 +628,10 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
       switch (comparerType) {
         case ComparerType.equal:
           query = query..where(transactions.amount.abs().equals(amount));
-          break;
         case ComparerType.greaterOrEqualThan:
           query = query..where(transactions.amount.abs().isBiggerOrEqualValue(amount));
-          break;
         case ComparerType.lessOrEqualThan:
           query = query..where(transactions.amount.abs().isSmallerOrEqualValue(amount));
-          break;
       }
     }
 
@@ -652,19 +648,15 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
       case TransactionFilterType.description:
         orderingTerm =
             sortDirectionType == SortDirectionType.asc ? OrderingTerm.asc(transactions.description) : OrderingTerm.desc(transactions.description);
-        break;
       case TransactionFilterType.amount:
         orderingTerm =
             sortDirectionType == SortDirectionType.asc ? OrderingTerm.asc(transactions.amount.abs()) : OrderingTerm.desc(transactions.amount.abs());
-        break;
       case TransactionFilterType.date:
         orderingTerm = sortDirectionType == SortDirectionType.asc
             ? OrderingTerm.asc(transactions.transactionDate)
             : OrderingTerm.desc(transactions.transactionDate);
-        break;
       case TransactionFilterType.category:
         orderingTerm = sortDirectionType == SortDirectionType.asc ? OrderingTerm.asc(categories.name) : OrderingTerm.desc(categories.name);
-        break;
     }
     query = query..orderBy([orderingTerm]);
 
@@ -688,8 +680,8 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
       }
 
       final tuple = TransactionUtils.getRecurringTransactionPeriods(parent.repetitionCycle, parent.transactionDate, parent.nextRecurringDate!, now);
-      final nextRecurringDate = tuple.item1;
-      final periods = tuple.item2;
+      final nextRecurringDate = tuple.$1;
+      final periods = tuple.$2;
       final children = await checkAndSaveRecurringTransactions(parent, nextRecurringDate, periods);
 
       createdChildren.addAll(children);

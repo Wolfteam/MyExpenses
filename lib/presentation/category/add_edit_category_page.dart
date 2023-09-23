@@ -72,7 +72,7 @@ class _Scaffold extends StatelessWidget {
                 if (state.isNew)
                   CategoryForm.create(type: state.type, iconData: state.icon, iconColor: state.iconColor)
                 else
-                  CategoryForm.edit(id: state.id, name: state.name, type: state.type, iconData: state.icon, iconColor: state.iconColor)
+                  CategoryForm.edit(id: state.id, name: state.name, type: state.type, iconData: state.icon, iconColor: state.iconColor),
               ],
             ),
           ),

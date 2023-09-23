@@ -161,7 +161,7 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
               children: [
                 NothingFound(
                   msg: state.showParentTransactions ? i18n.noRecurringTransactionsWereFound : i18n.noTransactionsForThisPeriod,
-                )
+                ),
               ],
             );
           },
