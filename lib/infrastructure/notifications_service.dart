@@ -10,6 +10,7 @@ import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/extensions/string_extensions.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/domain/services/services.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -22,6 +23,8 @@ const _largeIcon = 'cost';
 const _fallbackTimeZone = 'Africa/Accra';
 
 class NotificationServiceImpl implements NotificationService {
+  static bool isPlatformSupported = [Platform.isAndroid, Platform.isIOS, Platform.isMacOS].any((el) => el);
+
   final LoggingService _loggingService;
   final _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -38,7 +41,7 @@ class NotificationServiceImpl implements NotificationService {
   Future<void> init() async {
     try {
       //TODO: TIMEZONES ON WINDOWS
-      if (Platform.isWindows) {
+      if (!isPlatformSupported) {
         return;
       }
       tz.initializeTimeZones();
@@ -53,19 +56,12 @@ class NotificationServiceImpl implements NotificationService {
       _loggingService.error(runtimeType, 'init: Failed to get timezone or device is GMT or UTC, assigning the generic one...', e, s);
       _setDefaultTimeZone();
     }
-  }
 
-  @override
-  Future<void> dispose() async {
-    await selectNotificationStream.close();
-  }
-
-  @override
-  Future<void> registerCallBacks() async {
     try {
-      if (Platform.isWindows) {
-        return Future.value();
+      if (!Platform.isMacOS) {
+        await Permission.notification.request();
       }
+
       const initializationSettingsAndroid = AndroidInitializationSettings('ic_notification');
       final initializationSettingsIOS = DarwinInitializationSettings(
         onDidReceiveLocalNotification: (int id, String? title, String? body, String? payload) async {
@@ -102,15 +98,8 @@ class NotificationServiceImpl implements NotificationService {
   }
 
   @override
-  Future<bool> requestIOSPermissions() async {
-    final specificImpl = _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
-    final result = await specificImpl?.requestPermissions(alert: true, badge: true, sound: true);
-
-    if (result == null) {
-      return false;
-    }
-
-    return result;
+  Future<void> dispose() async {
+    await selectNotificationStream.close();
   }
 
   @override

@@ -78,14 +78,10 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     return BlocListener<MainTabBloc, MainTabState>(
       listener: (ctx, state) async {
-        if (Platform.isIOS) {
-          await notificationService.requestIOSPermissions();
-        }
         if (!mounted) {
           return;
         }
         notificationService.selectNotificationStream.stream.listen((notification) => _onSelectNotification(notification));
-        await notificationService.registerCallBacks();
       },
       //TODO: DESKTOP SCAFFOLD
       child: Platform.isWindows

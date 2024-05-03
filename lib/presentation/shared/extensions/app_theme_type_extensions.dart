@@ -45,6 +45,7 @@ extension AppThemeTypeExtensions on AppAccentColorType {
     switch (theme) {
       case AppThemeType.dark:
         return ThemeData.dark().copyWith(
+          useMaterial3: false,
           primaryColor: color,
           primaryColorLight: color.withOpacity(0.5),
           primaryColorDark: color,
@@ -52,6 +53,7 @@ extension AppThemeTypeExtensions on AppAccentColorType {
         );
       case AppThemeType.light:
         return ThemeData.light().copyWith(
+          useMaterial3: false,
           primaryColor: color,
           primaryColorLight: color.withOpacity(0.8),
           primaryColorDark: color,

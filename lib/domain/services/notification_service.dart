@@ -10,10 +10,6 @@ abstract class NotificationService {
 
   Future<void> dispose();
 
-  Future<void> registerCallBacks();
-
-  Future<bool> requestIOSPermissions();
-
   Future<void> showNotificationWithoutId(AppNotificationType type, String title, String body, {String? payload});
 
   Future<void> showNotification(int id, AppNotificationType type, String title, String body, {String? payload});
