@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
+import 'package:my_expenses/domain/extensions/string_extensions.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/settings/widgets/setting_card_subtitle_text.dart';
 import 'package:my_expenses/presentation/settings/widgets/settings_card.dart';
 import 'package:my_expenses/presentation/settings/widgets/settings_card_title_text.dart';
+import 'package:my_expenses/presentation/shared/common_dropdown_button.dart';
 import 'package:my_expenses/presentation/shared/extensions/app_theme_type_extensions.dart';
+import 'package:my_expenses/presentation/shared/styles.dart';
+import 'package:my_expenses/presentation/shared/utils/enum_utils.dart';
 
 class AccentColorSettingsCard extends StatelessWidget {
   final AppAccentColorType accentColorType;
@@ -23,44 +27,25 @@ class AccentColorSettingsCard extends StatelessWidget {
         children: <Widget>[
           SettingsCardTitleText(text: i18n.accentColor, icon: const Icon(Icons.colorize)),
           SettingsCardSubtitleText(text: i18n.chooseAccentColor),
-          GridView.count(
-            shrinkWrap: true,
-            primary: false,
-            padding: const EdgeInsets.all(20),
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            crossAxisCount: 5,
-            children: AppAccentColorType.values
-                .map(
-                  (accentColor) => _Item(accentColor: accentColor, isSelected: accentColorType == accentColor),
-                )
-                .toList(),
+          Padding(
+            padding: Styles.edgeInsetHorizontal16,
+            child: CommonDropdownButton<AppAccentColorType>(
+              hint: i18n.chooseAccentColor,
+              currentValue: accentColorType,
+              values: EnumUtils.getTranslatedAndSortedEnum<AppAccentColorType>(AppAccentColorType.values, (val, _) => _getAccentColorName(val)),
+              onChanged: _accentColorChanged,
+              leadingIconBuilder: (val) => Container(
+                margin: const EdgeInsets.only(right: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: val.getAccentColor(),
+                ),
+                width: 20,
+                height: 20,
+              ),
+            ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _Item extends StatelessWidget {
-  final AppAccentColorType accentColor;
-  final bool isSelected;
-
-  const _Item({
-    required this.accentColor,
-    required this.isSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final color = accentColor.getAccentColor();
-
-    return InkWell(
-      onTap: () => _accentColorChanged(accentColor, context),
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        color: color,
-        child: isSelected ? const Icon(Icons.check, color: Colors.white) : null,
       ),
     );
   }
@@ -68,5 +53,11 @@ class _Item extends StatelessWidget {
   void _accentColorChanged(AppAccentColorType newValue, BuildContext context) {
     context.read<SettingsBloc>().add(SettingsEvent.appAccentColorChanged(selectedAccentColor: newValue));
     context.read<AppBloc>().add(AppEvent.accentColorChanged(accentColor: newValue));
+  }
+
+  String _getAccentColorName(AppAccentColorType color) {
+    final name = color.name;
+    final words = name.split(RegExp('(?<=[a-z])(?=[A-Z])'));
+    return words.map((e) => e.toCapitalized()).join(' ');
   }
 }

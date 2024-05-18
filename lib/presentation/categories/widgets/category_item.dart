@@ -24,7 +24,7 @@ class CategoryItem extends StatelessWidget {
     }
 
     return Container(
-      decoration: isInSelectionMode && !isAnotherItemSelected && category.isSelected ? BoxDecoration(color: theme.primaryColorLight) : null,
+      decoration: isInSelectionMode && !isAnotherItemSelected && category.isSelected ? BoxDecoration(color: theme.colorScheme.secondary) : null,
       child: ListTile(
         leading: IconTheme(
           data: IconThemeData(color: category.iconColor),

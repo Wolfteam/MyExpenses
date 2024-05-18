@@ -59,6 +59,7 @@ class _CategoriesListPageState extends State<CategoriesListPage> with AutomaticK
           ? FloatingActionButton(
               heroTag: widget.loadIncomes ? 'AddIncomesFab' : 'AddExpensesFab',
               onPressed: _gotoAddCategoryPage,
+              mini: true,
               child: const Icon(Icons.add),
             )
           : null,

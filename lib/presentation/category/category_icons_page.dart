@@ -118,7 +118,7 @@ class _Icon extends StatelessWidget {
       key: isSelected ? _selectedKey : null,
       iconSize: 30,
       color: isSelected
-          ? theme.primaryColor
+          ? theme.colorScheme.primary
           : theme.brightness == Brightness.dark
               ? Colors.white
               : Colors.black87,

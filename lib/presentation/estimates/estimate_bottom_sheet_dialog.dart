@@ -33,7 +33,6 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final i18n = S.of(context);
-    final textColor = theme.brightness == Brightness.dark ? Colors.white : Colors.black;
     return BlocBuilder<EstimatesBloc, EstimatesState>(
       builder: (ctx, state) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -51,13 +50,13 @@ class _Body extends StatelessWidget {
             ),
             Text('${i18n.startDate}:'),
             TextButton(
-              style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap, foregroundColor: textColor),
+              style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
               onPressed: () => _changeDate(context, s.fromDate, s.currentLanguage, true),
               child: Align(alignment: Alignment.centerLeft, child: Text(s.fromDateString)),
             ),
             Text('${i18n.untilDate}:'),
             TextButton(
-              style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap, foregroundColor: textColor),
+              style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
               onPressed: () => _changeDate(context, s.untilDate, s.currentLanguage, false),
               child: Align(alignment: Alignment.centerLeft, child: Text(s.untilDateString)),
             ),
@@ -72,9 +71,9 @@ class _Body extends StatelessWidget {
             ButtonBar(
               layoutBehavior: ButtonBarLayoutBehavior.constrained,
               children: <Widget>[
-                OutlinedButton(
+                TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text(i18n.close, style: TextStyle(color: theme.primaryColor)),
+                  child: Text(i18n.close),
                 ),
               ],
             ),

@@ -34,8 +34,6 @@ class OtherSettingsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final i18n = S.of(context);
-    final theme = Theme.of(context);
-
     final content = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -48,32 +46,27 @@ class OtherSettingsCard extends StatelessWidget {
             hint: i18n.currencySymbol,
             currentValue: currencySymbolType,
             values: CurrencySymbolType.values.map((e) => TranslatedEnum(e, CurrencyUtils.getCurrencySymbol(e))).toList(),
-            isDense: true,
-            selectedItemBuilder: (ctx) => CurrencySymbolType.values.map((value) => _CurrencyItem(value: value)).toList(),
+            selectedItemBuilder: (current) => _CurrencyItem(value: current.enumValue),
             onChanged: (v, _) => _currencyChanged(v, context),
           ),
         ),
         SwitchListTile(
-          activeColor: theme.colorScheme.secondary,
           value: currencyToTheRight,
           title: Text(i18n.currencySymbolToRight),
           onChanged: (v) => _currencyPlacementChanged(v, context),
         ),
         SwitchListTile(
-          activeColor: theme.colorScheme.secondary,
           value: askForPassword,
           title: Text(i18n.askForPassword),
           onChanged: (v) => _askForPasswordChanged(v, context),
         ),
         if (canUseFingerPrint)
           SwitchListTile(
-            activeColor: theme.colorScheme.secondary,
             value: askForFingerPrint,
             title: Text(i18n.askForFingerPrint),
             onChanged: (v) => _askForFingerPrintChanged(v, context),
           ),
         SwitchListTile(
-          activeColor: theme.colorScheme.secondary,
           value: showNotificationForRecurringTrans,
           title: Text(i18n.showNotificationForRecurringTrans),
           onChanged: (v) => _showNotificationForRecurringTransChanged(v, context),

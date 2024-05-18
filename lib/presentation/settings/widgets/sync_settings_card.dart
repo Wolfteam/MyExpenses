@@ -42,7 +42,6 @@ class SyncSettingsCard extends StatelessWidget {
             ),
           ),
           SwitchListTile(
-            activeColor: theme.colorScheme.secondary,
             value: showNotificationAfterFullSync,
             title: Text(i18n.showNotificationAfterFullSync),
             onChanged: (v) => _showNotificationAfterFullSyncChanged(v, context),

@@ -177,7 +177,6 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
       child: ScaleTransition(
         scale: _hideFabAnimController,
         child: FloatingActionButton(
-          backgroundColor: Theme.of(context).primaryColor,
           mini: true,
           onPressed: () => _scrollController.goToTheTop(),
           child: const Icon(Icons.arrow_upward),

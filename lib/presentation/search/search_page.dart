@@ -57,7 +57,6 @@ class _SearchPageState extends State<SearchPage> with SingleTickerProviderStateM
           scale: _hideFabAnimController,
           child: FloatingActionButton(
             mini: true,
-            backgroundColor: Theme.of(context).primaryColor,
             onPressed: () => _scrollController.goToTheTop(),
             child: const Icon(Icons.arrow_upward),
           ),

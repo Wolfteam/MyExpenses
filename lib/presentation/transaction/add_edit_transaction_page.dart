@@ -13,6 +13,7 @@ import 'package:my_expenses/injection.dart';
 import 'package:my_expenses/presentation/categories/categories_page.dart';
 import 'package:my_expenses/presentation/shared/extensions/i18n_extensions.dart';
 import 'package:my_expenses/presentation/shared/input_suffix_icon.dart';
+import 'package:my_expenses/presentation/shared/styles.dart';
 import 'package:my_expenses/presentation/shared/utils/bloc_utils.dart';
 import 'package:my_expenses/presentation/shared/utils/toast_utils.dart';
 import 'package:my_expenses/presentation/transaction/widgets/form_app_bar.dart';
@@ -148,7 +149,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                 if (isChildTransaction)
                   Text(
                     i18n.childTransactionCantBeDeleted,
-                    style: theme.textTheme.bodySmall!.copyWith(color: theme.primaryColorDark),
+                    style: theme.textTheme.bodySmall!.copyWith(color: theme.colorScheme.primary),
                   ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -352,19 +353,23 @@ class AddEditTransactionHeader extends StatelessWidget {
         : '${i18n.date}: $transactionDateString';
 
     final formattedAmount = context.watch<CurrencyBloc>().format(amount);
-    final categoryType = category.isAnIncome ? i18n.income : i18n.expense;
     final repetitionCycleType = i18n.translateRepetitionCycleType(repetitionCycle);
+    final Color? transactionColor = category.id <= 0
+        ? null
+        : category.isAnIncome
+            ? Colors.green
+            : Colors.red;
 
     return SizedBox(
       height: 260.0,
       child: Stack(
         children: <Widget>[
-          Container(height: 150, color: theme.primaryColorDark),
+          Container(height: 150, color: theme.colorScheme.primary),
           Container(
             padding: const EdgeInsets.only(
               top: 60.0,
-              left: 20.0,
-              right: 20.0,
+              left: 10.0,
+              right: 10.0,
               bottom: 10.0,
             ),
             child: Material(
@@ -377,68 +382,49 @@ class AddEditTransactionHeader extends StatelessWidget {
                 ),
               ),
               elevation: 5.0,
-              child: Column(
-                children: <Widget>[
-                  const SizedBox(
-                    height: 50.0,
-                  ),
-                  Text(
-                    description,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(
-                    height: 5.0,
-                  ),
-                  Text(
-                    dateString,
-                    style: theme.textTheme.titleSmall,
-                  ),
-                  const SizedBox(
-                    height: 16.0,
-                  ),
-                  SizedBox(
-                    height: 40.0,
-                    child: Row(
+              child: Container(
+                margin: Styles.edgeInsetHorizontal16,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    const SizedBox(height: 40.0),
+                    Text(
+                      description,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                    Text(
+                      dateString,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleSmall,
+                    ),
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: <Widget>[
                         Expanded(
                           child: ListTile(
+                            contentPadding: EdgeInsets.zero,
                             title: Tooltip(
                               message: formattedAmount,
                               child: Text(
                                 formattedAmount,
                                 textAlign: TextAlign.center,
                                 overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.titleLarge,
+                                style: theme.textTheme.titleLarge!.copyWith(color: transactionColor),
                               ),
                             ),
                             subtitle: Text(
                               i18n.amount.toUpperCase(),
                               textAlign: TextAlign.center,
+                              overflow: TextOverflow.ellipsis,
                               style: theme.textTheme.bodySmall,
                             ),
                           ),
                         ),
                         Expanded(
                           child: ListTile(
-                            title: Tooltip(
-                              message: categoryType,
-                              child: Text(
-                                categoryType,
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.titleLarge,
-                              ),
-                            ),
-                            subtitle: Text(
-                              i18n.category.toUpperCase(),
-                              textAlign: TextAlign.center,
-                              style: theme.textTheme.bodySmall,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: ListTile(
+                            contentPadding: EdgeInsets.zero,
                             title: Tooltip(
                               message: repetitionCycleType,
                               child: Text(
@@ -451,14 +437,15 @@ class AddEditTransactionHeader extends StatelessWidget {
                             subtitle: Text(
                               i18n.repetitions.toUpperCase(),
                               textAlign: TextAlign.center,
+                              overflow: TextOverflow.ellipsis,
                               style: theme.textTheme.bodySmall,
                             ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -470,8 +457,8 @@ class AddEditTransactionHeader extends StatelessWidget {
               color: theme.cardColor.withOpacity(0.8),
               type: MaterialType.circle,
               child: IconButton(
-                iconSize: 75,
-                icon: FaIcon(category.icon, size: 60),
+                iconSize: 80,
+                icon: FaIcon(category.icon),
                 color: category.iconColor,
                 onPressed: !isChildTransaction ? () => _changeCategory(context) : null,
                 disabledColor: category.iconColor,

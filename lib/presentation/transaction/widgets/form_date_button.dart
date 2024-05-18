@@ -63,7 +63,7 @@ class _FormDateButtonState extends State<FormDateButton> {
             child: Text(
               i18n.recurringDateMustStartFromTomorrow,
               textAlign: TextAlign.center,
-              style: theme.textTheme.bodySmall!.copyWith(color: theme.primaryColorDark),
+              style: theme.textTheme.bodySmall!.copyWith(color: theme.colorScheme.primary),
             ),
           ),
       ],

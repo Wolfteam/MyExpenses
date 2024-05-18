@@ -37,21 +37,17 @@ class _YearPickerDialogState extends State<_YearPickerDialog> {
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
-    final theme = Theme.of(context);
     final width = MediaQuery.of(context).size.width * 0.7;
     return AlertDialog(
       title: Text(s.pickYear),
       actions: [
-        OutlinedButton(
+        TextButton(
           onPressed: () {
             Navigator.pop(context);
           },
-          child: Text(
-            s.cancel,
-            style: TextStyle(color: theme.primaryColor),
-          ),
+          child: Text(s.cancel),
         ),
-        ElevatedButton(
+        FilledButton(
           onPressed: () => Navigator.pop(context, selectedDate),
           child: Text(s.ok),
         ),

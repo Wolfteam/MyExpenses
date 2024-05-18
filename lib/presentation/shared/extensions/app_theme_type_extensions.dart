@@ -41,26 +41,15 @@ extension AppThemeTypeExtensions on AppAccentColorType {
 
   ThemeData getThemeData(AppThemeType theme) {
     final color = getAccentColor();
-    //TODO: TO REMOVE THIS WARNING YOU MAY WANT TO FORK THE month_picker_dialog lib
-    switch (theme) {
-      case AppThemeType.dark:
-        return ThemeData.dark().copyWith(
-          useMaterial3: false,
-          primaryColor: color,
-          primaryColorLight: color.withOpacity(0.5),
-          primaryColorDark: color,
-          colorScheme: ColorScheme.dark(primary: color, secondary: color),
-        );
-      case AppThemeType.light:
-        return ThemeData.light().copyWith(
-          useMaterial3: false,
-          primaryColor: color,
-          primaryColorLight: color.withOpacity(0.8),
-          primaryColorDark: color,
-          colorScheme: ColorScheme.light(primary: color, secondary: color),
-        );
-      default:
-        throw Exception('The provided theme  = $theme is not valid ');
-    }
+    final brightness = switch (theme) {
+      AppThemeType.dark => Brightness.dark,
+      AppThemeType.light => Brightness.light,
+    };
+
+    final ColorScheme colorScheme = ColorScheme.fromSeed(seedColor: color, brightness: brightness);
+    return switch (brightness) {
+      Brightness.dark => ThemeData.dark(useMaterial3: true).copyWith(colorScheme: colorScheme),
+      Brightness.light => ThemeData.light(useMaterial3: true).copyWith(colorScheme: colorScheme),
+    };
   }
 }

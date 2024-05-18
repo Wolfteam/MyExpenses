@@ -32,12 +32,17 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     final i18n = S.of(context);
+    final tabBar = TabBar(
+      controller: _tabController,
+      tabs: [
+        Tab(text: i18n.incomes),
+        Tab(text: i18n.expenses),
+      ],
+    );
 
     if (!widget.isInSelectionMode) {
       return Scaffold(
-        appBar: _TabBar(
-          tabController: _tabController,
-        ),
+        appBar: tabBar,
         body: _TabBarView(
           tabController: _tabController,
           isInSelectionMode: widget.isInSelectionMode,
@@ -57,9 +62,7 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
             ),
         ],
         title: Text(i18n.selectCategory),
-        bottom: _TabBar(
-          tabController: _tabController,
-        ),
+        bottom: tabBar,
       ),
       body: _TabBarView(
         tabController: _tabController,
@@ -100,30 +103,6 @@ class _CategoriesPageState extends State<CategoriesPage> with SingleTickerProvid
     selectedCatProvider.currentSelectedItem = null;
     Navigator.of(context).pop(selectedCatProvider.currentSelectedItem);
   }
-}
-
-class _TabBar extends StatelessWidget implements PreferredSizeWidget {
-  final TabController tabController;
-
-  const _TabBar({required this.tabController});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final i18n = S.of(context);
-    return TabBar(
-      indicatorColor: theme.primaryColor,
-      labelColor: theme.brightness == Brightness.dark ? Colors.white : Colors.black,
-      controller: tabController,
-      tabs: [
-        Tab(icon: const Icon(Icons.more), text: i18n.incomes),
-        Tab(icon: const Icon(Icons.pages), text: i18n.expenses),
-      ],
-    );
-  }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(76);
 }
 
 class _TabBarView extends StatelessWidget {

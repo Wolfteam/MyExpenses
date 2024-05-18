@@ -129,16 +129,13 @@ class _FormState extends State<_Form> {
             ButtonBar(
               children: <Widget>[
                 if (!widget.promptForPassword)
-                  OutlinedButton(
+                  TextButton(
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: Text(
-                      i18n.cancel,
-                      style: TextStyle(color: theme.primaryColor),
-                    ),
+                    child: Text(i18n.cancel),
                   ),
-                ElevatedButton(
+                FilledButton(
                   onPressed: !widget.promptForPassword && !state.isFormValid
                       ? null
                       : !widget.promptForPassword
