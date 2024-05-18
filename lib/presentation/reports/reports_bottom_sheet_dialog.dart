@@ -31,9 +31,7 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final i18n = S.of(context);
-    final textColor = theme.brightness == Brightness.dark ? Colors.white : Colors.black;
     return BlocConsumer<ReportsBloc, ReportState>(
       listener: (ctx, state) async {
         state.map(
@@ -70,7 +68,6 @@ class _Body extends StatelessWidget {
               ModalSheetTitle(title: i18n.exportFrom),
               Text('${i18n.startDate}:'),
               TextButton(
-                style: TextButton.styleFrom(foregroundColor: textColor),
                 onPressed: () => _showDatePicker(context, state.from, true),
                 child: Align(
                   alignment: Alignment.centerLeft,
@@ -79,7 +76,6 @@ class _Body extends StatelessWidget {
               ),
               Text('${i18n.endDate}:'),
               TextButton(
-                style: TextButton.styleFrom(foregroundColor: textColor),
                 onPressed: () => _showDatePicker(context, state.to, false),
                 child: Align(
                   alignment: Alignment.centerLeft,
@@ -103,16 +99,13 @@ class _Body extends StatelessWidget {
               ButtonBar(
                 buttonPadding: const EdgeInsets.symmetric(horizontal: 20),
                 children: <Widget>[
-                  OutlinedButton(
+                  TextButton(
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: Text(
-                      i18n.cancel,
-                      style: TextStyle(color: theme.primaryColor),
-                    ),
+                    child: Text(i18n.cancel),
                   ),
-                  ElevatedButton(
+                  FilledButton(
                     onPressed: () => _generateReport(context),
                     child: Text(i18n.generate),
                   ),

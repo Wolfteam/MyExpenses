@@ -96,17 +96,14 @@ class _Content extends StatelessWidget {
                     ),
                   ButtonBar(
                     children: <Widget>[
-                      OutlinedButton(
+                      TextButton(
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        child: Text(
-                          i18n.close,
-                          style: TextStyle(color: theme.primaryColor),
-                        ),
+                        child: Text(i18n.close),
                       ),
                       if (state.users.isEmpty)
-                        ElevatedButton(
+                        FilledButton(
                           onPressed: () => context.read<UserAccountsBloc>().add(const UserAccountsEvent.signIn()),
                           child: Text(i18n.add),
                         ),

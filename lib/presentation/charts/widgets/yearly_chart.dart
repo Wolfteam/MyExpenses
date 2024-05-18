@@ -93,7 +93,7 @@ class YearlyChart extends StatelessWidget {
                 getTooltipItems: (value) => value
                     .map((e) => LineTooltipItem(bloc.format(e.y), TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: gridColor)))
                     .toList(),
-                tooltipBgColor: accentColor,
+                getTooltipColor: (_) => accentColor,
               ),
             ),
             lineBarsData: [

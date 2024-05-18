@@ -21,16 +21,15 @@ class ConfirmDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
-    final theme = Theme.of(context);
     return AlertDialog(
       title: Text(title),
       content: Text(content),
       actions: [
-        OutlinedButton(
+        TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(cancelText ?? s.cancel, style: TextStyle(color: theme.primaryColor)),
+          child: Text(cancelText ?? s.cancel),
         ),
-        ElevatedButton(
+        FilledButton(
           onPressed: () {
             onOk();
             Navigator.pop(context);

@@ -74,7 +74,7 @@ class FormRepetitionCycleDropDown extends StatelessWidget {
                   i18n.translateRepetitionCycleType(repetitionCycle).toLowerCase(),
                 ),
                 textAlign: TextAlign.center,
-                style: theme.textTheme.bodySmall!.copyWith(color: theme.primaryColorDark),
+                style: theme.textTheme.bodySmall!.copyWith(color: theme.colorScheme.primary),
               ),
             ),
         ],

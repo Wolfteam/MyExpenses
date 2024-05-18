@@ -101,15 +101,14 @@ class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilter
                         )
                         .toList(),
                   ),
-                Divider(color: theme.colorScheme.secondary),
                 ButtonBar(
                   layoutBehavior: ButtonBarLayoutBehavior.constrained,
                   children: <Widget>[
-                    OutlinedButton(
+                    TextButton(
                       onPressed: () => _closeModal(context),
-                      child: Text(i18n.close, style: TextStyle(color: theme.primaryColor)),
+                      child: Text(i18n.close),
                     ),
-                    ElevatedButton(
+                    FilledButton(
                       onPressed: () => _applyAmount(context),
                       child: Text(i18n.apply),
                     ),

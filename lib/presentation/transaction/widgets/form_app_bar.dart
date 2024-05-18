@@ -58,13 +58,13 @@ class FormAppBar extends StatelessWidget implements PreferredSizeWidget {
         title: Text(i18n.deleteX(description)),
         content: Text(i18n.confirmDeleteTransaction),
         actions: <Widget>[
-          OutlinedButton(
+          TextButton(
             onPressed: () {
               Navigator.of(ctx).pop();
             },
             child: Text(i18n.close),
           ),
-          ElevatedButton(
+          FilledButton(
             onPressed: () {
               Navigator.of(ctx).pop();
 
@@ -89,14 +89,14 @@ class FormAppBar extends StatelessWidget implements PreferredSizeWidget {
         title: Text(i18n.deleteX(i18n.childTransactions.toLowerCase())),
         content: Text(i18n.deleteChildTransactionsConfirmation),
         actions: <Widget>[
-          OutlinedButton(
+          TextButton(
             onPressed: () {
               context.read<TransactionFormBloc>().add(const TransactionFormEvent.deleteTransaction(keepChildren: true));
               Navigator.of(ctx).pop();
             },
             child: Text(i18n.no),
           ),
-          ElevatedButton(
+          FilledButton(
             onPressed: () {
               context.read<TransactionFormBloc>().add(const TransactionFormEvent.deleteTransaction(keepChildren: false));
               Navigator.of(ctx).pop();

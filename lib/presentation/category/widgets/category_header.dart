@@ -28,18 +28,18 @@ class CategoryHeader extends StatelessWidget {
     final theme = Theme.of(context);
     final i18n = S.of(context);
     return SizedBox(
-      height: 200.0,
+      height: 220.0,
       child: Stack(
         children: <Widget>[
           Container(
             height: 150,
-            color: theme.primaryColorDark,
+            color: theme.colorScheme.primary,
           ),
           Container(
             padding: const EdgeInsets.only(
               top: 40.0,
-              left: 20.0,
-              right: 20.0,
+              left: 10.0,
+              right: 10.0,
               bottom: 10.0,
             ),
             child: Material(
@@ -47,27 +47,25 @@ class CategoryHeader extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10.0),
               ),
               elevation: 5.0,
-              child: Column(
-                children: <Widget>[
-                  const SizedBox(
-                    height: 50.0,
-                  ),
-                  Padding(
-                    padding: Styles.edgeInsetHorizontal16,
-                    child: Text(
-                      name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.titleLarge,
+              child: Container(
+                margin: Styles.edgeInsetHorizontal16,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    const SizedBox(height: 50.0),
+                    Padding(
+                      padding: Styles.edgeInsetHorizontal16,
+                      child: Text(
+                        name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 5.0,
-                  ),
-                  SizedBox(
-                    height: 40.0,
-                    child: Row(
+                    const SizedBox(height: 5.0),
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: <Widget>[
                         Expanded(
                           child: ListTile(
@@ -80,6 +78,7 @@ class CategoryHeader extends StatelessWidget {
                             subtitle: Text(
                               i18n.category.toUpperCase(),
                               textAlign: TextAlign.center,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(fontSize: 11.0),
                             ),
                           ),
@@ -95,27 +94,27 @@ class CategoryHeader extends StatelessWidget {
                             subtitle: Text(
                               i18n.parent.toUpperCase(),
                               textAlign: TextAlign.center,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(fontSize: 11.0),
                             ),
                           ),
                         ),
                       ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
           Container(
-            margin: const EdgeInsets.only(top: 5),
             alignment: Alignment.topCenter,
             child: Material(
               elevation: 10,
               color: theme.cardColor.withOpacity(0.8),
               type: MaterialType.circle,
               child: IconButton(
-                iconSize: 65,
-                icon: FaIcon(iconData, size: 50),
+                iconSize: 80,
+                icon: FaIcon(iconData),
                 color: iconColor,
                 onPressed: () => _gotoIconsPage(context),
               ),

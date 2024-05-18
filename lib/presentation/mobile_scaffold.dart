@@ -54,7 +54,6 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Theme.of(context).primaryColor,
         heroTag: 'CreateTransactionFab',
         onPressed: () => _gotoAddTransactionPage(context),
         child: const Icon(Icons.add),
@@ -63,7 +62,6 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
         listener: (ctx, state) => _onDrawerStateChanged(state),
         builder: (ctx, state) => BottomNavigationBar(
           showUnselectedLabels: true,
-          selectedItemColor: Theme.of(context).primaryColor,
           type: BottomNavigationBarType.fixed,
           currentIndex: _index,
           onTap: _changeCurrentTab,

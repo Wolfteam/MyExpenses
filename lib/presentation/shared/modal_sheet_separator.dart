@@ -7,13 +7,15 @@ class ModalSheetSeparator extends StatelessWidget {
     return Center(
       child: Container(
         margin: const EdgeInsets.only(bottom: 15),
-        child: SizedBox(
-          width: 100,
-          height: 10,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: theme.primaryColor,
-              borderRadius: BorderRadius.circular(20),
+        child: FractionallySizedBox(
+          widthFactor: 0.3,
+          child: SizedBox(
+            height: 8,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary,
+                borderRadius: BorderRadius.circular(20),
+              ),
             ),
           ),
         ),

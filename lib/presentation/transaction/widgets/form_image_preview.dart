@@ -77,7 +77,6 @@ class _ImageDialog extends StatelessWidget {
                   onPressed: () => Navigator.pop(context),
                 ),
                 IconButton(
-                  color: Theme.of(context).primaryColor,
                   icon: const Icon(Icons.delete),
                   onPressed: () => _showDeleteImageDialog(context).then(
                     (value) {
@@ -121,13 +120,13 @@ class _DeleteImageDialog extends StatelessWidget {
       title: Text(i18n.removeImg),
       content: Text(i18n.areYouSure),
       actions: <Widget>[
-        OutlinedButton(
+        TextButton(
           onPressed: () {
             Navigator.of(context).pop(false);
           },
           child: Text(i18n.cancel),
         ),
-        ElevatedButton(
+        FilledButton(
           onPressed: () {
             Navigator.of(context).pop(true);
           },

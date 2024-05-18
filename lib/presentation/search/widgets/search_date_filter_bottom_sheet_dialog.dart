@@ -12,11 +12,8 @@ import 'package:my_expenses/presentation/shared/utils/i18n_utils.dart';
 class SearchDateFilterBottomSheetDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final i18n = S.of(context);
     final now = DateTime.now();
-    final textColor = theme.brightness == Brightness.dark ? Colors.white : Colors.black;
-
     return SingleChildScrollView(
       padding: MediaQuery.of(context).viewInsets,
       child: Container(
@@ -36,7 +33,7 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
                 ModalSheetTitle(title: i18n.filterByX(i18n.date.toLowerCase())),
                 Text('${i18n.startDate}:'),
                 TextButton(
-                  style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap, foregroundColor: textColor),
+                  style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                   onPressed: () => _changeDate(context, state.tempFrom ?? now, state.currentLanguage, true),
                   child: Align(
                     alignment: Alignment.centerLeft,
@@ -45,26 +42,25 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
                 ),
                 Text('${i18n.untilDate}:'),
                 TextButton(
-                  style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap, foregroundColor: textColor),
+                  style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                   onPressed: () => _changeDate(context, state.tempUntil ?? now, state.currentLanguage, false),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text((state.untilString.isNullEmptyOrWhitespace ? i18n.na : state.untilString)!),
                   ),
                 ),
-                Divider(color: theme.colorScheme.secondary),
                 ButtonBar(
                   layoutBehavior: ButtonBarLayoutBehavior.constrained,
                   children: <Widget>[
-                    OutlinedButton(
+                    TextButton(
                       onPressed: () => _closeModal(context),
-                      child: Text(i18n.close, style: TextStyle(color: theme.primaryColor)),
+                      child: Text(i18n.close),
                     ),
-                    OutlinedButton(
+                    TextButton(
                       onPressed: () => _clearFilters(context),
-                      child: Text(i18n.clear, style: TextStyle(color: theme.primaryColor)),
+                      child: Text(i18n.clear),
                     ),
-                    ElevatedButton(
+                    FilledButton(
                       onPressed: () => _applyDates(context),
                       child: Text(i18n.apply),
                     ),
