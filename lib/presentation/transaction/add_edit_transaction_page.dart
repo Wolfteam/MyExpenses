@@ -685,6 +685,7 @@ class _LongDescriptionInput extends StatelessWidget {
               alignLabelWithHint: true,
               labelText: i18n.longDescription,
               hintText: i18n.descriptionOfThisTransaction,
+              hintMaxLines: 1,
             ),
             autovalidateMode: isLongDescriptionDirty ? AutovalidateMode.always : null,
             onFieldSubmitted: (_) => onSubmit(),
