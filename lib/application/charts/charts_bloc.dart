@@ -74,7 +74,7 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
     return ChartsState.loaded(
       currentYear: selectedYear,
       currentMonthDate: selectedMonthDate,
-      currentMonthDateString: dateString!,
+      currentMonthDateString: dateString,
       transactionsPerMonth: transactionsPerMonth,
       transactionsPerYear: transactionsPerYear,
       transactions: transactions,

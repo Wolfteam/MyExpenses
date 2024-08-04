@@ -78,7 +78,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
           incomes: incomes,
           expenses: expenses,
           total: balance,
-          month: month!,
+          month: month,
           transactions: monthBalance,
           currentDate: inThisDate,
         ),
@@ -204,7 +204,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     }
   }
 
-  List<TransactionsSummaryPerDay> _buildTransactionSummaryPerDayFor(DateTime from,  List<TransactionItem> allTransactions, bool onlyIncomes) {
+  List<TransactionsSummaryPerDay> _buildTransactionSummaryPerDayFor(DateTime from, List<TransactionItem> allTransactions, bool onlyIncomes) {
     final transactions = allTransactions.where((t) => t.category.isAnIncome == onlyIncomes).toList();
     final map = <DateTime, double>{};
     for (final transaction in transactions) {

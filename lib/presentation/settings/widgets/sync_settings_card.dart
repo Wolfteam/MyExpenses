@@ -24,7 +24,6 @@ class SyncSettingsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final i18n = S.of(context);
-    final theme = Theme.of(context);
 
     return SettingsCard(
       child: Column(

@@ -58,7 +58,6 @@ class _FormState extends State<_Form> {
   @override
   Widget build(BuildContext context) {
     final i18n = S.of(context);
-    final theme = Theme.of(context);
     return BlocConsumer<PasswordDialogBloc, PasswordDialogState>(
       listener: (ctx, state) {
         if (state.passwordWasSaved) {

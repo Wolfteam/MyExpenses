@@ -32,7 +32,6 @@ class _Content extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final i18n = S.of(context);
     return BlocConsumer<UserAccountsBloc, UserAccountsState>(
       listener: (ctx, state) {
