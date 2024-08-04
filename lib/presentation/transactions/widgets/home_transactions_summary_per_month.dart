@@ -5,6 +5,7 @@ import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/generated/l10n.dart';
+import 'package:my_expenses/presentation/shared/styles.dart';
 
 class HomeTransactionSummaryPerMonth extends StatelessWidget {
   final String month;
@@ -178,14 +179,12 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
   }
 
   Future _changeCurrentDate(BuildContext context) async {
-    final darkTheme = Theme.of(context).brightness == Brightness.dark;
     final now = DateTime.now();
     await showMonthPicker(
       context: context,
       initialDate: currentDate,
       lastDate: DateTime(now.year + 1),
-      locale: locale,
-      unselectedMonthTextColor: darkTheme ? Colors.white : Colors.black,
+      monthPickerDialogSettings: Styles.getMonthPickerDialogSettings(locale, context),
     ).then((selectedDate) {
       if (selectedDate == null) {
         return;

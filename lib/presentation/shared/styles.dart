@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 
 class Styles {
   static final RoundedRectangleBorder cardSettingsShape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(10));
@@ -22,4 +23,20 @@ class Styles {
   static final popupMenuButtonRadius = BorderRadius.circular(18);
 
   static const double iconButtonSplashRadius = 20;
+
+  static MonthPickerDialogSettings getMonthPickerDialogSettings(Locale locale, BuildContext context) {
+    final theme = Theme.of(context);
+    final darkTheme = theme.brightness == Brightness.dark;
+    return MonthPickerDialogSettings(
+      headerSettings: PickerHeaderSettings(
+        headerBackgroundColor: darkTheme ? theme.colorScheme.primaryContainer : theme.colorScheme.primary,
+      ),
+      dialogSettings: PickerDialogSettings(
+        locale: locale,
+      ),
+      buttonsSettings: PickerButtonsSettings(
+        unselectedMonthsTextColor: darkTheme ? Colors.white : Colors.black,
+      ),
+    );
+  }
 }
