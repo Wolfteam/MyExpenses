@@ -99,12 +99,6 @@ class Injection {
       getIt.registerSingleton<NetworkService>(NetworkServiceImpl());
     }
 
-    if (!getIt.isRegistered<TelemetryService>()) {
-      final impl = TelemetryServiceImpl();
-      await impl.init();
-      getIt.registerSingleton<TelemetryService>(impl);
-    }
-
     if (!getIt.isRegistered<DeviceInfoService>()) {
       final impl = DeviceInfoServiceImpl();
       await impl.init();
@@ -112,7 +106,7 @@ class Injection {
     }
 
     if (!getIt.isRegistered<LoggingService>()) {
-      getIt.registerSingleton<LoggingService>(LoggingServiceImpl(getIt<TelemetryService>(), getIt<DeviceInfoService>()));
+      getIt.registerSingleton<LoggingService>(LoggingServiceImpl(getIt<DeviceInfoService>()));
     }
 
     if (!getIt.isRegistered<PathService>()) {
@@ -201,14 +195,10 @@ class Injection {
     }
 
     //To avoid problems, its better to just get some instances manually
-    final telemetryService = TelemetryServiceImpl();
-    //For some reason the init does not work here...
-    // await telemetryService.init();
-
     final deviceInfoService = DeviceInfoServiceImpl();
     await deviceInfoService.init();
 
-    final loggingService = LoggingServiceImpl(telemetryService, deviceInfoService);
+    final loggingService = LoggingServiceImpl(deviceInfoService);
     final settingsService = SettingsServiceImpl(loggingService);
     await settingsService.init();
 

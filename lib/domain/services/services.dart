@@ -9,4 +9,3 @@ export 'path_service.dart';
 export 'secure_storage_service.dart';
 export 'settings_service.dart';
 export 'sync_service.dart';
-export 'telemetry_service.dart';

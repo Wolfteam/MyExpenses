@@ -5,11 +5,10 @@ import 'package:my_expenses/domain/services/services.dart';
 import 'package:sprintf/sprintf.dart';
 
 class LoggingServiceImpl implements LoggingService {
-  final TelemetryService _telemetryService;
   final DeviceInfoService _deviceInfoService;
   final _logger = Logger();
 
-  LoggingServiceImpl(this._telemetryService, this._deviceInfoService);
+  LoggingServiceImpl(this._deviceInfoService);
 
   @override
   void info(Type type, String msg, [List<Object>? args]) {
@@ -53,12 +52,10 @@ class LoggingServiceImpl implements LoggingService {
 
   void _trackError(String tag, String msg, [dynamic ex, StackTrace? trace]) {
     final map = _buildError(tag, msg, ex, trace);
-    _telemetryService.trackEventAsync('Error - ${DateTime.now()}', map);
   }
 
   void _trackWarning(String tag, String msg, [dynamic ex, StackTrace? trace]) {
     final map = _buildError(tag, msg, ex, trace);
-    _telemetryService.trackEventAsync('Warning - ${DateTime.now()}', map);
   }
 
   Map<String, String> _buildError(String tag, String msg, [dynamic ex, StackTrace? trace]) {
