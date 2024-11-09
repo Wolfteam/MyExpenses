@@ -20,7 +20,6 @@ class TransactionsCardContainer extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
       ),
-      margin: const EdgeInsets.all(5),
       child: Column(
         children: <Widget>[
           _buildHeader(context),

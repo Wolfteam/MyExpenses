@@ -5,6 +5,7 @@ import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/shared/extensions/scroll_controller_extensions.dart';
 import 'package:my_expenses/presentation/shared/nothing_found.dart';
 import 'package:my_expenses/presentation/shared/sliver_loading.dart';
+import 'package:my_expenses/presentation/shared/styles.dart';
 import 'package:my_expenses/presentation/shared/utils/i18n_utils.dart';
 import 'package:my_expenses/presentation/transactions/widgets/home_last_7_days_summary.dart';
 import 'package:my_expenses/presentation/transactions/widgets/home_transactions_summary_per_month.dart';
@@ -43,17 +44,19 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
     super.build(context);
 
     return Scaffold(
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 1),
-          ),
-          _buildTransSummaryPerMonth(),
-          _buildLast7DaysSummary(),
-          _buildTransactionTypeSwitch(),
-          _buildTransactions(),
-        ],
+      body: Padding(
+        padding: Styles.edgeInsetHorizontal10,
+        child: CustomScrollView(
+          controller: _scrollController,
+          slivers: [
+            _buildTransSummaryPerMonth(),
+            const SliverPadding(padding: Styles.edgeInsetAll10),
+            _buildLast7DaysSummary(),
+            const SliverPadding(padding: Styles.edgeInsetAll10),
+            _buildTransactionTypeSwitch(),
+            _buildTransactions(),
+          ],
+        ),
       ),
       floatingActionButton: _buildFab(),
     );
@@ -93,7 +96,7 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
         return state.map(
           loading: (_) => const SliverLoading(),
           initial: (s) => SliverToBoxAdapter(
-            child: s.showLast7Days ? HomeLast7DaysSummary(selectedType: s.selectedType, incomes: s.incomes, expenses: s.expenses) : null,
+            child: s.showLast7Days ? HomeLast7DaysSummary(incomes: s.incomes, expenses: s.expenses) : null,
           ),
         );
       },
@@ -106,28 +109,25 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
         final i18n = S.of(context);
         return state.maybeMap(
           initial: (state) => SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 15, right: 5),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                    state.showParentTransactions ? i18n.recurringTransactions : i18n.transactions,
-                    textAlign: TextAlign.start,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.swap_horiz),
-                    onPressed: () {
-                      if (!state.showParentTransactions) {
-                        context.read<TransactionsBloc>().add(const TransactionsEvent.loadRecurringTransactions());
-                      } else {
-                        context.read<TransactionsBloc>().add(TransactionsEvent.loadTransactions(inThisDate: state.currentDate));
-                      }
-                    },
-                  ),
-                ],
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text(
+                  state.showParentTransactions ? i18n.recurringTransactions : i18n.transactions,
+                  textAlign: TextAlign.start,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.swap_horiz),
+                  onPressed: () {
+                    if (!state.showParentTransactions) {
+                      context.read<TransactionsBloc>().add(const TransactionsEvent.loadRecurringTransactions());
+                    } else {
+                      context.read<TransactionsBloc>().add(TransactionsEvent.loadTransactions(inThisDate: state.currentDate));
+                    }
+                  },
+                ),
+              ],
             ),
           ),
           orElse: () => const SliverLoading(),
@@ -147,10 +147,7 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
                 padding: const EdgeInsets.only(bottom: 25),
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate(
-                    (ctx, index) => Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 5),
-                      child: TransactionsCardContainer(model: state.transactionsPerMonth[index]),
-                    ),
+                    (ctx, index) => TransactionsCardContainer(model: state.transactionsPerMonth[index]),
                     childCount: state.transactionsPerMonth.length,
                   ),
                 ),

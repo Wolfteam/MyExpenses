@@ -1,13 +1,13 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/generated/l10n.dart';
+import 'package:my_expenses/presentation/shared/mixins/transaction_mixin.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
 
-class HomeTransactionSummaryPerMonth extends StatelessWidget {
+class HomeTransactionSummaryPerMonth extends StatelessWidget with TransactionMixin {
   final String month;
   final double expenses;
   final double incomes;
@@ -28,157 +28,81 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 3,
-      margin: const EdgeInsets.all(10),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(bottomRight: Radius.circular(60)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          _buildTitle(context),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              _buildPieChart(context),
-              _buildSummary(context),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTitle(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10, left: 20, right: 15),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Text(
-            month,
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          IconButton(
-            icon: const Icon(Icons.swap_horiz),
-            onPressed: () => _changeCurrentDate(context),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPieChart(BuildContext context) {
-    return SizedBox(
-      height: 180,
-      width: 180,
-      child: PieChart(
-        PieChartData(
-          borderData: FlBorderData(show: false),
-          sectionsSpace: 0,
-          centerSpaceRadius: 0,
-          startDegreeOffset: -90,
-          sections: data
-              .where((el) => el.percentage != 0)
-              .map(
-                (e) => PieChartSectionData(
-                  color: e.color,
-                  value: e.percentage,
-                  title: '${e.percentage} %',
-                  radius: 80,
-                  titleStyle: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              )
-              .toList(),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSummary(BuildContext context) {
+    final currencyBloc = context.watch<CurrencyBloc>();
     final theme = Theme.of(context);
     final i18n = S.of(context);
-    final textStyle = theme.textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold);
-    final expenseTextStyle = textStyle.copyWith(color: Colors.red);
-    final incomeTextStyle = textStyle.copyWith(color: Colors.green);
-
-    final currencyBloc = context.watch<CurrencyBloc>();
-
-    return Expanded(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Text(
-                    '${i18n.income}:',
-                    style: textStyle,
-                  ),
-                  Text(
-                    '${i18n.expense}:',
-                    style: textStyle,
-                  ),
-                  Text(
-                    '${i18n.total}:',
-                    style: textStyle,
-                  ),
-                ],
+    final textStyle = theme.textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold);
+    final expenseTextStyle = textStyle.copyWith(color: getTransactionColor());
+    final incomeTextStyle = textStyle.copyWith(color: getTransactionColor(isAnIncome: true));
+    final double incomePercentage = data.firstWhere((el) => el.isAnIncome).percentage;
+    final double expensesPercentage = data.firstWhere((el) => !el.isAnIncome).percentage;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Text(
+              month,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            IconButton(
+              icon: const Icon(Icons.swap_horiz),
+              onPressed: () => _changeCurrentDate(context),
+            ),
+          ],
+        ),
+        Padding(
+          padding: Styles.edgeInsetHorizontal16,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(
+                flex: 40,
+                child: _SummaryCard.incomes(
+                  amount: incomes,
+                  percentage: incomePercentage,
+                ),
               ),
+              const Spacer(flex: 20),
+              Expanded(
+                flex: 40,
+                child: _SummaryCard.expenses(
+                  amount: expenses,
+                  percentage: expensesPercentage,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: Styles.edgeInsetHorizontal16,
+          child: RichText(
+            textAlign: TextAlign.end,
+            overflow: TextOverflow.ellipsis,
+            text: TextSpan(
+              style: textStyle,
+              children: [
+                TextSpan(
+                  text: i18n.balanceX(''),
+                ),
+                TextSpan(
+                  text: currencyBloc.format(total),
+                  style: total == 0
+                      ? textStyle
+                      : total > 0
+                          ? incomeTextStyle
+                          : expenseTextStyle,
+                ),
+              ],
             ),
           ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(right: 20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Tooltip(
-                    message: currencyBloc.format(incomes),
-                    child: Text(
-                      currencyBloc.format(incomes),
-                      textAlign: TextAlign.end,
-                      overflow: TextOverflow.ellipsis,
-                      style: incomeTextStyle,
-                    ),
-                  ),
-                  Tooltip(
-                    message: currencyBloc.format(expenses),
-                    child: Text(
-                      currencyBloc.format(expenses),
-                      textAlign: TextAlign.end,
-                      overflow: TextOverflow.ellipsis,
-                      style: expenseTextStyle,
-                    ),
-                  ),
-                  Tooltip(
-                    message: currencyBloc.format(total),
-                    child: Text(
-                      currencyBloc.format(total),
-                      textAlign: TextAlign.end,
-                      overflow: TextOverflow.ellipsis,
-                      style: total >= 0 ? incomeTextStyle : expenseTextStyle,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Future _changeCurrentDate(BuildContext context) async {
+  Future<void> _changeCurrentDate(BuildContext context) async {
     final now = DateTime.now();
     await showMonthPicker(
       context: context,
@@ -186,10 +110,72 @@ class HomeTransactionSummaryPerMonth extends StatelessWidget {
       lastDate: DateTime(now.year + 1),
       monthPickerDialogSettings: Styles.getMonthPickerDialogSettings(locale, context),
     ).then((selectedDate) {
-      if (selectedDate == null) {
+      if (selectedDate == null || !context.mounted) {
         return;
       }
       context.read<TransactionsBloc>().add(TransactionsEvent.loadTransactions(inThisDate: selectedDate));
     });
+  }
+}
+
+class _SummaryCard extends StatelessWidget with TransactionMixin {
+  final double amount;
+  final double percentage;
+  final bool isForIncomes;
+
+  const _SummaryCard({
+    required this.amount,
+    required this.percentage,
+    required this.isForIncomes,
+  });
+
+  const _SummaryCard.incomes({
+    required this.amount,
+    required this.percentage,
+  }) : isForIncomes = true;
+
+  const _SummaryCard.expenses({
+    required this.amount,
+    required this.percentage,
+  }) : isForIncomes = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final currencyBloc = context.watch<CurrencyBloc>();
+    final theme = Theme.of(context);
+    final i18n = S.of(context);
+    final textStyle = theme.textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold);
+
+    return Card(
+      color: getTransactionColor(isAnIncome: isForIncomes),
+      child: Padding(
+        padding: Styles.edgeInsetAll10,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(isForIncomes == true ? Icons.arrow_circle_up : Icons.arrow_circle_down),
+            const SizedBox(height: 20),
+            Tooltip(
+              message: currencyBloc.format(amount),
+              child: Text(
+                currencyBloc.format(amount),
+                overflow: TextOverflow.ellipsis,
+                style: textStyle,
+              ),
+            ),
+            Text(
+              i18n.income,
+              style: theme.textTheme.bodySmall,
+              overflow: TextOverflow.ellipsis,
+            ),
+            Text(
+              '$percentage %',
+              style: theme.textTheme.bodySmall,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
