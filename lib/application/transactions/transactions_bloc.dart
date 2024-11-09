@@ -154,9 +154,9 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     List<TransactionItem> transactions,
   ) {
     if (transactions.isNotEmpty) {
-      final incomeAmount = incomes <= 0 ? 0 : incomes;
-      final double expensesPercentage = incomeAmount <= 0 ? 100 : (expenses * 100 / incomeAmount).abs();
-      final double incomesPercentage = expensesPercentage >= 100 ? 0 : 100 - expensesPercentage;
+      final total = incomes.abs() + expenses.abs();
+      final double expensesPercentage = expenses.abs() * 100 / total;
+      final double incomesPercentage = incomes * 100 / total;
 
       return [
         TransactionsSummaryPerMonth(
@@ -172,10 +172,15 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
       ];
     }
 
-    return [
-      const TransactionsSummaryPerMonth(
+    return const [
+      TransactionsSummaryPerMonth(
+        order: 0,
+        percentage: 0,
+        isAnIncome: false,
+      ),
+      TransactionsSummaryPerMonth(
         order: 1,
-        percentage: 100,
+        percentage: 0,
         isAnIncome: true,
       ),
     ];
