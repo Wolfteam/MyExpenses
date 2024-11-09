@@ -5,7 +5,6 @@ class TransactionsLast7DaysState with _$TransactionsLast7DaysState {
   const factory TransactionsLast7DaysState.loading() = _LoadingState;
   const factory TransactionsLast7DaysState.initial({
     required bool showLast7Days,
-    required TransactionType selectedType,
     required List<TransactionsSummaryPerDay> incomes,
     required List<TransactionsSummaryPerDay> expenses,
   }) = _InitialState;

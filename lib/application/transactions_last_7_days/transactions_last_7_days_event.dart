@@ -8,8 +8,4 @@ class TransactionsLast7DaysEvent with _$TransactionsLast7DaysEvent {
     TransactionType? selectedType,
     @Default(true) bool showLast7Days,
   }) = _Init;
-
-  const factory TransactionsLast7DaysEvent.typeChanged({
-    required TransactionType newValue,
-  }) = _TypeChanged;
 }
