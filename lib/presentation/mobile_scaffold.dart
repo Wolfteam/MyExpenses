@@ -38,7 +38,6 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
   Widget build(BuildContext context) {
     final i18n = S.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(S.of(context).appName)),
       drawer: AppDrawer(),
       body: SafeArea(
         child: TabBarView(
@@ -62,6 +61,7 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
         listener: (ctx, state) => _onDrawerStateChanged(state),
         builder: (ctx, state) => BottomNavigationBar(
           showUnselectedLabels: true,
+          landscapeLayout: BottomNavigationBarLandscapeLayout.linear,
           type: BottomNavigationBarType.fixed,
           currentIndex: _index,
           onTap: _changeCurrentTab,
@@ -69,18 +69,22 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
             BottomNavigationBarItem(
               label: i18n.transactions,
               icon: const Icon(Icons.account_balance),
+              tooltip: i18n.transactions,
             ),
             BottomNavigationBarItem(
               label: i18n.charts,
               icon: const Icon(Icons.pie_chart),
+              tooltip: i18n.charts,
             ),
             BottomNavigationBarItem(
               label: i18n.categories,
               icon: const Icon(Icons.category),
+              tooltip: i18n.categories,
             ),
             BottomNavigationBarItem(
               label: i18n.config,
               icon: const Icon(Icons.settings),
+              tooltip: i18n.config,
             ),
           ],
         ),

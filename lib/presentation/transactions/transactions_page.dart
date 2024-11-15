@@ -7,9 +7,10 @@ import 'package:my_expenses/presentation/shared/nothing_found.dart';
 import 'package:my_expenses/presentation/shared/sliver_loading.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
 import 'package:my_expenses/presentation/shared/utils/i18n_utils.dart';
-import 'package:my_expenses/presentation/transactions/widgets/home_last_7_days_summary.dart';
-import 'package:my_expenses/presentation/transactions/widgets/home_transactions_summary_per_month.dart';
+import 'package:my_expenses/presentation/transactions/widgets/home_welcome.dart';
+import 'package:my_expenses/presentation/transactions/widgets/transactions_activity_chart.dart';
 import 'package:my_expenses/presentation/transactions/widgets/transactions_card_container.dart';
+import 'package:my_expenses/presentation/transactions/widgets/transactions_summary_per_month.dart';
 
 class TransactionsPage extends StatefulWidget {
   @override
@@ -43,22 +44,65 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
   Widget build(BuildContext context) {
     super.build(context);
 
-    return Scaffold(
-      body: Padding(
-        padding: Styles.edgeInsetHorizontal10,
-        child: CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            _buildTransSummaryPerMonth(),
-            const SliverPadding(padding: Styles.edgeInsetAll10),
-            _buildLast7DaysSummary(),
-            const SliverPadding(padding: Styles.edgeInsetAll10),
-            _buildTransactionTypeSwitch(),
-            _buildTransactions(),
-          ],
+    return Stack(
+      children: [
+        Padding(
+          padding: Styles.edgeInsetAll16,
+          child: MediaQuery.of(context).orientation == Orientation.portrait
+              ? CustomScrollView(
+                  controller: _scrollController,
+                  slivers: [
+                    _buildHomeWelcome(),
+                    _buildTransSummaryPerMonth(),
+                    _buildHomeActivity(),
+                    _buildTransactionTypeSwitch(),
+                    _buildTransactions(),
+                  ],
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      flex: 55,
+                      child: CustomScrollView(
+                        slivers: [
+                          _buildHomeWelcome(),
+                          _buildTransSummaryPerMonth(),
+                          _buildHomeActivity(),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      flex: 45,
+                      child: CustomScrollView(
+                        controller: _scrollController,
+                        slivers: [
+                          _buildTransactionTypeSwitch(),
+                          _buildTransactions(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
         ),
-      ),
-      floatingActionButton: _buildFab(),
+        Align(
+          alignment: Alignment.bottomRight,
+          child: Padding(
+            padding: Styles.edgeInsetAll16,
+            child: FadeTransition(
+              opacity: _hideFabAnimController,
+              child: ScaleTransition(
+                scale: _hideFabAnimController,
+                child: FloatingActionButton(
+                  mini: true,
+                  onPressed: () => _scrollController.goToTheTop(),
+                  child: const Icon(Icons.arrow_upward),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -69,13 +113,19 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
     super.dispose();
   }
 
+  Widget _buildHomeWelcome() {
+    return const SliverToBoxAdapter(
+      child: HomeWelcome(),
+    );
+  }
+
   Widget _buildTransSummaryPerMonth() {
     return BlocBuilder<TransactionsPerMonthBloc, TransactionsPerMonthState>(
       builder: (c, s) {
         return s.map(
           loading: (_) => const SliverLoading(),
           initial: (s) => SliverToBoxAdapter(
-            child: HomeTransactionSummaryPerMonth(
+            child: TransactionSummaryPerMonth(
               expenses: s.expenses,
               incomes: s.incomes,
               total: s.total,
@@ -84,19 +134,6 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
               currentDate: s.currentDate,
               locale: currentLocale(s.currentLanguage),
             ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildLast7DaysSummary() {
-    return BlocBuilder<TransactionsLast7DaysBloc, TransactionsLast7DaysState>(
-      builder: (context, state) {
-        return state.map(
-          loading: (_) => const SliverLoading(),
-          initial: (s) => SliverToBoxAdapter(
-            child: s.showLast7Days ? HomeLast7DaysSummary(incomes: s.incomes, expenses: s.expenses) : null,
           ),
         );
       },
@@ -168,17 +205,9 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
     );
   }
 
-  Widget _buildFab() {
-    return FadeTransition(
-      opacity: _hideFabAnimController,
-      child: ScaleTransition(
-        scale: _hideFabAnimController,
-        child: FloatingActionButton(
-          mini: true,
-          onPressed: () => _scrollController.goToTheTop(),
-          child: const Icon(Icons.arrow_upward),
-        ),
-      ),
+  Widget _buildHomeActivity() {
+    return const SliverToBoxAdapter(
+      child: TransactionsActivityChart(),
     );
   }
 }
