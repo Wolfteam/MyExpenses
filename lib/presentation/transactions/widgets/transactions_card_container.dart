@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/models/models.dart' as models;
 import 'package:my_expenses/generated/l10n.dart';
-import 'package:my_expenses/presentation/shared/styles.dart';
 import 'package:my_expenses/presentation/transactions/widgets/transaction_item.dart';
 
 class TransactionsCardContainer extends StatelessWidget {
@@ -17,13 +16,12 @@ class TransactionsCardContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
+      margin: const EdgeInsets.symmetric(vertical: 10),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           _buildHeader(context),
-          const Divider(color: Colors.grey, height: 1),
+          const Divider(height: 1),
           ListView.builder(
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
@@ -37,6 +35,7 @@ class TransactionsCardContainer extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     final i18n = S.of(context);
+    final theme = Theme.of(context);
     final currencyBloc = context.watch<CurrencyBloc>();
     final expenses = '${i18n.expenses}: ${currencyBloc.format(model.dayExpenses)}';
     final incomes = '${i18n.incomes}: ${currencyBloc.format(model.dayIncomes)}';
@@ -50,7 +49,11 @@ class TransactionsCardContainer extends StatelessWidget {
             flex: 35,
             child: Tooltip(
               message: model.dateString,
-              child: Text(model.dateString, overflow: TextOverflow.ellipsis, style: Styles.textStyleGrey12),
+              child: Text(
+                model.dateString,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelSmall,
+              ),
             ),
           ),
           Flexible(
@@ -62,7 +65,7 @@ class TransactionsCardContainer extends StatelessWidget {
                 text: TextSpan(
                   // Note: Styles for TextSpans must be explicitly defined.
                   // Child text spans will inherit styles from parent
-                  style: Styles.textStyleGrey12,
+                  style: theme.textTheme.labelSmall,
                   children: <TextSpan>[
                     TextSpan(text: expenses),
                     const TextSpan(text: '  '),

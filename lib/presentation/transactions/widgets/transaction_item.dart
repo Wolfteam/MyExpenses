@@ -34,49 +34,48 @@ class TransactionItem extends StatelessWidget {
                 ? Text(i18n.dateOn(dateString))
                 : null;
 
-    return InkWell(
-      customBorder: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
+    return ListTile(
+      dense: true,
+      visualDensity: VisualDensity.comfortable,
+      titleAlignment: ListTileTitleAlignment.center,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       onTap: () => _goToDetails(context),
-      child: ListTile(
-        dense: true,
-        leading: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(
-              item.category.icon,
-              color: item.category.iconColor,
-            ),
-          ],
+      leading: Icon(
+        item.category.icon,
+        color: item.category.iconColor,
+      ),
+      title: Tooltip(
+        message: item.description,
+        child: Text(
+          item.description,
+          overflow: TextOverflow.ellipsis,
         ),
-        title: Text(item.description),
-        subtitle: !item.isParentTransaction || item.nextRecurringDate == null
-            ? subtitle
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  if (subtitle != null) subtitle,
-                  daysLeft,
-                ],
-              ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            Text(
-              currencyBloc.format(item.amount),
-              style: TextStyle(
-                color: item.category.isAnIncome ? Colors.green : Colors.red,
-              ),
+      ),
+      subtitle: !item.isParentTransaction || item.nextRecurringDate == null
+          ? subtitle
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                if (subtitle != null) subtitle,
+                daysLeft,
+              ],
             ),
-            if (item.isChildTransaction)
-              Container(
-                margin: const EdgeInsets.only(left: 5),
-                child: const Icon(Icons.alarm, size: 20),
-              ),
-          ],
-        ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          Text(
+            currencyBloc.format(item.amount),
+            style: TextStyle(
+              color: item.category.isAnIncome ? Colors.green : Colors.red,
+            ),
+          ),
+          if (item.isChildTransaction)
+            Container(
+              margin: const EdgeInsets.only(left: 5),
+              child: const Icon(Icons.alarm, size: 20),
+            ),
+        ],
       ),
     );
   }

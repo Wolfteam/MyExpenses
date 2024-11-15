@@ -7,6 +7,7 @@ class Styles {
   static final transactionCardShape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(15));
 
   static const double cardElevation = 3;
+  static const edgeInsetAll16 = EdgeInsets.all(16);
   static const edgeInsetAll10 = EdgeInsets.all(10);
   static const edgeInsetAll5 = EdgeInsets.all(5);
   static const edgeInsetAll0 = EdgeInsets.zero;
