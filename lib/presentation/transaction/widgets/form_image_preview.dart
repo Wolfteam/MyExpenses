@@ -42,7 +42,6 @@ class FormImagePreview extends StatelessWidget {
 
   Future<void> _showImageDialog(BuildContext context) {
     return showDialog(
-      barrierDismissible: true,
       context: context,
       builder: (_) => BlocProvider.value(
         value: context.read<TransactionFormBloc>(),
@@ -80,7 +79,7 @@ class _ImageDialog extends StatelessWidget {
                   icon: const Icon(Icons.delete),
                   onPressed: () => _showDeleteImageDialog(context).then(
                     (value) {
-                      if (value == true) {
+                      if (value == true && context.mounted) {
                         _deleteImage(context);
                       }
                     },

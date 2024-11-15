@@ -205,7 +205,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                           textAlign: TextAlign.center,
                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                         ),
-                        ButtonBar(
+                        OverflowBar(
                           alignment: MainAxisAlignment.center,
                           children: <Widget>[
                             TextButton.icon(
@@ -241,7 +241,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               ),
               orElse: () => null,
             ),
-            body: scrollView,
+            body: SafeArea(child: scrollView),
           );
 
           if (state.isSavingForm) {
@@ -310,7 +310,9 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         context.read<TransactionFormBloc>().add(TransactionFormEvent.imageChanged(path: image.path, imageExists: true));
       }
     } catch (e) {
-      ToastUtils.showWarningToast(context, i18n.acceptPermissionsToUseThisFeature);
+      if (context.mounted && mounted) {
+        ToastUtils.showWarningToast(context, i18n.acceptPermissionsToUseThisFeature);
+      }
     }
   }
 }
@@ -348,9 +350,8 @@ class AddEditTransactionHeader extends StatelessWidget {
     const cornerRadius = Radius.circular(20);
     final theme = Theme.of(context);
     final i18n = S.of(context);
-    final dateString = isParentTransaction && nextRecurringDate != null && isRecurringTransactionRunning
-        ? i18n.nextDateOn(utils.DateUtils.formatDateWithoutLocale(nextRecurringDate, utils.DateUtils.monthDayAndYearFormat))
-        : '${i18n.date}: $transactionDateString';
+    final dateString =
+        isParentTransaction && nextRecurringDate != null && isRecurringTransactionRunning ? i18n.nextDateOn(utils.DateUtils.formatDateWithoutLocale(nextRecurringDate, utils.DateUtils.monthDayAndYearFormat)) : '${i18n.date}: $transactionDateString';
 
     final formattedAmount = context.watch<CurrencyBloc>().format(amount);
     final repetitionCycleType = i18n.translateRepetitionCycleType(repetitionCycle);
@@ -527,8 +528,7 @@ class _RecurringSwitch extends StatelessWidget {
     );
   }
 
-  void _isRunningChanged(bool newValue, BuildContext context) =>
-      context.read<TransactionFormBloc>().add(TransactionFormEvent.isRunningChanged(isRunning: newValue));
+  void _isRunningChanged(bool newValue, BuildContext context) => context.read<TransactionFormBloc>().add(TransactionFormEvent.isRunningChanged(isRunning: newValue));
 }
 
 typedef OnInputSubmit = void Function();
