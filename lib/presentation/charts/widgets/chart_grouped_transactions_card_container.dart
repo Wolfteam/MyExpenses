@@ -50,6 +50,7 @@ class ChartGroupedTransactionsCardContainer extends StatelessWidget {
           ListView.builder(
             physics: const NeverScrollableScrollPhysics(),
             shrinkWrap: true,
+            padding: EdgeInsets.zero,
             itemCount: grouped.transactions.length,
             itemBuilder: (ctx, index) => TransactionItem(item: grouped.transactions[index], showDate: true),
           ),

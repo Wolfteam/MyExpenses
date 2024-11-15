@@ -34,46 +34,38 @@ class IncomeExpensePieChart extends StatelessWidget {
     final dataToUse = TransactionUtils.buildChartTransactionItems(transactions, onlyIncomes: incomes);
 
     final currencyBloc = context.read<CurrencyBloc>();
-    final double aspectRatio = MediaQuery.of(context).orientation == Orientation.portrait ? 1 : 1.5;
 
-    return Container(
-      margin: const EdgeInsets.only(top: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          TextButton(
-            style: TextButton.styleFrom(padding: EdgeInsets.zero),
-            onPressed: () => dataToUse.isNotEmpty ? _goToDetailsPage(context, incomes) : null,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                      margin: const EdgeInsets.only(left: 20),
-                      child: Text(incomes ? i18n.incomes : i18n.expenses, style: titleStyle),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(left: 20),
-                      child: Text(
-                        currencyBloc.format(totalAmount),
-                        overflow: TextOverflow.ellipsis,
-                        style: textStyle!.copyWith(color: incomes ? Colors.green : Colors.red),
-                      ),
-                    ),
-                  ],
-                ),
-                Icon(
-                  Icons.arrow_forward,
-                  color: isDarkTheme ? Colors.white : Colors.black,
-                ),
-              ],
-            ),
+    return Column(
+      children: <Widget>[
+        TextButton(
+          style: TextButton.styleFrom(padding: EdgeInsets.zero),
+          onPressed: () => dataToUse.isNotEmpty ? _goToDetailsPage(context, incomes) : null,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(incomes ? i18n.incomes : i18n.expenses, style: titleStyle),
+                  Text(
+                    currencyBloc.format(totalAmount),
+                    overflow: TextOverflow.ellipsis,
+                    style: textStyle!.copyWith(color: incomes ? Colors.green : Colors.red),
+                  ),
+                ],
+              ),
+              Icon(
+                Icons.arrow_forward,
+                color: isDarkTheme ? Colors.white : Colors.black,
+              ),
+            ],
           ),
-          AspectRatio(aspectRatio: aspectRatio, child: PieChartTransactionsPerMonths(dataToUse)),
-        ],
-      ),
+        ),
+        SizedBox(
+          height: 200,
+          child: PieChartTransactionsPerMonths(dataToUse),
+        ),
+      ],
     );
   }
 

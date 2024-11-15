@@ -1,109 +1,144 @@
-import 'dart:math' as math;
-
-import 'package:darq/darq.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:my_expenses/application/bloc.dart';
-import 'package:my_expenses/domain/extensions/iterable_extensions.dart';
+import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/models/models.dart';
+import 'package:my_expenses/domain/utils/transaction_utils.dart';
+import 'package:my_expenses/generated/l10n.dart';
+import 'package:my_expenses/presentation/charts/widgets/income_expense_pie_chart.dart';
+import 'package:my_expenses/presentation/shared/mixins/transaction_mixin.dart';
+import 'package:my_expenses/presentation/shared/nothing_found.dart';
+import 'package:my_expenses/presentation/shared/styles.dart';
+import 'package:my_expenses/presentation/shared/utils/i18n_utils.dart';
 
-class MonthlyBarChart extends StatelessWidget {
-  final List<TransactionsSummaryPerDate> transactionsPerDate;
+class MonthlyBarChart extends StatelessWidget with TransactionMixin {
+  final DateTime currentMonthDate;
+  final String currentMonthDateString;
+  final int currentYear;
+  final AppLanguageType language;
+  final double totalIncomeAmount;
+  final double totalExpenseAmount;
+  final List<TransactionItem> transactions;
+  final List<TransactionsSummaryPerDate> transactionsPerMonth;
 
-  const MonthlyBarChart({super.key, required this.transactionsPerDate});
+  const MonthlyBarChart({
+    required this.currentMonthDate,
+    required this.currentMonthDateString,
+    required this.currentYear,
+    required this.language,
+    required this.totalIncomeAmount,
+    required this.totalExpenseAmount,
+    required this.transactions,
+    required this.transactionsPerMonth,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final i18n = S.of(context);
     final theme = Theme.of(context);
-    final lineColor = theme.brightness == Brightness.dark ? Colors.white : Colors.black;
-    final textStyle = TextStyle(color: lineColor, fontWeight: FontWeight.bold, fontSize: 10);
     final currencyBloc = context.read<CurrencyBloc>();
-    final maxWastedValue = transactionsPerDate.isEmpty ? 0 : transactionsPerDate.map((e) => e.totalAmount.abs()).max();
-    final double maxValue = maxWastedValue == 0 ? 10 : maxWastedValue + 0.3 * maxWastedValue;
-    final aspectRatio = MediaQuery.of(context).orientation == Orientation.portrait ? 3 / 2 : 2 / 1;
-    final interval = maxValue / 4;
-    final double reservedSize = maxValue.toStringAsFixed(2).length * 5;
+    final (TextStyle tooltipTextStyle, BoxDecoration tooltipBoxDecoration, EdgeInsets tooltipPadding) = Styles.getTooltipStyling(context);
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      child: AspectRatio(
-        aspectRatio: aspectRatio,
-        child: BarChart(
-          BarChartData(
-            alignment: BarChartAlignment.spaceEvenly,
-            maxY: maxValue,
-            minY: -maxValue,
-            barTouchData: BarTouchData(
-              enabled: false,
-              touchTooltipData: BarTouchTooltipData(
-                getTooltipColor: (_) => Colors.transparent,
-                tooltipPadding: EdgeInsets.zero,
-                tooltipMargin: 8,
-                getTooltipItem: (group, groupIndex, rod, rodIndex) => BarTooltipItem(
-                  currencyBloc.format(rod.toY),
-                  TextStyle(color: lineColor, fontWeight: FontWeight.bold, fontSize: 11),
-                ),
-              ),
-            ),
-            titlesData: FlTitlesData(
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  getTitlesWidget: (value, meta) => Transform.rotate(
-                    angle: math.pi / 7.2,
-                    child: Text(
-                      transactionsPerDate.elementAt(value.toInt() - 1).dateRangeString,
-                      style: textStyle.copyWith(fontSize: 9, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ),
-              ),
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  getTitlesWidget: (value, meta) => Container(
-                    margin: const EdgeInsets.only(right: 5),
-                    child: Text(meta.formattedValue, textAlign: TextAlign.end, style: textStyle),
-                  ),
-                  reservedSize: reservedSize,
-                  interval: interval,
-                ),
-              ),
-              rightTitles: const AxisTitles(),
-              topTitles: const AxisTitles(),
-            ),
-            gridData: FlGridData(
-              drawVerticalLine: false,
-              horizontalInterval: interval,
-              checkToShowHorizontalLine: (value) => true,
-              getDrawingHorizontalLine: (value) {
-                if (value == 0) {
-                  return FlLine(color: lineColor);
-                }
-                return FlLine(color: lineColor, strokeWidth: 0.8);
-              },
-            ),
-            borderData: FlBorderData(show: false),
-            barGroups: transactionsPerDate
-                .mapIndex(
-                  (e, i) => BarChartGroupData(
-                    x: i + 1,
-                    showingTooltipIndicators: [0],
-                    barRods: [
-                      BarChartRodData(
-                        toY: e.totalAmount,
-                        width: 50,
-                        borderRadius: BorderRadius.zero,
-                        rodStackItems: [BarChartRodStackItem(0, e.totalAmount, e.color)],
-                      ),
-                    ],
-                  ),
-                )
-                .toList(),
-          ),
-        ),
+    final double monthlyBalance = TransactionUtils.getTotalAmounts(transactionsPerMonth.map((e) => e.totalAmount));
+    final List<FlSpot> totalSpots = [];
+    final List<FlSpot> incomeSpots = [];
+    final List<FlSpot> expenseSpots = [];
+    double yMaxValue = 10;
+    double yMinValue = -10;
+
+    for (int i = 0; i < transactionsPerMonth.length; i++) {
+      final double x = i.toDouble();
+      final transaction = transactionsPerMonth[i];
+      totalSpots.add(FlSpot(x, transaction.totalAmount));
+      incomeSpots.add(FlSpot(x, transaction.incomeAmount));
+      expenseSpots.add(FlSpot(x, transaction.expenseAmount));
+
+      if (yMaxValue < transaction.incomeAmount) {
+        yMaxValue = transaction.incomeAmount;
+      }
+
+      if (yMinValue > transaction.expenseAmount) {
+        yMinValue = transaction.expenseAmount;
+      }
+    }
+
+    final dotData = FlDotData(
+      getDotPainter: (x, y, z, w) => FlDotCirclePainter(
+        color: Colors.white,
+        strokeColor: Colors.black,
+        strokeWidth: 1,
       ),
     );
+    final Color accentColor = Theme.of(context).colorScheme.secondary;
+    final List<Color> totalColors = [
+      accentColor.withOpacity(0.5),
+      accentColor,
+    ];
+    final Color incomeColor = getTransactionColor(isAnIncome: true);
+    final Color expenseColor = getTransactionColor();
+    final List<Color> incomeColors = [
+      incomeColor.withOpacity(0.5),
+      incomeColor,
+    ];
+    final List<Color> expenseColors = [
+      expenseColor.withOpacity(0.5),
+      expenseColor,
+    ];
+
+    final colorSpotMap = <List<Color>, List<FlSpot>>{
+      totalColors: totalSpots,
+      incomeColors: incomeSpots,
+      expenseColors: expenseSpots,
+    };
+
+    final textColor = theme.brightness == Brightness.dark ? Colors.white : Colors.black;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (transactions.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Expanded(
+                  child: IncomeExpensePieChart.income(
+                    transactions: transactions,
+                    totalAmount: totalIncomeAmount,
+                  ),
+                ),
+                Expanded(
+                  child: IncomeExpensePieChart.expense(
+                    transactions: transactions,
+                    totalAmount: totalExpenseAmount,
+                  ),
+                ),
+              ],
+            ),
+          )
+        else
+          NothingFound(msg: i18n.noRecurringTransactionsWereFound),
+      ],
+    );
+  }
+
+  Future<void> _changeCurrentMonthDate(BuildContext context) async {
+    final now = DateTime.now();
+    final selectedDate = await showMonthPicker(
+      context: context,
+      initialDate: currentMonthDate,
+      lastDate: DateTime(now.year + 1),
+      monthPickerDialogSettings: Styles.getMonthPickerDialogSettings(currentLocale(language), context),
+    );
+
+    if (selectedDate == null) {
+      return;
+    }
+
+    if (context.mounted) {
+      context.read<ChartsBloc>().add(ChartsEvent.loadChart(selectedMonthDate: selectedDate, selectedYear: currentYear));
+    }
   }
 }
