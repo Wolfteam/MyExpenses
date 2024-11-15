@@ -13,5 +13,7 @@ export 'report_file_type.dart';
 export 'secure_resource_type.dart';
 export 'sort_direction_type.dart';
 export 'sync_intervals_type.dart';
+export 'transaction_activity_date_range_type.dart';
+export 'transaction_activity_type.dart';
 export 'transaction_filter_type.dart';
 export 'transaction_type.dart';
