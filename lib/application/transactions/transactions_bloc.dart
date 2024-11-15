@@ -1,11 +1,9 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:darq/darq.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
 import 'package:my_expenses/application/bloc.dart';
-import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/models/entities/daos/transactions_dao.dart';
 import 'package:my_expenses/domain/models/entities/daos/users_dao.dart';
 import 'package:my_expenses/domain/models/models.dart';
@@ -22,9 +20,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
   final TransactionsDao _transactionsDao;
   final UsersDao _usersDao;
   final SettingsService _settingsService;
-
   final TransactionsPerMonthBloc _transactionsPerMonthBloc;
-  final TransactionsLast7DaysBloc _transactionsLast7DaysBloc;
 
   TransactionsBloc(
     this._logger,
@@ -32,7 +28,6 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     this._usersDao,
     this._settingsService,
     this._transactionsPerMonthBloc,
-    this._transactionsLast7DaysBloc,
   ) : super(const TransactionsState.loading());
 
   _InitialState get currentState => state as _InitialState;
@@ -67,9 +62,6 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
       _logger.info(runtimeType, '_buildInitialState: Generating month balance...');
       final monthBalance = _buildMonthBalance(incomes, expenses, transactions);
 
-      _logger.info(runtimeType, '_buildInitialState: Generating incomes / expenses transactions per week...');
-      final transPerWeek = await _buildTransactionSummaryPerDay(currentUser?.id);
-
       _logger.info(runtimeType, '_buildInitialState: Generating transactions per month..');
       final transPerMonth = TransactionUtils.buildTransactionsPerMonth(_settingsService.getCurrentLanguageModel(), transactions);
 
@@ -84,31 +76,13 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         ),
       );
 
-      final showLast7Days = DateTime.now().month == inThisDate.month;
       if (state is! _InitialState) {
-        _transactionsLast7DaysBloc.add(
-          TransactionsLast7DaysEvent.init(
-            selectedType: TransactionType.incomes,
-            incomes: transPerWeek.item0,
-            expenses: transPerWeek.item1,
-            showLast7Days: showLast7Days,
-          ),
-        );
-
         return TransactionsState.initial(
           currentDate: inThisDate,
           transactionsPerMonth: transPerMonth,
           language: _settingsService.getCurrentLanguageModel(),
         );
       }
-
-      _transactionsLast7DaysBloc.add(
-        TransactionsLast7DaysEvent.init(
-          incomes: transPerWeek.item0,
-          expenses: transPerWeek.item1,
-          showLast7Days: showLast7Days,
-        ),
-      );
 
       return currentState.copyWith.call(
         currentDate: inThisDate,
@@ -184,59 +158,5 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         isAnIncome: true,
       ),
     ];
-  }
-
-  Future<Tuple2<List<TransactionsSummaryPerDay>, List<TransactionsSummaryPerDay>>> _buildTransactionSummaryPerDay(int? userId) async {
-    final now = DateTime.now();
-    final sevenDaysAgo = now.subtract(const Duration(days: 6));
-    final from = DateTime(sevenDaysAgo.year, sevenDaysAgo.month, sevenDaysAgo.day);
-    final to = DateTime(now.year, now.month, now.day, 23, 59, 59);
-
-    _logger.info(
-      runtimeType,
-      '_buildTransactionSummaryPerDay: Getting income + expenses transactions summary from = $from to = $to',
-    );
-
-    try {
-      final allTransactions = await _transactionsDao.getAllTransactions(userId, from, to);
-      final incomes = _buildTransactionSummaryPerDayFor(from, allTransactions, true);
-      final expenses = _buildTransactionSummaryPerDayFor(from, allTransactions, false);
-
-      return Tuple2(incomes, expenses);
-    } catch (e, s) {
-      _logger.error(runtimeType, '_buildTransactionSummaryPerDay: Unknown error occurred', e, s);
-      return const Tuple2([], []);
-    }
-  }
-
-  List<TransactionsSummaryPerDay> _buildTransactionSummaryPerDayFor(DateTime from, List<TransactionItem> allTransactions, bool onlyIncomes) {
-    final transactions = allTransactions.where((t) => t.category.isAnIncome == onlyIncomes).toList();
-    final map = <DateTime, double>{};
-    for (final transaction in transactions) {
-      final date = DateTime(
-        transaction.transactionDate.year,
-        transaction.transactionDate.month,
-        transaction.transactionDate.day,
-      );
-
-      if (map.keys.any((key) => key == date)) {
-        map[date] = transaction.amount + map[date]!;
-      } else {
-        map.addAll({date: transaction.amount});
-      }
-    }
-
-    for (var i = 0; i <= 6; i++) {
-      final mustExistDate = from.add(Duration(days: i));
-      if (map.containsKey(mustExistDate)) {
-        continue;
-      }
-      map.addAll({mustExistDate: 0.0});
-    }
-
-    final models = map.entries.map((kvp) => TransactionsSummaryPerDay(date: kvp.key, totalDayAmount: kvp.value)).toList();
-
-    models.sort((t1, t2) => t1.date.compareTo(t2.date));
-    return models;
   }
 }

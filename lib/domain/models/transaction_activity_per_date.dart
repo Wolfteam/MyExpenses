@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:my_expenses/domain/enums/enums.dart';
 
-part 'transactions_activity_per_date.freezed.dart';
+part 'transaction_activity_per_date.freezed.dart';
 
 @freezed
 class TransactionActivityPerDate with _$TransactionActivityPerDate {
