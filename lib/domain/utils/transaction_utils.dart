@@ -78,9 +78,7 @@ class TransactionUtils {
       currentRecurringDate = getNextRecurringDate(cycle, currentRecurringDate);
     }
 
-    if (cycle == RepetitionCycleType.eachMonth &&
-        currentRecurringDate.day != transactionDate.day &&
-        DateUtils.getLastDayDateOfTheMonth(currentRecurringDate).day == transactionDate.day) {
+    if (cycle == RepetitionCycleType.eachMonth && currentRecurringDate.day != transactionDate.day && DateUtils.getLastDayDateOfTheMonth(currentRecurringDate).day == transactionDate.day) {
       currentRecurringDate = DateTime(currentRecurringDate.year, currentRecurringDate.month, transactionDate.day);
     }
 
@@ -112,7 +110,7 @@ class TransactionUtils {
 
     for (final kvp in transPerMonth.entries) {
       final dateString = DateUtils.formatAppDate(kvp.key, language);
-      final dayString = DateUtils.formatAppDate(kvp.key, language, DateUtils.dayStringFormat);
+      final dayString = DateUtils.formatAppDate(kvp.key, language, DateUtils.dayNameStringFormat);
 
       final dateSummary = '$dateString ${toBeginningOfSentenceCase(dayString, language.code)}';
 

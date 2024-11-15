@@ -5,10 +5,11 @@ class DateUtils {
   static const String fullMonthFormat = 'MMMM';
   static const String dayAndMonthFormat = 'dd/MM';
   static const String monthAndDayFormat = 'MM/dd';
-  static const String dayStringFormat = 'EEEE';
+  static const String dayNameStringFormat = 'EEEE';
   static const String monthDayAndYearFormat = 'dd/MM/yyyy';
   static const String fullMonthAndYearFormat = 'MMMM yyyy';
   static const String monthDayYearAndHourFormat = 'dd/MM/yyyy hh:mm:ss a';
+  static const String dayStringFormat = 'dd';
 
   static String formatAppDate(DateTime? date, LanguageModel language, [String format = dayAndMonthFormat]) => formatDate(date, language.code, format);
 
@@ -32,8 +33,7 @@ class DateUtils {
 
   static DateTime getFirstDayDateOfTheMonth(DateTime from) => DateTime(from.year, from.month);
 
-  static DateTime getLastDayDateOfTheMonth(DateTime from) =>
-      (from.month < 12) ? DateTime(from.year, from.month + 1, 0, 23, 59, 59) : DateTime(from.year + 1, 1, 0, 23, 59, 59);
+  static DateTime getLastDayDateOfTheMonth(DateTime from) => (from.month < 12) ? DateTime(from.year, from.month + 1, 0, 23, 59, 59) : DateTime(from.year + 1, 1, 0, 23, 59, 59);
 
   static DateTime getNextMonthDate(DateTime from) {
     DateTime tentativeDate = DateTime(from.year, from.month + 1, from.day);
