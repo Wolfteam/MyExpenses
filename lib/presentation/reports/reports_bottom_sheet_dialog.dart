@@ -90,14 +90,12 @@ class _Body extends StatelessWidget {
                   hint: Text(i18n.selectFormat),
                   underline: Container(height: 0, color: Colors.transparent),
                   value: state.selectedFileType,
-                  items: ReportFileType.values
-                      .map((item) => DropdownMenuItem<ReportFileType>(value: item, child: Text(i18n.getReportFileTypeName(item))))
-                      .toList(),
+                  items: ReportFileType.values.map((item) => DropdownMenuItem<ReportFileType>(value: item, child: Text(i18n.getReportFileTypeName(item)))).toList(),
                   onChanged: (newValue) => _reportFileTypeChanged(context, newValue!),
                 ),
               ),
-              ButtonBar(
-                buttonPadding: const EdgeInsets.symmetric(horizontal: 20),
+              OverflowBar(
+                alignment: MainAxisAlignment.end,
                 children: <Widget>[
                   TextButton(
                     onPressed: () {
@@ -127,7 +125,7 @@ class _Body extends StatelessWidget {
       firstDate: DateTime(now.year - 10),
       lastDate: DateTime(now.year, now.month, now.day, 23, 59, 59),
     ).then((selectedDate) {
-      if (selectedDate == null) {
+      if (selectedDate == null || !context.mounted) {
         return;
       }
 
@@ -139,8 +137,7 @@ class _Body extends StatelessWidget {
     });
   }
 
-  void _reportFileTypeChanged(BuildContext context, ReportFileType newValue) =>
-      context.read<ReportsBloc>().add(ReportsEvent.fileTypeChanged(selectedFileType: newValue));
+  void _reportFileTypeChanged(BuildContext context, ReportFileType newValue) => context.read<ReportsBloc>().add(ReportsEvent.fileTypeChanged(selectedFileType: newValue));
 
   void _generateReport(BuildContext context) {
     final translations = S.of(context).getReportTranslations();

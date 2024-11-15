@@ -93,7 +93,8 @@ class _Content extends StatelessWidget {
                       msg: i18n.noUserAccountsFound,
                       padding: const EdgeInsets.only(right: 20, left: 20, top: 10),
                     ),
-                  ButtonBar(
+                  OverflowBar(
+                    alignment: MainAxisAlignment.end,
                     children: <Widget>[
                       TextButton(
                         onPressed: () {

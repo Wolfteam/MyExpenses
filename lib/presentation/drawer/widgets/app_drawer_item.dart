@@ -99,7 +99,6 @@ class AppDrawerItem extends StatelessWidget {
     //TODO: IF THE CONTENT IS TO LARGE, WE CANT CLOSE THE SHEET
     showModalBottomSheet(
       shape: Styles.modalBottomSheetShape,
-      isDismissible: true,
       isScrollControlled: true,
       context: context,
       builder: (ctx) => ReportsBottomSheetDialog(),
@@ -110,7 +109,6 @@ class AppDrawerItem extends StatelessWidget {
     Navigator.pop(context);
     showModalBottomSheet(
       shape: Styles.modalBottomSheetShape,
-      isDismissible: true,
       isScrollControlled: true,
       context: context,
       builder: (ctx) => EstimateBottomSheetDialog(),

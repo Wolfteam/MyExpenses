@@ -83,7 +83,6 @@ class AppDrawerHeader extends StatelessWidget {
     Navigator.pop(context);
     showModalBottomSheet(
       shape: Styles.modalBottomSheetShape,
-      isDismissible: true,
       isScrollControlled: true,
       context: context,
       builder: (ctx) => UserAccountsBottomSheetDialog(),

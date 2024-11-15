@@ -68,8 +68,8 @@ class _Body extends StatelessWidget {
               expenses: s.expenseAmount,
               total: s.totalAmount,
             ),
-            ButtonBar(
-              layoutBehavior: ButtonBarLayoutBehavior.constrained,
+            OverflowBar(
+              alignment: MainAxisAlignment.end,
               children: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.pop(context),
@@ -92,7 +92,7 @@ class _Body extends StatelessWidget {
       initialDate: initialDate,
       lastDate: DateTime(now.year + 1),
     ).then((selectedDate) {
-      if (selectedDate == null) {
+      if (selectedDate == null || !context.mounted) {
         return;
       }
       if (isFromDate) {
