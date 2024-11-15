@@ -8,6 +8,7 @@ export 'chart_transaction_item.dart';
 export 'current_selected_category.dart';
 export 'language_model.dart';
 export 'reports/report_translations.dart';
+export 'transaction_activity_per_date.dart';
 export 'transaction_card_items.dart';
 export 'transaction_item.dart';
 export 'transactions_summary_per_date.dart';
