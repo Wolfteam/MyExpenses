@@ -205,10 +205,12 @@
   "yearly": "Anual",
   "monthly": "Mensual",
   "pickYear": "Selecciona un año",
+  "balance": "Balance",
   "balanceX": "Balance: {amount}",
   "information": "Información",
   "googleLoginChangesExplanation": "Debido a cambios en la lógica de login con Google, debes volver a loguearte.",
   "syncing": "Sincronizando...",
   "doNotCloseTheAppWhileAppSyncsData": "No cierres la aplicación mientras se sincroniza tu data",
-  "logInCancelledOrFailed": "El inicio de sesión fue cancelado o falló"
+  "logInCancelledOrFailed": "El inicio de sesión fue cancelado o falló",
+  "activity": "Actividad"
 }
