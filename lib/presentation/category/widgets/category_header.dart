@@ -134,7 +134,7 @@ class CategoryHeader extends StatelessWidget {
     context.read<CategoryIconBloc>().add(CategoryIconEvent.selectionChanged(selectedIcon: currentIcon));
 
     await Navigator.of(context).push(route).then((selectedIcon) {
-      if (selectedIcon == null) {
+      if (selectedIcon == null || !context.mounted) {
         return;
       }
 
