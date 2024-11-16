@@ -212,5 +212,6 @@
   "syncing": "Syncing...",
   "doNotCloseTheAppWhileAppSyncsData": "Do not close the app while the app syncs your data",
   "logInCancelledOrFailed": "Log in was cancelled or failed",
-  "activity": "Activity"
+  "activity": "Activity",
+  "hello": "Hello"
 }

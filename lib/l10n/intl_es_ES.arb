@@ -212,5 +212,6 @@
   "syncing": "Sincronizando...",
   "doNotCloseTheAppWhileAppSyncsData": "No cierres la aplicación mientras se sincroniza tu data",
   "logInCancelledOrFailed": "El inicio de sesión fue cancelado o falló",
-  "activity": "Actividad"
+  "activity": "Actividad",
+  "hello": "Hola"
 }
