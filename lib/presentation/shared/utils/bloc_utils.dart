@@ -4,14 +4,7 @@ import 'package:my_expenses/application/bloc.dart';
 
 class BlocUtils {
   static void raiseAllCommonBlocEvents(BuildContext ctx) {
-    raiseCommonBlocEvents(
-      ctx,
-      reloadCategories: true,
-      reloadCharts: true,
-      reloadDrawer: true,
-      reloadSettings: true,
-      reloadTransactions: true,
-    );
+    raiseCommonBlocEvents(ctx, reloadCategories: true, reloadCharts: true, reloadDrawer: true, reloadSettings: true, reloadTransactions: true);
   }
 
   static void raiseCommonBlocEvents(
@@ -26,12 +19,9 @@ class BlocUtils {
 
     final now = DateTime.now();
     if (reloadTransactions) {
-      final transBloc = ctx.read<TransactionsBloc>();
-      if (transBloc.currentState.showParentTransactions) {
-        ctx.read<TransactionsBloc>().add(const TransactionsEvent.loadRecurringTransactions());
-      } else {
-        ctx.read<TransactionsBloc>().add(TransactionsEvent.loadTransactions(inThisDate: now));
-      }
+      ctx.read<TransactionsBloc>().add(TransactionsEvent.init(currentDate: now));
+      ctx.read<TransactionsSummaryPerMonthBloc>().add(TransactionsSummaryPerMonthEvent.init(currentDate: now));
+      ctx.read<TransactionsActivityBloc>().add(TransactionsActivityEvent.dateChanged(currentDate: now));
     }
 
     if (reloadCharts) {

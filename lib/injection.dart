@@ -110,6 +110,14 @@ class Injection {
     return TransactionsActivityBloc(logger, transactionsDao, usersDao, settingsService);
   }
 
+  static TransactionsBloc get transactionsBloc {
+    final logger = getIt<LoggingService>();
+    final transactionsDao = getIt<TransactionsDao>();
+    final usersDao = getIt<UsersDao>();
+    final settingsService = getIt<SettingsService>();
+    return TransactionsBloc(logger, transactionsDao, usersDao, settingsService);
+  }
+
   static Future<void> init() async {
     if (!getIt.isRegistered<NetworkService>()) {
       getIt.registerSingleton<NetworkService>(NetworkServiceImpl());

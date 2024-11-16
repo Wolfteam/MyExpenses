@@ -107,7 +107,7 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
             final msg = state.wasUpdated || state.wasCreated ? i18n.transactionsWasSuccessfullySaved : i18n.transactionsWasSuccessfullyDeleted;
             ToastUtils.showSucceedToast(ctx, msg);
 
-            ctx.read<TransactionsBloc>().add(TransactionsEvent.loadTransactions(inThisDate: state.transactionDate));
+            ctx.read<TransactionsBloc>().add(TransactionsEvent.init(currentDate: state.transactionDate));
             ctx.read<ChartsBloc>().add(ChartsEvent.loadChart(selectedMonthDate: state.transactionDate, selectedYear: state.transactionDate.year));
 
             Navigator.of(ctx).pop();

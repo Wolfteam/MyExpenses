@@ -72,7 +72,7 @@ class TransactionSummaryPerMonth extends StatelessWidget with TransactionMixin {
       if (selectedDate == null || !context.mounted) {
         return;
       }
-      context.read<TransactionsBloc>().add(TransactionsEvent.loadTransactions(inThisDate: selectedDate));
+      context.read<TransactionsBloc>().add(TransactionsEvent.init(currentDate: selectedDate));
       context.read<TransactionsSummaryPerMonthBloc>().add(TransactionsSummaryPerMonthEvent.init(currentDate: selectedDate));
     });
   }

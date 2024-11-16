@@ -52,13 +52,7 @@ class MyApp extends StatelessWidget {
             create: (context) => Injection.transactionsSummaryPerMonthBloc..add(TransactionsSummaryPerMonthEvent.init(currentDate: DateTime.now())),
           ),
           BlocProvider(
-            create: (ctx) {
-              final logger = getIt<LoggingService>();
-              final transactionsDao = getIt<TransactionsDao>();
-              final usersDao = getIt<UsersDao>();
-              final settingsService = getIt<SettingsService>();
-              return TransactionsBloc(logger, transactionsDao, usersDao, settingsService);
-            },
+            create: (ctx) => Injection.transactionsBloc..add(TransactionsEvent.init(currentDate: DateTime.now())),
           ),
           BlocProvider(
             create: (ctx) => Injection.transactionsActivityBloc..add(const TransactionsActivityEvent.init()),

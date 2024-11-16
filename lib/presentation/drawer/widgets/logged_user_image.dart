@@ -10,11 +10,13 @@ class LoggedUserImage extends StatelessWidget {
   final bool isUserSignedIn;
   final String? image;
   final double radius;
+  final bool popContext;
 
   const LoggedUserImage({
     required this.isUserSignedIn,
     required this.image,
     this.radius = 40,
+    this.popContext = true,
   });
 
   @override
@@ -39,7 +41,9 @@ class LoggedUserImage extends StatelessWidget {
   }
 
   Future<void> _signIn(BuildContext context) {
-    // Navigator.pop(context);
+    if (popContext) {
+      Navigator.pop(context);
+    }
     return showModalBottomSheet(
       shape: Styles.modalBottomSheetShape,
       isScrollControlled: true,

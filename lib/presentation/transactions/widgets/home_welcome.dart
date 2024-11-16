@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_expenses/application/bloc.dart';
-import 'package:my_expenses/domain/utils/date_utils.dart' as date_utils;
+import 'package:my_expenses/domain/extensions/string_extensions.dart';
+import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/drawer/widgets/logged_user_image.dart';
 
 class HomeWelcome extends StatelessWidget {
@@ -9,45 +10,48 @@ class HomeWelcome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final S i18n = S.of(context);
     final theme = Theme.of(context);
     final now = DateTime.now();
-    final dateString = date_utils.DateUtils.formatDateWithoutLocale(now, date_utils.DateUtils.dayNameStringFormat);
-    //todo: complete this
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () => Scaffold.of(context).openDrawer(),
-          child: const Icon(Icons.menu),
-        ),
-        Expanded(
-          child: Column(
-            children: [
-              Text(
-                'Hello',
-                style: theme.textTheme.headlineLarge!.copyWith(fontWeight: FontWeight.bold),
-              ),
-              Text(
-                'Jan 10, 2024',
-                style: theme.textTheme.titleMedium,
-              ),
-            ],
+    return BlocBuilder<DrawerBloc, DrawerState>(
+      builder: (context, state) => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () => Scaffold.of(context).openDrawer(),
+            child: const Icon(Icons.menu),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(right: 10),
-          child: BlocBuilder<DrawerBloc, DrawerState>(
-            builder: (context, state) => state.isUserSignedIn
+          Expanded(
+            child: Column(
+              children: [
+                Text(
+                  i18n.hello,
+                  style: theme.textTheme.headlineMedium!.copyWith(fontWeight: FontWeight.bold),
+                ),
+                if (state.fullName.isNotNullEmptyOrWhitespace)
+                  Text(
+                    state.fullName!,
+                    style: theme.textTheme.titleSmall,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: state.isUserSignedIn
                 ? LoggedUserImage(
                     image: state.img,
                     isUserSignedIn: state.isUserSignedIn,
                     radius: 20,
+                    popContext: false,
                   )
-                : const SizedBox.shrink(),
+                : null,
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

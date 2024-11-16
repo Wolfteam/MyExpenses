@@ -30,10 +30,7 @@ class AppDrawerHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            LoggedUserImage(
-              image: image,
-              isUserSignedIn: isUserSignedIn,
-            ),
+            LoggedUserImage(image: image, isUserSignedIn: isUserSignedIn),
             if (!isUserSignedIn)
               Container(
                 margin: const EdgeInsets.only(top: 10),
