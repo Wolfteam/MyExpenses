@@ -5,7 +5,7 @@ class TransactionsActivityEvent with _$TransactionsActivityEvent {
   const factory TransactionsActivityEvent.init() = _Init;
 
   const factory TransactionsActivityEvent.dateChanged({
-    required DateTime date,
+    required DateTime currentDate,
   }) = _DateChanged;
 
   const factory TransactionsActivityEvent.dateRangeChanged({

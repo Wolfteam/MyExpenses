@@ -41,7 +41,7 @@ class TransactionsActivityBloc extends Bloc<TransactionsActivityEvent, Transacti
     final UserItem? currentUser = await _usersDao.getActiveUser();
     final s = await event.map(
       init: (_) => _handleChange(DateTime.now(), TransactionActivityDateRangeType.last7days, userId: currentUser?.id),
-      dateChanged: (e) => _handleChange(e.date, state.type, userId: currentUser?.id),
+      dateChanged: (e) => _handleChange(e.currentDate, state.type, userId: currentUser?.id),
       dateRangeChanged: (e) => _handleChange(state.currentDate, e.type, userId: currentUser?.id),
       activitySelected: (e) => _handleActivityTypeChange(e.type),
     );
@@ -61,20 +61,6 @@ class TransactionsActivityBloc extends Bloc<TransactionsActivityEvent, Transacti
   }
 
   Future<TransactionsActivityState> _handleChange(DateTime currentDate, TransactionActivityDateRangeType type, {int? userId}) async {
-    if (state.loaded) {
-      if (state.currentDate == currentDate && state.type == type) {
-        return state;
-      }
-
-      if (state.type == type && type == TransactionActivityDateRangeType.last7days) {
-        return state;
-      }
-
-      if (state.type == type && type == TransactionActivityDateRangeType.yearly && state.currentDate.year == currentDate.year) {
-        return state;
-      }
-    }
-
     List<TransactionActivityPerDate> transactions = [];
     switch (type) {
       case TransactionActivityDateRangeType.last7days:

@@ -33,10 +33,6 @@ class TransactionsSummaryPerMonthBloc extends Bloc<TransactionsSummaryPerMonthEv
   }
 
   Future<TransactionsSummaryPerMonthState> _handle(DateTime date) async {
-    if (state.map(loading: (_) => false, loaded: (state) => state.currentDate == date)) {
-      return state;
-    }
-
     try {
       _logger.info(runtimeType, '_handle: Generating month summary for month ${date.month}...');
       final UserItem? currentUser = await _usersDao.getActiveUser();
