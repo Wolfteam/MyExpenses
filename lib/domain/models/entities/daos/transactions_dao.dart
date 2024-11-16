@@ -3,6 +3,8 @@ import 'package:my_expenses/domain/models/drive.dart' as drive;
 import 'package:my_expenses/domain/models/transaction_item.dart';
 
 abstract class TransactionsDao {
+  Future<double> getAmount(int? userId, DateTime from, DateTime to, bool calculateIncome);
+
   Future<List<TransactionItem>> getAllTransactions(int? userId, DateTime from, DateTime to);
 
   Future<TransactionItem> saveTransaction(TransactionItem transaction);
