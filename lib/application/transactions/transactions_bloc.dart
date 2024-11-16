@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:intl/intl.dart';
 import 'package:my_expenses/domain/models/entities/daos/transactions_dao.dart';
 import 'package:my_expenses/domain/models/entities/daos/users_dao.dart';
 import 'package:my_expenses/domain/models/models.dart';
@@ -27,73 +26,35 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     this._settingsService,
   ) : super(const TransactionsState.loading());
 
-  _InitialState get currentState => state as _InitialState;
-
   @override
   Stream<TransactionsState> mapEventToState(TransactionsEvent event) async* {
-    final s = await event.map(
-      loadTransactions: (e) => _loadTransactions(e.inThisDate),
-      loadRecurringTransactions: (_) => _loadRecurringTransactions(),
-    );
-
+    final s = await event.map(init: (e) => _handle(e.currentDate));
     yield s;
   }
 
-  Future<TransactionsState> _loadTransactions(DateTime inThisDate) async {
-    final month = toBeginningOfSentenceCase(
-      DateUtils.formatAppDate(inThisDate, _settingsService.getCurrentLanguageModel(), DateUtils.fullMonthFormat),
-    );
-    final from = DateUtils.getFirstDayDateOfTheMonth(inThisDate);
-    final to = DateUtils.getLastDayDateOfTheMonth(from);
-
-    try {
-      final currentUser = await _usersDao.getActiveUser();
-      _logger.info(runtimeType, '_buildInitialState: Getting all the transactions from = $from to = $to');
-
-      final transactions = await _transactionsDao.getAllTransactions(currentUser?.id, from, to);
-
-      _logger.info(runtimeType, '_buildInitialState: Generating transactions per month..');
-      final transPerMonth = TransactionUtils.buildTransactionsPerMonth(_settingsService.getCurrentLanguageModel(), transactions);
-
-      if (state is! _InitialState) {
-        return TransactionsState.initial(
-          currentDate: inThisDate,
-          transactionsPerMonth: transPerMonth,
-          language: _settingsService.getCurrentLanguageModel(),
-        );
-      }
-
-      return currentState.copyWith.call(
-        currentDate: inThisDate,
-        transactionsPerMonth: transPerMonth,
-        language: _settingsService.getCurrentLanguageModel(),
-        showParentTransactions: false,
-      );
-    } catch (e, s) {
-      _logger.error(runtimeType, '_buildInitialState: An unknown error occurred', e, s);
-      return TransactionsState.initial(
-        currentDate: inThisDate,
-        transactionsPerMonth: [],
-        language: _settingsService.getCurrentLanguageModel(),
-      );
+  Future<TransactionsState> _handle(DateTime date) async {
+    if (state.maybeMap(loaded: (state) => state.currentDate == date, orElse: () => false)) {
+      return state;
     }
-  }
+    final LanguageModel language = _settingsService.getCurrentLanguageModel();
+    final DateTime from = DateUtils.getFirstDayDateOfTheMonth(date);
+    final DateTime to = DateUtils.getLastDayDateOfTheMonth(from);
 
-  Future<TransactionsState> _loadRecurringTransactions() async {
     try {
-      _logger.info(runtimeType, '_buildRecurringState: Getting all parent transactions...');
-      final currentUser = await _usersDao.getActiveUser();
-      final transactions = await _transactionsDao.getAllParentTransactions(currentUser?.id);
-      final transPerMonth = TransactionUtils.buildTransactionsPerMonth(
-        _settingsService.getCurrentLanguageModel(),
-        transactions,
-        sortByNextRecurringDate: true,
-      );
+      final UserItem? currentUser = await _usersDao.getActiveUser();
+      _logger.info(runtimeType, '_handle: Getting all the transactions from = $from to = $to');
 
-      return currentState.copyWith(showParentTransactions: true, transactionsPerMonth: transPerMonth);
+      final List<TransactionItem> transactions = await _transactionsDao.getAllTransactions(currentUser?.id, from, to);
+      final List<TransactionItem> recurringTransactions = await _transactionsDao.getAllParentTransactions(currentUser?.id);
+      return TransactionsState.loaded(
+        currentDate: date,
+        language: language,
+        transactions: TransactionUtils.buildTransactionsPerMonth(language, transactions),
+        recurringTransactions: TransactionUtils.buildTransactionsPerMonth(language, recurringTransactions, sortByNextRecurringDate: true),
+      );
     } catch (e, s) {
-      _logger.error(runtimeType, '_buildRecurringState: Unknown error', e, s);
-      return currentState.copyWith(showParentTransactions: true, transactionsPerMonth: []);
+      _logger.error(runtimeType, '_handle: An unknown error occurred', e, s);
+      return TransactionsState.loaded(currentDate: date, language: language, transactions: [], recurringTransactions: []);
     }
   }
 }
