@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/utils/date_utils.dart' as date_utils;
+import 'package:my_expenses/presentation/drawer/widgets/logged_user_image.dart';
 
 class HomeWelcome extends StatelessWidget {
   const HomeWelcome({super.key});
@@ -34,8 +37,14 @@ class HomeWelcome extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.only(right: 10),
-          child: CircleAvatar(
-            backgroundColor: Colors.purple,
+          child: BlocBuilder<DrawerBloc, DrawerState>(
+            builder: (context, state) => state.isUserSignedIn
+                ? LoggedUserImage(
+                    image: state.img,
+                    isUserSignedIn: state.isUserSignedIn,
+                    radius: 20,
+                  )
+                : const SizedBox.shrink(),
           ),
         ),
       ],

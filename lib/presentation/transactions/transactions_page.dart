@@ -6,7 +6,6 @@ import 'package:my_expenses/presentation/shared/extensions/scroll_controller_ext
 import 'package:my_expenses/presentation/shared/nothing_found.dart';
 import 'package:my_expenses/presentation/shared/sliver_loading.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
-import 'package:my_expenses/presentation/shared/utils/i18n_utils.dart';
 import 'package:my_expenses/presentation/transactions/widgets/home_welcome.dart';
 import 'package:my_expenses/presentation/transactions/widgets/transactions_activity_chart.dart';
 import 'package:my_expenses/presentation/transactions/widgets/transactions_card_container.dart';
@@ -120,24 +119,7 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
   }
 
   Widget _buildTransSummaryPerMonth() {
-    return BlocBuilder<TransactionsPerMonthBloc, TransactionsPerMonthState>(
-      builder: (c, s) {
-        return s.map(
-          loading: (_) => const SliverLoading(),
-          initial: (s) => SliverToBoxAdapter(
-            child: TransactionSummaryPerMonth(
-              expenses: s.expenses,
-              incomes: s.incomes,
-              total: s.total,
-              month: s.month,
-              data: s.transactions,
-              currentDate: s.currentDate,
-              locale: currentLocale(s.currentLanguage),
-            ),
-          ),
-        );
-      },
-    );
+    return const SliverToBoxAdapter(child: TransactionSummaryPerMonth());
   }
 
   Widget _buildTransactionTypeSwitch() {

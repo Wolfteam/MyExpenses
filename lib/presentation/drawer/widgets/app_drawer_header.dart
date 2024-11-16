@@ -1,9 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/drawer/user_accounts_bottom_sheet_dialog.dart';
-import 'package:my_expenses/presentation/shared/custom_assets.dart';
+import 'package:my_expenses/presentation/drawer/widgets/logged_user_image.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
 
 class AppDrawerHeader extends StatelessWidget {
@@ -32,18 +30,9 @@ class AppDrawerHeader extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            InkWell(
-              borderRadius: BorderRadius.circular(40),
-              onTap: () => _signIn(context),
-              child: isUserSignedIn
-                  ? Container(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: CircleAvatar(
-                        radius: 40,
-                        backgroundImage: FileImage(File(image!)),
-                      ),
-                    )
-                  : Image.asset(CustomAssets.appIcon, width: 80, height: 80),
+            LoggedUserImage(
+              image: image,
+              isUserSignedIn: isUserSignedIn,
             ),
             if (!isUserSignedIn)
               Container(

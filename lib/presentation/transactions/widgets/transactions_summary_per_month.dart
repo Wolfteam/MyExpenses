@@ -2,78 +2,66 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:my_expenses/application/bloc.dart';
-import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/generated/l10n.dart';
+import 'package:my_expenses/presentation/shared/loading.dart';
 import 'package:my_expenses/presentation/shared/mixins/transaction_mixin.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
+import 'package:my_expenses/presentation/shared/utils/i18n_utils.dart';
 
 class TransactionSummaryPerMonth extends StatelessWidget with TransactionMixin {
-  final String month;
-  final double expenses;
-  final double incomes;
-  final double total;
-  final List<TransactionsSummaryPerMonth> data;
-  final DateTime currentDate;
-  final Locale locale;
-
-  const TransactionSummaryPerMonth({
-    required this.month,
-    required this.expenses,
-    required this.incomes,
-    required this.total,
-    required this.data,
-    required this.currentDate,
-    required this.locale,
-  });
+  const TransactionSummaryPerMonth();
 
   @override
   Widget build(BuildContext context) {
-    final double incomePercentage = data.firstWhere((el) => el.isAnIncome).percentage;
-    final double expensesPercentage = data.firstWhere((el) => !el.isAnIncome).percentage;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return BlocBuilder<TransactionsSummaryPerMonthBloc, TransactionsSummaryPerMonthState>(
+      builder: (context, state) => state.map(
+        loading: (state) => const Loading(useScaffold: false),
+        loaded: (state) => Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Text(
-              month,
-              style: Theme.of(context).textTheme.titleLarge,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text(
+                  state.month,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.calendar_month),
+                  onPressed: () => _changeCurrentDate(context, state.currentDate, currentLocale(state.language)),
+                ),
+              ],
             ),
-            IconButton(
-              icon: const Icon(Icons.calendar_month),
-              onPressed: () => _changeCurrentDate(context),
+            Padding(
+              padding: Styles.edgeInsetHorizontal10,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    flex: 45,
+                    child: _SummaryCard.incomes(
+                      amount: state.income,
+                      percentage: state.incomePercentage,
+                    ),
+                  ),
+                  const Spacer(flex: 10),
+                  Expanded(
+                    flex: 45,
+                    child: _SummaryCard.expenses(
+                      amount: state.expense,
+                      percentage: state.expensePercentage,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
-        Padding(
-          padding: Styles.edgeInsetHorizontal10,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Expanded(
-                flex: 45,
-                child: _SummaryCard.incomes(
-                  amount: incomes,
-                  percentage: incomePercentage,
-                ),
-              ),
-              const Spacer(flex: 10),
-              Expanded(
-                flex: 45,
-                child: _SummaryCard.expenses(
-                  amount: expenses,
-                  percentage: expensesPercentage,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+      ),
     );
   }
 
-  Future<void> _changeCurrentDate(BuildContext context) async {
+  Future<void> _changeCurrentDate(BuildContext context, DateTime currentDate, Locale locale) async {
     final now = DateTime.now();
     await showMonthPicker(
       context: context,
@@ -85,7 +73,7 @@ class TransactionSummaryPerMonth extends StatelessWidget with TransactionMixin {
         return;
       }
       context.read<TransactionsBloc>().add(TransactionsEvent.loadTransactions(inThisDate: selectedDate));
-      context.read<TransactionsActivityBloc>().add(TransactionsActivityEvent.dateChanged(date: selectedDate));
+      context.read<TransactionsSummaryPerMonthBloc>().add(TransactionsSummaryPerMonthEvent.init(currentDate: selectedDate));
     });
   }
 }
