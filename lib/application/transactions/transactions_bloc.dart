@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
-import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/models/entities/daos/transactions_dao.dart';
 import 'package:my_expenses/domain/models/entities/daos/users_dao.dart';
 import 'package:my_expenses/domain/models/models.dart';
@@ -20,14 +19,12 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
   final TransactionsDao _transactionsDao;
   final UsersDao _usersDao;
   final SettingsService _settingsService;
-  final TransactionsPerMonthBloc _transactionsPerMonthBloc;
 
   TransactionsBloc(
     this._logger,
     this._transactionsDao,
     this._usersDao,
     this._settingsService,
-    this._transactionsPerMonthBloc,
   ) : super(const TransactionsState.loading());
 
   _InitialState get currentState => state as _InitialState;
@@ -55,26 +52,8 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
 
       final transactions = await _transactionsDao.getAllTransactions(currentUser?.id, from, to);
 
-      final incomes = _getTotalIncomes(transactions);
-      final expenses = _getTotalExpenses(transactions);
-      final balance = TransactionUtils.roundDouble(incomes + expenses);
-
-      _logger.info(runtimeType, '_buildInitialState: Generating month balance...');
-      final monthBalance = _buildMonthBalance(incomes, expenses, transactions);
-
       _logger.info(runtimeType, '_buildInitialState: Generating transactions per month..');
       final transPerMonth = TransactionUtils.buildTransactionsPerMonth(_settingsService.getCurrentLanguageModel(), transactions);
-
-      _transactionsPerMonthBloc.add(
-        TransactionsPerMonthEvent.init(
-          incomes: incomes,
-          expenses: expenses,
-          total: balance,
-          month: month,
-          transactions: monthBalance,
-          currentDate: inThisDate,
-        ),
-      );
 
       if (state is! _InitialState) {
         return TransactionsState.initial(
@@ -116,47 +95,5 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
       _logger.error(runtimeType, '_buildRecurringState: Unknown error', e, s);
       return currentState.copyWith(showParentTransactions: true, transactionsPerMonth: []);
     }
-  }
-
-  double _getTotalExpenses(List<TransactionItem> transactions) => TransactionUtils.getTotalTransactionAmounts(transactions);
-
-  double _getTotalIncomes(List<TransactionItem> transactions) => TransactionUtils.getTotalTransactionAmounts(transactions, onlyIncomes: true);
-
-  List<TransactionsSummaryPerMonth> _buildMonthBalance(
-    double incomes,
-    double expenses,
-    List<TransactionItem> transactions,
-  ) {
-    if (transactions.isNotEmpty) {
-      final total = incomes.abs() + expenses.abs();
-      final double expensesPercentage = expenses.abs() * 100 / total;
-      final double incomesPercentage = incomes * 100 / total;
-
-      return [
-        TransactionsSummaryPerMonth(
-          order: 0,
-          percentage: TransactionUtils.roundDouble(expensesPercentage),
-          isAnIncome: false,
-        ),
-        TransactionsSummaryPerMonth(
-          order: 1,
-          percentage: TransactionUtils.roundDouble(incomesPercentage),
-          isAnIncome: true,
-        ),
-      ];
-    }
-
-    return const [
-      TransactionsSummaryPerMonth(
-        order: 0,
-        percentage: 0,
-        isAnIncome: false,
-      ),
-      TransactionsSummaryPerMonth(
-        order: 1,
-        percentage: 0,
-        isAnIncome: true,
-      ),
-    ];
   }
 }

@@ -16,5 +16,5 @@ export 'splash_screen/splash_screen_bloc.dart';
 export 'transaction_form/transaction_form_bloc.dart';
 export 'transactions/transactions_bloc.dart';
 export 'transactions_activity/transactions_activity_bloc.dart';
-export 'transactions_per_month/transactions_per_month_bloc.dart';
+export 'transactions_summary_per_month/transactions_summary_per_month_bloc.dart';
 export 'users_accounts/user_accounts_bloc.dart';

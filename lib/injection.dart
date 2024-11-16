@@ -94,6 +94,14 @@ class Injection {
     return TransactionFormBloc(logger, transactionsDao, usersDao, settingsService, pathService, syncService);
   }
 
+  static TransactionsSummaryPerMonthBloc get transactionsSummaryPerMonthBloc {
+    final logger = getIt<LoggingService>();
+    final transactionsDao = getIt<TransactionsDao>();
+    final usersDao = getIt<UsersDao>();
+    final settingsService = getIt<SettingsService>();
+    return TransactionsSummaryPerMonthBloc(logger, transactionsDao, usersDao, settingsService);
+  }
+
   static TransactionsActivityBloc get transactionsActivityBloc {
     final logger = getIt<LoggingService>();
     final transactionsDao = getIt<TransactionsDao>();
