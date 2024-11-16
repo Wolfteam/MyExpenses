@@ -4,6 +4,7 @@ import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/extensions/string_extensions.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/drawer/widgets/logged_user_image.dart';
+import 'package:my_expenses/presentation/shared/styles.dart';
 
 class HomeWelcome extends StatelessWidget {
   const HomeWelcome({super.key});
@@ -14,43 +15,46 @@ class HomeWelcome extends StatelessWidget {
     final theme = Theme.of(context);
     final now = DateTime.now();
     return BlocBuilder<DrawerBloc, DrawerState>(
-      builder: (context, state) => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          InkWell(
-            borderRadius: BorderRadius.circular(16),
-            onTap: () => Scaffold.of(context).openDrawer(),
-            child: const Icon(Icons.menu),
-          ),
-          Expanded(
-            child: Column(
-              children: [
-                Text(
-                  i18n.hello,
-                  style: theme.textTheme.headlineMedium!.copyWith(fontWeight: FontWeight.bold),
-                ),
-                if (state.fullName.isNotNullEmptyOrWhitespace)
-                  Text(
-                    state.fullName!,
-                    style: theme.textTheme.titleSmall,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-              ],
+      builder: (context, state) => Padding(
+        padding: Styles.edgeInsetHorizontal10,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () => Scaffold.of(context).openDrawer(),
+              child: const Icon(Icons.menu),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: state.isUserSignedIn
-                ? LoggedUserImage(
-                    image: state.img,
-                    isUserSignedIn: state.isUserSignedIn,
-                    radius: 20,
-                    popContext: false,
-                  )
-                : null,
-          ),
-        ],
+            Expanded(
+              child: Center(
+                child: Column(
+                  children: [
+                    Text(
+                      i18n.hello,
+                      style: theme.textTheme.headlineMedium!.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    if (state.fullName.isNotNullEmptyOrWhitespace)
+                      Text(
+                        state.fullName!,
+                        style: theme.textTheme.titleSmall,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            if (state.isUserSignedIn)
+              LoggedUserImage(
+                image: state.img,
+                isUserSignedIn: state.isUserSignedIn,
+                radius: 20,
+                popContext: false,
+              )
+            else
+              const SizedBox.square(dimension: 40),
+          ],
+        ),
       ),
     );
   }

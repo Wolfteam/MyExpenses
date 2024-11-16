@@ -61,7 +61,7 @@ class _Content extends StatelessWidget {
         initial: (state) => state.signInInProcess
             ? const Loading(useScaffold: false)
             : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ModalSheetSeparator(),
