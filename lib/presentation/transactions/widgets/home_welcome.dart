@@ -4,7 +4,6 @@ import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/extensions/string_extensions.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/drawer/widgets/logged_user_image.dart';
-import 'package:my_expenses/presentation/shared/styles.dart';
 
 class HomeWelcome extends StatelessWidget {
   const HomeWelcome({super.key});
@@ -16,14 +15,13 @@ class HomeWelcome extends StatelessWidget {
     final now = DateTime.now();
     return BlocBuilder<DrawerBloc, DrawerState>(
       builder: (context, state) => Padding(
-        padding: Styles.edgeInsetHorizontal10,
+        padding: const EdgeInsets.only(right: 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            InkWell(
-              borderRadius: BorderRadius.circular(16),
-              onTap: () => Scaffold.of(context).openDrawer(),
-              child: const Icon(Icons.menu),
+            IconButton(
+              onPressed: () => Scaffold.of(context).openDrawer(),
+              icon: const Icon(Icons.menu),
             ),
             Expanded(
               child: Center(

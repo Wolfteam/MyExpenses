@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/extensions/string_extensions.dart';
 import 'package:my_expenses/generated/l10n.dart';
-import 'package:my_expenses/injection.dart';
 import 'package:my_expenses/presentation/search/widgets/search_box_card.dart';
 import 'package:my_expenses/presentation/search/widgets/search_filter_bar.dart';
 import 'package:my_expenses/presentation/shared/extensions/scroll_controller_extensions.dart';
@@ -12,17 +11,6 @@ import 'package:my_expenses/presentation/shared/styles.dart';
 import 'package:my_expenses/presentation/transactions/widgets/transaction_item_card_container.dart';
 
 class SearchPage extends StatefulWidget {
-  static MaterialPageRoute route() {
-    final route = MaterialPageRoute(
-      fullscreenDialog: true,
-      builder: (ctx) => BlocProvider<SearchBloc>(
-        create: (ctx) => Injection.searchBloc..add(const SearchEvent.init()),
-        child: SearchPage(),
-      ),
-    );
-    return route;
-  }
-
   @override
   _SearchPageState createState() => _SearchPageState();
 }

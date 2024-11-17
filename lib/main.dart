@@ -98,14 +98,7 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(create: (ctx) => CategoryIconBloc()),
           BlocProvider(
-            create: (ctx) {
-              final logger = getIt<LoggingService>();
-              final transactionsDao = getIt<TransactionsDao>();
-              final usersDao = getIt<UsersDao>();
-              final settingsService = getIt<SettingsService>();
-              final now = DateTime.now();
-              return ChartsBloc(logger, transactionsDao, usersDao, settingsService)..add(ChartsEvent.loadChart(selectedMonthDate: now, selectedYear: now.year));
-            },
+            create: (ctx) => Injection.searchBloc..add(const SearchEvent.init()),
           ),
         ],
         child: AppWidget(),
