@@ -54,6 +54,7 @@ class TransactionUtils {
   }
 
   static double roundDouble(double value, {int places = 2}) {
+    assert(places > 0);
     final mod = pow(10.0, places);
     return (value * mod).round().toDouble() / mod;
   }
