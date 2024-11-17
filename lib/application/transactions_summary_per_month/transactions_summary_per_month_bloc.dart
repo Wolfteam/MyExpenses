@@ -44,8 +44,8 @@ class TransactionsSummaryPerMonthBloc extends Bloc<TransactionsSummaryPerMonthEv
       final double expense = await _transactionsDao.getAmount(currentUser?.id, from, to, false);
       final double total = TransactionUtils.roundDouble(income.abs() + expense.abs());
       final double balance = TransactionUtils.roundDouble(income + expense);
-      final double incomePercentage = TransactionUtils.roundDouble(income * 100 / total);
-      final double expensePercentage = TransactionUtils.roundDouble(expense.abs() * 100 / total);
+      final double incomePercentage = total == 0 ? 0 : TransactionUtils.roundDouble(income * 100 / total);
+      final double expensePercentage = total == 0 ? 0 : TransactionUtils.roundDouble(expense.abs() * 100 / total);
 
       final String month = toBeginningOfSentenceCase(DateUtils.formatAppDate(date, _settingsService.getCurrentLanguageModel(), DateUtils.fullMonthFormat));
 
