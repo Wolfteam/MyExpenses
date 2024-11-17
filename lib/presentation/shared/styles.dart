@@ -10,10 +10,12 @@ class Styles {
   static const edgeInsetAll16 = EdgeInsets.all(16);
   static const edgeInsetAll10 = EdgeInsets.all(10);
   static const edgeInsetAll5 = EdgeInsets.all(5);
-  static const edgeInsetAll0 = EdgeInsets.zero;
   static const edgeInsetHorizontal16 = EdgeInsets.symmetric(horizontal: 16);
   static const edgeInsetHorizontal10 = EdgeInsets.symmetric(horizontal: 10);
   static const edgeInsetHorizontal5 = EdgeInsets.symmetric(horizontal: 5);
+  static const edgeInsetVertical16 = EdgeInsets.symmetric(vertical: 16);
+  static const edgeInsetVertical10 = EdgeInsets.symmetric(vertical: 10);
+  static const edgeInsetVertical5 = EdgeInsets.symmetric(vertical: 5);
 
   static const modalBottomSheetShape = RoundedRectangleBorder(
     borderRadius: BorderRadius.only(topRight: Radius.circular(35), topLeft: Radius.circular(35)),

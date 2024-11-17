@@ -5,7 +5,6 @@ import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/estimates/estimate_bottom_sheet_dialog.dart';
 import 'package:my_expenses/presentation/reports/reports_bottom_sheet_dialog.dart';
-import 'package:my_expenses/presentation/search/search_page.dart';
 import 'package:my_expenses/presentation/shared/dialogs/confirm_dialog.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
 
@@ -33,9 +32,6 @@ class AppDrawerItem extends StatelessWidget {
       case AppDrawerItemType.reports:
         icon = const Icon(Icons.insert_drive_file);
         text = i18n.reports;
-      case AppDrawerItemType.charts:
-        icon = const Icon(Icons.pie_chart);
-        text = i18n.charts;
       case AppDrawerItemType.categories:
         icon = const Icon(Icons.category);
         text = i18n.categories;
@@ -82,10 +78,6 @@ class AppDrawerItem extends StatelessWidget {
       _showEstimatesBottomSheet(context);
       return;
     }
-    if (type == AppDrawerItemType.search) {
-      _showSearchPage(context);
-      return;
-    }
     if (type == AppDrawerItemType.logout) {
       _showSignOutDialog(context);
       return;
@@ -113,11 +105,6 @@ class AppDrawerItem extends StatelessWidget {
       context: context,
       builder: (ctx) => EstimateBottomSheetDialog(),
     );
-  }
-
-  void _showSearchPage(BuildContext context) {
-    Navigator.pop(context);
-    Navigator.push(context, SearchPage.route());
   }
 
   void _showSignOutDialog(BuildContext context) {

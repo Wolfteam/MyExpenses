@@ -103,12 +103,12 @@ class OtherSettingsCard extends StatelessWidget {
 
   void _currencyChanged(CurrencySymbolType newValue, BuildContext context) {
     context.read<SettingsBloc>().add(SettingsEvent.currencyChanged(selectedCurrency: newValue));
-    BlocUtils.raiseCommonBlocEvents(context, reloadCharts: true, reloadTransactions: true);
+    BlocUtils.raiseCommonBlocEvents(context, reloadTransactions: true);
   }
 
   void _currencyPlacementChanged(bool newValue, BuildContext context) {
     context.read<SettingsBloc>().add(SettingsEvent.currencyPlacementChanged(placeToTheRight: newValue));
-    BlocUtils.raiseCommonBlocEvents(context, reloadTransactions: true, reloadCharts: true);
+    BlocUtils.raiseCommonBlocEvents(context, reloadTransactions: true);
   }
 }
 

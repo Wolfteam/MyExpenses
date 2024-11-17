@@ -92,7 +92,7 @@ class _Scaffold extends StatelessWidget {
   void _notifyCategorySavedOrDeleted(BuildContext context) {
     context.read<IncomesCategoriesBloc>().add(const CategoriesListEvent.getCategories(loadIncomes: true));
     context.read<ExpensesCategoriesBloc>().add(const CategoriesListEvent.getCategories(loadIncomes: false));
-    BlocUtils.raiseCommonBlocEvents(context, reloadCategories: true, reloadCharts: true, reloadTransactions: true);
+    BlocUtils.raiseCommonBlocEvents(context, reloadCategories: true, reloadTransactions: true);
   }
 }
 
