@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:my_expenses/domain/models/category_item.dart';
+import 'package:my_expenses/domain/models/models.dart';
 
 //TODO: MAYBE REMOVE THIS
 class CurrentSelectedCategory extends ChangeNotifier {

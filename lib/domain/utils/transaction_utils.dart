@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
-import 'package:darq/darq.dart' show DistinctExtension, SelectExtension;
 import 'package:intl/intl.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/models/models.dart';
@@ -97,7 +96,7 @@ class TransactionUtils {
       final dateToUse = (sortByNextRecurringDate ? transaction.nextRecurringDate : transaction.transactionDate)!;
       final date = DateTime(dateToUse.year, dateToUse.month, dateToUse.day);
 
-      if (transPerMonth.keys.any((key) => key == date)) {
+      if (transPerMonth.containsKey(date)) {
         transPerMonth[date]!.add(transaction);
       } else {
         transPerMonth.addAll({
@@ -106,37 +105,23 @@ class TransactionUtils {
       }
     }
 
-    final models = <TransactionCardItems>[];
-
-    for (final kvp in transPerMonth.entries) {
+    return transPerMonth.entries.sortedByCompare((kvp) => kvp.key, (t1, t2) {
+      if (sortType == SortDirectionType.asc) {
+        return t1.compareTo(t2);
+      }
+      return t2.compareTo(t1);
+    }).map((kvp) {
       final dateString = DateUtils.formatAppDate(kvp.key, language);
       final dayString = DateUtils.formatAppDate(kvp.key, language, DateUtils.dayNameStringFormat);
 
       final dateSummary = '$dateString ${toBeginningOfSentenceCase(dayString, language.code)}';
-
-      models.add(TransactionCardItems(date: kvp.key, dateString: dateSummary, transactions: kvp.value));
-    }
-
-    if (sortType == SortDirectionType.asc) {
-      models.sort((t1, t2) => t1.date.compareTo(t2.date));
-    } else {
-      models.sort((t1, t2) => t2.date.compareTo(t1.date));
-    }
-
-    return models;
-  }
-
-  static List<ChartTransactionItem> buildChartTransactionItems(List<TransactionItem> transactions, {bool onlyIncomes = true}) {
-    final items = <ChartTransactionItem>[];
-    final cats = transactions.where((t) => t.category.isAnIncome == onlyIncomes).select((element, index) => element.category.id).distinct().toList();
-
-    for (var i = 0; i < cats.length; i++) {
-      final catId = cats[i];
-      final category = transactions.firstWhere((t) => t.category.id == catId).category;
-      final double amount = transactions.where((t) => t.category.id == catId).map((e) => e.amount).sum;
-      items.add(ChartTransactionItem(value: amount, order: i, categoryColor: category.iconColor));
-    }
-
-    return items;
+      return TransactionCardItems(
+        groupedBy: dateSummary,
+        transactions: kvp.value,
+        income: getTotalTransactionAmounts(kvp.value, onlyIncomes: true),
+        expense: getTotalTransactionAmounts(kvp.value),
+        balance: getTotalTransactionAmount(kvp.value),
+      );
+    }).toList();
   }
 }

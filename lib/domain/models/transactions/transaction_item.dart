@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
-import 'package:my_expenses/domain/models/category_item.dart';
+import 'package:my_expenses/domain/models/models.dart';
 
 part 'transaction_item.freezed.dart';
 part 'transaction_item.g.dart';

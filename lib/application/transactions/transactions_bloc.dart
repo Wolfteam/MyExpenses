@@ -31,11 +31,11 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
   Stream<TransactionsState> mapEventToState(TransactionsEvent event) async* {
     final s = await event.map(
       init: (e) => _handle(e.currentDate, TransactionFilterType.date, SortDirectionType.desc),
-      groupTypeChanged: (e) => state.map(
+      groupingTypeChanged: (e) => state.map(
         loading: (_) => throw Exception('Invalid state'),
         loaded: (state) => _handle(state.currentDate, e.type, state.sortDirectionType),
       ),
-      sortTypeChanged: (e) => state.map(
+      sortDirectionTypeChanged: (e) => state.map(
         loading: (_) => throw Exception('Invalid state'),
         loaded: (state) => _handle(state.currentDate, state.groupingType, e.type),
       ),
