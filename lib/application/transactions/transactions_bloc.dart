@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/models/entities/daos/transactions_dao.dart';
 import 'package:my_expenses/domain/models/entities/daos/users_dao.dart';
 import 'package:my_expenses/domain/models/models.dart';
@@ -28,14 +29,21 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
 
   @override
   Stream<TransactionsState> mapEventToState(TransactionsEvent event) async* {
-    final s = await event.map(init: (e) => _handle(e.currentDate));
+    final s = await event.map(
+      init: (e) => _handle(e.currentDate, TransactionFilterType.date, SortDirectionType.desc),
+      groupTypeChanged: (e) => state.map(
+        loading: (_) => throw Exception('Invalid state'),
+        loaded: (state) => _handle(state.currentDate, e.type, state.sortDirectionType),
+      ),
+      sortTypeChanged: (e) => state.map(
+        loading: (_) => throw Exception('Invalid state'),
+        loaded: (state) => _handle(state.currentDate, state.groupingType, e.type),
+      ),
+    );
     yield s;
   }
 
-  Future<TransactionsState> _handle(DateTime date) async {
-    if (state.maybeMap(loaded: (state) => state.currentDate == date, orElse: () => false)) {
-      return state;
-    }
+  Future<TransactionsState> _handle(DateTime date, TransactionFilterType groupingType, SortDirectionType sortDirectionType) async {
     final LanguageModel language = _settingsService.getCurrentLanguageModel();
     final DateTime from = DateUtils.getFirstDayDateOfTheMonth(date);
     final DateTime to = DateUtils.getLastDayDateOfTheMonth(from);
@@ -49,12 +57,78 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
       return TransactionsState.loaded(
         currentDate: date,
         language: language,
-        transactions: TransactionUtils.buildTransactionsPerMonth(language, transactions),
+        groupingType: groupingType,
+        sortDirectionType: sortDirectionType,
+        transactions: TransactionUtils.buildTransactionsPerMonth(language, transactions, sortType: sortDirectionType),
         recurringTransactions: TransactionUtils.buildTransactionsPerMonth(language, recurringTransactions, sortByNextRecurringDate: true),
+        groupedTransactionsByCategory: groupingType == TransactionFilterType.category ? _groupByCategory([...transactions], sortDirectionType) : <TransactionCardItems>[],
       );
     } catch (e, s) {
       _logger.error(runtimeType, '_handle: An unknown error occurred', e, s);
-      return TransactionsState.loaded(currentDate: date, language: language, transactions: [], recurringTransactions: []);
+      return TransactionsState.loaded(
+        currentDate: date,
+        language: language,
+        groupingType: groupingType,
+        sortDirectionType: sortDirectionType,
+        transactions: [],
+        recurringTransactions: [],
+        groupedTransactionsByCategory: [],
+      );
     }
+  }
+
+  void _sortTransactions(List<TransactionItem> transactions, TransactionFilterType groupingType, SortDirectionType sortDirectionType) {
+    switch (groupingType) {
+      case TransactionFilterType.description:
+        if (sortDirectionType == SortDirectionType.asc) {
+          transactions.sort((t1, t2) => t1.description.compareTo(t2.description));
+        } else {
+          transactions.sort((t1, t2) => t2.description.compareTo(t1.description));
+        }
+      case TransactionFilterType.amount:
+        if (sortDirectionType == SortDirectionType.asc) {
+          transactions.sort((t1, t2) => t1.amount.abs().compareTo(t2.amount.abs()));
+        } else {
+          transactions.sort((t1, t2) => t2.amount.abs().compareTo(t1.amount.abs()));
+        }
+      case TransactionFilterType.date:
+        if (sortDirectionType == SortDirectionType.asc) {
+          transactions.sort((t1, t2) => t1.transactionDate.compareTo(t2.transactionDate));
+        } else {
+          transactions.sort((t1, t2) => t2.transactionDate.compareTo(t1.transactionDate));
+        }
+      case TransactionFilterType.category:
+        break;
+      default:
+        throw Exception('$groupingType is not supported');
+    }
+  }
+
+  List<TransactionCardItems> _groupByCategory(List<TransactionItem> transactions, SortDirectionType sortDirectionType) {
+    final List<CategoryItem> categories = transactions.map((t) => t.category).toList();
+    final List<int> catsIds = categories.map((c) => c.id).toSet().toList();
+    final grouped = <TransactionCardItems>[];
+    for (final int catId in catsIds) {
+      final CategoryItem category = categories.firstWhere((c) => c.id == catId);
+      final List<TransactionItem> trans = transactions.where((t) => t.category.id == catId).toList();
+      _sortTransactions(trans, TransactionFilterType.amount, sortDirectionType);
+
+      final group = TransactionCardItems(
+        groupedBy: category.name,
+        transactions: trans,
+        income: TransactionUtils.getTotalTransactionAmounts(trans, onlyIncomes: true),
+        expense: TransactionUtils.getTotalTransactionAmounts(trans),
+        balance: TransactionUtils.getTotalTransactionAmount(trans),
+      );
+      grouped.add(group);
+    }
+
+    if (sortDirectionType == SortDirectionType.asc) {
+      grouped.sort((t1, t2) => t1.balance.abs().compareTo(t2.balance.abs()));
+    } else {
+      grouped.sort((t1, t2) => t2.balance.abs().compareTo(t1.balance.abs()));
+    }
+
+    return grouped;
   }
 }
