@@ -2,8 +2,6 @@ export 'app/app_bloc.dart';
 export 'categories_list/categories_list_bloc.dart';
 export 'category_form/category_form_bloc.dart';
 export 'category_icon/category_icon_bloc.dart';
-export 'chart_details/chart_details_bloc.dart';
-export 'charts/charts_bloc.dart';
 export 'currency/currency_bloc.dart';
 export 'drawer/drawer_bloc.dart';
 export 'estimates/estimates_bloc.dart';
