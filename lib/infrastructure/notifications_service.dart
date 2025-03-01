@@ -63,19 +63,13 @@ class NotificationServiceImpl implements NotificationService {
       }
 
       const initializationSettingsAndroid = AndroidInitializationSettings('ic_notification');
-      final initializationSettingsIOS = DarwinInitializationSettings(
-        onDidReceiveLocalNotification: (int id, String? title, String? body, String? payload) async {
-          // didReceiveLocalNotificationStream.add(
-          //   ReceivedNotification(
-          //     id: id,
-          //     title: title,
-          //     body: body,
-          //     payload: payload,
-          //   ),
-          // );
-        },
+      const initializationSettingsIOS = DarwinInitializationSettings();
+      const initializationSettingsMacOS = DarwinInitializationSettings();
+      const initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid,
+        iOS: initializationSettingsIOS,
+        macOS: initializationSettingsMacOS,
       );
-      final initializationSettings = InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
       await _flutterLocalNotificationsPlugin.initialize(
         initializationSettings,
         onDidReceiveNotificationResponse: (NotificationResponse notificationResponse) {

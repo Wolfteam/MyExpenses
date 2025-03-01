@@ -215,7 +215,7 @@ class _Chart extends StatelessWidget with TransactionMixin {
                 maxIncluded: false,
                 minIncluded: false,
                 getTitlesWidget: (value, meta) => SideTitleWidget(
-                  axisSide: meta.axisSide,
+                  meta: meta,
                   fitInside: SideTitleFitInsideData.fromTitleMeta(meta),
                   child: Tooltip(
                     message: bloc.format(value),
