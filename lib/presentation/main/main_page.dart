@@ -65,39 +65,34 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     return BlocListener<MainTabBloc, MainTabState>(
-      listener: (ctx, state) async {
+      listener: (ctx, state) {
         if (!mounted) {
           return;
         }
         notificationService.selectNotificationStream.stream.listen((notification) => _onSelectNotification(notification));
       },
       //TODO: DESKTOP SCAFFOLD
-      child: Platform.isWindows
-          ? MobileScaffold(
-              defaultIndex: 0,
-              tabController: _tabController,
-            )
-          : RateMyAppBuilder(
-              rateMyApp: RateMyApp(minDays: 7, minLaunches: 10, remindDays: 7, remindLaunches: 10),
-              onInitialized: (ctx, rateMyApp) async {
-                if (!rateMyApp.shouldOpenDialog) {
-                  return;
-                }
-                final s = S.of(ctx);
-                await rateMyApp.showRateDialog(
-                  ctx,
-                  title: s.rateThisApp,
-                  message: s.rateMsg,
-                  rateButton: s.rate,
-                  laterButton: s.maybeLater,
-                  noButton: s.noThanks,
-                );
-              },
-              builder: (context) => MobileScaffold(
-                defaultIndex: 0,
-                tabController: _tabController,
+      child:
+          Platform.isWindows
+              ? MobileScaffold(defaultIndex: 0, tabController: _tabController)
+              : RateMyAppBuilder(
+                rateMyApp: RateMyApp(minDays: 7, minLaunches: 10, remindDays: 7, remindLaunches: 10),
+                onInitialized: (ctx, rateMyApp) async {
+                  if (!rateMyApp.shouldOpenDialog) {
+                    return;
+                  }
+                  final s = S.of(ctx);
+                  await rateMyApp.showRateDialog(
+                    ctx,
+                    title: s.rateThisApp,
+                    message: s.rateMsg,
+                    rateButton: s.rate,
+                    laterButton: s.maybeLater,
+                    noButton: s.noThanks,
+                  );
+                },
+                builder: (context) => MobileScaffold(defaultIndex: 0, tabController: _tabController),
               ),
-            ),
     );
   }
 
@@ -109,30 +104,31 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
     super.dispose();
   }
 
-  Future<dynamic> _onDidReceiveLocalNotification(int id, String? title, String? body, String? payload) async {
+  Future<dynamic> _onDidReceiveLocalNotification(int id, String? title, String? body, String? payload) {
     final i18n = S.of(context);
     return showDialog(
       context: context,
-      builder: (BuildContext context) => CupertinoAlertDialog(
-        title: Text(title!),
-        content: Text(body!),
-        actions: [
-          CupertinoDialogAction(
-            isDefaultAction: true,
-            onPressed: () {
-              Navigator.of(context, rootNavigator: true).pop();
-            },
-            child: Text(i18n.ok),
+      builder:
+          (BuildContext context) => CupertinoAlertDialog(
+            title: Text(title!),
+            content: Text(body!),
+            actions: [
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                onPressed: () {
+                  Navigator.of(context, rootNavigator: true).pop();
+                },
+                child: Text(i18n.ok),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
   Future<void> _onSelectNotification(AppNotification notification) async {
     final settingsService = getIt<SettingsService>();
     final logger = getIt<LoggingService>();
-//TODO: IF YOU OPEN THE NOTIFICATION WHILE THE APP IS CLOSED, NOTHING HAPPENS
+    //TODO: IF YOU OPEN THE NOTIFICATION WHILE THE APP IS CLOSED, NOTHING HAPPENS
     try {
       WidgetsFlutterBinding.ensureInitialized();
       final i18n = await getI18n(settingsService.language);

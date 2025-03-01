@@ -34,8 +34,6 @@ extension AppThemeTypeExtensions on AppAccentColorType {
         return Colors.teal;
       case AppAccentColorType.amber:
         return Colors.amber;
-      default:
-        throw Exception('The provided accent color = $this is not valid ');
     }
   }
 
@@ -46,10 +44,7 @@ extension AppThemeTypeExtensions on AppAccentColorType {
       AppThemeType.light => Brightness.light,
     };
 
-    final ColorScheme colorScheme = ColorScheme.fromSeed(
-      seedColor: color,
-      brightness: brightness,
-    );
+    final ColorScheme colorScheme = ColorScheme.fromSeed(seedColor: color, brightness: brightness);
     return switch (brightness) {
       Brightness.dark => ThemeData.dark(useMaterial3: true).copyWith(colorScheme: colorScheme),
       Brightness.light => ThemeData.light(useMaterial3: true).copyWith(colorScheme: colorScheme),

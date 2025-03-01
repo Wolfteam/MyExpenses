@@ -18,24 +18,14 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
     final query = select(categories)..orderBy([(t) => OrderingTerm(expression: t.name)]);
 
     if (userId != null) {
-      query.where(
-        (c) => c.userId.equals(userId) & c.localStatus.equals(LocalStatusType.deleted.index).not(),
-      );
+      query.where((c) => c.userId.equals(userId) & c.localStatus.equals(LocalStatusType.deleted.index).not());
     } else {
-      query.where(
-        (c) => c.userId.isNull() & c.localStatus.equals(LocalStatusType.deleted.index).not(),
-      );
+      query.where((c) => c.userId.isNull() & c.localStatus.equals(LocalStatusType.deleted.index).not());
     }
 
     return query
         .map(
-          (row) => CategoryItem(
-            id: row.id,
-            isAnIncome: row.isAnIncome,
-            name: row.name,
-            icon: row.icon,
-            iconColor: row.iconColor,
-          ),
+          (row) => CategoryItem(id: row.id, isAnIncome: row.isAnIncome, name: row.name, icon: row.icon, iconColor: row.iconColor),
         )
         .get();
   }
@@ -47,7 +37,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
   }
 
   @override
-  Future<List<CategoryItem>> getAllIncomes(int? userId) async {
+  Future<List<CategoryItem>> getAllIncomes(int? userId) {
     final query = select(categories);
 
     if (userId != null) {
@@ -117,7 +107,10 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
         updatedAt: Value(DateTime.now()),
         updatedBy: const Value(createdBy),
         userId: Value(userId),
-        localStatus: currentCat.localStatus == LocalStatusType.created ? const Value(LocalStatusType.created) : const Value(LocalStatusType.updated),
+        localStatus:
+            currentCat.localStatus == LocalStatusType.created
+                ? const Value(LocalStatusType.created)
+                : const Value(LocalStatusType.updated),
       );
 
       await (update(categories)..where((t) => t.id.equals(id))).write(updatedFields);
@@ -182,12 +175,8 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
   @override
   Future<List<drive.Category>> getAllCategoriesToSync(int userId) {
     return (select(categories)
-          ..where(
-            (c) => c.localStatus.equals(LocalStatusType.deleted.index).not() & c.userId.equals(userId),
-          )
-          ..orderBy(
-            [(c) => OrderingTerm(expression: c.id)],
-          ))
+          ..where((c) => c.localStatus.equals(LocalStatusType.deleted.index).not() & c.userId.equals(userId))
+          ..orderBy([(c) => OrderingTerm(expression: c.id)]))
         .map(
           (row) => drive.Category(
             createdAt: row.createdAt,
@@ -205,62 +194,48 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
   }
 
   @override
-  Future<void> syncDownDelete(
-    int userId,
-    List<drive.Category> existingCats,
-  ) async {
-    final catsInDb = await (select(categories)
-          ..where(
-            (c) => c.userId.equals(userId) & c.localStatus.equals(LocalStatusType.created.index).not(),
-          ))
-        .get();
+  Future<void> syncDownDelete(int userId, List<drive.Category> existingCats) async {
+    final catsInDb =
+        await (select(categories)
+          ..where((c) => c.userId.equals(userId) & c.localStatus.equals(LocalStatusType.created.index).not())).get();
     final downloadedCatsHash = existingCats.map((c) => c.createdHash).toList();
     final catsToDelete = catsInDb.where((c) => !downloadedCatsHash.contains(c.createdHash)).map((t) => t.id).toList();
 
     if (catsToDelete.isEmpty) return;
 
     await batch((b) {
-      b.deleteWhere<Categories, Category>(
-        categories,
-        (c) => c.id.isIn(catsToDelete),
-      );
+      b.deleteWhere<Categories, Category>(categories, (c) => c.id.isIn(catsToDelete));
     });
   }
 
   @override
   Future<void> syncUpDelete(int userId) {
-    return (delete(categories)
-          ..where(
-            (c) => c.localStatus.equals(LocalStatusType.deleted.index) & c.userId.equals(userId),
-          ))
-        .go();
+    return (delete(categories)..where((c) => c.localStatus.equals(LocalStatusType.deleted.index) & c.userId.equals(userId))).go();
   }
 
   @override
-  Future<void> syncDownCreate(
-    int userId,
-    List<drive.Category> existingCats,
-  ) async {
+  Future<void> syncDownCreate(int userId, List<drive.Category> existingCats) async {
     final catsInDb = await (select(categories)..where((c) => c.userId.equals(userId))).get();
     final localCatsHash = catsInDb.map((c) => c.createdHash).toList();
-    final catsToBeCreated = existingCats
-        .where((c) => !localCatsHash.contains(c.createdHash))
-        .map(
-          (c) => CategoriesCompanion.insert(
-            localStatus: LocalStatusType.nothing,
-            createdAt: c.createdAt,
-            createdBy: c.createdBy,
-            createdHash: c.createdHash,
-            icon: Value(const IconDataConverter().fromSql(c.icon)),
-            iconColor: const ColorConverter().fromSql(c.iconColor),
-            isAnIncome: c.isAnIncome,
-            name: c.name,
-            updatedAt: Value(c.updatedAt),
-            updatedBy: Value(c.updatedBy),
-            userId: Value(userId),
-          ),
-        )
-        .toList();
+    final catsToBeCreated =
+        existingCats
+            .where((c) => !localCatsHash.contains(c.createdHash))
+            .map(
+              (c) => CategoriesCompanion.insert(
+                localStatus: LocalStatusType.nothing,
+                createdAt: c.createdAt,
+                createdBy: c.createdBy,
+                createdHash: c.createdHash,
+                icon: Value(const IconDataConverter().fromSql(c.icon)),
+                iconColor: const ColorConverter().fromSql(c.iconColor),
+                isAnIncome: c.isAnIncome,
+                name: c.name,
+                updatedAt: Value(c.updatedAt),
+                updatedBy: Value(c.updatedBy),
+                userId: Value(userId),
+              ),
+            )
+            .toList();
 
     if (catsToBeCreated.isEmpty) return;
 
@@ -270,17 +245,16 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
   }
 
   @override
-  Future<void> syncDownUpdate(
-    int userId,
-    List<drive.Category> existingCats,
-  ) async {
+  Future<void> syncDownUpdate(int userId, List<drive.Category> existingCats) async {
     final existingCatsToUse = existingCats.where((t) => t.updatedAt != null).toList();
     final downloadedCatsHash = existingCatsToUse.map((c) => c.createdHash).toList();
-    final catsInDb = await (select(categories)
-          ..where(
-            (c) => c.userId.equals(userId) & c.createdHash.isIn(downloadedCatsHash) & c.localStatus.equals(LocalStatusType.deleted.index).not(),
-          ))
-        .get();
+    final catsInDb =
+        await (select(categories)..where(
+          (c) =>
+              c.userId.equals(userId) &
+              c.createdHash.isIn(downloadedCatsHash) &
+              c.localStatus.equals(LocalStatusType.deleted.index).not(),
+        )).get();
 
     final catsToUpdate = <Category>[];
     for (final cat in catsToUpdate) {
@@ -302,9 +276,7 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
           CategoriesCompanion(
             localStatus: const Value(LocalStatusType.nothing),
             icon: Value(const IconDataConverter().fromSql(updatedCat.icon)),
-            iconColor: Value(
-              const ColorConverter().fromSql(updatedCat.iconColor),
-            ),
+            iconColor: Value(const ColorConverter().fromSql(updatedCat.iconColor)),
             isAnIncome: Value(updatedCat.isAnIncome),
             name: Value(updatedCat.name),
             updatedAt: Value(updatedCat.updatedAt),
@@ -320,21 +292,11 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
   @override
   Future<void> updateAllLocalStatus(LocalStatusType newValue) {
     return update(categories).write(
-      CategoriesCompanion(
-        updatedAt: Value(DateTime.now()),
-        updatedBy: const Value(createdBy),
-        localStatus: Value(newValue),
-      ),
+      CategoriesCompanion(updatedAt: Value(DateTime.now()), updatedBy: const Value(createdBy), localStatus: Value(newValue)),
     );
   }
 
   CategoryItem _mapToCategoryItem(Category cat) {
-    return CategoryItem(
-      id: cat.id,
-      isAnIncome: cat.isAnIncome,
-      name: cat.name,
-      icon: cat.icon,
-      iconColor: cat.iconColor,
-    );
+    return CategoryItem(id: cat.id, isAnIncome: cat.isAnIncome, name: cat.name, icon: cat.icon, iconColor: cat.iconColor);
   }
 }

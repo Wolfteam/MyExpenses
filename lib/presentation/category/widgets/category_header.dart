@@ -15,13 +15,7 @@ class CategoryHeader extends StatelessWidget {
   final IconData iconData;
   final Color iconColor;
 
-  const CategoryHeader({
-    super.key,
-    required this.name,
-    required this.type,
-    required this.iconData,
-    required this.iconColor,
-  });
+  const CategoryHeader({super.key, required this.name, required this.type, required this.iconData, required this.iconColor});
 
   @override
   Widget build(BuildContext context) {
@@ -31,21 +25,11 @@ class CategoryHeader extends StatelessWidget {
       height: 220.0,
       child: Stack(
         children: <Widget>[
+          Container(height: 150, color: theme.colorScheme.primary),
           Container(
-            height: 150,
-            color: theme.colorScheme.primary,
-          ),
-          Container(
-            padding: const EdgeInsets.only(
-              top: 40.0,
-              left: 10.0,
-              right: 10.0,
-              bottom: 10.0,
-            ),
+            padding: const EdgeInsets.only(top: 40.0, left: 10.0, right: 10.0, bottom: 10.0),
             child: Material(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
               elevation: 5.0,
               child: Container(
                 margin: Styles.edgeInsetHorizontal16,
@@ -110,14 +94,9 @@ class CategoryHeader extends StatelessWidget {
             alignment: Alignment.topCenter,
             child: Material(
               elevation: 10,
-              color: theme.cardColor.withOpacity(0.8),
+              color: theme.cardColor.withValues(alpha: 0.8),
               type: MaterialType.circle,
-              child: IconButton(
-                iconSize: 80,
-                icon: FaIcon(iconData),
-                color: iconColor,
-                onPressed: () => _gotoIconsPage(context),
-              ),
+              child: IconButton(iconSize: 80, icon: FaIcon(iconData), color: iconColor, onPressed: () => _gotoIconsPage(context)),
             ),
           ),
         ],
@@ -126,9 +105,7 @@ class CategoryHeader extends StatelessWidget {
   }
 
   Future<void> _gotoIconsPage(BuildContext context) async {
-    final route = MaterialPageRoute<CategoryIcon>(
-      builder: (ctx) => CategoryIconsPage(),
-    );
+    final route = MaterialPageRoute<CategoryIcon>(builder: (ctx) => CategoryIconsPage());
 
     final currentIcon = CategoryUtils.getByIconData(iconData);
     context.read<CategoryIconBloc>().add(CategoryIconEvent.selectionChanged(selectedIcon: currentIcon));
@@ -142,5 +119,6 @@ class CategoryHeader extends StatelessWidget {
     });
   }
 
-  void _iconChanged(BuildContext context, IconData icon) => context.read<CategoryFormBloc>().add(CategoryFormEvent.iconChanged(selectedIcon: icon));
+  void _iconChanged(BuildContext context, IconData icon) =>
+      context.read<CategoryFormBloc>().add(CategoryFormEvent.iconChanged(selectedIcon: icon));
 }

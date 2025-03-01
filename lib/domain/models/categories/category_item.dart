@@ -10,8 +10,8 @@ class CategoryItem with _$CategoryItem {
     required int id,
     required bool isAnIncome,
     required String name,
-    @JsonKey(ignore: true) IconData? icon,
-    @JsonKey(ignore: true) Color? iconColor,
+    @JsonKey(includeToJson: false, includeFromJson: false) IconData? icon,
+    @JsonKey(includeToJson: false, includeFromJson: false) Color? iconColor,
     @Default(false) bool isSelected,
   }) = _CategoryItem;
 

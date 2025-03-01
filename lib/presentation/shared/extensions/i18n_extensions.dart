@@ -9,8 +9,6 @@ extension I18nExtensions on S {
         return dark;
       case AppThemeType.light:
         return light;
-      default:
-        throw Exception('The provided app theme = $theme is not valid');
     }
   }
 
@@ -20,8 +18,6 @@ extension I18nExtensions on S {
         return english;
       case AppLanguageType.spanish:
         return spanish;
-      default:
-        throw Exception('The provided app lang = $lang is not valid');
     }
   }
 
@@ -39,8 +35,6 @@ extension I18nExtensions on S {
         return biweekly;
       case RepetitionCycleType.eachYear:
         return eachYear;
-      default:
-        throw Exception('The provided repetition cycle = $cycle is not valid');
     }
   }
 
@@ -50,8 +44,6 @@ extension I18nExtensions on S {
         return incomes;
       case TransactionType.expenses:
         return expenses;
-      default:
-        throw Exception('The provided transaction type = $type is not valid');
     }
   }
 
@@ -69,8 +61,6 @@ extension I18nExtensions on S {
         return each12Hours;
       case SyncIntervalType.eachDay:
         return eachDay;
-      default:
-        throw Exception('The provided sync interval = $interval is not valid');
     }
   }
 
@@ -106,8 +96,6 @@ extension I18nExtensions on S {
         return religion;
       case CategoryIconType.pets:
         return pets;
-      default:
-        return na;
     }
   }
 
@@ -121,8 +109,6 @@ extension I18nExtensions on S {
         return date;
       case TransactionFilterType.category:
         return category;
-      default:
-        throw Exception('Invalid transaction filter');
     }
   }
 
@@ -132,8 +118,6 @@ extension I18nExtensions on S {
         return ascending;
       case SortDirectionType.desc:
         return descending;
-      default:
-        throw Exception('Invalid sort direction');
     }
   }
 
@@ -143,8 +127,6 @@ extension I18nExtensions on S {
         return csv;
       case ReportFileType.pdf:
         return pdf;
-      default:
-        throw Exception('Invalid file type');
     }
   }
 
@@ -156,8 +138,6 @@ extension I18nExtensions on S {
         return greaterOrEqual;
       case ComparerType.lessOrEqualThan:
         return lessOrEqual;
-      default:
-        throw Exception('Invalid comparer type');
     }
   }
 

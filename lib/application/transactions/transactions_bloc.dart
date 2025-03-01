@@ -20,25 +20,20 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
   final UsersDao _usersDao;
   final SettingsService _settingsService;
 
-  TransactionsBloc(
-    this._logger,
-    this._transactionsDao,
-    this._usersDao,
-    this._settingsService,
-  ) : super(const TransactionsState.loading());
+  TransactionsBloc(this._logger, this._transactionsDao, this._usersDao, this._settingsService) : super(const TransactionsState.loading());
 
   @override
   Stream<TransactionsState> mapEventToState(TransactionsEvent event) async* {
     final s = await event.map(
       init: (e) => _handle(e.currentDate, TransactionFilterType.date, SortDirectionType.desc),
-      groupingTypeChanged: (e) => state.map(
-        loading: (_) => throw Exception('Invalid state'),
-        loaded: (state) => _handle(state.currentDate, e.type, state.sortDirectionType),
-      ),
-      sortDirectionTypeChanged: (e) => state.map(
-        loading: (_) => throw Exception('Invalid state'),
-        loaded: (state) => _handle(state.currentDate, state.groupingType, e.type),
-      ),
+      groupingTypeChanged:
+          (e) => state.map(
+            loading: (_) => throw Exception('Invalid state'),
+            loaded: (state) => _handle(state.currentDate, e.type, state.sortDirectionType),
+          ),
+      sortDirectionTypeChanged:
+          (e) =>
+              state.map(loading: (_) => throw Exception('Invalid state'), loaded: (state) => _handle(state.currentDate, state.groupingType, e.type)),
     );
     yield s;
   }
@@ -61,7 +56,8 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         sortDirectionType: sortDirectionType,
         transactions: TransactionUtils.buildTransactionsPerMonth(language, transactions, sortType: sortDirectionType),
         recurringTransactions: TransactionUtils.buildTransactionsPerMonth(language, recurringTransactions, sortByNextRecurringDate: true),
-        groupedTransactionsByCategory: groupingType == TransactionFilterType.category ? _groupByCategory([...transactions], sortDirectionType) : <TransactionCardItems>[],
+        groupedTransactionsByCategory:
+            groupingType == TransactionFilterType.category ? _groupByCategory([...transactions], sortDirectionType) : <TransactionCardItems>[],
       );
     } catch (e, s) {
       _logger.error(runtimeType, '_handle: An unknown error occurred', e, s);
@@ -99,8 +95,6 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         }
       case TransactionFilterType.category:
         break;
-      default:
-        throw Exception('$groupingType is not supported');
     }
   }
 
