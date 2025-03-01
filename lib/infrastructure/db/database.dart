@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:io';
 import 'dart:isolate';
 
@@ -8,6 +7,7 @@ import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/isolate.dart';
 import 'package:drift/native.dart';
+import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart' show Color, IconData;
 import 'package:my_expenses/domain/enums/enums.dart';
@@ -19,11 +19,11 @@ import 'package:my_expenses/infrastructure/db/transactions_dao_impl.dart';
 import 'package:my_expenses/infrastructure/db/users_dao_impl.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:sqlite3/open.dart';
 
 part 'database.g.dart';
 
 const createdBy = 'system';
+const String dbName = 'my_expenses';
 
 String createdHash(List<Object> columns) {
   final output = AccumulatorSink<Digest>();
@@ -40,34 +40,11 @@ String createdHash(List<Object> columns) {
 
 Future<String> _getDatabasePath() async {
   final dbFolder = await getApplicationDocumentsDirectory();
-  return p.join(dbFolder.path, 'my_expenses.sqlite');
+  return p.join(dbFolder.path, '$dbName.sqlite');
 }
 
-LazyDatabase _openConnection() {
-  open.overrideFor(OperatingSystem.windows, _openOnWindows);
-  // the LazyDatabase util lets us find the right location for the file async.
-  return LazyDatabase(() async {
-    // put the database file, called db.sqlite here, into the documents folder
-    // for your app.
-    final path = await _getDatabasePath();
-    final file = File(path);
-    // TODO: CHANGE THIS
-    // if (await file.exists()) {
-    //   debugPrint('********Deleting database');
-    //   debugPrint('********Db path =  ${dbFolder.path}');
-    //   await file.delete();
-    // }
-    return NativeDatabase(file, logStatements: kDebugMode);
-  });
-}
-
-DynamicLibrary _openOnWindows() {
-  //https://www.sqlite.org/download.html
-  //Precompiled Binaries for Windows
-  final script = File(Platform.script.toFilePath()).parent;
-  final path = '${script.path}/sqlite3.dll';
-  final libraryNextToScript = File(path);
-  return DynamicLibrary.open(libraryNextToScript.path);
+QueryExecutor _openConnection() {
+  return driftDatabase(name: dbName);
 }
 
 Future<DatabaseConnection> _connectAsync() async {

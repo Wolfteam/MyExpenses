@@ -10,38 +10,88 @@ class TransactionsCardContainer extends StatelessWidget {
   final models.TransactionCardItems model;
 
   const TransactionsCardContainer({
-    super.key,
     required this.model,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      margin: const EdgeInsets.all(5),
+      margin: Styles.edgeInsetVertical5,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _buildHeader(context),
-          const Divider(color: Colors.grey, height: 1),
-          ListView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: model.transactions.length,
-            itemBuilder: (context, index) => TransactionItem(item: model.transactions[index]),
+          _DateAndAmountHeader(model: model),
+          const Divider(height: 1),
+          ...model.transactions.map((el) => TransactionItem(item: el)),
+        ],
+      ),
+    );
+  }
+}
+
+class CategoryGroupedTransactionsCardContainer extends StatelessWidget {
+  final models.TransactionCardItems group;
+
+  const CategoryGroupedTransactionsCardContainer({
+    required this.group,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final S i18n = S.of(context);
+    final currencyBloc = context.watch<CurrencyBloc>();
+    return Card(
+      margin: Styles.edgeInsetVertical5,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          _Header(left: group.groupedBy, right: ''),
+          const Divider(height: 1),
+          ...group.transactions.map((el) => TransactionItem(item: el)),
+          Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 10),
+            child: Text(
+              '${i18n.total}: ${currencyBloc.format(group.balance)}',
+              textAlign: TextAlign.end,
+              style: const TextStyle(color: Colors.grey),
+            ),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildHeader(BuildContext context) {
+class _DateAndAmountHeader extends StatelessWidget {
+  final models.TransactionCardItems model;
+
+  const _DateAndAmountHeader({
+    required this.model,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final i18n = S.of(context);
     final currencyBloc = context.watch<CurrencyBloc>();
-    final expenses = '${i18n.expenses}: ${currencyBloc.format(model.dayExpenses)}';
-    final incomes = '${i18n.incomes}: ${currencyBloc.format(model.dayIncomes)}';
+    final String expenses = '${i18n.expenses}: ${currencyBloc.format(model.expense)}';
+    final String incomes = '${i18n.incomes}: ${currencyBloc.format(model.income)}';
+    final String right = '$expenses  $incomes';
+    return _Header(left: model.groupedBy, right: right);
+  }
+}
 
+class _Header extends StatelessWidget {
+  final String left;
+  final String right;
+
+  const _Header({
+    required this.left,
+    required this.right,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(top: 8, left: 10, right: 10, bottom: 5),
       child: Row(
@@ -50,26 +100,22 @@ class TransactionsCardContainer extends StatelessWidget {
           Flexible(
             flex: 35,
             child: Tooltip(
-              message: model.dateString,
-              child: Text(model.dateString, overflow: TextOverflow.ellipsis, style: Styles.textStyleGrey12),
+              message: left,
+              child: Text(
+                left,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelSmall,
+              ),
             ),
           ),
           Flexible(
             flex: 65,
             child: Tooltip(
-              message: '$expenses  $incomes',
-              child: RichText(
+              message: right,
+              child: Text(
+                right,
                 overflow: TextOverflow.ellipsis,
-                text: TextSpan(
-                  // Note: Styles for TextSpans must be explicitly defined.
-                  // Child text spans will inherit styles from parent
-                  style: Styles.textStyleGrey12,
-                  children: <TextSpan>[
-                    TextSpan(text: expenses),
-                    const TextSpan(text: '  '),
-                    TextSpan(text: incomes),
-                  ],
-                ),
+                style: theme.textTheme.labelSmall,
               ),
             ),
           ),

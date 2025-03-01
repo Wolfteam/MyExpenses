@@ -30,86 +30,43 @@ class EstimatesSummary extends StatelessWidget {
     final expenseTextStyle = textStyle.copyWith(color: Colors.red);
     final incomeTextStyle = textStyle.copyWith(color: Colors.green);
 
-    final formattedIncomes = currencyBloc.format(income);
-    final formattedExpenses = currencyBloc.format(expenses);
-    final formattedTotal = currencyBloc.format(total);
+    final String formattedIncomes = currencyBloc.format(income);
+    final String formattedExpenses = currencyBloc.format(expenses);
+    final String formattedTotal = currencyBloc.format(total);
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 5),
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          Flexible(
-            flex: 70,
-            fit: FlexFit.tight,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                if (showIncomes)
-                  Text(
-                    '${i18n.incomes}:',
-                    textAlign: TextAlign.end,
-                    overflow: TextOverflow.ellipsis,
-                    style: incomeTextStyle,
-                  ),
-                if (showExpenses)
-                  Text(
-                    '${i18n.expenses}:',
-                    textAlign: TextAlign.end,
-                    overflow: TextOverflow.ellipsis,
-                    style: expenseTextStyle,
-                  ),
-                if (showTotal)
-                  Text(
-                    '${i18n.total}:',
-                    textAlign: TextAlign.end,
-                    style: total >= 0 ? incomeTextStyle : expenseTextStyle,
-                  ),
-              ],
-            ),
+    final String incomesText = '${i18n.incomes}: $formattedIncomes';
+    final String expensesText = '${i18n.expenses}: $formattedExpenses';
+    final String totalText = '${i18n.total}: $formattedTotal';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        if (showIncomes)
+          Text(
+            incomesText,
+            textAlign: TextAlign.end,
+            overflow: TextOverflow.ellipsis,
+            style: incomeTextStyle,
           ),
-          Flexible(
-            flex: 30,
-            fit: FlexFit.tight,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                if (showIncomes)
-                  Tooltip(
-                    message: formattedIncomes,
-                    child: Text(
-                      formattedIncomes,
-                      textAlign: TextAlign.end,
-                      overflow: TextOverflow.ellipsis,
-                      style: incomeTextStyle,
-                    ),
-                  ),
-                if (showExpenses)
-                  Tooltip(
-                    message: formattedExpenses,
-                    child: Text(
-                      formattedExpenses,
-                      textAlign: TextAlign.end,
-                      overflow: TextOverflow.ellipsis,
-                      style: expenseTextStyle,
-                    ),
-                  ),
-                if (showTotal)
-                  Tooltip(
-                    message: formattedTotal,
-                    child: Text(
-                      formattedTotal,
-                      textAlign: TextAlign.end,
-                      overflow: TextOverflow.ellipsis,
-                      style: total >= 0 ? incomeTextStyle : expenseTextStyle,
-                    ),
-                  ),
-              ],
-            ),
+        if (showExpenses)
+          Text(
+            expensesText,
+            textAlign: TextAlign.end,
+            overflow: TextOverflow.ellipsis,
+            style: expenseTextStyle,
           ),
-        ],
-      ),
+        if (showTotal)
+          Text(
+            totalText,
+            textAlign: TextAlign.end,
+            overflow: TextOverflow.ellipsis,
+            style: total == 0
+                ? textStyle
+                : total > 0
+                    ? incomeTextStyle
+                    : expenseTextStyle,
+          ),
+      ],
     );
   }
 }

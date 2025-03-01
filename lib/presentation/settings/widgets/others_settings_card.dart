@@ -77,8 +77,7 @@ class OtherSettingsCard extends StatelessWidget {
     return SettingsCard(child: content);
   }
 
-  void _askForFingerPrintChanged(bool ask, BuildContext context) =>
-      context.read<SettingsBloc>().add(SettingsEvent.askForFingerPrintChanged(ask: ask));
+  void _askForFingerPrintChanged(bool ask, BuildContext context) => context.read<SettingsBloc>().add(SettingsEvent.askForFingerPrintChanged(ask: ask));
 
   Future<void> _askForPasswordChanged(bool ask, BuildContext context) async {
     if (!ask) {
@@ -92,7 +91,7 @@ class OtherSettingsCard extends StatelessWidget {
       isScrollControlled: true,
       builder: (ctx) => const PasswordBottomSheet(),
     ).then((result) {
-      if (result == null) {
+      if (result == null || !context.mounted) {
         return;
       }
 
@@ -100,17 +99,16 @@ class OtherSettingsCard extends StatelessWidget {
     });
   }
 
-  void _showNotificationForRecurringTransChanged(bool newValue, BuildContext context) =>
-      context.read<SettingsBloc>().add(SettingsEvent.showNotificationForRecurringTransChanged(show: newValue));
+  void _showNotificationForRecurringTransChanged(bool newValue, BuildContext context) => context.read<SettingsBloc>().add(SettingsEvent.showNotificationForRecurringTransChanged(show: newValue));
 
   void _currencyChanged(CurrencySymbolType newValue, BuildContext context) {
     context.read<SettingsBloc>().add(SettingsEvent.currencyChanged(selectedCurrency: newValue));
-    BlocUtils.raiseCommonBlocEvents(context, reloadCharts: true, reloadTransactions: true);
+    BlocUtils.raiseCommonBlocEvents(context, reloadTransactions: true);
   }
 
   void _currencyPlacementChanged(bool newValue, BuildContext context) {
     context.read<SettingsBloc>().add(SettingsEvent.currencyPlacementChanged(placeToTheRight: newValue));
-    BlocUtils.raiseCommonBlocEvents(context, reloadTransactions: true, reloadCharts: true);
+    BlocUtils.raiseCommonBlocEvents(context, reloadTransactions: true);
   }
 }
 

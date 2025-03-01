@@ -4,8 +4,8 @@ import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/categories/categories_page.dart';
-import 'package:my_expenses/presentation/charts/charts_page.dart';
 import 'package:my_expenses/presentation/drawer/app_drawer.dart';
+import 'package:my_expenses/presentation/search/search_page.dart';
 import 'package:my_expenses/presentation/settings/settings_page.dart';
 import 'package:my_expenses/presentation/shared/utils/bloc_utils.dart';
 import 'package:my_expenses/presentation/transaction/add_edit_transaction_page.dart';
@@ -38,7 +38,6 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
   Widget build(BuildContext context) {
     final i18n = S.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(S.of(context).appName)),
       drawer: AppDrawer(),
       body: SafeArea(
         child: TabBarView(
@@ -46,8 +45,8 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
           physics: const NeverScrollableScrollPhysics(),
           children: [
             TransactionsPage(),
-            ChartsPage(),
             const CategoriesPage(),
+            SearchPage(),
             SettingsPage(),
           ],
         ),
@@ -56,12 +55,14 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
       floatingActionButton: FloatingActionButton(
         heroTag: 'CreateTransactionFab',
         onPressed: () => _gotoAddTransactionPage(context),
+        tooltip: i18n.addTransaction,
         child: const Icon(Icons.add),
       ),
       bottomNavigationBar: BlocConsumer<DrawerBloc, DrawerState>(
         listener: (ctx, state) => _onDrawerStateChanged(state),
         builder: (ctx, state) => BottomNavigationBar(
           showUnselectedLabels: true,
+          landscapeLayout: BottomNavigationBarLandscapeLayout.linear,
           type: BottomNavigationBarType.fixed,
           currentIndex: _index,
           onTap: _changeCurrentTab,
@@ -69,18 +70,22 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
             BottomNavigationBarItem(
               label: i18n.transactions,
               icon: const Icon(Icons.account_balance),
-            ),
-            BottomNavigationBarItem(
-              label: i18n.charts,
-              icon: const Icon(Icons.pie_chart),
+              tooltip: i18n.transactions,
             ),
             BottomNavigationBarItem(
               label: i18n.categories,
               icon: const Icon(Icons.category),
+              tooltip: i18n.categories,
+            ),
+            BottomNavigationBarItem(
+              label: i18n.search,
+              icon: const Icon(Icons.search),
+              tooltip: i18n.search,
             ),
             BottomNavigationBarItem(
               label: i18n.config,
               icon: const Icon(Icons.settings),
+              tooltip: i18n.config,
             ),
           ],
         ),
@@ -93,9 +98,9 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
     switch (item) {
       case AppDrawerItemType.transactions:
         index = 0;
-      case AppDrawerItemType.charts:
-        index = 1;
       case AppDrawerItemType.categories:
+        index = 1;
+      case AppDrawerItemType.search:
         index = 2;
       case AppDrawerItemType.settings:
         index = 3;
@@ -134,8 +139,8 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
 
   AppDrawerItemType _getSelectedDrawerItem(int index) {
     if (index == 0) return AppDrawerItemType.transactions;
-    if (index == 1) return AppDrawerItemType.charts;
-    if (index == 2) return AppDrawerItemType.categories;
+    if (index == 1) return AppDrawerItemType.categories;
+    if (index == 2) return AppDrawerItemType.search;
     if (index == 3) return AppDrawerItemType.settings;
 
     throw Exception('The provided index = $index is not valid in the bottom nav bar items');

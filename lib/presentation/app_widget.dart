@@ -34,8 +34,7 @@ class _AppWidgetState extends State<AppWidget> {
         state.maybeMap(
           loaded: (state) async {
             final locale = _getLocale(state.language);
-            final localeChanged =
-                _currentLocale != null && (_currentLocale!.languageCode != locale.languageCode || _currentLocale!.countryCode != locale.countryCode);
+            final localeChanged = _currentLocale != null && (_currentLocale!.languageCode != locale.languageCode || _currentLocale!.countryCode != locale.countryCode);
             final bloc = ctx.read<AppBloc>();
             if (localeChanged) {
               debugPrint('Language changed');
@@ -64,7 +63,7 @@ class _AppWidgetState extends State<AppWidget> {
 
           final locale = _getLocale(state.language);
           return MaterialApp(
-            home: MainPage(showGoogleLoginChangesExplanation: state.forcedSignOut),
+            home: const MainPage(),
             theme: theme,
             //Without this, the lang won't be reloaded
             locale: locale,

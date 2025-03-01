@@ -47,7 +47,7 @@ class _FormDateButtonState extends State<FormDateButton> {
             const Icon(Icons.calendar_today, size: 30),
             Expanded(
               child: TextButton(
-                style: ButtonStyle(foregroundColor: MaterialStateProperty.all<Color>(textColor)),
+                style: ButtonStyle(foregroundColor: WidgetStateProperty.all<Color>(textColor)),
                 onPressed: !widget.isChildTransaction ? () => _transactionDateClicked(context) : null,
                 child: Align(
                   alignment: Alignment.centerLeft,
@@ -103,7 +103,7 @@ class _FormDateButtonState extends State<FormDateButton> {
       return;
     }
 
-    if (!mounted) {
+    if (!mounted || !context.mounted) {
       return;
     }
     context.read<TransactionFormBloc>().add(TransactionFormEvent.transactionDateChanged(transactionDate: selectedDate));

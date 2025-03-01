@@ -1,6 +1,6 @@
 import 'package:my_expenses/domain/enums/enums.dart';
-import 'package:my_expenses/domain/models/category_item.dart';
 import 'package:my_expenses/domain/models/drive.dart' as drive;
+import 'package:my_expenses/domain/models/models.dart';
 
 abstract class CategoriesDao {
   Future<List<CategoryItem>> getAll(int? userId);

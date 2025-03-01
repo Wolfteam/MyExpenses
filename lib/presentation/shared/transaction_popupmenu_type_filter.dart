@@ -41,7 +41,7 @@ class TransactionPopupMenuTypeFilter extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: PopupMenuButton<int>(
-          padding: Styles.edgeInsetAll0,
+          padding: EdgeInsets.zero,
           tooltip: i18n.transactionType,
           initialValue: selectedValue == null ? nothingSelected : selectedValue!.index,
           onSelected: onSelectedValue,

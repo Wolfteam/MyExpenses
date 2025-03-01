@@ -2,9 +2,15 @@ part of 'transactions_bloc.dart';
 
 @freezed
 class TransactionsEvent with _$TransactionsEvent {
-  const factory TransactionsEvent.loadTransactions({
-    required DateTime inThisDate,
-  }) = _LoadTransactions;
+  const factory TransactionsEvent.init({
+    required DateTime currentDate,
+  }) = _Init;
 
-  const factory TransactionsEvent.loadRecurringTransactions() = _LoadRecurringTransactions;
+  const factory TransactionsEvent.groupingTypeChanged({
+    required TransactionFilterType type,
+  }) = _GroupTypeChanged;
+
+  const factory TransactionsEvent.sortDirectionTypeChanged({
+    required SortDirectionType type,
+  }) = _SortTypeChanged;
 }

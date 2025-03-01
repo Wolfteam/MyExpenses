@@ -4,20 +4,12 @@ import 'package:my_expenses/application/bloc.dart';
 
 class BlocUtils {
   static void raiseAllCommonBlocEvents(BuildContext ctx) {
-    raiseCommonBlocEvents(
-      ctx,
-      reloadCategories: true,
-      reloadCharts: true,
-      reloadDrawer: true,
-      reloadSettings: true,
-      reloadTransactions: true,
-    );
+    raiseCommonBlocEvents(ctx, reloadCategories: true, reloadDrawer: true, reloadSettings: true, reloadTransactions: true);
   }
 
   static void raiseCommonBlocEvents(
     BuildContext ctx, {
     bool reloadTransactions = false,
-    bool reloadCharts = false,
     bool reloadCategories = false,
     bool reloadDrawer = false,
     bool reloadSettings = false,
@@ -26,16 +18,9 @@ class BlocUtils {
 
     final now = DateTime.now();
     if (reloadTransactions) {
-      final transBloc = ctx.read<TransactionsBloc>();
-      if (transBloc.currentState.showParentTransactions) {
-        ctx.read<TransactionsBloc>().add(const TransactionsEvent.loadRecurringTransactions());
-      } else {
-        ctx.read<TransactionsBloc>().add(TransactionsEvent.loadTransactions(inThisDate: now));
-      }
-    }
-
-    if (reloadCharts) {
-      ctx.read<ChartsBloc>().add(ChartsEvent.loadChart(selectedMonthDate: now, selectedYear: now.year));
+      ctx.read<TransactionsBloc>().add(TransactionsEvent.init(currentDate: now));
+      ctx.read<TransactionsSummaryPerMonthBloc>().add(TransactionsSummaryPerMonthEvent.init(currentDate: now));
+      ctx.read<TransactionsActivityBloc>().add(TransactionsActivityEvent.dateChanged(currentDate: now));
     }
 
     if (reloadCategories) {

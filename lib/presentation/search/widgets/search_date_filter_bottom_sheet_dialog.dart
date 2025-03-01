@@ -49,8 +49,8 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
                     child: Text((state.untilString.isNullEmptyOrWhitespace ? i18n.na : state.untilString)!),
                   ),
                 ),
-                ButtonBar(
-                  layoutBehavior: ButtonBarLayoutBehavior.constrained,
+                OverflowBar(
+                  alignment: MainAxisAlignment.end,
                   children: <Widget>[
                     TextButton(
                       onPressed: () => _closeModal(context),
@@ -83,7 +83,7 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
       initialDate: initialDate,
       lastDate: DateTime(now.year + 1),
     ).then((selectedDate) {
-      if (selectedDate == null) {
+      if (selectedDate == null || !context.mounted) {
         return;
       }
       if (isFromDate) {

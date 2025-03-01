@@ -48,23 +48,14 @@ class MyApp extends StatelessWidget {
               return ExpensesCategoriesBloc(logger, categoriesDao, usersDao);
             },
           ),
-          BlocProvider(create: (ctx) => TransactionsLast7DaysBloc()),
-          BlocProvider(create: (ctx) => TransactionsPerMonthBloc(getIt<SettingsService>())),
           BlocProvider(
-            create: (ctx) {
-              final logger = getIt<LoggingService>();
-              final transactionsDao = getIt<TransactionsDao>();
-              final usersDao = getIt<UsersDao>();
-              final settingsService = getIt<SettingsService>();
-              return TransactionsBloc(
-                logger,
-                transactionsDao,
-                usersDao,
-                settingsService,
-                ctx.read<TransactionsPerMonthBloc>(),
-                ctx.read<TransactionsLast7DaysBloc>(),
-              );
-            },
+            create: (context) => Injection.transactionsSummaryPerMonthBloc..add(TransactionsSummaryPerMonthEvent.init(currentDate: DateTime.now())),
+          ),
+          BlocProvider(
+            create: (ctx) => Injection.transactionsBloc..add(TransactionsEvent.init(currentDate: DateTime.now())),
+          ),
+          BlocProvider(
+            create: (ctx) => Injection.transactionsActivityBloc..add(const TransactionsActivityEvent.init()),
           ),
           BlocProvider(
             create: (ctx) {
@@ -75,8 +66,7 @@ class MyApp extends StatelessWidget {
               final googleService = getIt<GoogleService>();
               final settingsService = getIt<SettingsService>();
               final pathService = getIt<PathService>();
-              return DrawerBloc(logger, usersDao, categoriesDao, bgService, googleService, settingsService, pathService)
-                ..add(const DrawerEvent.init());
+              return DrawerBloc(logger, usersDao, categoriesDao, bgService, googleService, settingsService, pathService)..add(const DrawerEvent.init());
             },
           ),
           BlocProvider(
@@ -103,21 +93,12 @@ class MyApp extends StatelessWidget {
               final secureStorage = getIt<SecureStorageService>();
               final bgService = getIt<BackgroundService>();
               final deviceInfoService = getIt<DeviceInfoService>();
-              return SettingsBloc(settingsService, secureStorage, bgService, deviceInfoService, getIt<UsersDao>(), ctx.read<AppBloc>())
-                ..add(const SettingsEvent.load());
+              return SettingsBloc(settingsService, secureStorage, bgService, deviceInfoService, getIt<UsersDao>(), ctx.read<AppBloc>())..add(const SettingsEvent.load());
             },
           ),
           BlocProvider(create: (ctx) => CategoryIconBloc()),
           BlocProvider(
-            create: (ctx) {
-              final logger = getIt<LoggingService>();
-              final transactionsDao = getIt<TransactionsDao>();
-              final usersDao = getIt<UsersDao>();
-              final settingsService = getIt<SettingsService>();
-              final now = DateTime.now();
-              return ChartsBloc(logger, transactionsDao, usersDao, settingsService)
-                ..add(ChartsEvent.loadChart(selectedMonthDate: now, selectedYear: now.year));
-            },
+            create: (ctx) => Injection.searchBloc..add(const SearchEvent.init()),
           ),
         ],
         child: AppWidget(),

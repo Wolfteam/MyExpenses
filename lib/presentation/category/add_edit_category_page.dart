@@ -64,16 +64,15 @@ class _Scaffold extends StatelessWidget {
           orElse: () => null,
         ),
         body: state.maybeMap(
-          loaded: (state) => SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                CategoryHeader(name: state.name, type: state.type, iconColor: state.iconColor, iconData: state.icon),
-                if (state.isNew)
-                  CategoryForm.create(type: state.type, iconData: state.icon, iconColor: state.iconColor)
-                else
-                  CategoryForm.edit(id: state.id, name: state.name, type: state.type, iconData: state.icon, iconColor: state.iconColor),
-              ],
+          loaded: (state) => SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  CategoryHeader(name: state.name, type: state.type, iconColor: state.iconColor, iconData: state.icon),
+                  if (state.isNew) CategoryForm.create(type: state.type, iconData: state.icon, iconColor: state.iconColor) else CategoryForm.edit(id: state.id, name: state.name, type: state.type, iconData: state.icon, iconColor: state.iconColor),
+                ],
+              ),
             ),
           ),
           orElse: () => null,
@@ -93,7 +92,7 @@ class _Scaffold extends StatelessWidget {
   void _notifyCategorySavedOrDeleted(BuildContext context) {
     context.read<IncomesCategoriesBloc>().add(const CategoriesListEvent.getCategories(loadIncomes: true));
     context.read<ExpensesCategoriesBloc>().add(const CategoriesListEvent.getCategories(loadIncomes: false));
-    BlocUtils.raiseCommonBlocEvents(context, reloadCategories: true, reloadCharts: true, reloadTransactions: true);
+    BlocUtils.raiseCommonBlocEvents(context, reloadCategories: true, reloadTransactions: true);
   }
 }
 

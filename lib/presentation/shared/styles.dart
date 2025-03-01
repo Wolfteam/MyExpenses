@@ -7,10 +7,15 @@ class Styles {
   static final transactionCardShape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(15));
 
   static const double cardElevation = 3;
+  static const edgeInsetAll16 = EdgeInsets.all(16);
   static const edgeInsetAll10 = EdgeInsets.all(10);
   static const edgeInsetAll5 = EdgeInsets.all(5);
-  static const edgeInsetAll0 = EdgeInsets.zero;
   static const edgeInsetHorizontal16 = EdgeInsets.symmetric(horizontal: 16);
+  static const edgeInsetHorizontal10 = EdgeInsets.symmetric(horizontal: 10);
+  static const edgeInsetHorizontal5 = EdgeInsets.symmetric(horizontal: 5);
+  static const edgeInsetVertical16 = EdgeInsets.symmetric(vertical: 16);
+  static const edgeInsetVertical10 = EdgeInsets.symmetric(vertical: 10);
+  static const edgeInsetVertical5 = EdgeInsets.symmetric(vertical: 5);
 
   static const modalBottomSheetShape = RoundedRectangleBorder(
     borderRadius: BorderRadius.only(topRight: Radius.circular(35), topLeft: Radius.circular(35)),
@@ -38,5 +43,32 @@ class Styles {
         unselectedMonthsTextColor: darkTheme ? Colors.white : Colors.black,
       ),
     );
+  }
+
+  static (TextStyle, BoxDecoration, EdgeInsets) getTooltipStyling(BuildContext context) {
+    double getDefaultFontSize(TargetPlatform platform) {
+      return switch (platform) {
+        TargetPlatform.macOS || TargetPlatform.linux || TargetPlatform.windows => 12.0,
+        TargetPlatform.android || TargetPlatform.fuchsia || TargetPlatform.iOS => 14.0,
+      };
+    }
+
+    final EdgeInsets padding = switch (Theme.of(context).platform) {
+      TargetPlatform.macOS || TargetPlatform.linux || TargetPlatform.windows => const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      TargetPlatform.android || TargetPlatform.fuchsia || TargetPlatform.iOS => const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+    };
+
+    final (TextStyle defaultTextStyle, BoxDecoration defaultDecoration) = switch (Theme.of(context)) {
+      ThemeData(brightness: Brightness.dark, :final TextTheme textTheme, :final TargetPlatform platform) => (
+          textTheme.bodyMedium!.copyWith(color: Colors.black, fontSize: getDefaultFontSize(platform)),
+          BoxDecoration(color: Colors.white.withOpacity(0.9), borderRadius: const BorderRadius.all(Radius.circular(4))),
+        ),
+      ThemeData(brightness: Brightness.light, :final TextTheme textTheme, :final TargetPlatform platform) => (
+          textTheme.bodyMedium!.copyWith(color: Colors.white, fontSize: getDefaultFontSize(platform)),
+          BoxDecoration(color: Colors.grey[700]!.withOpacity(0.9), borderRadius: const BorderRadius.all(Radius.circular(4))),
+        ),
+    };
+
+    return (defaultTextStyle, defaultDecoration, padding);
   }
 }

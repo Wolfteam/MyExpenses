@@ -101,8 +101,8 @@ class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilter
                         )
                         .toList(),
                   ),
-                ButtonBar(
-                  layoutBehavior: ButtonBarLayoutBehavior.constrained,
+                OverflowBar(
+                  alignment: MainAxisAlignment.end,
                   children: <Widget>[
                     TextButton(
                       onPressed: () => _closeModal(context),

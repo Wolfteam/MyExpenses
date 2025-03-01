@@ -32,10 +32,8 @@ class SearchFilterBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final i18n = S.of(context);
-    return ButtonBar(
+    return OverflowBar(
       alignment: MainAxisAlignment.spaceEvenly,
-      overflowDirection: VerticalDirection.down,
-      buttonPadding: Styles.edgeInsetAll0,
       children: [
         IconButton(
           icon: const Icon(Icons.date_range),
@@ -81,7 +79,6 @@ class SearchFilterBar extends StatelessWidget {
     bloc.add(const SearchEvent.resetTempDates());
     showModalBottomSheet(
       shape: Styles.modalBottomSheetShape,
-      isDismissible: true,
       isScrollControlled: true,
       context: context,
       builder: (ctx) => BlocProvider.value(
@@ -97,7 +94,6 @@ class SearchFilterBar extends StatelessWidget {
     bloc.add(const SearchEvent.resetTempDates());
     showModalBottomSheet(
       shape: Styles.modalBottomSheetShape,
-      isDismissible: true,
       isScrollControlled: true,
       context: context,
       builder: (ctx) => BlocProvider.value(
@@ -119,7 +115,9 @@ class SearchFilterBar extends StatelessWidget {
       builder: (ctx) => CategoriesPage(isInSelectionMode: true, showDeselectButton: true, selectedCategory: category),
     );
     await Navigator.of(context).push(route).then((_) {
-      context.read<SearchBloc>().add(SearchEvent.categoryChanged(newValue: selectedCatProvider.currentSelectedItem));
+      if (context.mounted) {
+        context.read<SearchBloc>().add(SearchEvent.categoryChanged(newValue: selectedCatProvider.currentSelectedItem));
+      }
     });
   }
 

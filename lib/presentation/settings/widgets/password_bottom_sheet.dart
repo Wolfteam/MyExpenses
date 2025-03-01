@@ -97,9 +97,7 @@ class _FormState extends State<_Form> {
                 _fieldFocusChange(context, _passwordFocus, _confirmPasswordFocus);
               },
               autovalidateMode: state.isPasswordDirty ? AutovalidateMode.always : null,
-              validator: (_) => (!widget.promptForPassword && !state.isPasswordValid) || (widget.promptForPassword && state.userIsValid == false)
-                  ? i18n.passwordIsNotValid
-                  : null,
+              validator: (_) => (!widget.promptForPassword && !state.isPasswordValid) || (widget.promptForPassword && state.userIsValid == false) ? i18n.passwordIsNotValid : null,
             ),
             if (!widget.promptForPassword)
               TextFormField(
@@ -125,7 +123,8 @@ class _FormState extends State<_Form> {
                 autovalidateMode: state.isConfirmPasswordDirty ? AutovalidateMode.always : null,
                 validator: (_) => state.isConfirmPasswordValid ? null : i18n.confirmPasswordIsNotValid,
               ),
-            ButtonBar(
+            OverflowBar(
+              alignment: MainAxisAlignment.end,
               children: <Widget>[
                 if (!widget.promptForPassword)
                   TextButton(

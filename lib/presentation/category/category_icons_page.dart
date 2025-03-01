@@ -6,6 +6,7 @@ import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/shared/extensions/i18n_extensions.dart';
+import 'package:my_expenses/presentation/shared/styles.dart';
 import 'package:my_expenses/presentation/shared/utils/category_utils.dart';
 
 final _selectedKey = GlobalKey();
@@ -19,8 +20,7 @@ class CategoryIconsPage extends StatelessWidget {
     final i18n = S.of(context);
     final icons = CategoryUtils.getAllCategoryIcons();
 
-    final types = CategoryIconType.values.where((el) => icons.any((i) => i.type == el)).toList()
-      ..sort((x, y) => i18n.getCategoryIconTypeName(x).compareTo(i18n.getCategoryIconTypeName(y)));
+    final types = CategoryIconType.values.where((el) => icons.any((i) => i.type == el)).toList()..sort((x, y) => i18n.getCategoryIconTypeName(x).compareTo(i18n.getCategoryIconTypeName(y)));
 
     return BlocBuilder<CategoryIconBloc, CategoryIconState>(
       builder: (ctx, state) => Scaffold(
@@ -34,11 +34,13 @@ class CategoryIconsPage extends StatelessWidget {
             ),
           ],
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: types.map((e) => _CategoryIconsPerType(type: e, selectedIcon: state.selectedIcon)).toList(),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: Styles.edgeInsetAll10,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: types.map((e) => _CategoryIconsPerType(type: e, selectedIcon: state.selectedIcon)).toList(),
+            ),
           ),
         ),
       ),
@@ -67,7 +69,6 @@ class _CategoryIconsPerType extends StatelessWidget {
   Widget build(BuildContext context) {
     final i18n = S.of(context);
     final theme = Theme.of(context);
-    final orientation = MediaQuery.of(context).orientation;
     final icons = _icons.where((i) => i.type == type).toList();
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 15),
@@ -78,13 +79,14 @@ class _CategoryIconsPerType extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 10),
             child: Text(
               i18n.getCategoryIconTypeName(type),
-              style: theme.textTheme.titleLarge!.copyWith(fontSize: 17),
+              style: theme.textTheme.titleLarge,
               textAlign: TextAlign.center,
             ),
           ),
-          GridView.count(
-            childAspectRatio: orientation == Orientation.portrait ? 1.5 : 2,
-            crossAxisCount: 4,
+          GridView.extent(
+            maxCrossAxisExtent: 60,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
             padding: EdgeInsets.zero,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -127,6 +129,5 @@ class _Icon extends StatelessWidget {
     );
   }
 
-  void _onIconClick(CategoryIcon icon, BuildContext context) =>
-      context.read<CategoryIconBloc>().add(CategoryIconEvent.selectionChanged(selectedIcon: icon));
+  void _onIconClick(CategoryIcon icon, BuildContext context) => context.read<CategoryIconBloc>().add(CategoryIconEvent.selectionChanged(selectedIcon: icon));
 }

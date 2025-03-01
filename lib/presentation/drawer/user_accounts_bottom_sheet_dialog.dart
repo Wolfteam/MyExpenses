@@ -61,7 +61,7 @@ class _Content extends StatelessWidget {
         initial: (state) => state.signInInProcess
             ? const Loading(useScaffold: false)
             : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ModalSheetSeparator(),
@@ -93,7 +93,8 @@ class _Content extends StatelessWidget {
                       msg: i18n.noUserAccountsFound,
                       padding: const EdgeInsets.only(right: 20, left: 20, top: 10),
                     ),
-                  ButtonBar(
+                  OverflowBar(
+                    alignment: MainAxisAlignment.end,
                     children: <Widget>[
                       TextButton(
                         onPressed: () {
