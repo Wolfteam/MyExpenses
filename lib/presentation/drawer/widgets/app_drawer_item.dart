@@ -43,8 +43,6 @@ class AppDrawerItem extends StatelessWidget {
       case AppDrawerItemType.search:
         icon = const Icon(Icons.search);
         text = i18n.search;
-      default:
-        throw Exception('Invalid drawer item type = $type');
     }
 
     if (!isSelected) {

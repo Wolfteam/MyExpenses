@@ -53,7 +53,12 @@ class NotificationServiceImpl implements NotificationService {
       _loggingService.info(runtimeType, 'init: ${e.msg}, assigning the generic one...');
       _setDefaultTimeZone();
     } catch (e, s) {
-      _loggingService.error(runtimeType, 'init: Failed to get timezone or device is GMT or UTC, assigning the generic one...', e, s);
+      _loggingService.error(
+        runtimeType,
+        'init: Failed to get timezone or device is GMT or UTC, assigning the generic one...',
+        e,
+        s,
+      );
       _setDefaultTimeZone();
     }
 
@@ -200,8 +205,6 @@ class NotificationServiceImpl implements NotificationService {
         return 20;
       case AppNotificationType.reports:
         return 30;
-      default:
-        throw Exception('The provided type = $type is not a valid notification type');
     }
   }
 }

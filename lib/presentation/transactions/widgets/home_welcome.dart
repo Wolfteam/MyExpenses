@@ -12,48 +12,32 @@ class HomeWelcome extends StatelessWidget {
   Widget build(BuildContext context) {
     final S i18n = S.of(context);
     final theme = Theme.of(context);
-    final now = DateTime.now();
     return BlocBuilder<DrawerBloc, DrawerState>(
-      builder: (context, state) => Padding(
-        padding: const EdgeInsets.only(right: 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-              onPressed: () => Scaffold.of(context).openDrawer(),
-              icon: const Icon(Icons.menu),
-            ),
-            Expanded(
-              child: Center(
-                child: Column(
-                  children: [
-                    Text(
-                      i18n.hello,
-                      style: theme.textTheme.headlineMedium!.copyWith(fontWeight: FontWeight.bold),
+      builder:
+          (context, state) => Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(onPressed: () => Scaffold.of(context).openDrawer(), icon: const Icon(Icons.menu)),
+                Expanded(
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Text(i18n.hello, style: theme.textTheme.headlineMedium!.copyWith(fontWeight: FontWeight.bold)),
+                        if (state.fullName.isNotNullEmptyOrWhitespace)
+                          Text(state.fullName!, style: theme.textTheme.titleSmall, overflow: TextOverflow.ellipsis, maxLines: 1),
+                      ],
                     ),
-                    if (state.fullName.isNotNullEmptyOrWhitespace)
-                      Text(
-                        state.fullName!,
-                        style: theme.textTheme.titleSmall,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                  ],
+                  ),
                 ),
-              ),
+                if (state.isUserSignedIn)
+                  LoggedUserImage(image: state.img, isUserSignedIn: state.isUserSignedIn, radius: 20, popContext: false)
+                else
+                  const SizedBox.square(dimension: 40),
+              ],
             ),
-            if (state.isUserSignedIn)
-              LoggedUserImage(
-                image: state.img,
-                isUserSignedIn: state.isUserSignedIn,
-                radius: 20,
-                popContext: false,
-              )
-            else
-              const SizedBox.square(dimension: 40),
-          ],
-        ),
-      ),
+          ),
     );
   }
 }
