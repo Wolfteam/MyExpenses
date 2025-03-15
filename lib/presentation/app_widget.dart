@@ -30,11 +30,13 @@ class _AppWidgetState extends State<AppWidget> {
       GlobalCupertinoLocalizations.delegate,
     ];
     return BlocConsumer<AppBloc, AppState>(
-      listener: (ctx, state) {
-        state.maybeMap(
-          loaded: (state) async {
+      listener: (ctx, state) async {
+        switch (state) {
+          case AppStateLoadedState():
             final locale = _getLocale(state.language);
-            final localeChanged = _currentLocale != null && (_currentLocale!.languageCode != locale.languageCode || _currentLocale!.countryCode != locale.countryCode);
+            final localeChanged =
+                _currentLocale != null &&
+                (_currentLocale!.languageCode != locale.languageCode || _currentLocale!.countryCode != locale.countryCode);
             final bloc = ctx.read<AppBloc>();
             if (localeChanged) {
               debugPrint('Language changed');
@@ -44,45 +46,37 @@ class _AppWidgetState extends State<AppWidget> {
             }
 
             _currentLocale = locale;
-          },
-          orElse: () {},
-        );
+          default:
+            break;
+        }
       },
-      builder: (ctx, state) => state.map(
-        loaded: (state) {
-          final theme = state.accentColor.getThemeData(state.theme);
-          if (state.bgTaskIsRunning) {
-            return MaterialApp(
-              theme: theme,
+      builder:
+          (ctx, state) => switch (state) {
+            AppStateLoadingState() => MaterialApp(
+              home: SplashScreen(),
+              theme: AppAccentColorType.orange.getThemeData(AppThemeType.dark),
+              themeMode: ThemeMode.dark,
+              localizationsDelegates: delegates,
+              supportedLocales: S.delegate.supportedLocales,
+              scrollBehavior: MyCustomScrollBehavior(),
+            ),
+            final AppStateLoadedState state when state.bgTaskIsRunning => MaterialApp(
+              theme: state.accentColor.getThemeData(state.theme),
               localizationsDelegates: delegates,
               supportedLocales: S.delegate.supportedLocales,
               home: const Loading(),
               scrollBehavior: MyCustomScrollBehavior(),
-            );
-          }
-
-          final locale = _getLocale(state.language);
-          return MaterialApp(
-            home: const MainPage(),
-            theme: theme,
-            //Without this, the lang won't be reloaded
-            locale: locale,
-            localizationsDelegates: delegates,
-            supportedLocales: S.delegate.supportedLocales,
-            scrollBehavior: MyCustomScrollBehavior(),
-          );
-        },
-        loading: (state) {
-          return MaterialApp(
-            home: SplashScreen(),
-            theme: AppAccentColorType.orange.getThemeData(AppThemeType.dark),
-            themeMode: ThemeMode.dark,
-            localizationsDelegates: delegates,
-            supportedLocales: S.delegate.supportedLocales,
-            scrollBehavior: MyCustomScrollBehavior(),
-          );
-        },
-      ),
+            ),
+            AppStateLoadedState() => MaterialApp(
+              home: const MainPage(),
+              theme: state.accentColor.getThemeData(state.theme),
+              //Without this, the lang won't be reloaded
+              locale: _getLocale(state.language),
+              localizationsDelegates: delegates,
+              supportedLocales: S.delegate.supportedLocales,
+              scrollBehavior: MyCustomScrollBehavior(),
+            ),
+          },
     );
   }
 
@@ -94,9 +88,9 @@ class _AppWidgetState extends State<AppWidget> {
 class MyCustomScrollBehavior extends MaterialScrollBehavior {
   @override
   Set<PointerDeviceKind> get dragDevices => {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
-        PointerDeviceKind.trackpad,
-        PointerDeviceKind.stylus,
-      };
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.trackpad,
+    PointerDeviceKind.stylus,
+  };
 }

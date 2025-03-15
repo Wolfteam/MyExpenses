@@ -20,55 +20,44 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
         margin: Styles.modalBottomSheetContainerMargin,
         padding: Styles.modalBottomSheetContainerPadding,
         child: BlocBuilder<SearchBloc, SearchState>(
-          builder: (ctx, state) => state.map(
-            loading: (_) => const Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            ),
-            initial: (state) => Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ModalSheetSeparator(),
-                ModalSheetTitle(title: i18n.filterByX(i18n.date.toLowerCase())),
-                Text('${i18n.startDate}:'),
-                TextButton(
-                  style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                  onPressed: () => _changeDate(context, state.tempFrom ?? now, state.currentLanguage, true),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text((state.fromString.isNullEmptyOrWhitespace ? i18n.na : state.fromString)!),
-                  ),
-                ),
-                Text('${i18n.untilDate}:'),
-                TextButton(
-                  style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                  onPressed: () => _changeDate(context, state.tempUntil ?? now, state.currentLanguage, false),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text((state.untilString.isNullEmptyOrWhitespace ? i18n.na : state.untilString)!),
-                  ),
-                ),
-                OverflowBar(
-                  alignment: MainAxisAlignment.end,
-                  children: <Widget>[
+          builder:
+              (ctx, state) => Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: switch (state) {
+                  SearchStateLoadingState() => [],
+                  SearchStateInitialState() => [
+                    ModalSheetSeparator(),
+                    ModalSheetTitle(title: i18n.filterByX(i18n.date.toLowerCase())),
+                    Text('${i18n.startDate}:'),
                     TextButton(
-                      onPressed: () => _closeModal(context),
-                      child: Text(i18n.close),
+                      style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                      onPressed: () => _changeDate(context, state.tempFrom ?? now, state.currentLanguage, true),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text((state.fromString.isNullEmptyOrWhitespace ? i18n.na : state.fromString)!),
+                      ),
                     ),
+                    Text('${i18n.untilDate}:'),
                     TextButton(
-                      onPressed: () => _clearFilters(context),
-                      child: Text(i18n.clear),
+                      style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                      onPressed: () => _changeDate(context, state.tempUntil ?? now, state.currentLanguage, false),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text((state.untilString.isNullEmptyOrWhitespace ? i18n.na : state.untilString)!),
+                      ),
                     ),
-                    FilledButton(
-                      onPressed: () => _applyDates(context),
-                      child: Text(i18n.apply),
+                    OverflowBar(
+                      alignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        TextButton(onPressed: () => _closeModal(context), child: Text(i18n.close)),
+                        TextButton(onPressed: () => _clearFilters(context), child: Text(i18n.clear)),
+                        FilledButton(onPressed: () => _applyDates(context), child: Text(i18n.apply)),
+                      ],
                     ),
                   ],
-                ),
-              ],
-            ),
-          ),
+                },
+              ),
         ),
       ),
     );

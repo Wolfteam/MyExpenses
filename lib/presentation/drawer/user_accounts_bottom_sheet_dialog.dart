@@ -36,8 +36,8 @@ class _Content extends StatelessWidget {
     return BlocConsumer<UserAccountsBloc, UserAccountsState>(
       listener: (ctx, state) {
         final i18n = S.of(ctx);
-        state.maybeMap(
-          initial: (state) {
+        switch (state) {
+          case UserAccountsEventInitialState():
             if (state.userWasDeleted) {
               ToastUtils.showSucceedToast(ctx, i18n.userWasSuccessfullyDeleted);
               ctx.read<DrawerBloc>().add(const DrawerEvent.init());
@@ -53,66 +53,62 @@ class _Content extends StatelessWidget {
                 ToastUtils.showErrorToast(ctx, i18n.logInCancelledOrFailed);
               }
             }
-          },
-          orElse: () {},
-        );
+          default:
+            break;
+        }
       },
-      builder: (ctx, state) => state.maybeMap(
-        initial: (state) => state.signInInProcess
-            ? const Loading(useScaffold: false)
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ModalSheetSeparator(),
-                  Text(
-                    i18n.accounts,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  if (state.users.isNotEmpty)
-                    ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: state.users.length,
-                      physics: const NeverScrollableScrollPhysics(),
-                      padding: EdgeInsets.zero,
-                      itemBuilder: (ctx, index) {
-                        final user = state.users[index];
-                        final canBeDeleted = state.users.length > 1;
-                        return UserAccountItem(
-                          id: user.id,
-                          fullname: user.name,
-                          email: user.email,
-                          imgUrl: user.pictureUrl!,
-                          isActive: user.isActive,
-                          canBeDeleted: canBeDeleted,
-                        );
-                      },
-                    )
-                  else
-                    NothingFound(
-                      msg: i18n.noUserAccountsFound,
-                      padding: const EdgeInsets.only(right: 20, left: 20, top: 10),
-                    ),
-                  OverflowBar(
-                    alignment: MainAxisAlignment.end,
-                    children: <Widget>[
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Text(i18n.close),
+      builder:
+          (ctx, state) => switch (state) {
+            UserAccountsEventLoadingState() => const Loading(useScaffold: false),
+            UserAccountsEventInitialState() =>
+              state.signInInProcess
+                  ? const Loading(useScaffold: false)
+                  : Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ModalSheetSeparator(),
+                      Text(i18n.accounts, style: Theme.of(context).textTheme.titleLarge),
+                      if (state.users.isNotEmpty)
+                        ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: state.users.length,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: EdgeInsets.zero,
+                          itemBuilder: (ctx, index) {
+                            final user = state.users[index];
+                            final canBeDeleted = state.users.length > 1;
+                            return UserAccountItem(
+                              id: user.id,
+                              fullname: user.name,
+                              email: user.email,
+                              imgUrl: user.pictureUrl!,
+                              isActive: user.isActive,
+                              canBeDeleted: canBeDeleted,
+                            );
+                          },
+                        )
+                      else
+                        NothingFound(msg: i18n.noUserAccountsFound, padding: const EdgeInsets.only(right: 20, left: 20, top: 10)),
+                      OverflowBar(
+                        alignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Text(i18n.close),
+                          ),
+                          if (state.users.isEmpty)
+                            FilledButton(
+                              onPressed: () => context.read<UserAccountsBloc>().add(const UserAccountsEvent.signIn()),
+                              child: Text(i18n.add),
+                            ),
+                        ],
                       ),
-                      if (state.users.isEmpty)
-                        FilledButton(
-                          onPressed: () => context.read<UserAccountsBloc>().add(const UserAccountsEvent.signIn()),
-                          child: Text(i18n.add),
-                        ),
                     ],
                   ),
-                ],
-              ),
-        orElse: () => const Loading(useScaffold: false),
-      ),
+          },
     );
   }
 }

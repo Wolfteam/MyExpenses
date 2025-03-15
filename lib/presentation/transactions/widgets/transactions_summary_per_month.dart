@@ -14,50 +14,39 @@ class TransactionSummaryPerMonth extends StatelessWidget with TransactionMixin {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TransactionsSummaryPerMonthBloc, TransactionsSummaryPerMonthState>(
-      builder: (context, state) => state.map(
-        loading: (state) => const Loading(useScaffold: false),
-        loaded: (state) => Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      builder:
+          (context, state) => switch (state) {
+            TransactionsSummaryPerMonthStateLoadingState() => const Loading(useScaffold: false),
+            TransactionsSummaryPerMonthStateLoadedState() => Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Text(
-                  state.month,
-                  style: Theme.of(context).textTheme.titleLarge,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(state.month, style: Theme.of(context).textTheme.titleLarge),
+                    IconButton(
+                      icon: const Icon(Icons.calendar_month),
+                      onPressed: () => _changeCurrentDate(context, state.currentDate, currentLocale(state.language)),
+                    ),
+                  ],
                 ),
-                IconButton(
-                  icon: const Icon(Icons.calendar_month),
-                  onPressed: () => _changeCurrentDate(context, state.currentDate, currentLocale(state.language)),
+                Padding(
+                  padding: Styles.edgeInsetHorizontal10,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Expanded(flex: 45, child: _SummaryCard.incomes(amount: state.income, percentage: state.incomePercentage)),
+                      const Spacer(flex: 10),
+                      Expanded(
+                        flex: 45,
+                        child: _SummaryCard.expenses(amount: state.expense, percentage: state.expensePercentage),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-            Padding(
-              padding: Styles.edgeInsetHorizontal10,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    flex: 45,
-                    child: _SummaryCard.incomes(
-                      amount: state.income,
-                      percentage: state.incomePercentage,
-                    ),
-                  ),
-                  const Spacer(flex: 10),
-                  Expanded(
-                    flex: 45,
-                    child: _SummaryCard.expenses(
-                      amount: state.expense,
-                      percentage: state.expensePercentage,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+          },
     );
   }
 
@@ -83,21 +72,11 @@ class _SummaryCard extends StatelessWidget with TransactionMixin {
   final double percentage;
   final bool isForIncomes;
 
-  const _SummaryCard({
-    required this.amount,
-    required this.percentage,
-    required this.isForIncomes,
-  });
+  const _SummaryCard({required this.amount, required this.percentage, required this.isForIncomes});
 
-  const _SummaryCard.incomes({
-    required this.amount,
-    required this.percentage,
-  }) : isForIncomes = true;
+  const _SummaryCard.incomes({required this.amount, required this.percentage}) : isForIncomes = true;
 
-  const _SummaryCard.expenses({
-    required this.amount,
-    required this.percentage,
-  }) : isForIncomes = false;
+  const _SummaryCard.expenses({required this.amount, required this.percentage}) : isForIncomes = false;
 
   @override
   Widget build(BuildContext context) {
@@ -117,22 +96,10 @@ class _SummaryCard extends StatelessWidget with TransactionMixin {
             const SizedBox(height: 20),
             Tooltip(
               message: currencyBloc.format(amount),
-              child: Text(
-                currencyBloc.format(amount),
-                overflow: TextOverflow.ellipsis,
-                style: textStyle,
-              ),
+              child: Text(currencyBloc.format(amount), overflow: TextOverflow.ellipsis, style: textStyle),
             ),
-            Text(
-              isForIncomes ? i18n.income : i18n.expenses,
-              style: theme.textTheme.bodySmall,
-              overflow: TextOverflow.ellipsis,
-            ),
-            Text(
-              '$percentage %',
-              style: theme.textTheme.bodySmall,
-              overflow: TextOverflow.ellipsis,
-            ),
+            Text(isForIncomes ? i18n.income : i18n.expenses, style: theme.textTheme.bodySmall, overflow: TextOverflow.ellipsis),
+            Text('$percentage %', style: theme.textTheme.bodySmall, overflow: TextOverflow.ellipsis),
           ],
         ),
       ),

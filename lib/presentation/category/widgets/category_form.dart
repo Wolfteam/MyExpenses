@@ -15,13 +15,7 @@ class CategoryForm extends StatelessWidget {
   final IconData iconData;
   final Color iconColor;
 
-  const CategoryForm.create({
-    super.key,
-    required this.type,
-    required this.iconData,
-    required this.iconColor,
-  })  : id = 0,
-        name = '';
+  const CategoryForm.create({super.key, required this.type, required this.iconData, required this.iconColor}) : id = 0, name = '';
 
   const CategoryForm.edit({
     super.key,
@@ -44,10 +38,7 @@ class CategoryForm extends StatelessWidget {
             Row(
               children: <Widget>[
                 Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    shape: BoxShape.circle,
-                  ),
+                  decoration: BoxDecoration(border: Border.all(color: Colors.grey), shape: BoxShape.circle),
                   margin: const EdgeInsets.only(right: 10),
                   child: IconButton(
                     splashRadius: 30,
@@ -101,10 +92,12 @@ class CategoryForm extends StatelessWidget {
   Future<void> _showColorPicker(BuildContext context) async {
     await showDialog(
       context: context,
-      builder: (_) => ColorPickerDialog(
-        iconColor: iconColor,
-        onColorSelected: (ctx, color) => context.read<CategoryFormBloc>().add(CategoryFormEvent.iconColorChanged(iconColor: color)),
-      ),
+      builder:
+          (_) => ColorPickerDialog(
+            iconColor: iconColor,
+            onColorSelected:
+                (ctx, color) => context.read<CategoryFormBloc>().add(CategoryFormEvent.iconColorChanged(iconColor: color)),
+          ),
     );
   }
 }
@@ -136,28 +129,30 @@ class _NameInputState extends State<_NameInput> {
   Widget build(BuildContext context) {
     final i18n = S.of(context);
     return BlocBuilder<CategoryFormBloc, CategoryState>(
-      builder: (ctx, state) => Expanded(
-        child: TextFormField(
-          minLines: 1,
-          maxLength: CategoryFormBloc.maxNameLength,
-          maxLengthEnforcement: MaxLengthEnforcement.enforced,
-          validator: (_) => state.maybeMap(
-            loaded: (state) => state.isNameValid ? null : i18n.invalidName,
-            orElse: () => null,
+      builder:
+          (ctx, state) => Expanded(
+            child: TextFormField(
+              minLines: 1,
+              maxLength: CategoryFormBloc.maxNameLength,
+              maxLengthEnforcement: MaxLengthEnforcement.enforced,
+              validator:
+                  (_) => switch (state) {
+                    CategoryStateLoadingState() => null,
+                    CategoryStateLoadedState() => state.isNameValid ? null : i18n.invalidName,
+                  },
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              controller: _nameController,
+              focusNode: _nameFocus,
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.done,
+              decoration: InputDecoration(
+                suffixIcon: _buildSuffixIconButton(_nameController, _nameFocus),
+                alignLabelWithHint: true,
+                hintText: i18n.categoryName,
+                labelText: i18n.name,
+              ),
+            ),
           ),
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          controller: _nameController,
-          focusNode: _nameFocus,
-          keyboardType: TextInputType.text,
-          textInputAction: TextInputAction.done,
-          decoration: InputDecoration(
-            suffixIcon: _buildSuffixIconButton(_nameController, _nameFocus),
-            alignLabelWithHint: true,
-            hintText: i18n.categoryName,
-            labelText: i18n.name,
-          ),
-        ),
-      ),
     );
   }
 
@@ -169,15 +164,16 @@ class _NameInputState extends State<_NameInput> {
   }
 
   Widget? _buildSuffixIconButton(TextEditingController controller, FocusNode focusNode) {
-    final suffixIcon = !controller.text.isNullEmptyOrWhitespace && focusNode.hasFocus
-        ? IconButton(
-            alignment: Alignment.bottomCenter,
-            icon: const Icon(Icons.close),
-            splashRadius: 20,
-            //For some reason an exception is thrown https://github.com/flutter/flutter/issues/35848
-            onPressed: () => Future.microtask(() => controller.clear()),
-          )
-        : null;
+    final suffixIcon =
+        !controller.text.isNullEmptyOrWhitespace && focusNode.hasFocus
+            ? IconButton(
+              alignment: Alignment.bottomCenter,
+              icon: const Icon(Icons.close),
+              splashRadius: 20,
+              //For some reason an exception is thrown https://github.com/flutter/flutter/issues/35848
+              onPressed: () => Future.microtask(() => controller.clear()),
+            )
+            : null;
 
     return suffixIcon;
   }

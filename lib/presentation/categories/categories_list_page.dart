@@ -10,12 +10,7 @@ class CategoriesListPage extends StatefulWidget {
   final bool isInSelectionMode;
   final models.CategoryItem? selectedCategory;
 
-  const CategoriesListPage({
-    super.key,
-    required this.loadIncomes,
-    this.isInSelectionMode = false,
-    this.selectedCategory,
-  });
+  const CategoriesListPage({super.key, required this.loadIncomes, this.isInSelectionMode = false, this.selectedCategory});
 
   @override
   _CategoriesListPageState createState() => _CategoriesListPageState();
@@ -42,27 +37,37 @@ class _CategoriesListPageState extends State<CategoriesListPage> with AutomaticK
     super.build(context);
 
     return Scaffold(
-      body: widget.loadIncomes
-          ? BlocBuilder<IncomesCategoriesBloc, CategoriesListState>(
-              builder: (ctx, state) => state.maybeMap(
-                loaded: (state) => _List(categories: state.categories, isInSelectionMode: widget.isInSelectionMode),
-                orElse: () => const Center(child: CircularProgressIndicator()),
+      body:
+          widget.loadIncomes
+              ? BlocBuilder<IncomesCategoriesBloc, CategoriesListState>(
+                builder:
+                    (ctx, state) => switch (state) {
+                      CategoriesListStateLoadedState() => _List(
+                        categories: state.categories,
+                        isInSelectionMode: widget.isInSelectionMode,
+                      ),
+                      _ => const Center(child: CircularProgressIndicator()),
+                    },
+              )
+              : BlocBuilder<ExpensesCategoriesBloc, CategoriesListState>(
+                builder:
+                    (ctx, state) => switch (state) {
+                      CategoriesListStateLoadedState() => _List(
+                        categories: state.categories,
+                        isInSelectionMode: widget.isInSelectionMode,
+                      ),
+                      _ => const Center(child: CircularProgressIndicator()),
+                    },
               ),
-            )
-          : BlocBuilder<ExpensesCategoriesBloc, CategoriesListState>(
-              builder: (ctx, state) => state.maybeMap(
-                loaded: (state) => _List(categories: state.categories, isInSelectionMode: widget.isInSelectionMode),
-                orElse: () => const Center(child: CircularProgressIndicator()),
-              ),
-            ),
-      floatingActionButton: !widget.isInSelectionMode
-          ? FloatingActionButton(
-              heroTag: widget.loadIncomes ? 'AddIncomesFab' : 'AddExpensesFab',
-              onPressed: _gotoAddCategoryPage,
-              mini: true,
-              child: const Icon(Icons.add),
-            )
-          : null,
+      floatingActionButton:
+          !widget.isInSelectionMode
+              ? FloatingActionButton(
+                heroTag: widget.loadIncomes ? 'AddIncomesFab' : 'AddExpensesFab',
+                onPressed: _gotoAddCategoryPage,
+                mini: true,
+                child: const Icon(Icons.add),
+              )
+              : null,
     );
   }
 
@@ -77,10 +82,7 @@ class _List extends StatelessWidget {
   final List<models.CategoryItem> categories;
   final bool isInSelectionMode;
 
-  const _List({
-    required this.categories,
-    required this.isInSelectionMode,
-  });
+  const _List({required this.categories, required this.isInSelectionMode});
 
   @override
   Widget build(BuildContext context) {
@@ -88,10 +90,7 @@ class _List extends StatelessWidget {
       itemCount: categories.length,
       //just to avoid problems on desktop
       controller: ScrollController(),
-      itemBuilder: (ctx, index) => CategoryItem(
-        category: categories[index],
-        isInSelectionMode: isInSelectionMode,
-      ),
+      itemBuilder: (ctx, index) => CategoryItem(category: categories[index], isInSelectionMode: isInSelectionMode),
     );
   }
 }

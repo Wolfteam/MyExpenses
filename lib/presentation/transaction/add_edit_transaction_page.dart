@@ -95,8 +95,8 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
 
     return BlocConsumer<TransactionFormBloc, TransactionFormState>(
       listener: (ctx, state) {
-        state.maybeMap(
-          initial: (state) {
+        switch (state) {
+          case TransactionFormStateInitialState():
             if (state.errorOccurred) {
               ToastUtils.showWarningToast(ctx, i18n.unknownErrorOcurred);
             }
@@ -104,154 +104,157 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
             if (state.nextRecurringDateWasUpdated) {
               BlocUtils.raiseCommonBlocEvents(context, reloadTransactions: true);
             }
-          },
-          transactionChanged: (state) {
-            final msg = state.wasUpdated || state.wasCreated ? i18n.transactionsWasSuccessfullySaved : i18n.transactionsWasSuccessfullyDeleted;
+          case TransactionFormStateTransactionChanged():
+            final msg =
+                state.wasUpdated || state.wasCreated
+                    ? i18n.transactionsWasSuccessfullySaved
+                    : i18n.transactionsWasSuccessfullyDeleted;
             ToastUtils.showSucceedToast(ctx, msg);
             BlocUtils.raiseCommonBlocEvents(context, reloadTransactions: true);
             Navigator.of(ctx).pop();
-          },
-          orElse: () => {},
-        );
+          default:
+            break;
+        }
       },
-      builder:
-          (ctx, state) => state.maybeMap(
-            initial: (state) {
-              if (state.errorOccurred) {
-                ToastUtils.showWarningToast(context, i18n.unknownErrorOcurred);
-              }
 
-              final isChildTransaction = TransactionFormState.isChildTransaction(state);
-
-              final scrollView = SingleChildScrollView(
-                child: Column(
-                  children: [
-                    AddEditTransactionHeader(
-                      description: state.description,
-                      amount: state.amount,
-                      category: state.category,
-                      isChildTransaction: isChildTransaction,
-                      nextRecurringDate: state.nextRecurringDate,
-                      repetitionCycle: state.repetitionCycle,
-                      transactionDateString: state.transactionDateString,
-                      isParentTransaction: state.isParentTransaction,
-                      isRecurringTransactionRunning: state.isRecurringTransactionRunning,
-                      onCategoryChanged: (selectedCat) {
-                        final amount = (double.tryParse(_amountController.text) ?? 0).abs();
-                        final amountText = selectedCat.isAnIncome ? '$amount' : '${amount * -1}';
-                        _amountController.text = amountText;
-                        if (_descriptionController.text.isNullEmptyOrWhitespace) {
-                          _descriptionController.text = selectedCat.name;
-                        }
-                        context.read<TransactionFormBloc>().add(TransactionFormEvent.categoryWasUpdated(category: selectedCat));
-                      },
+      builder: (ctx, state) {
+        switch (state) {
+          case TransactionFormStateInitialState():
+            final isChildTransaction = TransactionFormState.isChildTransaction(state);
+            final scrollView = SingleChildScrollView(
+              child: Column(
+                children: [
+                  AddEditTransactionHeader(
+                    description: state.description,
+                    amount: state.amount,
+                    category: state.category,
+                    isChildTransaction: isChildTransaction,
+                    nextRecurringDate: state.nextRecurringDate,
+                    repetitionCycle: state.repetitionCycle,
+                    transactionDateString: state.transactionDateString,
+                    isParentTransaction: state.isParentTransaction,
+                    isRecurringTransactionRunning: state.isRecurringTransactionRunning,
+                    onCategoryChanged: (selectedCat) {
+                      final amount = (double.tryParse(_amountController.text) ?? 0).abs();
+                      final amountText = selectedCat.isAnIncome ? '$amount' : '${amount * -1}';
+                      _amountController.text = amountText;
+                      if (_descriptionController.text.isNullEmptyOrWhitespace) {
+                        _descriptionController.text = selectedCat.name;
+                      }
+                      context.read<TransactionFormBloc>().add(TransactionFormEvent.categoryWasUpdated(category: selectedCat));
+                    },
+                  ),
+                  if (isChildTransaction)
+                    Text(
+                      i18n.childTransactionCantBeDeleted,
+                      style: theme.textTheme.bodySmall!.copyWith(color: theme.colorScheme.primary),
                     ),
-                    if (isChildTransaction)
-                      Text(i18n.childTransactionCantBeDeleted, style: theme.textTheme.bodySmall!.copyWith(color: theme.colorScheme.primary)),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 25),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: <Widget>[
-                            if (state.isParentTransaction) _RecurringSwitch(isRecurringTransactionRunning: state.isRecurringTransactionRunning),
-                            _AmountInput(
-                              amountController: _amountController,
-                              amountFocus: _amountFocus,
-                              isChildTransaction: isChildTransaction,
-                              isAmountValid: state.isAmountValid,
-                              isAmountDirty: state.isAmountDirty,
-                              onSubmit: () => _fieldFocusChange(context, _amountFocus, _descriptionFocus),
-                            ),
-                            _DescriptionInput(
-                              descriptionController: _descriptionController,
-                              descriptionFocus: _descriptionFocus,
-                              isChildTransaction: isChildTransaction,
-                              isDescriptionDirty: state.isDescriptionDirty,
-                              isDescriptionValid: state.isDescriptionValid,
-                              onSubmit: () => _fieldFocusChange(context, _descriptionFocus, _longDescriptionFocus),
-                            ),
-                            _LongDescriptionInput(
-                              longDescriptionController: _longDescriptionController,
-                              longDescriptionFocus: _longDescriptionFocus,
-                              isChildTransaction: isChildTransaction,
-                              isLongDescriptionDirty: state.isLongDescriptionDirty,
-                              isLongDescriptionValid: state.isLongDescriptionValid,
-                              onSubmit: () => _fieldFocusChange(context, _longDescriptionFocus, _repetitionsFocus),
-                            ),
-                            FormDateButton(
-                              isChildTransaction: isChildTransaction,
-                              repetitionCycle: state.repetitionCycle,
-                              transactionDate: state.transactionDate,
-                              transactionDateString: state.transactionDateString,
-                              isTransactionDateValid: state.isTransactionDateValid,
-                              language: state.language,
-                              firstDate: state.firstDate,
-                              lastDate: state.lastDate,
-                            ),
-                            FormRepetitionCycleDropDown(
-                              isChildTransaction: isChildTransaction,
-                              isParentTransaction: state.isParentTransaction,
-                              repetitionCycle: state.repetitionCycle,
-                              language: state.languageModel,
-                              transactionDate: state.transactionDate,
-                            ),
-                            Text(i18n.addPicture, textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-                            OverflowBar(
-                              alignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                TextButton.icon(
-                                  onPressed: !isChildTransaction ? () => _pickPicture(true, i18n) : null,
-                                  icon: const Icon(Icons.photo_library),
-                                  label: Text(i18n.fromGallery),
-                                ),
-                                TextButton.icon(
-                                  onPressed: !isChildTransaction ? () => _pickPicture(false, i18n) : null,
-                                  icon: const Icon(Icons.camera_enhance),
-                                  label: Text(i18n.fromCamera),
-                                ),
-                              ],
-                            ),
-                            if (state.imageExists) FormImagePreview(imagePath: state.imagePath!),
-                          ],
-                        ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          if (state.isParentTransaction)
+                            _RecurringSwitch(isRecurringTransactionRunning: state.isRecurringTransactionRunning),
+                          _AmountInput(
+                            amountController: _amountController,
+                            amountFocus: _amountFocus,
+                            isChildTransaction: isChildTransaction,
+                            isAmountValid: state.isAmountValid,
+                            isAmountDirty: state.isAmountDirty,
+                            onSubmit: () => _fieldFocusChange(context, _amountFocus, _descriptionFocus),
+                          ),
+                          _DescriptionInput(
+                            descriptionController: _descriptionController,
+                            descriptionFocus: _descriptionFocus,
+                            isChildTransaction: isChildTransaction,
+                            isDescriptionDirty: state.isDescriptionDirty,
+                            isDescriptionValid: state.isDescriptionValid,
+                            onSubmit: () => _fieldFocusChange(context, _descriptionFocus, _longDescriptionFocus),
+                          ),
+                          _LongDescriptionInput(
+                            longDescriptionController: _longDescriptionController,
+                            longDescriptionFocus: _longDescriptionFocus,
+                            isChildTransaction: isChildTransaction,
+                            isLongDescriptionDirty: state.isLongDescriptionDirty,
+                            isLongDescriptionValid: state.isLongDescriptionValid,
+                            onSubmit: () => _fieldFocusChange(context, _longDescriptionFocus, _repetitionsFocus),
+                          ),
+                          FormDateButton(
+                            isChildTransaction: isChildTransaction,
+                            repetitionCycle: state.repetitionCycle,
+                            transactionDate: state.transactionDate,
+                            transactionDateString: state.transactionDateString,
+                            isTransactionDateValid: state.isTransactionDateValid,
+                            language: state.language,
+                            firstDate: state.firstDate,
+                            lastDate: state.lastDate,
+                          ),
+                          FormRepetitionCycleDropDown(
+                            isChildTransaction: isChildTransaction,
+                            isParentTransaction: state.isParentTransaction,
+                            repetitionCycle: state.repetitionCycle,
+                            language: state.languageModel,
+                            transactionDate: state.transactionDate,
+                          ),
+                          Text(
+                            i18n.addPicture,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                          ),
+                          OverflowBar(
+                            alignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              TextButton.icon(
+                                onPressed: !isChildTransaction ? () => _pickPicture(true, i18n) : null,
+                                icon: const Icon(Icons.photo_library),
+                                label: Text(i18n.fromGallery),
+                              ),
+                              TextButton.icon(
+                                onPressed: !isChildTransaction ? () => _pickPicture(false, i18n) : null,
+                                icon: const Icon(Icons.camera_enhance),
+                                label: Text(i18n.fromCamera),
+                              ),
+                            ],
+                          ),
+                          if (state.imageExists) FormImagePreview(imagePath: state.imagePath!),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
+            );
+
+            final scaffold = Scaffold(
+              appBar: FormAppBar(
+                isNewTransaction: TransactionFormState.isNewTransaction(state),
+                isParentTransaction: state.isParentTransaction,
+                toEditTransaction: widget.item != null,
+                isChildTransaction: TransactionFormState.isChildTransaction(state),
+                isFormValid: TransactionFormState.isFormValid(state),
+                description: state.description,
+              ),
+              body: SafeArea(child: scrollView),
+            );
+
+            if (state.isSavingForm) {
+              return Stack(
+                children: [
+                  scaffold,
+                  const Opacity(opacity: 0.5, child: ModalBarrier(dismissible: false, color: Colors.black)),
+                  const Center(child: CircularProgressIndicator()),
+                ],
               );
+            }
 
-              final scaffold = Scaffold(
-                appBar: state.maybeMap(
-                  initial:
-                      (state) => FormAppBar(
-                        isNewTransaction: TransactionFormState.isNewTransaction(state),
-                        isParentTransaction: state.isParentTransaction,
-                        toEditTransaction: widget.item != null,
-                        isChildTransaction: TransactionFormState.isChildTransaction(state),
-                        isFormValid: TransactionFormState.isFormValid(state),
-                        description: state.description,
-                      ),
-                  orElse: () => null,
-                ),
-                body: SafeArea(child: scrollView),
-              );
-
-              if (state.isSavingForm) {
-                return Stack(
-                  children: [
-                    scaffold,
-                    const Opacity(opacity: 0.5, child: ModalBarrier(dismissible: false, color: Colors.black)),
-                    const Center(child: CircularProgressIndicator()),
-                  ],
-                );
-              }
-
-              return scaffold;
-            },
-            orElse: () => const Center(child: CircularProgressIndicator()),
-          ),
+            return scaffold;
+          default:
+            return const Center(child: CircularProgressIndicator());
+        }
+      },
     );
   }
 
@@ -282,7 +285,9 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
       return;
     }
     _currentLongDescription = _longDescriptionController.text;
-    context.read<TransactionFormBloc>().add(TransactionFormEvent.longDescriptionChanged(longDescription: _longDescriptionController.text));
+    context.read<TransactionFormBloc>().add(
+      TransactionFormEvent.longDescriptionChanged(longDescription: _longDescriptionController.text),
+    );
   }
 
   Future<void> _pickPicture(bool fromGallery, S i18n) async {
@@ -364,7 +369,12 @@ class AddEditTransactionHeader extends StatelessWidget {
             padding: const EdgeInsets.only(top: 60.0, left: 10.0, right: 10.0, bottom: 10.0),
             child: Material(
               shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(bottomLeft: cornerRadius, bottomRight: cornerRadius, topLeft: cornerRadius, topRight: cornerRadius),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: cornerRadius,
+                  bottomRight: cornerRadius,
+                  topLeft: cornerRadius,
+                  topRight: cornerRadius,
+                ),
               ),
               elevation: 5.0,
               child: Container(
@@ -454,7 +464,9 @@ class AddEditTransactionHeader extends StatelessWidget {
       selectedCatProvider.currentSelectedItem = category;
     }
 
-    final route = MaterialPageRoute<CategoryItem>(builder: (ctx) => CategoriesPage(isInSelectionMode: true, selectedCategory: category));
+    final route = MaterialPageRoute<CategoryItem>(
+      builder: (ctx) => CategoriesPage(isInSelectionMode: true, selectedCategory: category),
+    );
     final selectedCat = await Navigator.of(context).push(route);
 
     selectedCatProvider.currentSelectedItem = null;
@@ -485,7 +497,9 @@ class _RecurringSwitch extends StatelessWidget {
             value: isRecurringTransactionRunning,
             title: Text(isRecurringTransactionRunning ? i18n.running : i18n.stopped),
             secondary: Icon(isRecurringTransactionRunning ? Icons.play_arrow : Icons.stop, size: 30),
-            subtitle: Text(isRecurringTransactionRunning ? i18n.recurringTransactionIsNowRunning : i18n.recurringTransactionIsNowStopped),
+            subtitle: Text(
+              isRecurringTransactionRunning ? i18n.recurringTransactionIsNowRunning : i18n.recurringTransactionIsNowStopped,
+            ),
             onChanged: (newValue) => _isRunningChanged(newValue, context),
           ),
         ],

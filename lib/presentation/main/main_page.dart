@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_expenses/application/bloc.dart';
@@ -102,27 +101,6 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
     WidgetsBinding.instance.removeObserver(this);
     notificationService.dispose();
     super.dispose();
-  }
-
-  Future<dynamic> _onDidReceiveLocalNotification(int id, String? title, String? body, String? payload) {
-    final i18n = S.of(context);
-    return showDialog(
-      context: context,
-      builder:
-          (BuildContext context) => CupertinoAlertDialog(
-            title: Text(title!),
-            content: Text(body!),
-            actions: [
-              CupertinoDialogAction(
-                isDefaultAction: true,
-                onPressed: () {
-                  Navigator.of(context, rootNavigator: true).pop();
-                },
-                child: Text(i18n.ok),
-              ),
-            ],
-          ),
-    );
   }
 
   Future<void> _onSelectNotification(AppNotification notification) async {
