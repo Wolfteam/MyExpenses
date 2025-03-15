@@ -1,8 +1,8 @@
 part of 'main_tab_bloc.dart';
 
 @freezed
-class MainTabState with _$MainTabState {
-  const factory MainTabState.loading() = _LoadingState;
+sealed class MainTabState with _$MainTabState {
+  const factory MainTabState.loading() = MainTabStateLoadingState;
 
-  const factory MainTabState.initial() = _InitialState;
+  const factory MainTabState.initial() = MainTabStateInitialState;
 }

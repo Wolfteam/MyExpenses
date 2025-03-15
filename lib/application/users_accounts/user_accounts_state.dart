@@ -1,8 +1,8 @@
 part of 'user_accounts_bloc.dart';
 
 @freezed
-class UserAccountsState with _$UserAccountsState {
-  const factory UserAccountsState.loading() = _LoadingState;
+sealed class UserAccountsState with _$UserAccountsState {
+  const factory UserAccountsState.loading() = UserAccountsEventLoadingState;
 
   const factory UserAccountsState.initial({
     required List<UserItem> users,
@@ -12,5 +12,5 @@ class UserAccountsState with _$UserAccountsState {
     @Default(false) bool accountWasAdded,
     @Default(false) bool signInInProcess,
     @Default(null) bool? signInResult,
-  }) = _InitialState;
+  }) = UserAccountsEventInitialState;
 }

@@ -1,9 +1,10 @@
 part of 'estimates_bloc.dart';
 
 @freezed
-class EstimatesState with _$EstimatesState {
-  factory EstimatesState.loading() = _EstimatesLoadingState;
-  factory EstimatesState.loaded({
+sealed class EstimatesState with _$EstimatesState {
+  const factory EstimatesState.loading() = EstimatesStateEstimatesLoadingState;
+
+  const factory EstimatesState.loaded({
     required int selectedTransactionType,
     required DateTime fromDate,
     required String fromDateString,
@@ -13,6 +14,5 @@ class EstimatesState with _$EstimatesState {
     @Default(0) double incomeAmount,
     @Default(0) double expenseAmount,
     @Default(0) double totalAmount,
-  }) = _EstimatesInitialState;
-  const EstimatesState._();
+  }) = EstimatesStateEstimatesInitialState;
 }

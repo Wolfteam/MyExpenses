@@ -29,24 +29,29 @@ class TransactionsActivityBloc extends Bloc<TransactionsActivityEvent, Transacti
   final UsersDao _usersDao;
   final SettingsService _settingsService;
 
-  TransactionsActivityBloc(
-    this._logger,
-    this._transactionsDao,
-    this._usersDao,
-    this._settingsService,
-  ) : super(_initialState);
+  TransactionsActivityBloc(this._logger, this._transactionsDao, this._usersDao, this._settingsService) : super(_initialState) {
+    on<TransactionsActivityEventInit>((event, emit) async {
+      final UserItem? currentUser = await _usersDao.getActiveUser();
+      final s = await _handleChange(DateTime.now(), TransactionActivityDateRangeType.last7days, userId: currentUser?.id);
+      emit(s);
+    });
 
-  @override
-  Stream<TransactionsActivityState> mapEventToState(TransactionsActivityEvent event) async* {
-    final UserItem? currentUser = await _usersDao.getActiveUser();
-    final s = await event.map(
-      init: (_) => _handleChange(DateTime.now(), TransactionActivityDateRangeType.last7days, userId: currentUser?.id),
-      dateChanged: (e) => _handleChange(e.currentDate, state.type, userId: currentUser?.id),
-      dateRangeChanged: (e) => _handleChange(state.currentDate, e.type, userId: currentUser?.id),
-      activitySelected: (e) => _handleActivityTypeChange(e.type),
-    );
+    on<TransactionsActivityEventDateChanged>((event, emit) async {
+      final UserItem? currentUser = await _usersDao.getActiveUser();
+      final s = await _handleChange(event.currentDate, state.type, userId: currentUser?.id);
+      emit(s);
+    });
 
-    yield s;
+    on<TransactionsActivityEventDateRangeChanged>((event, emit) async {
+      final UserItem? currentUser = await _usersDao.getActiveUser();
+      final s = await _handleChange(state.currentDate, event.type, userId: currentUser?.id);
+      emit(s);
+    });
+
+    on<TransactionsActivityEventActivitySelected>((event, emit) async {
+      final s = await _handleActivityTypeChange(event.type);
+      emit(s);
+    });
   }
 
   Future<TransactionsActivityState> _handleActivityTypeChange(TransactionActivityType type) {
@@ -60,7 +65,11 @@ class TransactionsActivityBloc extends Bloc<TransactionsActivityEvent, Transacti
     return Future.value(state.copyWith(selectedActivityTypes: activityTypes));
   }
 
-  Future<TransactionsActivityState> _handleChange(DateTime currentDate, TransactionActivityDateRangeType type, {int? userId}) async {
+  Future<TransactionsActivityState> _handleChange(
+    DateTime currentDate,
+    TransactionActivityDateRangeType type, {
+    int? userId,
+  }) async {
     List<TransactionActivityPerDate> transactions = [];
     switch (type) {
       case TransactionActivityDateRangeType.last7days:
@@ -82,10 +91,7 @@ class TransactionsActivityBloc extends Bloc<TransactionsActivityEvent, Transacti
     final DateTime sevenDaysAgo = now.subtract(const Duration(days: 6));
     final from = DateTime(sevenDaysAgo.year, sevenDaysAgo.month, sevenDaysAgo.day);
     final until = DateTime(now.year, now.month, now.day, 23, 59, 59);
-    _logger.info(
-      runtimeType,
-      '_buildLast7Days: Getting income + expenses transactions summary from = $from until = $until',
-    );
+    _logger.info(runtimeType, '_buildLast7Days: Getting income + expenses transactions summary from = $from until = $until');
 
     final List<TransactionItem> transactions = await _transactionsDao.getAllTransactions(userId, from, until);
     return _buildPerDay(from, transactions);
@@ -125,22 +131,17 @@ class TransactionsActivityBloc extends Bloc<TransactionsActivityEvent, Transacti
       groupedPerDay.addAll({mustExistDate: activity});
     }
 
-    return groupedPerDay.entries.sortedBy((kvp) => kvp.key).map(
-      (kvp) {
-        final TransactionActivityPerDate trans = kvp.value;
-        final double income = TransactionUtils.roundDouble(trans.income);
-        final double expenses = TransactionUtils.roundDouble(trans.expense);
-        final double balance = TransactionUtils.roundDouble(income + expenses);
-        return trans.copyWith(income: income, expense: expenses, balance: balance);
-      },
-    ).toList();
+    return groupedPerDay.entries.sortedBy((kvp) => kvp.key).map((kvp) {
+      final TransactionActivityPerDate trans = kvp.value;
+      final double income = TransactionUtils.roundDouble(trans.income);
+      final double expenses = TransactionUtils.roundDouble(trans.expense);
+      final double balance = TransactionUtils.roundDouble(income + expenses);
+      return trans.copyWith(income: income, expense: expenses, balance: balance);
+    }).toList();
   }
 
   Future<List<TransactionActivityPerDate>> _buildPerDateRange(DateTime from, DateTime until, {int? userId}) async {
-    _logger.info(
-      runtimeType,
-      '_buildPerDateRange: Getting income + expenses transactions summary from = $from to = $until',
-    );
+    _logger.info(runtimeType, '_buildPerDateRange: Getting income + expenses transactions summary from = $from to = $until');
 
     final List<TransactionItem> transactions = await _transactionsDao.getAllTransactions(userId, from, until);
     transactions.sort((t1, t2) => t1.transactionDate.compareTo(t2.transactionDate));
@@ -164,7 +165,12 @@ class TransactionsActivityBloc extends Bloc<TransactionsActivityEvent, Transacti
       final String end = DateUtils.formatAppDate(last, lang, DateUtils.dayStringFormat);
       final String dateRangeString = '$start - $end';
 
-      final activity = TransactionActivityPerDate(income: income, expense: expenses, balance: balance, dateRangeString: dateRangeString);
+      final activity = TransactionActivityPerDate(
+        income: income,
+        expense: expenses,
+        balance: balance,
+        dateRangeString: dateRangeString,
+      );
       grouped.add(activity);
 
       i += last.difference(first).inDays;
@@ -186,23 +192,25 @@ class TransactionsActivityBloc extends Bloc<TransactionsActivityEvent, Transacti
 
   Future<List<TransactionActivityPerDate>> _buildPerYear(int year, {int? userId}) async {
     final now = DateTime.now();
-    final maxMonth = year != now.year
-        ? DateTime.december
-        : now.month == DateTime.december
+    final maxMonth =
+        year != now.year
+            ? DateTime.december
+            : now.month == DateTime.december
             ? DateTime.december
             : now.month;
     final from = DateUtils.getFirstDayDateOfTheMonth(DateTime(year));
     final until = DateUtils.getLastDayDateOfTheMonth(DateTime(year, maxMonth));
-    _logger.info(
-      runtimeType,
-      '_buildPerYear: Getting income + expenses transactions summary from = $from to = $until',
-    );
+    _logger.info(runtimeType, '_buildPerYear: Getting income + expenses transactions summary from = $from to = $until');
 
     final transactions = await _transactionsDao.getAllTransactions(userId, from, until);
     final grouped = <TransactionActivityPerDate>[];
     for (int i = DateTime.january; i <= maxMonth; i++) {
-      final double income = TransactionUtils.getTotalAmounts(transactions.where((el) => el.transactionDate.month == i && el.category.isAnIncome).map((el) => el.amount));
-      final double expense = TransactionUtils.getTotalAmounts(transactions.where((el) => el.transactionDate.month == i && !el.category.isAnIncome).map((el) => el.amount));
+      final double income = TransactionUtils.getTotalAmounts(
+        transactions.where((el) => el.transactionDate.month == i && el.category.isAnIncome).map((el) => el.amount),
+      );
+      final double expense = TransactionUtils.getTotalAmounts(
+        transactions.where((el) => el.transactionDate.month == i && !el.category.isAnIncome).map((el) => el.amount),
+      );
       final double monthly = TransactionUtils.roundDouble(income + expense);
 
       final activity = TransactionActivityPerDate(income: income, expense: expense, balance: monthly);

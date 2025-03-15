@@ -20,25 +20,35 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
   final UsersDao _usersDao;
   final SettingsService _settingsService;
 
-  TransactionsBloc(this._logger, this._transactionsDao, this._usersDao, this._settingsService) : super(const TransactionsState.loading());
+  TransactionsBloc(this._logger, this._transactionsDao, this._usersDao, this._settingsService)
+    : super(const TransactionsState.loading()) {
+    on<TransactionsEventInit>((event, emit) async {
+      final s = await _handle(event.currentDate, TransactionFilterType.date, SortDirectionType.desc);
+      emit(s);
+    });
 
-  @override
-  Stream<TransactionsState> mapEventToState(TransactionsEvent event) async* {
-    final s = await event.map(
-      init: (e) => _handle(e.currentDate, TransactionFilterType.date, SortDirectionType.desc),
-      groupingTypeChanged:
-          (e) => state.map(
-            loading: (_) => throw Exception('Invalid state'),
-            loaded: (state) => _handle(state.currentDate, e.type, state.sortDirectionType),
-          ),
-      sortDirectionTypeChanged:
-          (e) =>
-              state.map(loading: (_) => throw Exception('Invalid state'), loaded: (state) => _handle(state.currentDate, state.groupingType, e.type)),
-    );
-    yield s;
+    on<TransactionsEventGroupTypeChanged>((event, emit) async {
+      final s = await switch (state) {
+        TransactionsStateLoadingState() => throw Exception('Invalid state'),
+        final TransactionsStateLoadedState state => _handle(state.currentDate, event.type, state.sortDirectionType),
+      };
+      emit(s);
+    });
+
+    on<TransactionsEventSortTypeChanged>((event, emit) async {
+      final s = await switch (state) {
+        TransactionsStateLoadingState() => throw Exception('Invalid state'),
+        final TransactionsStateLoadedState state => _handle(state.currentDate, state.groupingType, event.type),
+      };
+      emit(s);
+    });
   }
 
-  Future<TransactionsState> _handle(DateTime date, TransactionFilterType groupingType, SortDirectionType sortDirectionType) async {
+  Future<TransactionsState> _handle(
+    DateTime date,
+    TransactionFilterType groupingType,
+    SortDirectionType sortDirectionType,
+  ) async {
     final LanguageModel language = _settingsService.getCurrentLanguageModel();
     final DateTime from = DateUtils.getFirstDayDateOfTheMonth(date);
     final DateTime to = DateUtils.getLastDayDateOfTheMonth(from);
@@ -55,9 +65,15 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         groupingType: groupingType,
         sortDirectionType: sortDirectionType,
         transactions: TransactionUtils.buildTransactionsPerMonth(language, transactions, sortType: sortDirectionType),
-        recurringTransactions: TransactionUtils.buildTransactionsPerMonth(language, recurringTransactions, sortByNextRecurringDate: true),
+        recurringTransactions: TransactionUtils.buildTransactionsPerMonth(
+          language,
+          recurringTransactions,
+          sortByNextRecurringDate: true,
+        ),
         groupedTransactionsByCategory:
-            groupingType == TransactionFilterType.category ? _groupByCategory([...transactions], sortDirectionType) : <TransactionCardItems>[],
+            groupingType == TransactionFilterType.category
+                ? _groupByCategory([...transactions], sortDirectionType)
+                : <TransactionCardItems>[],
       );
     } catch (e, s) {
       _logger.error(runtimeType, '_handle: An unknown error occurred', e, s);
@@ -73,7 +89,11 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     }
   }
 
-  void _sortTransactions(List<TransactionItem> transactions, TransactionFilterType groupingType, SortDirectionType sortDirectionType) {
+  void _sortTransactions(
+    List<TransactionItem> transactions,
+    TransactionFilterType groupingType,
+    SortDirectionType sortDirectionType,
+  ) {
     switch (groupingType) {
       case TransactionFilterType.description:
         if (sortDirectionType == SortDirectionType.asc) {

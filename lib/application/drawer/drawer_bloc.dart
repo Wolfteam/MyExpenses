@@ -28,20 +28,21 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
     this._googleService,
     this._settingsService,
     this._pathService,
-  ) : super(const DrawerState.loaded(selectedPage: AppDrawerItemType.transactions));
+  ) : super(const DrawerState.loaded(selectedPage: AppDrawerItemType.transactions)) {
+    on<DrawerEventInit>((event, emit) async {
+      final s = await _initialize();
+      emit(s);
+    });
 
-  @override
-  Stream<DrawerState> mapEventToState(DrawerEvent event) async* {
-    final s = await event.map(
-      init: (_) => _initialize(),
-      selectedItemChanged: (e) async => state.copyWith(
-        selectedPage: e.selectedPage,
-        userSignedOut: false,
-      ),
-      signOut: (_) => _signOut(),
-    );
+    on<DrawerEventSelectedItemChanged>((event, emit) {
+      final s = state.copyWith(selectedPage: event.selectedPage, userSignedOut: false);
+      emit(s);
+    });
 
-    yield s;
+    on<DrawerEventSignOut>((event, emit) async {
+      final s = await _signOut();
+      emit(s);
+    });
   }
 
   Future<DrawerState> _initialize() async {
@@ -54,13 +55,7 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
 
     _logger.info(runtimeType, '_initialize: User is signed in');
     final imgPath = await _pathService.getDynamicUserImg(user.pictureUrl);
-    return state.copyWith(
-      email: user.email,
-      fullName: user.name,
-      img: imgPath,
-      isUserSignedIn: true,
-      userSignedOut: false,
-    );
+    return state.copyWith(email: user.email, fullName: user.name, img: imgPath, isUserSignedIn: true, userSignedOut: false);
   }
 
   Future<DrawerState> _signOut() async {
@@ -75,10 +70,6 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
     }
 
     _logger.info(runtimeType, '_signOut: User was signed out');
-    return DrawerState.loaded(
-      selectedPage: AppDrawerItemType.transactions,
-      isUserSignedIn: !signedOut,
-      userSignedOut: signedOut,
-    );
+    return DrawerState.loaded(selectedPage: AppDrawerItemType.transactions, isUserSignedIn: !signedOut, userSignedOut: signedOut);
   }
 }

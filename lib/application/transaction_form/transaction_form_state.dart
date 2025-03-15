@@ -1,36 +1,37 @@
 part of 'transaction_form_bloc.dart';
 
 @freezed
-class TransactionFormState with _$TransactionFormState {
+sealed class TransactionFormState with _$TransactionFormState {
   static TransactionFormState created(DateTime transactionDate) => TransactionFormState.transactionChanged(
-        wasCreated: true,
-        wasDeleted: false,
-        wasUpdated: false,
-        transactionDate: transactionDate,
-      );
+    wasCreated: true,
+    wasDeleted: false,
+    wasUpdated: false,
+    transactionDate: transactionDate,
+  );
 
   static TransactionFormState updated(DateTime transactionDate) => TransactionFormState.transactionChanged(
-        wasCreated: false,
-        wasDeleted: false,
-        wasUpdated: true,
-        transactionDate: transactionDate,
-      );
+    wasCreated: false,
+    wasDeleted: false,
+    wasUpdated: true,
+    transactionDate: transactionDate,
+  );
 
   static TransactionFormState deleted(DateTime transactionDate) => TransactionFormState.transactionChanged(
-        wasCreated: false,
-        wasDeleted: true,
-        wasUpdated: false,
-        transactionDate: transactionDate,
-      );
+    wasCreated: false,
+    wasDeleted: true,
+    wasUpdated: false,
+    transactionDate: transactionDate,
+  );
 
-  static bool isNewTransaction(_InitialState state) => state.id <= 0;
+  static bool isNewTransaction(TransactionFormStateInitialState state) => state.id <= 0;
 
-  static bool isChildTransaction(_InitialState state) => !state.isParentTransaction && state.parentTransactionId != null;
+  static bool isChildTransaction(TransactionFormStateInitialState state) =>
+      !state.isParentTransaction && state.parentTransactionId != null;
 
-  static bool isFormValid(_InitialState state) =>
+  static bool isFormValid(TransactionFormStateInitialState state) =>
       state.isAmountValid && state.isDescriptionValid && state.isTransactionDateValid && state.isCategoryValid;
 
-  const factory TransactionFormState.loading() = _LoadingState;
+  const factory TransactionFormState.loading() = TransactionFormStateLoadingState;
 
   const factory TransactionFormState.initial({
     required int id,
@@ -62,12 +63,12 @@ class TransactionFormState with _$TransactionFormState {
     @Default(true) bool isRecurringTransactionRunning,
     DateTime? nextRecurringDate,
     @Default(false) bool nextRecurringDateWasUpdated,
-  }) = _InitialState;
+  }) = TransactionFormStateInitialState;
 
   const factory TransactionFormState.transactionChanged({
     required bool wasCreated,
     required bool wasUpdated,
     required bool wasDeleted,
     required DateTime transactionDate,
-  }) = _TransactionChanged;
+  }) = TransactionFormStateTransactionChanged;
 }

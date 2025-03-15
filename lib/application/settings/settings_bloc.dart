@@ -27,76 +27,94 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     this._deviceInfoService,
     this._usersDao,
     this._appBloc,
-  ) : super(const SettingsState.loading());
+  ) : super(const SettingsState.loading()) {
+    on<SettingsEventLoad>((event, emit) async {
+      final s = await _buildInitialState();
+      emit(s);
+    });
 
-  _InitialState get currentState => state as _InitialState;
+    on<SettingsEventAppThemeChanged>((event, emit) {
+      _settingsService.appTheme = event.selectedAppTheme;
+      final s = currentState.copyWith(appTheme: event.selectedAppTheme);
+      emit(s);
+    });
 
-  @override
-  Stream<SettingsState> mapEventToState(SettingsEvent event) async* {
-    final s = await event.map(
-      load: (_) async => _buildInitialState(),
-      appThemeChanged: (e) async {
-        _settingsService.appTheme = e.selectedAppTheme;
-        return currentState.copyWith(appTheme: e.selectedAppTheme);
-      },
-      appAccentColorChanged: (e) async {
-        _settingsService.accentColor = e.selectedAccentColor;
-        return currentState.copyWith(accentColor: e.selectedAccentColor);
-      },
-      appLanguageChanged: (e) async {
-        _settingsService.language = e.selectedLanguage;
-        _appBloc.add(AppEvent.languageChanged(newValue: e.selectedLanguage));
-        return currentState.copyWith(appLanguage: e.selectedLanguage);
-      },
-      syncIntervalChanged: (e) async {
-        _settingsService.syncInterval = e.selectedSyncInterval;
-        await _backgroundService.cancelSyncTask();
-        return currentState.copyWith(syncInterval: e.selectedSyncInterval);
-      },
-      askForPasswordChanged: (e) async {
-        _settingsService.askForPassword = e.ask;
+    on<SettingsEventAppAccentColorChanged>((event, emit) {
+      _settingsService.accentColor = event.selectedAccentColor;
+      final s = currentState.copyWith(accentColor: event.selectedAccentColor);
+      emit(s);
+    });
 
-        if (e.ask) {
-          _settingsService.askForFingerPrint = false;
-          return currentState.copyWith(askForPassword: e.ask, askForFingerPrint: false);
-        }
+    on<SettingsEventAppLanguageChanged>((event, emit) {
+      _settingsService.language = event.selectedLanguage;
+      _appBloc.add(AppEvent.languageChanged(newValue: event.selectedLanguage));
+      final s = currentState.copyWith(appLanguage: event.selectedLanguage);
+      emit(s);
+    });
+
+    on<SettingsEventSyncIntervalChanged>((event, emit) async {
+      _settingsService.syncInterval = event.selectedSyncInterval;
+      await _backgroundService.cancelSyncTask();
+      final s = currentState.copyWith(syncInterval: event.selectedSyncInterval);
+      emit(s);
+    });
+
+    on<SettingsEventAskForPasswordChanged>((event, emit) async {
+      _settingsService.askForPassword = event.ask;
+      SettingsState s;
+      if (event.ask) {
+        _settingsService.askForFingerPrint = false;
+        s = currentState.copyWith(askForPassword: event.ask, askForFingerPrint: false);
+      } else {
         await _secureStorageService.delete(SecureResourceType.loginPassword, _secureStorageService.defaultUsername);
-        return currentState.copyWith(askForPassword: e.ask);
-      },
-      askForFingerPrintChanged: (e) async {
-        _settingsService.askForFingerPrint = e.ask;
+        s = currentState.copyWith(askForPassword: event.ask);
+      }
+      emit(s);
+    });
 
-        if (e.ask) {
-          await _secureStorageService.delete(SecureResourceType.loginPassword, _secureStorageService.defaultUsername);
-          _settingsService.askForPassword = false;
-          return currentState.copyWith(askForPassword: false, askForFingerPrint: e.ask);
-        }
-        return currentState.copyWith(askForFingerPrint: e.ask);
-      },
-      currencyChanged: (e) async {
-        _settingsService.currencySymbol = e.selectedCurrency;
-        return currentState.copyWith(currencySymbol: e.selectedCurrency);
-      },
-      currencyPlacementChanged: (e) async {
-        _settingsService.currencyToTheRight = e.placeToTheRight;
-        return currentState.copyWith(currencyToTheRight: e.placeToTheRight);
-      },
-      showNotificationAfterFullSyncChanged: (e) async {
-        _settingsService.showNotifAfterFullSync = e.show;
-        return currentState.copyWith(showNotificationAfterFullSync: e.show);
-      },
-      showNotificationForRecurringTransChanged: (e) async {
-        _settingsService.showNotifForRecurringTrans = e.show;
-        return currentState.copyWith(showNotificationForRecurringTrans: e.show);
-      },
-      triggerSyncTask: (e) async {
-        await _backgroundService.runSyncTask(e.translations);
-        return state;
-      },
-    );
+    on<SettingsEventAskForFingerPrintChanged>((event, emit) async {
+      _settingsService.askForFingerPrint = event.ask;
+      SettingsState s;
+      if (event.ask) {
+        await _secureStorageService.delete(SecureResourceType.loginPassword, _secureStorageService.defaultUsername);
+        _settingsService.askForPassword = false;
+        s = currentState.copyWith(askForPassword: false, askForFingerPrint: event.ask);
+      } else {
+        s = currentState.copyWith(askForFingerPrint: event.ask);
+      }
+      emit(s);
+    });
 
-    yield s;
+    on<SettingsEventCurrencyChanged>((event, emit) {
+      _settingsService.currencySymbol = event.selectedCurrency;
+      final s = currentState.copyWith(currencySymbol: event.selectedCurrency);
+      emit(s);
+    });
+
+    on<SettingsEventCurrencyPlacementChanged>((event, emit) {
+      _settingsService.currencyToTheRight = event.placeToTheRight;
+      final s = currentState.copyWith(currencyToTheRight: event.placeToTheRight);
+      emit(s);
+    });
+
+    on<SettingsEventShowNotificationAfterFullSyncChanged>((event, emit) {
+      _settingsService.showNotifAfterFullSync = event.show;
+      final s = currentState.copyWith(showNotificationAfterFullSync: event.show);
+      emit(s);
+    });
+
+    on<SettingsEventShowNotificationForRecurringTransChanged>((event, emit) {
+      _settingsService.showNotifForRecurringTrans = event.show;
+      final s = currentState.copyWith(showNotificationForRecurringTrans: event.show);
+      emit(s);
+    });
+
+    on<SettingsEventTriggerSyncTask>((event, emit) async {
+      await _backgroundService.runSyncTask(event.translations);
+    });
   }
+
+  SettingsStateInitialState get currentState => state as SettingsStateInitialState;
 
   Future<SettingsState> _buildInitialState() async {
     final appSettings = _settingsService.appSettings;

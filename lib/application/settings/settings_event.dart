@@ -1,49 +1,34 @@
 part of 'settings_bloc.dart';
 
 @freezed
-class SettingsEvent with _$SettingsEvent {
-  const factory SettingsEvent.load() = _Load;
+sealed class SettingsEvent with _$SettingsEvent {
+  const factory SettingsEvent.load() = SettingsEventLoad;
 
-  const factory SettingsEvent.appThemeChanged({
-    required AppThemeType selectedAppTheme,
-  }) = _AppThemeChanged;
+  const factory SettingsEvent.appThemeChanged({required AppThemeType selectedAppTheme}) = SettingsEventAppThemeChanged;
 
-  const factory SettingsEvent.appAccentColorChanged({
-    required AppAccentColorType selectedAccentColor,
-  }) = _AppAccentColorChanged;
+  const factory SettingsEvent.appAccentColorChanged({required AppAccentColorType selectedAccentColor}) =
+      SettingsEventAppAccentColorChanged;
 
-  const factory SettingsEvent.appLanguageChanged({
-    required AppLanguageType selectedLanguage,
-  }) = _AppLanguageChanged;
+  const factory SettingsEvent.appLanguageChanged({required AppLanguageType selectedLanguage}) = SettingsEventAppLanguageChanged;
 
   const factory SettingsEvent.syncIntervalChanged({
     required SyncIntervalType selectedSyncInterval,
     required BackgroundTranslations translations,
-  }) = _SyncIntervalChanged;
+  }) = SettingsEventSyncIntervalChanged;
 
-  const factory SettingsEvent.askForPasswordChanged({
-    required bool ask,
-  }) = _AskForPasswordChanged;
+  const factory SettingsEvent.askForPasswordChanged({required bool ask}) = SettingsEventAskForPasswordChanged;
 
-  const factory SettingsEvent.askForFingerPrintChanged({
-    required bool ask,
-  }) = _AskForFingerPrintChanged;
+  const factory SettingsEvent.askForFingerPrintChanged({required bool ask}) = SettingsEventAskForFingerPrintChanged;
 
-  const factory SettingsEvent.currencyChanged({
-    required CurrencySymbolType selectedCurrency,
-  }) = _CurrencyChanged;
+  const factory SettingsEvent.currencyChanged({required CurrencySymbolType selectedCurrency}) = SettingsEventCurrencyChanged;
 
-  const factory SettingsEvent.currencyPlacementChanged({
-    required bool placeToTheRight,
-  }) = _CurrencyPlacementChanged;
+  const factory SettingsEvent.currencyPlacementChanged({required bool placeToTheRight}) = SettingsEventCurrencyPlacementChanged;
 
-  const factory SettingsEvent.showNotificationAfterFullSyncChanged({
-    required bool show,
-  }) = _ShowNotificationAfterFullSyncChanged;
+  const factory SettingsEvent.showNotificationAfterFullSyncChanged({required bool show}) =
+      SettingsEventShowNotificationAfterFullSyncChanged;
 
-  const factory SettingsEvent.showNotificationForRecurringTransChanged({
-    required bool show,
-  }) = _ShowNotificationForRecurringTransChanged;
+  const factory SettingsEvent.showNotificationForRecurringTransChanged({required bool show}) =
+      SettingsEventShowNotificationForRecurringTransChanged;
 
-  const factory SettingsEvent.triggerSyncTask({required BackgroundTranslations translations}) = _TriggerSyncTask;
+  const factory SettingsEvent.triggerSyncTask({required BackgroundTranslations translations}) = SettingsEventTriggerSyncTask;
 }

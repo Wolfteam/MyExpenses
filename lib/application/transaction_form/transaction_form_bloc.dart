@@ -42,118 +42,155 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
     this._settingsService,
     this._pathService,
     this._syncService,
-  ) : super(const TransactionFormState.loading());
+  ) : super(const TransactionFormState.loading()) {
+    on<TransactionFormEventAdd>((event, emit) {
+      final s = _initialState();
+      emit(s);
+    });
 
-  _InitialState get currentState => state as _InitialState;
+    on<TransactionFormEventEdit>((event, emit) async {
+      final s = await _edit(event.id);
+      emit(s);
+    });
 
-  @override
-  Stream<TransactionFormState> mapEventToState(
-    TransactionFormEvent event,
-  ) async* {
-    try {
-      if (event is _Submit) {
-        yield currentState.copyWith(isSavingForm: true);
-      }
+    on<TransactionFormEventAmountChanged>((event, emit) {
+      final s = currentState.copyWith(amount: event.amount, isAmountValid: _isAmountValid(event.amount), isAmountDirty: true);
+      emit(s);
+    });
 
-      final s = await event.map(
-        add: (_) async => _initialState(),
-        edit: (e) async => _edit(e.id),
-        amountChanged: (e) async => currentState.copyWith(amount: e.amount, isAmountValid: _isAmountValid(e.amount), isAmountDirty: true),
-        descriptionChanged: (e) async => currentState.copyWith(
-          description: e.description,
-          isDescriptionValid: _isDescriptionValid(e.description),
-          isDescriptionDirty: true,
-        ),
-        longDescriptionChanged: (e) async => currentState.copyWith(
-          longDescription: e.longDescription,
-          isDescriptionValid: _isLongDescriptionValid(e.longDescription),
-          isDescriptionDirty: true,
-        ),
-        transactionDateChanged: (e) async {
-          final transactionDateString = DateUtils.formatAppDate(
-            e.transactionDate,
-            _settingsService.getCurrentLanguageModel(),
-            DateUtils.monthDayAndYearFormat,
-          );
-          return currentState.copyWith(
-            transactionDate: e.transactionDate,
-            isTransactionDateValid: _isTransactionDateValid(e.transactionDate, currentState.repetitionCycle),
-            transactionDateString: transactionDateString,
-          );
-        },
-        repetitionCycleChanged: (e) async {
-          final transactionDate = _getInitialDateToUse(e.repetitionCycle);
-          final transactionDateString = DateUtils.formatAppDate(
-            transactionDate,
-            _settingsService.getCurrentLanguageModel(),
-            DateUtils.monthDayAndYearFormat,
-          );
-          final firstDate = _getFirstDateToUse(e.repetitionCycle, transactionDate);
-
-          return currentState.copyWith(
-            transactionDate: transactionDate,
-            firstDate: firstDate,
-            repetitionCycle: e.repetitionCycle,
-            isTransactionDateValid: _isTransactionDateValid(transactionDate, e.repetitionCycle),
-            transactionDateString: transactionDateString,
-          );
-        },
-        categoryWasUpdated: (e) async => currentState.copyWith(category: e.category, isCategoryValid: true),
-        imageChanged: (e) async => currentState.copyWith(imagePath: e.path, imageExists: e.imageExists),
-        isRunningChanged: (e) async => _isRunningChanged(e.isRunning),
-        deleteTransaction: (e) async => _deleteTransaction(currentState.id, e.keepChildren),
-        submit: (e) async => _saveTransaction(),
+    on<TransactionFormEventDescriptionChanged>((event, emit) {
+      final s = currentState.copyWith(
+        description: event.description,
+        isDescriptionValid: _isDescriptionValid(event.description),
+        isDescriptionDirty: true,
       );
-      yield s;
+      emit(s);
+    });
 
-      if (event is _IsRunningChanged) {
-        yield currentState.copyWith(nextRecurringDateWasUpdated: false);
-      }
+    on<TransactionFormEventLongDescriptionChanged>((event, emit) {
+      final s = currentState.copyWith(
+        longDescription: event.longDescription,
+        isDescriptionValid: _isLongDescriptionValid(event.longDescription),
+        isDescriptionDirty: true,
+      );
+      emit(s);
+    });
+
+    on<TransactionFormEventTransactionDateChanged>((event, emit) {
+      final transactionDateString = DateUtils.formatAppDate(
+        event.transactionDate,
+        _settingsService.getCurrentLanguageModel(),
+        DateUtils.monthDayAndYearFormat,
+      );
+      final s = currentState.copyWith(
+        transactionDate: event.transactionDate,
+        isTransactionDateValid: _isTransactionDateValid(event.transactionDate, currentState.repetitionCycle),
+        transactionDateString: transactionDateString,
+      );
+      emit(s);
+    });
+
+    on<TransactionFormEventRepetitionCycleChanged>((event, emit) {
+      final transactionDate = _getInitialDateToUse(event.repetitionCycle);
+      final transactionDateString = DateUtils.formatAppDate(
+        transactionDate,
+        _settingsService.getCurrentLanguageModel(),
+        DateUtils.monthDayAndYearFormat,
+      );
+      final firstDate = _getFirstDateToUse(event.repetitionCycle, transactionDate);
+      final s = currentState.copyWith(
+        transactionDate: transactionDate,
+        firstDate: firstDate,
+        repetitionCycle: event.repetitionCycle,
+        isTransactionDateValid: _isTransactionDateValid(transactionDate, event.repetitionCycle),
+        transactionDateString: transactionDateString,
+      );
+      emit(s);
+    });
+
+    on<TransactionFormEventCategoryWasUpdated>((event, emit) {
+      final s = currentState.copyWith(category: event.category, isCategoryValid: true);
+      emit(s);
+    });
+
+    on<TransactionFormEventImageChanged>((event, emit) {
+      final s = currentState.copyWith(imagePath: event.path, imageExists: event.imageExists);
+      emit(s);
+    });
+
+    on<TransactionFormEventIsRunningChanged>(
+      (event, emit) => _onSaveOrDelete(emit, () async {
+        final s = await _isRunningChanged(event.isRunning);
+        emit(s);
+        emit(currentState.copyWith(nextRecurringDateWasUpdated: false));
+      }),
+    );
+
+    on<TransactionFormEventDeleteTransaction>(
+      (event, emit) => _onSaveOrDelete(emit, () async {
+        final s = await _deleteTransaction(currentState.id, event.keepChildren);
+        emit(s);
+      }),
+    );
+
+    on<TransactionFormEventSubmit>(
+      (event, emit) => _onSaveOrDelete(emit, () async {
+        emit(currentState.copyWith(isSavingForm: true));
+        final s = await _saveTransaction();
+        emit(s);
+      }),
+    );
+  }
+
+  TransactionFormStateInitialState get currentState => state as TransactionFormStateInitialState;
+
+  Future<void> _onSaveOrDelete(Emitter<TransactionFormState> emit, Future<void> Function() body) async {
+    try {
+      await body.call();
     } catch (e, s) {
       _logger.error(runtimeType, 'Unknown error', e, s);
-      yield currentState.copyWith(errorOccurred: true, isSavingForm: false);
-      yield currentState.copyWith(errorOccurred: false);
+      emit(currentState.copyWith(errorOccurred: true, isSavingForm: false));
+      emit(currentState.copyWith(errorOccurred: false));
     }
   }
 
-  _InitialState _initialState() {
+  TransactionFormStateInitialState _initialState() {
     final cat = CategoryUtils.getByName(CategoryUtils.question);
-    final category = CategoryItem(
-      id: 0,
-      isAnIncome: false,
-      name: cat.name,
-      icon: cat.icon.icon,
-      iconColor: material.Colors.blue,
-    );
+    final category = CategoryItem(id: 0, isAnIncome: false, name: cat.name, icon: cat.icon.icon, iconColor: material.Colors.blue);
     final language = _settingsService.language;
     final now = DateTime.now();
-    final transactionDateString = DateUtils.formatAppDate(now, _settingsService.getCurrentLanguageModel(), DateUtils.monthDayAndYearFormat);
+    final transactionDateString = DateUtils.formatAppDate(
+      now,
+      _settingsService.getCurrentLanguageModel(),
+      DateUtils.monthDayAndYearFormat,
+    );
 
     return TransactionFormState.initial(
-      id: 0,
-      amount: 0,
-      isAmountValid: false,
-      isAmountDirty: false,
-      description: '',
-      isDescriptionValid: false,
-      isDescriptionDirty: false,
-      transactionDate: now,
-      transactionDateString: transactionDateString,
-      isTransactionDateValid: true,
-      firstDate: DateTime(now.year - 1),
-      lastDate: DateTime(now.year + 10),
-      repetitionCycle: RepetitionCycleType.none,
-      category: category,
-      isCategoryValid: false,
-      language: language,
-      languageModel: _settingsService.getCurrentLanguageModel(),
-      isLongDescriptionDirty: false,
-      isLongDescriptionValid: true,
-      longDescription: '',
-    ) as _InitialState;
+          id: 0,
+          amount: 0,
+          isAmountValid: false,
+          isAmountDirty: false,
+          description: '',
+          isDescriptionValid: false,
+          isDescriptionDirty: false,
+          transactionDate: now,
+          transactionDateString: transactionDateString,
+          isTransactionDateValid: true,
+          firstDate: DateTime(now.year - 1),
+          lastDate: DateTime(now.year + 10),
+          repetitionCycle: RepetitionCycleType.none,
+          category: category,
+          isCategoryValid: false,
+          language: language,
+          languageModel: _settingsService.getCurrentLanguageModel(),
+          isLongDescriptionDirty: false,
+          isLongDescriptionValid: true,
+          longDescription: '',
+        )
+        as TransactionFormStateInitialState;
   }
 
-  Future<_InitialState> _edit(int id) async {
+  Future<TransactionFormStateInitialState> _edit(int id) async {
     final transaction = await _transactionsDao.getTransaction(id);
     String? imgPath = transaction.imagePath;
 
@@ -207,14 +244,12 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
 
   bool _isAmountValid(double amount) => amount != 0 && '$amount'.length <= maxAmountLength;
 
-  bool _isDescriptionValid(String description) => !description.isNullOrEmpty(minLength: minDescriptionLength, maxLength: maxDescriptionLength);
+  bool _isDescriptionValid(String description) =>
+      !description.isNullOrEmpty(minLength: minDescriptionLength, maxLength: maxDescriptionLength);
 
   bool _isLongDescriptionValid(String description) =>
       description.isNullEmptyOrWhitespace ||
-      !description.isNullOrEmpty(
-        minLength: minLongDescriptionLength,
-        maxLength: maxLongDescriptionLength,
-      );
+      !description.isNullOrEmpty(minLength: minLongDescriptionLength, maxLength: maxLongDescriptionLength);
 
   bool _isTransactionDateValid(DateTime date, RepetitionCycleType cycle) {
     if (cycle == RepetitionCycleType.none) return true;
@@ -252,10 +287,7 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
     try {
       _logger.info(runtimeType, '_deleteTransaction: Getting transactionId = $id');
       if (currentState.isParentTransaction) {
-        _logger.info(
-          runtimeType,
-          '_deleteTransaction: Trying to delete parent transactionId = $id and children = $keepChildren',
-        );
+        _logger.info(runtimeType, '_deleteTransaction: Trying to delete parent transactionId = $id and children = $keepChildren');
         await _transactionsDao.deleteParentTransaction(id, keepChildTransactions: keepChildren);
         return TransactionFormState.deleted(DateTime.now());
       }
@@ -326,9 +358,10 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
     final tomorrow = now.add(const Duration(days: 1));
     final inFifteenDate = DateUtils.getNextBiweeklyDate(now);
 
-    final firstDate = cycle == RepetitionCycleType.none
-        ? DateTime(now.year - 1)
-        : cycle == RepetitionCycleType.biweekly
+    final firstDate =
+        cycle == RepetitionCycleType.none
+            ? DateTime(now.year - 1)
+            : cycle == RepetitionCycleType.biweekly
             ? inFifteenDate
             : tomorrow;
 
@@ -342,9 +375,10 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
     final tomorrow = now.add(const Duration(days: 1));
     final inFifteenDate = DateUtils.getNextBiweeklyDate(now);
 
-    final transactionDate = cycle == RepetitionCycleType.none
-        ? now
-        : cycle == RepetitionCycleType.biweekly
+    final transactionDate =
+        cycle == RepetitionCycleType.none
+            ? now
+            : cycle == RepetitionCycleType.biweekly
             ? inFifteenDate
             : tomorrow;
 
@@ -354,7 +388,9 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
   TransactionItem _toTransactionItem(String? imgFilename) {
     final amountToSave = currentState.amount.abs();
     final nextRecurringDate =
-        currentState.repetitionCycle == RepetitionCycleType.none || !currentState.isRecurringTransactionRunning ? null : currentState.transactionDate;
+        currentState.repetitionCycle == RepetitionCycleType.none || !currentState.isRecurringTransactionRunning
+            ? null
+            : currentState.transactionDate;
     final isParentTransaction = nextRecurringDate != null;
 
     return TransactionItem(

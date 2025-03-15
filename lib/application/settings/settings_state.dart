@@ -1,8 +1,8 @@
 part of 'settings_bloc.dart';
 
 @freezed
-class SettingsState with _$SettingsState {
-  const factory SettingsState.loading() = _LoadingState;
+sealed class SettingsState with _$SettingsState {
+  const factory SettingsState.loading() = SettingsStateLoadingState;
 
   const factory SettingsState.initial({
     required AppThemeType appTheme,
@@ -20,5 +20,5 @@ class SettingsState with _$SettingsState {
     required bool showNotificationForRecurringTrans,
     required String appName,
     required String appVersion,
-  }) = _InitialState;
+  }) = SettingsStateInitialState;
 }

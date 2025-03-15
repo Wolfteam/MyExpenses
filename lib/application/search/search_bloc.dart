@@ -17,42 +17,87 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   final UsersDao _usersDao;
   final SettingsService _settingsService;
 
-  _InitialState get currentState => state as _InitialState;
+  SearchStateInitialState get currentState => state as SearchStateInitialState;
 
-  SearchBloc(
-    this._logger,
-    this._transactionsDao,
-    this._usersDao,
-    this._settingsService,
-  ) : super(const SearchState.loading());
+  SearchBloc(this._logger, this._transactionsDao, this._usersDao, this._settingsService) : super(const SearchState.loading()) {
+    on<SearchEventInit>((event, emit) async {
+      emit(const SearchState.loading());
+      final s = await _init();
+      emit(s);
+    });
 
-  @override
-  Stream<SearchState> mapEventToState(SearchEvent event) async* {
-    if (event is _Init) {
-      yield const SearchState.loading();
-    }
-    final s = await event.map(
-      init: (_) async => _init(),
-      loadMore: (_) async => _loadMore(),
-      descriptionChanged: (e) async => _descriptionChanged(e.newValue),
-      applyTempDates: (_) async => _applyTempDates(),
-      tempFromDateChanged: (e) async => _tempFromDateChanged(e.newValue),
-      tempToDateChanged: (e) async => _tempToDateChanged(e.newValue),
-      resetTempDates: (_) async => _resetTempDates(),
-      applyTempAmount: (_) async => _applyTempAmount(),
-      tempAmountChanged: (e) async => _tempAmountChanged(e.newValue),
-      tempComparerTypeChanged: (e) async => _tempComparerTypeChanged(e.newValue),
-      comparerTypeChanged: (e) async => _comparerTypeChanged(e.newValue),
-      categoryChanged: (e) async => _categoryChanged(e.newValue),
-      transactionFilterChanged: (e) async => _transactionFilterChanged(e.newValue),
-      sortDirectionChanged: (e) async => _sortDirectionChanged(e.newValue),
-      transactionTypeChanged: (e) async => _transactionTypeChanged(e.newValue),
-    );
+    on<SearchEventLoadMore>((event, emit) async {
+      final s = await _loadMore();
+      emit(s);
+    });
 
-    yield s;
+    on<SearchEventDescriptionChanged>((event, emit) async {
+      final s = await _descriptionChanged(event.newValue);
+      emit(s);
+    });
+
+    on<SearchEventApplyTempDates>((event, emit) async {
+      final s = await _applyTempDates();
+      emit(s);
+    });
+
+    on<SearchEventTempFromDateChanged>((event, emit) {
+      final s = _tempFromDateChanged(event.newValue);
+      emit(s);
+    });
+
+    on<SearchEventTempToDateChanged>((event, emit) {
+      final s = _tempToDateChanged(event.newValue);
+      emit(s);
+    });
+
+    on<SearchEventResetTempDates>((event, emit) {
+      final s = _resetTempDates();
+      emit(s);
+    });
+
+    on<SearchEventApplyTempAmount>((event, emit) async {
+      final s = await _applyTempAmount();
+      emit(s);
+    });
+
+    on<SearchEventTempAmountChanged>((event, emit) {
+      final s = _tempAmountChanged(event.newValue);
+      emit(s);
+    });
+
+    on<SearchEventTempComparerTypeChanged>((event, emit) {
+      final s = _tempComparerTypeChanged(event.newValue);
+      emit(s);
+    });
+
+    on<SearchEventComparerTypeChanged>((event, emit) async {
+      final s = await _comparerTypeChanged(event.newValue);
+      emit(s);
+    });
+
+    on<SearchEventCategoryChanged>((event, emit) async {
+      final s = await _categoryChanged(event.newValue);
+      emit(s);
+    });
+
+    on<SearchEventTransactionFilterChanged>((event, emit) async {
+      final s = await _transactionFilterChanged(event.newValue);
+      emit(s);
+    });
+
+    on<SearchEventSortDirectionChanged>((event, emit) async {
+      final s = await _sortDirectionChanged(event.newValue);
+      emit(s);
+    });
+
+    on<SearchEventTransactionTypeChanged>((event, emit) async {
+      final s = await _transactionTypeChanged(event.newValue);
+      emit(s);
+    });
   }
 
-  Future<SearchState> _init() async {
+  Future<SearchState> _init() {
     final now = DateTime.now();
     final from = DateUtils.getFirstDayDateOfTheMonth(now);
     final to = DateUtils.getLastDayDateOfTheMonth(now);
@@ -256,7 +301,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       );
       final hasReachedMax = transactions.isEmpty || transactions.length < take;
       final lang = _settingsService.getCurrentLanguageModel();
-      if (state is! _InitialState) {
+      if (state is! SearchStateInitialState) {
         return SearchState.initial(
           currentLanguage: languageType,
           hasReachedMax: hasReachedMax,

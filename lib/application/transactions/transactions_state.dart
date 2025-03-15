@@ -1,8 +1,9 @@
 part of 'transactions_bloc.dart';
 
 @freezed
-class TransactionsState with _$TransactionsState {
-  const factory TransactionsState.loading() = _LoadingState;
+sealed class TransactionsState with _$TransactionsState {
+  const factory TransactionsState.loading() = TransactionsStateLoadingState;
+
   const factory TransactionsState.loaded({
     required DateTime currentDate,
     required LanguageModel language,
@@ -11,5 +12,5 @@ class TransactionsState with _$TransactionsState {
     required List<TransactionCardItems> transactions,
     required List<TransactionCardItems> recurringTransactions,
     required List<TransactionCardItems> groupedTransactionsByCategory,
-  }) = _LoadedState;
+  }) = TransactionsStateLoadedState;
 }

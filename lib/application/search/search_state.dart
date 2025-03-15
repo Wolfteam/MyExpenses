@@ -1,8 +1,9 @@
 part of 'search_bloc.dart';
 
 @freezed
-class SearchState with _$SearchState {
-  const factory SearchState.loading() = _LoadingState;
+sealed class SearchState with _$SearchState {
+  const factory SearchState.loading() = SearchStateLoadingState;
+
   const factory SearchState.initial({
     required AppLanguageType currentLanguage,
     required List<TransactionItem> transactions,
@@ -23,5 +24,5 @@ class SearchState with _$SearchState {
     TransactionType? transactionType,
     required TransactionFilterType transactionFilterType,
     required SortDirectionType sortDirectionType,
-  }) = _InitialState;
+  }) = SearchStateInitialState;
 }
