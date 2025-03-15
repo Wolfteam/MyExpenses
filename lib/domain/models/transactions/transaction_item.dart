@@ -6,7 +6,7 @@ part 'transaction_item.freezed.dart';
 part 'transaction_item.g.dart';
 
 @freezed
-class TransactionItem with _$TransactionItem {
+sealed class TransactionItem with _$TransactionItem {
   bool get isChildTransaction => parentTransactionId != null;
 
   const factory TransactionItem({

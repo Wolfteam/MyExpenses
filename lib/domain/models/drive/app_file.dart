@@ -6,11 +6,8 @@ part 'app_file.freezed.dart';
 part 'app_file.g.dart';
 
 @freezed
-class AppFile with _$AppFile {
-  const factory AppFile({
-    required List<Transaction> transactions,
-    required List<Category> categories,
-  }) = _AppFile;
+sealed class AppFile with _$AppFile {
+  const factory AppFile({required List<Transaction> transactions, required List<Category> categories}) = _AppFile;
 
   factory AppFile.fromJson(Map<String, dynamic> json) => _$AppFileFromJson(json);
 }

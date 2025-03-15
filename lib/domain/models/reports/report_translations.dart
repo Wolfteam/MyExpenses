@@ -11,7 +11,7 @@ typedef AppVersion = String Function(String version);
 typedef ReportWasSuccessfullyGenerated = String Function(String filename);
 
 @freezed
-class ReportTranslations with _$ReportTranslations {
+sealed class ReportTranslations with _$ReportTranslations {
   const factory ReportTranslations({
     required String appName,
     required String transactions,

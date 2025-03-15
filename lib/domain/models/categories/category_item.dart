@@ -5,7 +5,7 @@ part 'category_item.freezed.dart';
 part 'category_item.g.dart';
 
 @freezed
-class CategoryItem with _$CategoryItem {
+sealed class CategoryItem with _$CategoryItem {
   const factory CategoryItem({
     required int id,
     required bool isAnIncome,

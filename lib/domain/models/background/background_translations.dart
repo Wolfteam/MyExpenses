@@ -4,7 +4,7 @@ part 'background_translations.freezed.dart';
 part 'background_translations.g.dart';
 
 @freezed
-class BackgroundTranslations with _$BackgroundTranslations {
+sealed class BackgroundTranslations with _$BackgroundTranslations {
   const factory BackgroundTranslations({
     required String automaticSync,
     required String unknownErrorOccurred,
