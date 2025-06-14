@@ -15,7 +15,7 @@ class EstimateBottomSheetDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: BlocProvider<EstimatesBloc>(
-        create: (ctx) => Injection.estimatesBloc..add(EstimatesEvent.load()),
+        create: (ctx) => Injection.estimatesBloc..add(const EstimatesEvent.load()),
         child: Container(
           margin: Styles.modalBottomSheetContainerMargin,
           padding: Styles.modalBottomSheetContainerPadding,
@@ -34,52 +34,46 @@ class _Body extends StatelessWidget {
     final theme = Theme.of(context);
     final i18n = S.of(context);
     return BlocBuilder<EstimatesBloc, EstimatesState>(
-      builder: (ctx, state) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: state.map(
-          loading: (_) => [],
-          loaded: (s) => [
-            ModalSheetSeparator(),
-            Text(
-              '${i18n.estimates} - ${_getSelectedTransactionText(i18n, s.selectedTransactionType)}',
-              style: theme.textTheme.titleLarge,
-            ),
-            EstimatesToggleButtons(
-              selectedButtons: _getSelectedButtons(s.selectedTransactionType),
-            ),
-            Text('${i18n.startDate}:'),
-            TextButton(
-              style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-              onPressed: () => _changeDate(context, s.fromDate, s.currentLanguage, true),
-              child: Align(alignment: Alignment.centerLeft, child: Text(s.fromDateString)),
-            ),
-            Text('${i18n.untilDate}:'),
-            TextButton(
-              style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-              onPressed: () => _changeDate(context, s.untilDate, s.currentLanguage, false),
-              child: Align(alignment: Alignment.centerLeft, child: Text(s.untilDateString)),
-            ),
-            Divider(color: theme.colorScheme.secondary),
-            Text('${i18n.period}: ${s.fromDateString} - ${s.untilDateString}'),
-            EstimatesSummary(
-              selectedButtons: _getSelectedButtons(s.selectedTransactionType),
-              income: s.incomeAmount,
-              expenses: s.expenseAmount,
-              total: s.totalAmount,
-            ),
-            OverflowBar(
-              alignment: MainAxisAlignment.end,
-              children: <Widget>[
+      builder:
+          (ctx, state) => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: switch (state) {
+              EstimatesStateEstimatesLoadingState() => [],
+              EstimatesStateEstimatesInitialState() => [
+                ModalSheetSeparator(),
+                Text(
+                  '${i18n.estimates} - ${_getSelectedTransactionText(i18n, state.selectedTransactionType)}',
+                  style: theme.textTheme.titleLarge,
+                ),
+                EstimatesToggleButtons(selectedButtons: _getSelectedButtons(state.selectedTransactionType)),
+                Text('${i18n.startDate}:'),
                 TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(i18n.close),
+                  style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                  onPressed: () => _changeDate(context, state.fromDate, state.currentLanguage, true),
+                  child: Align(alignment: Alignment.centerLeft, child: Text(state.fromDateString)),
+                ),
+                Text('${i18n.untilDate}:'),
+                TextButton(
+                  style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                  onPressed: () => _changeDate(context, state.untilDate, state.currentLanguage, false),
+                  child: Align(alignment: Alignment.centerLeft, child: Text(state.untilDateString)),
+                ),
+                Divider(color: theme.colorScheme.secondary),
+                Text('${i18n.period}: ${state.fromDateString} - ${state.untilDateString}'),
+                EstimatesSummary(
+                  selectedButtons: _getSelectedButtons(state.selectedTransactionType),
+                  income: state.incomeAmount,
+                  expenses: state.expenseAmount,
+                  total: state.totalAmount,
+                ),
+                OverflowBar(
+                  alignment: MainAxisAlignment.end,
+                  children: <Widget>[TextButton(onPressed: () => Navigator.pop(context), child: Text(i18n.close))],
                 ),
               ],
-            ),
-          ],
-        ),
-      ),
+            },
+          ),
     );
   }
 
@@ -100,7 +94,7 @@ class _Body extends StatelessWidget {
       } else {
         context.read<EstimatesBloc>().add(EstimatesEvent.untilDateChanged(newDate: selectedDate));
       }
-      context.read<EstimatesBloc>().add(EstimatesEvent.calculate());
+      context.read<EstimatesBloc>().add(const EstimatesEvent.calculate());
     });
   }
 

@@ -8,12 +8,7 @@ class SearchBoxCard extends StatelessWidget {
   final FocusNode focusNode;
   final TextEditingController controller;
 
-  const SearchBoxCard({
-    super.key,
-    required this.showCleanButton,
-    required this.focusNode,
-    required this.controller,
-  });
+  const SearchBoxCard({super.key, required this.showCleanButton, required this.focusNode, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +21,7 @@ class SearchBoxCard extends StatelessWidget {
       shape: Styles.floatingCardShape,
       child: Row(
         children: <Widget>[
-          Container(
-            margin: const EdgeInsets.only(left: 10),
-            child: const Icon(Icons.search, size: 30),
-          ),
+          Container(margin: const EdgeInsets.only(left: 10), child: const Icon(Icons.search, size: 30)),
           Expanded(
             child: TextField(
               controller: controller,
@@ -48,11 +40,7 @@ class SearchBoxCard extends StatelessWidget {
             ),
           ),
           if (showCleanButton)
-            IconButton(
-              icon: const Icon(Icons.close),
-              splashRadius: Styles.iconButtonSplashRadius,
-              onPressed: _cleanSearchText,
-            ),
+            IconButton(icon: const Icon(Icons.close), splashRadius: Styles.iconButtonSplashRadius, onPressed: _cleanSearchText),
         ],
       ),
     );

@@ -4,7 +4,7 @@ part 'category.freezed.dart';
 part 'category.g.dart';
 
 @freezed
-class Category with _$Category {
+sealed class Category with _$Category {
   const factory Category({
     required String name,
     required bool isAnIncome,

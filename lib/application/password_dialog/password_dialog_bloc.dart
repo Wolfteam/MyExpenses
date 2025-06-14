@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
@@ -31,55 +29,61 @@ class PasswordDialogBloc extends Bloc<PasswordDialogEvent, PasswordDialogState> 
   static int maxLength = 10;
   static int minLength = 3;
 
-  PasswordDialogBloc(this._logger, this._secureStorageService) : super(_initialState);
-
-  @override
-  Stream<PasswordDialogState> mapEventToState(
-    PasswordDialogEvent event,
-  ) async* {
-    final s = await event.map(
-      passwordChanged: (e) async => state.copyWith(
-        password: e.newValue,
-        isPasswordValid: _isPasswordValid(e.newValue),
+  PasswordDialogBloc(this._logger, this._secureStorageService) : super(_initialState) {
+    on<PasswordDialogEventPasswordChanged>((event, emit) {
+      final s = state.copyWith(
+        password: event.newValue,
+        isPasswordValid: _isPasswordValid(event.newValue),
         isPasswordDirty: true,
         isConfirmPasswordValid: _isPasswordValid(state.confirmPassword),
-        passwordsMatch: _passwordMatches(e.newValue, state.confirmPassword),
-      ),
-      showPassword: (e) async => state.copyWith(showPassword: e.show),
-      confirmPasswordChanged: (e) async => state.copyWith(
+        passwordsMatch: _passwordMatches(event.newValue, state.confirmPassword),
+      );
+      emit(s);
+    });
+
+    on<PasswordDialogEventShowPasswod>((event, emit) {
+      final s = state.copyWith(showPassword: event.show);
+      emit(s);
+    });
+
+    on<PasswordDialogEventConfirmPasswordChanged>((event, emit) {
+      final s = state.copyWith(
         isPasswordValid: _isPasswordValid(state.password),
-        confirmPassword: e.newValue,
+        confirmPassword: event.newValue,
         isConfirmPasswordDirty: true,
-        isConfirmPasswordValid: _isPasswordValid(e.newValue),
-        passwordsMatch: _passwordMatches(state.password, e.newValue),
-      ),
-      showConfirmPassword: (e) async => state.copyWith(showConfirmPassword: e.show),
-      submit: (e) async {
-        _logger.info(runtimeType, 'Trying to save password...');
-        final hash = _getHashedPassword(state.password);
-        _secureStorageService.save(SecureResourceType.loginPassword, _secureStorageService.defaultUsername, hash);
+        isConfirmPasswordValid: _isPasswordValid(event.newValue),
+        passwordsMatch: _passwordMatches(state.password, event.newValue),
+      );
+      emit(s);
+    });
 
-        _logger.info(runtimeType, 'Password was successfully saved...');
+    on<PasswordDialogEventShowConfirmPasswod>((event, emit) {
+      final s = state.copyWith(showConfirmPassword: event.show);
+      emit(s);
+    });
 
-        return state.copyWith(passwordWasSaved: true);
-      },
-      validatePassword: (e) async {
-        final pass = await _secureStorageService.get(SecureResourceType.loginPassword, _secureStorageService.defaultUsername);
-        final hasher = HashCrypt(algo: HashAlgo.Blake2b);
-        final isValid = hasher.check(plain: e.password, hashed: pass!);
-        return state.copyWith(userIsValid: isValid);
-      },
-    );
+    on<PasswordDialogEventSubmit>((event, emit) {
+      _logger.info(runtimeType, 'Trying to save password...');
+      final hash = _getHashedPassword(state.password);
+      _secureStorageService.save(SecureResourceType.loginPassword, _secureStorageService.defaultUsername, hash);
 
-    yield s;
+      _logger.info(runtimeType, 'Password was successfully saved...');
+      final s = state.copyWith(passwordWasSaved: true);
+      emit(s);
+      emit(_initialState);
+    });
 
-    if (event is _Submit) {
-      yield _initialState;
-    }
+    on<PasswordDialogEventValidatePassword>((event, emit) async {
+      final pass = await _secureStorageService.get(SecureResourceType.loginPassword, _secureStorageService.defaultUsername);
+      final hasher = HashCrypt(algo: HashAlgo.Blake2b);
+      final isValid = hasher.check(plain: event.password, hashed: pass!);
+      final s = state.copyWith(userIsValid: isValid);
+      emit(s);
 
-    if (event is _ValidatePassword && state.userIsValid == true) {
-      yield _initialState;
-    }
+      if (s.userIsValid == true) {
+        emit(_initialState);
+      }
+    });
   }
 
   bool _isPasswordValid(String password) => !password.isNullOrEmpty(minLength: minLength, maxLength: maxLength);

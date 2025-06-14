@@ -5,14 +5,11 @@ import 'package:my_expenses/presentation/shared/mixins/transaction_mixin.dart';
 part 'transactions_summary_per_month.freezed.dart';
 
 @freezed
-class TransactionsSummaryPerMonth with _$TransactionsSummaryPerMonth, TransactionMixin {
+sealed class TransactionsSummaryPerMonth with _$TransactionsSummaryPerMonth, TransactionMixin {
   Color get color => getTransactionColor(isAnIncome: isAnIncome);
 
-  const factory TransactionsSummaryPerMonth({
-    required int order,
-    required double percentage,
-    required bool isAnIncome,
-  }) = _TransactionsSummaryPerMonth;
+  const factory TransactionsSummaryPerMonth({required int order, required double percentage, required bool isAnIncome}) =
+      _TransactionsSummaryPerMonth;
 
   const TransactionsSummaryPerMonth._();
 }

@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-enum _ToastType {
-  info,
-  succeed,
-  warning,
-  error,
-}
+enum _ToastType { info, succeed, warning, error }
 
 class ToastUtils {
   static Duration toastDuration = const Duration(seconds: 2);
@@ -41,38 +36,20 @@ class ToastUtils {
       case _ToastType.error:
         bgColor = Colors.red;
         icon = const Icon(Icons.dangerous, color: Colors.white);
-      default:
-        throw Exception('Invalid toast type = $type');
     }
 
     final widget = _buildToast(msg, textColor, bgColor, icon, toast.context!);
-    toast.showToast(
-      child: widget,
-      gravity: ToastGravity.BOTTOM,
-      toastDuration: toastDuration,
-    );
+    toast.showToast(child: widget, gravity: ToastGravity.BOTTOM, toastDuration: toastDuration);
   }
 
   static Widget _buildToast(String msg, Color textColor, Color bgColor, Icon icon, BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(25.0),
-        color: bgColor,
-      ),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(25.0), color: bgColor),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          icon,
-          const SizedBox(width: 10.0),
-          Flexible(
-            child: Text(
-              msg,
-              style: TextStyle(color: textColor),
-            ),
-          ),
-        ],
+        children: [icon, const SizedBox(width: 10.0), Flexible(child: Text(msg, style: TextStyle(color: textColor)))],
       ),
     );
   }

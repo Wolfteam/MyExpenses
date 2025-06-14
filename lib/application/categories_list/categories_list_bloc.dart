@@ -16,58 +16,50 @@ abstract class _CategoriesListBloc extends Bloc<CategoriesListEvent, CategoriesL
   final CategoriesDao _categoriesDao;
   final UsersDao _usersDao;
 
-  _CategoriesListBloc(this._logger, this._categoriesDao, this._usersDao) : super(const CategoriesListState.loading());
+  _CategoriesListBloc(this._logger, this._categoriesDao, this._usersDao) : super(const CategoriesListState.loading()) {
+    on<CategoriesListEventGetCategories>((event, emit) async {
+      final s = await _loadCategories(event);
+      emit(s);
+    });
 
-  _LoadedState get currentState => state as _LoadedState;
+    on<CategoriesListEventCategoryWasSelected>((event, emit) {
+      final s = _categorySelected(event);
+      emit(s);
+    });
 
-  @override
-  Stream<CategoriesListState> mapEventToState(
-    CategoriesListEvent event,
-  ) async* {
-    final s = await event.map(
-      getCategories: (e) async => _loadCategories(e),
-      categoryWasSelected: (e) async => _categorySelected(e),
-      unSelectAll: (_) async {
-        if (state is! _LoadedState) {
-          return state;
-        }
-        final categories = _changeSelectedState(false);
-        return currentState.copyWith.call(categories: categories);
-      },
-    );
-
-    yield s;
+    on<CategoriesListEventUnselectAll>((event, emit) {
+      if (state is! CategoriesListStateLoadedState) {
+        return;
+      }
+      final categories = _changeSelectedState(false);
+      final s = currentState.copyWith.call(categories: categories);
+      emit(s);
+    });
   }
 
-  Future<CategoriesListState> _loadCategories(_GetCategories event) async {
+  CategoriesListStateLoadedState get currentState => state as CategoriesListStateLoadedState;
+
+  Future<CategoriesListState> _loadCategories(CategoriesListEventGetCategories event) async {
     try {
       _logger.info(
         runtimeType,
         '_loadCategories: Trying to get all the ${event.loadIncomes ? "incomes" : "expenses"} categories',
       );
       final currentUser = await _usersDao.getActiveUser();
-      final categories = await _categoriesDao.getAllCategories(
-        event.loadIncomes,
-        currentUser?.id,
-      );
+      final categories = await _categoriesDao.getAllCategories(event.loadIncomes, currentUser?.id);
 
       if (event.selectedCategory != null && categories.any((t) => t.id == event.selectedCategory!.id)) {
         _setSelectedItem(event.selectedCategory!.id, categories);
       }
       return buildCategoriesLoadedState(categories);
     } catch (e, s) {
-      _logger.error(
-        runtimeType,
-        '_loadCategories: Unknown error occurred',
-        e,
-        s,
-      );
+      _logger.error(runtimeType, '_loadCategories: Unknown error occurred', e, s);
       return buildCategoriesLoadedState([]);
     }
   }
 
-  CategoriesListState _categorySelected(_CategoryWasSelected event) {
-    if (state is! _LoadedState || !currentState.categories.any((c) => c.id == event.selectedCategory.id)) {
+  CategoriesListState _categorySelected(CategoriesListEventCategoryWasSelected event) {
+    if (state is! CategoriesListStateLoadedState || !currentState.categories.any((c) => c.id == event.selectedCategory.id)) {
       return state;
     }
 
@@ -99,11 +91,7 @@ abstract class _CategoriesListBloc extends Bloc<CategoriesListEvent, CategoriesL
 }
 
 class IncomesCategoriesBloc extends _CategoriesListBloc {
-  IncomesCategoriesBloc(
-    super.logger,
-    super.categoriesDao,
-    super.usersDao,
-  );
+  IncomesCategoriesBloc(super.logger, super.categoriesDao, super.usersDao);
 
   @override
   CategoriesListState buildCategoriesLoadedState(List<CategoryItem> categories) {
@@ -112,11 +100,7 @@ class IncomesCategoriesBloc extends _CategoriesListBloc {
 }
 
 class ExpensesCategoriesBloc extends _CategoriesListBloc {
-  ExpensesCategoriesBloc(
-    super.logger,
-    super.categoriesDao,
-    super.usersDao,
-  );
+  ExpensesCategoriesBloc(super.logger, super.categoriesDao, super.usersDao);
 
   @override
   CategoriesListState buildCategoriesLoadedState(List<CategoryItem> categories) {

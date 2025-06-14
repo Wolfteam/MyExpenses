@@ -22,7 +22,7 @@ class SyncServiceImpl implements SyncService {
   static const _appFile = 'app_file.json';
   static const _readmeFile = 'README.md';
 
-  Future<Directory?> get _appDir async {
+  Future<Directory?> get _appDir {
     if (Platform.isIOS) {
       return getApplicationDocumentsDirectory();
     }
@@ -118,9 +118,7 @@ class SyncServiceImpl implements SyncService {
     }
   }
 
-  Future<void> _uploadAppFile(
-    String currentUser,
-  ) async {
+  Future<void> _uploadAppFile(String currentUser) async {
     try {
       _logger.info(runtimeType, '_uploadAppFile: Trying to upload app file to drive');
       final filePath = await appFilePath;
@@ -152,10 +150,7 @@ class SyncServiceImpl implements SyncService {
 
       final transactions = await _transactionsDao.getAllTransactionsToSync(currentUser.id);
 
-      _logger.info(
-        runtimeType,
-        'createAppFile: Getting all categories to save..',
-      );
+      _logger.info(runtimeType, 'createAppFile: Getting all categories to save..');
       final categories = await _categoriesDao.getAllCategoriesToSync(currentUser.id);
 
       final appFile = AppFile(transactions: transactions, categories: categories);
@@ -176,7 +171,8 @@ class SyncServiceImpl implements SyncService {
       _logger.info(runtimeType, '_createReadmeFile: Creating $_readmeFile');
       final path = await readmeFilePath;
       final file = File(path);
-      const contents = 'DO NOT DELETE NOR MODIFY THIS FOLDER AND ITS CONTENTS.\n' +
+      const contents =
+          'DO NOT DELETE NOR MODIFY THIS FOLDER AND ITS CONTENTS.\n' +
           'This folder is used by MyExpenses to keep your transactions and categories synced';
       await file.writeAsString(contents);
     } catch (e, s) {
@@ -265,10 +261,7 @@ class SyncServiceImpl implements SyncService {
 
   Future<void> _updateLocalStatus(LocalStatusType newValue) {
     _logger.info(runtimeType, '_updateLocalStatus: Updating the local status for all categories and transactions');
-    return Future.wait([
-      _categoriesDao.updateAllLocalStatus(newValue),
-      _transactionsDao.updateAllLocalStatus(newValue),
-    ]);
+    return Future.wait([_categoriesDao.updateAllLocalStatus(newValue), _transactionsDao.updateAllLocalStatus(newValue)]);
   }
 
   Future<void> _uploadAllLocalImgs(int userId) async {
@@ -276,13 +269,10 @@ class SyncServiceImpl implements SyncService {
 
     try {
       final imgPath = await _pathService.getUserImgPath(userId);
-      final imgs = await Directory(imgPath)
-          .list()
-          .asyncMap((f) => f.path)
-          .where(
-            (path) => path.startsWith(_pathService.transactionImgPrefix),
-          )
-          .toList();
+      final imgs =
+          await Directory(
+            imgPath,
+          ).list().asyncMap((f) => f.path).where((path) => path.startsWith(_pathService.transactionImgPrefix)).toList();
 
       _logger.info(runtimeType, '_uploadAllLocalImgs: ${imgs.length} will be uploaded...');
 
@@ -298,9 +288,7 @@ class SyncServiceImpl implements SyncService {
   Future<void> _downloadAllRemoteImgs(int userId) async {
     try {
       _logger.info(runtimeType, '_downloadAllRemoteImgs: Trying to download all remote imgs...');
-      final currentImgsMap = await _googleService.getAllImages(
-        _pathService.transactionImgPrefix,
-      );
+      final currentImgsMap = await _googleService.getAllImages(_pathService.transactionImgPrefix);
 
       _logger.info(runtimeType, '_downloadAllRemoteImgs: ${currentImgsMap.length} images will be downloaded...');
 
@@ -320,18 +308,15 @@ class SyncServiceImpl implements SyncService {
   Future<void> _uploadPendingImgs(int userId) async {
     try {
       _logger.info(runtimeType, '_updateImgFiles: Getting all remote imgs...');
-      final currentImgsMap = await _googleService.getAllImages(
-        _pathService.transactionImgPrefix,
-      );
+      final currentImgsMap = await _googleService.getAllImages(_pathService.transactionImgPrefix);
 
       _logger.info(runtimeType, '_updateImgFiles: Getting all local imgs...');
       final imgPath = await _pathService.getUserImgPath(userId);
 
-      final imgs = await Directory(imgPath)
-          .list()
-          .asyncMap((f) => basename(f.path))
-          .where((path) => path.contains(_pathService.transactionImgPrefix))
-          .toList();
+      final imgs =
+          await Directory(
+            imgPath,
+          ).list().asyncMap((f) => basename(f.path)).where((path) => path.contains(_pathService.transactionImgPrefix)).toList();
 
       final imgsToUpload = imgs.where((filename) => !currentImgsMap.values.contains(filename)).toList();
       _logger.info(runtimeType, '_updateImgFiles: We will upload ${imgsToUpload.length} imgs...');

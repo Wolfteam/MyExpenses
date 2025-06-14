@@ -5,7 +5,7 @@ part 'transaction.freezed.dart';
 part 'transaction.g.dart';
 
 @freezed
-class Transaction with _$Transaction {
+sealed class Transaction with _$Transaction {
   const factory Transaction({
     required double amount,
     required String description,

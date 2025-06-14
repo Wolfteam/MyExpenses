@@ -5,7 +5,7 @@ import 'package:my_expenses/domain/enums/enums.dart';
 part 'category_icon.freezed.dart';
 
 @freezed
-class CategoryIcon with _$CategoryIcon {
+sealed class CategoryIcon with _$CategoryIcon {
   const factory CategoryIcon({
     required Icon icon,
     required String name,

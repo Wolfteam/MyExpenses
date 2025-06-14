@@ -41,63 +41,84 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
     this._syncService,
     this._networkService,
     this._appBloc,
-  ) : super(const UserAccountsState.loading());
+  ) : super(const UserAccountsState.loading()) {
+    on<UserAccountsEventInit>(
+      (event, emit) => _handler(event, emit, () async {
+        final s = await _initialize();
+        emit(s);
+      }),
+    );
 
-  _InitialState get currentState => state.maybeMap(
-        initial: (state) => state,
-        orElse: () => throw Exception('Invalid state'),
-      );
+    on<UserAccountsEventDeleteAccount>(
+      (event, emit) => _handler(event, emit, () async {
+        final s = await _deleteUser(event.id, currentState);
+        emit(s);
+      }),
+    );
 
-  @override
-  Stream<UserAccountsState> mapEventToState(UserAccountsEvent event) async* {
-    final isSignIn = event is _SignIn;
-    if (isSignIn) {
-      yield currentState.copyWith(signInInProcess: true);
+    on<UserAccountsEventChangeActiveAccount>(
+      (event, emit) => _handler(event, emit, () async {
+        final s = await _changeActiveUser(event.newActiveUserId, currentState);
+        emit(s);
+      }),
+    );
 
-      final isInternetAvailable = await _networkService.isInternetAvailable();
-      if (!isInternetAvailable) {
-        _logger.warning(runtimeType, '_signIn: Network is not available');
-        yield currentState.copyWith(signInInProcess: false, isNetworkAvailable: false);
-        return;
-      }
+    on<UserAccountsEventSignIn>(
+      (event, emit) => _handler(event, emit, () async {
+        emit(currentState.copyWith(signInInProcess: true));
 
-      await _googleService.signOut();
-      final isSignedIn = await _googleService.signIn();
-      if (!isSignedIn) {
-        _logger.warning(runtimeType, '_signIn: Failed');
-        yield currentState.copyWith(signInInProcess: false, signInResult: false);
-        return;
-      }
+        final isInternetAvailable = await _networkService.isInternetAvailable();
+        if (!isInternetAvailable) {
+          _logger.warning(runtimeType, '_signIn: Network is not available');
+          emit(currentState.copyWith(signInInProcess: false, isNetworkAvailable: false));
+          return;
+        }
 
-      yield currentState.copyWith(signInResult: true);
-    }
+        await _googleService.signOut();
+        final isSignedIn = await _googleService.signIn();
+        if (!isSignedIn) {
+          _logger.warning(runtimeType, '_signIn: Failed');
+          emit(currentState.copyWith(signInInProcess: false, signInResult: false));
+          return;
+        }
 
+        emit(currentState.copyWith(signInResult: true));
+        final s = await _signIn(currentState);
+        emit(s);
+      }),
+    );
+  }
+
+  UserAccountsEventInitialState get currentState => switch (state) {
+    UserAccountsEventLoadingState() => throw Exception('Invalid state'),
+    final UserAccountsEventInitialState state => state,
+  };
+
+  Future<void> _handler(UserAccountsEvent event, Emitter<UserAccountsState> emit, Future<void> Function() body) async {
+    final isSignIn = event is UserAccountsEventSignIn;
     try {
-      final s = await event.map(
-        init: (_) => _initialize(),
-        deleteAccount: (e) => _deleteUser(e.id, currentState),
-        changeActiveAccount: (e) => _changeActiveUser(e.newActiveUserId, currentState),
-        signIn: (_) => _signIn(currentState),
-      );
-
-      yield s;
+      await body.call();
     } catch (e, s) {
       _logger.error(runtimeType, 'Unknown error occurred', e, s);
       if (isSignIn) {
-        yield currentState.copyWith(signInResult: false);
+        emit(currentState.copyWith(signInResult: false));
       }
     }
 
-    yield state.maybeMap(
-      initial: (state) => state.copyWith(
-        userWasDeleted: false,
-        activeUserChanged: false,
-        signInResult: null,
-        accountWasAdded: false,
-        signInInProcess: false,
-      ),
-      orElse: () => state,
-    );
+    switch (state) {
+      case final UserAccountsEventInitialState state:
+        emit(
+          state.copyWith(
+            userWasDeleted: false,
+            activeUserChanged: false,
+            signInResult: null,
+            accountWasAdded: false,
+            signInInProcess: false,
+          ),
+        );
+      default:
+        break;
+    }
   }
 
   Future<UserAccountsState> _initialize() async {
@@ -111,7 +132,7 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
     return UserAccountsState.initial(users: updatedUsers, isNetworkAvailable: true);
   }
 
-  Future<UserAccountsState> _deleteUser(int id, _InitialState state) async {
+  Future<UserAccountsState> _deleteUser(int id, UserAccountsEventInitialState state) async {
     try {
       _logger.info(runtimeType, '_deleteUser: Trying to delete userId = $id');
       _logger.info(runtimeType, '_deleteUser: Deleting all transactions for userId = $id');
@@ -145,7 +166,7 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
     }
   }
 
-  Future<UserAccountsState> _changeActiveUser(int id, _InitialState state) async {
+  Future<UserAccountsState> _changeActiveUser(int id, UserAccountsEventInitialState state) async {
     try {
       //This is to give enough time for the button effect
       await Future.delayed(const Duration(milliseconds: 250));
@@ -164,7 +185,7 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
     }
   }
 
-  Future<UserAccountsState> _signIn(_InitialState state) async {
+  Future<UserAccountsState> _signIn(UserAccountsEventInitialState state) async {
     try {
       _logger.info(runtimeType, '_signIn: Getting user info...');
       _appBloc.add(const AppEvent.bgTaskIsRunning(isRunning: true));
@@ -176,7 +197,12 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
       await Future.wait([
         _secureStorageService.save(SecureResourceType.currentUser, _secureStorageService.defaultUsername, user.email),
         _secureStorageService.update(SecureResourceType.accessTokenData, _secureStorageService.defaultUsername, true, user.email),
-        _secureStorageService.update(SecureResourceType.accessTokenExpiricy, _secureStorageService.defaultUsername, true, user.email),
+        _secureStorageService.update(
+          SecureResourceType.accessTokenExpiricy,
+          _secureStorageService.defaultUsername,
+          true,
+          user.email,
+        ),
         _secureStorageService.update(SecureResourceType.accessTokenType, _secureStorageService.defaultUsername, true, user.email),
       ]);
 
@@ -213,6 +239,10 @@ class UserAccountsBloc extends Bloc<UserAccountsEvent, UserAccountsState> {
 
     final currentActiveUser = users.where((u) => u.isActive).first;
     _logger.info(runtimeType, '_updateSecureStorageUsername: Setting secure storage user to = ${currentActiveUser.email}');
-    await _secureStorageService.save(SecureResourceType.currentUser, _secureStorageService.defaultUsername, currentActiveUser.email);
+    await _secureStorageService.save(
+      SecureResourceType.currentUser,
+      _secureStorageService.defaultUsername,
+      currentActiveUser.email,
+    );
   }
 }

@@ -33,15 +33,9 @@ class Styles {
     final theme = Theme.of(context);
     final darkTheme = theme.brightness == Brightness.dark;
     return MonthPickerDialogSettings(
-      headerSettings: PickerHeaderSettings(
-        headerBackgroundColor: darkTheme ? theme.colorScheme.primaryContainer : theme.colorScheme.primary,
-      ),
-      dialogSettings: PickerDialogSettings(
-        locale: locale,
-      ),
-      buttonsSettings: PickerButtonsSettings(
-        unselectedMonthsTextColor: darkTheme ? Colors.white : Colors.black,
-      ),
+      headerSettings: PickerHeaderSettings(headerBackgroundColor: darkTheme ? theme.colorScheme.primaryContainer : theme.colorScheme.primary),
+      dialogSettings: PickerDialogSettings(locale: locale),
+      dateButtonsSettings: PickerDateButtonsSettings(unselectedMonthsTextColor: darkTheme ? Colors.white : Colors.black),
     );
   }
 
@@ -60,13 +54,13 @@ class Styles {
 
     final (TextStyle defaultTextStyle, BoxDecoration defaultDecoration) = switch (Theme.of(context)) {
       ThemeData(brightness: Brightness.dark, :final TextTheme textTheme, :final TargetPlatform platform) => (
-          textTheme.bodyMedium!.copyWith(color: Colors.black, fontSize: getDefaultFontSize(platform)),
-          BoxDecoration(color: Colors.white.withOpacity(0.9), borderRadius: const BorderRadius.all(Radius.circular(4))),
-        ),
+        textTheme.bodyMedium!.copyWith(color: Colors.black, fontSize: getDefaultFontSize(platform)),
+        BoxDecoration(color: Colors.white.withValues(alpha: 0.9), borderRadius: const BorderRadius.all(Radius.circular(4))),
+      ),
       ThemeData(brightness: Brightness.light, :final TextTheme textTheme, :final TargetPlatform platform) => (
-          textTheme.bodyMedium!.copyWith(color: Colors.white, fontSize: getDefaultFontSize(platform)),
-          BoxDecoration(color: Colors.grey[700]!.withOpacity(0.9), borderRadius: const BorderRadius.all(Radius.circular(4))),
-        ),
+        textTheme.bodyMedium!.copyWith(color: Colors.white, fontSize: getDefaultFontSize(platform)),
+        BoxDecoration(color: Colors.grey[700]!.withValues(alpha: 0.9), borderRadius: const BorderRadius.all(Radius.circular(4))),
+      ),
     };
 
     return (defaultTextStyle, defaultDecoration, padding);

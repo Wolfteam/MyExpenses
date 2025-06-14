@@ -1,7 +1,7 @@
 part of 'password_dialog_bloc.dart';
 
 @freezed
-class PasswordDialogState with _$PasswordDialogState {
+sealed class PasswordDialogState with _$PasswordDialogState {
   bool get isFormValid => isPasswordValid && isConfirmPasswordValid && passwordsMatch;
 
   const PasswordDialogState._();
@@ -19,5 +19,5 @@ class PasswordDialogState with _$PasswordDialogState {
     required bool passwordWasSaved,
     //this one can be null, and if it is, it means that the user has been validated
     bool? userIsValid,
-  }) = _Initial;
+  }) = PasswordDialogStateInitial;
 }

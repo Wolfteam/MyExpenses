@@ -19,17 +19,12 @@ class TransactionsSummaryPerMonthBloc extends Bloc<TransactionsSummaryPerMonthEv
   final UsersDao _usersDao;
   final SettingsService _settingsService;
 
-  TransactionsSummaryPerMonthBloc(
-    this._logger,
-    this._transactionsDao,
-    this._usersDao,
-    this._settingsService,
-  ) : super(const TransactionsSummaryPerMonthState.loading());
-
-  @override
-  Stream<TransactionsSummaryPerMonthState> mapEventToState(TransactionsSummaryPerMonthEvent event) async* {
-    final s = await event.map(init: (e) => _handle(e.currentDate));
-    yield s;
+  TransactionsSummaryPerMonthBloc(this._logger, this._transactionsDao, this._usersDao, this._settingsService)
+    : super(const TransactionsSummaryPerMonthState.loading()) {
+    on<TransactionsSummaryPerMonthEventInit>((event, emit) async {
+      final s = await _handle(event.currentDate);
+      emit(s);
+    });
   }
 
   Future<TransactionsSummaryPerMonthState> _handle(DateTime date) async {
@@ -47,7 +42,9 @@ class TransactionsSummaryPerMonthBloc extends Bloc<TransactionsSummaryPerMonthEv
       final double incomePercentage = total == 0 ? 0 : TransactionUtils.roundDouble(income * 100 / total);
       final double expensePercentage = total == 0 ? 0 : TransactionUtils.roundDouble(expense.abs() * 100 / total);
 
-      final String month = toBeginningOfSentenceCase(DateUtils.formatAppDate(date, _settingsService.getCurrentLanguageModel(), DateUtils.fullMonthFormat));
+      final String month = toBeginningOfSentenceCase(
+        DateUtils.formatAppDate(date, _settingsService.getCurrentLanguageModel(), DateUtils.fullMonthFormat),
+      );
 
       return TransactionsSummaryPerMonthState.loaded(
         month: month,

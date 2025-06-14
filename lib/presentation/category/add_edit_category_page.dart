@@ -13,16 +13,14 @@ import 'package:my_expenses/presentation/shared/utils/toast_utils.dart';
 class AddEditCategoryPage extends StatelessWidget {
   final models.CategoryItem? category;
 
-  const AddEditCategoryPage({
-    super.key,
-    this.category,
-  });
+  const AddEditCategoryPage({super.key, this.category});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (ctx) {
-        final event = category == null ? const CategoryFormEvent.addCategory() : CategoryFormEvent.editCategory(category: category!);
+        final event =
+            category == null ? const CategoryFormEvent.addCategory() : CategoryFormEvent.editCategory(category: category!);
         return Injection.categoryFormBloc..add(event);
       },
       child: const _Scaffold(),
@@ -38,8 +36,8 @@ class _Scaffold extends StatelessWidget {
     final i18n = S.of(context);
     return BlocConsumer<CategoryFormBloc, CategoryState>(
       listener: (ctx, state) {
-        state.maybeMap(
-          loaded: (state) {
+        switch (state) {
+          case CategoryStateLoadedState():
             if (state.errorOccurred) {
               ToastUtils.showWarningToast(ctx, i18n.unknownErrorOcurred);
             }
@@ -50,34 +48,44 @@ class _Scaffold extends StatelessWidget {
             if (state.saved || state.deleted) {
               _onCategoryAddedOrDeleted(context, state.deleted);
             }
-          },
-          orElse: () {},
-        );
+          default:
+            break;
+        }
       },
-      builder: (ctx, state) => Scaffold(
-        appBar: state.maybeMap(
-          loaded: (state) => _AppBar(
-            name: state.name,
-            isFormValid: ctx.read<CategoryFormBloc>().isFormValid(),
-            isNewCategory: state.isNew,
-          ),
-          orElse: () => null,
-        ),
-        body: state.maybeMap(
-          loaded: (state) => SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  CategoryHeader(name: state.name, type: state.type, iconColor: state.iconColor, iconData: state.icon),
-                  if (state.isNew) CategoryForm.create(type: state.type, iconData: state.icon, iconColor: state.iconColor) else CategoryForm.edit(id: state.id, name: state.name, type: state.type, iconData: state.icon, iconColor: state.iconColor),
-                ],
+      builder:
+          (ctx, state) => Scaffold(
+            appBar: switch (state) {
+              CategoryStateLoadingState() => null,
+              CategoryStateLoadedState() => _AppBar(
+                name: state.name,
+                isFormValid: ctx.read<CategoryFormBloc>().isFormValid(),
+                isNewCategory: state.isNew,
+              ),
+            },
+            body: SafeArea(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: switch (state) {
+                    CategoryStateLoadingState() => [],
+                    CategoryStateLoadedState() => [
+                      CategoryHeader(name: state.name, type: state.type, iconColor: state.iconColor, iconData: state.icon),
+                      if (state.isNew)
+                        CategoryForm.create(type: state.type, iconData: state.icon, iconColor: state.iconColor)
+                      else
+                        CategoryForm.edit(
+                          id: state.id,
+                          name: state.name,
+                          type: state.type,
+                          iconData: state.icon,
+                          iconColor: state.iconColor,
+                        ),
+                    ],
+                  },
+                ),
               ),
             ),
           ),
-          orElse: () => null,
-        ),
-      ),
     );
   }
 
@@ -101,30 +109,18 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isNewCategory;
   final bool isFormValid;
 
-  const _AppBar({
-    required this.name,
-    required this.isNewCategory,
-    required this.isFormValid,
-  });
+  const _AppBar({required this.name, required this.isNewCategory, required this.isFormValid});
 
   @override
   Widget build(BuildContext context) {
     final i18n = S.of(context);
     return AppBar(
-      title: Text(
-        isNewCategory ? i18n.addCategory : i18n.editCategory,
-      ),
+      title: Text(isNewCategory ? i18n.addCategory : i18n.editCategory),
       leading: const BackButton(),
       actions: <Widget>[
-        IconButton(
-          icon: const Icon(Icons.save),
-          onPressed: isFormValid ? () => _saveCategory(context) : null,
-        ),
+        IconButton(icon: const Icon(Icons.save), onPressed: isFormValid ? () => _saveCategory(context) : null),
         if (!isNewCategory)
-          IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () => _showDeleteConfirmationDialog(context, name),
-          ),
+          IconButton(icon: const Icon(Icons.delete), onPressed: () => _showDeleteConfirmationDialog(context, name)),
       ],
     );
   }
@@ -139,12 +135,13 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
 
     return showDialog(
       context: context,
-      builder: (ctx) => ConfirmDialog(
-        title: i18n.deleteX(categoryName),
-        content: i18n.confirmDeleteCategory,
-        onOk: () => context.read<CategoryFormBloc>().add(const CategoryFormEvent.deleteCategory()),
-        okText: i18n.yes,
-      ),
+      builder:
+          (ctx) => ConfirmDialog(
+            title: i18n.deleteX(categoryName),
+            content: i18n.confirmDeleteCategory,
+            onOk: () => context.read<CategoryFormBloc>().add(const CategoryFormEvent.deleteCategory()),
+            okText: i18n.yes,
+          ),
     );
   }
 }

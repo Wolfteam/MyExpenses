@@ -5,13 +5,10 @@ import 'package:my_expenses/presentation/shared/mixins/transaction_mixin.dart';
 part 'transactions_summary_per_day.freezed.dart';
 
 @freezed
-class TransactionsSummaryPerDay with _$TransactionsSummaryPerDay, TransactionMixin {
+sealed class TransactionsSummaryPerDay with _$TransactionsSummaryPerDay, TransactionMixin {
   Color get color => getTransactionColor(isAnIncome: isTransactionAnIncome(totalDayAmount));
 
-  const factory TransactionsSummaryPerDay({
-    required DateTime date,
-    required double totalDayAmount,
-  }) = _TransactionsSummaryPerDay;
+  const factory TransactionsSummaryPerDay({required DateTime date, required double totalDayAmount}) = _TransactionsSummaryPerDay;
 
   const TransactionsSummaryPerDay._();
 }

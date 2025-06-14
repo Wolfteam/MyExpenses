@@ -1,8 +1,8 @@
 part of 'app_bloc.dart';
 
 @freezed
-class AppState with _$AppState {
-  const factory AppState.loading() = _LoadingState;
+sealed class AppState with _$AppState {
+  const factory AppState.loading() = AppStateLoadingState;
 
   const factory AppState.loaded({
     required bool isInitialized,
@@ -11,5 +11,5 @@ class AppState with _$AppState {
     required bool bgTaskIsRunning,
     required LanguageModel language,
     @Default(false) bool forcedSignOut,
-  }) = _LoadedState;
+  }) = AppStateLoadedState;
 }

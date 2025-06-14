@@ -1,18 +1,14 @@
 part of 'transactions_activity_bloc.dart';
 
 @freezed
-class TransactionsActivityEvent with _$TransactionsActivityEvent {
-  const factory TransactionsActivityEvent.init() = _Init;
+sealed class TransactionsActivityEvent with _$TransactionsActivityEvent {
+  const factory TransactionsActivityEvent.init() = TransactionsActivityEventInit;
 
-  const factory TransactionsActivityEvent.dateChanged({
-    required DateTime currentDate,
-  }) = _DateChanged;
+  const factory TransactionsActivityEvent.dateChanged({required DateTime currentDate}) = TransactionsActivityEventDateChanged;
 
-  const factory TransactionsActivityEvent.dateRangeChanged({
-    required TransactionActivityDateRangeType type,
-  }) = _DateRangeChanged;
+  const factory TransactionsActivityEvent.dateRangeChanged({required TransactionActivityDateRangeType type}) =
+      TransactionsActivityEventDateRangeChanged;
 
-  const factory TransactionsActivityEvent.activitySelected({
-    required TransactionActivityType type,
-  }) = _ActivitySelected;
+  const factory TransactionsActivityEvent.activitySelected({required TransactionActivityType type}) =
+      TransactionsActivityEventActivitySelected;
 }

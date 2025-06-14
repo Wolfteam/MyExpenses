@@ -1,30 +1,20 @@
 part of 'category_form_bloc.dart';
 
 @freezed
-class CategoryFormEvent with _$CategoryFormEvent {
-  const factory CategoryFormEvent.addCategory() = _AddCategory;
+sealed class CategoryFormEvent with _$CategoryFormEvent {
+  const factory CategoryFormEvent.addCategory() = CategoryFormEventAddCategory;
 
-  const factory CategoryFormEvent.editCategory({
-    required CategoryItem category,
-  }) = _EditCategory;
+  const factory CategoryFormEvent.editCategory({required CategoryItem category}) = CategoryFormEventEditCategory;
 
-  const factory CategoryFormEvent.nameChanged({
-    required String name,
-  }) = _NameChanged;
+  const factory CategoryFormEvent.nameChanged({required String name}) = CategoryFormEventNameChanged;
 
-  const factory CategoryFormEvent.typeChanged({
-    required TransactionType selectedType,
-  }) = _TypeChanged;
+  const factory CategoryFormEvent.typeChanged({required TransactionType selectedType}) = CategoryFormEventTypeChanged;
 
-  const factory CategoryFormEvent.iconChanged({
-    required IconData selectedIcon,
-  }) = _IconChanged;
+  const factory CategoryFormEvent.iconChanged({required IconData selectedIcon}) = CategoryFormEventIconChanged;
 
-  const factory CategoryFormEvent.iconColorChanged({
-    required Color iconColor,
-  }) = _IconColorChanged;
+  const factory CategoryFormEvent.iconColorChanged({required Color iconColor}) = CategoryFormEventIconColorChanged;
 
-  const factory CategoryFormEvent.deleteCategory() = _DeleteCategory;
+  const factory CategoryFormEvent.deleteCategory() = CategoryFormEventDeleteCategory;
 
-  const factory CategoryFormEvent.formSubmitted() = _FormSubmitted;
+  const factory CategoryFormEvent.formSubmitted() = CategoryFormEventFormSubmitted;
 }

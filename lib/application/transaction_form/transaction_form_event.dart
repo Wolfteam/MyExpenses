@@ -1,49 +1,33 @@
 part of 'transaction_form_bloc.dart';
 
 @freezed
-class TransactionFormEvent with _$TransactionFormEvent {
-  const factory TransactionFormEvent.add() = _Add;
+sealed class TransactionFormEvent with _$TransactionFormEvent {
+  const factory TransactionFormEvent.add() = TransactionFormEventAdd;
 
-  const factory TransactionFormEvent.edit({
-    required int id,
-  }) = _Edit;
+  const factory TransactionFormEvent.edit({required int id}) = TransactionFormEventEdit;
 
-  const factory TransactionFormEvent.amountChanged({
-    required double amount,
-  }) = _AmountChanged;
+  const factory TransactionFormEvent.amountChanged({required double amount}) = TransactionFormEventAmountChanged;
 
-  const factory TransactionFormEvent.descriptionChanged({
-    required String description,
-  }) = _DescriptionChanged;
+  const factory TransactionFormEvent.descriptionChanged({required String description}) = TransactionFormEventDescriptionChanged;
 
-  const factory TransactionFormEvent.longDescriptionChanged({
-    required String longDescription,
-  }) = _LongDescriptionChanged;
+  const factory TransactionFormEvent.longDescriptionChanged({required String longDescription}) =
+      TransactionFormEventLongDescriptionChanged;
 
-  const factory TransactionFormEvent.transactionDateChanged({
-    required DateTime transactionDate,
-  }) = _TransactionDateChanged;
+  const factory TransactionFormEvent.transactionDateChanged({required DateTime transactionDate}) =
+      TransactionFormEventTransactionDateChanged;
 
-  const factory TransactionFormEvent.repetitionCycleChanged({
-    required RepetitionCycleType repetitionCycle,
-  }) = _RepetitionCycleChanged;
+  const factory TransactionFormEvent.repetitionCycleChanged({required RepetitionCycleType repetitionCycle}) =
+      TransactionFormEventRepetitionCycleChanged;
 
-  const factory TransactionFormEvent.categoryWasUpdated({
-    required CategoryItem category,
-  }) = _CategoryWasUpdated;
+  const factory TransactionFormEvent.categoryWasUpdated({required CategoryItem category}) =
+      TransactionFormEventCategoryWasUpdated;
 
-  const factory TransactionFormEvent.imageChanged({
-    required String path,
-    required bool imageExists,
-  }) = _ImageChanged;
+  const factory TransactionFormEvent.imageChanged({required String path, required bool imageExists}) =
+      TransactionFormEventImageChanged;
 
-  const factory TransactionFormEvent.isRunningChanged({
-    required bool isRunning,
-  }) = _IsRunningChanged;
+  const factory TransactionFormEvent.isRunningChanged({required bool isRunning}) = TransactionFormEventIsRunningChanged;
 
-  const factory TransactionFormEvent.deleteTransaction({
-    required bool keepChildren,
-  }) = _DeleteTransaction;
+  const factory TransactionFormEvent.deleteTransaction({required bool keepChildren}) = TransactionFormEventDeleteTransaction;
 
-  const factory TransactionFormEvent.submit() = _Submit;
+  const factory TransactionFormEvent.submit() = TransactionFormEventSubmit;
 }

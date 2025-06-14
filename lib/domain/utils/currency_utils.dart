@@ -14,8 +14,6 @@ class CurrencyUtils {
         return '€';
       case CurrencySymbolType.pounds:
         return '£';
-      default:
-        throw Exception('Invalid currency symbol type');
     }
   }
 
@@ -28,27 +26,18 @@ class CurrencyUtils {
     String thousandSeparator = ',',
     String decimalSeparator = '.',
   }) {
-    final baseFormat = _refineSeparator(
-      amount,
-      decimalDigits,
-      thousandSeparator,
-      decimalSeparator,
-    );
+    final baseFormat = _refineSeparator(amount, decimalDigits, thousandSeparator, decimalSeparator);
     if (!symbolToTheRight) return '$symbol$symbolSeparator$baseFormat';
 
     return '$baseFormat$symbolSeparator$symbol';
   }
 
-  static String _baseFormat(double amount, int decimalDigits) => NumberFormat.currency(
-        symbol: '',
-        decimalDigits: decimalDigits,
-        locale: 'en_US',
-      ).format(amount);
+  static String _baseFormat(double amount, int decimalDigits) =>
+      NumberFormat.currency(symbol: '', decimalDigits: decimalDigits, locale: 'en_US').format(amount);
 
   static String _refineSeparator(double amount, int decimalDigits, String thousandSeparator, String decimalSeparator) =>
-      _baseFormat(amount, decimalDigits)
-          .replaceAll(',', '(,)')
-          .replaceAll('.', '(.)')
-          .replaceAll('(,)', thousandSeparator)
-          .replaceAll('(.)', decimalSeparator);
+      _baseFormat(
+        amount,
+        decimalDigits,
+      ).replaceAll(',', '(,)').replaceAll('.', '(.)').replaceAll('(,)', thousandSeparator).replaceAll('(.)', decimalSeparator);
 }

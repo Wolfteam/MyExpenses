@@ -24,34 +24,33 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
     return Padding(
       padding: Styles.edgeInsetAll5,
       child: BlocBuilder<SettingsBloc, SettingsState>(
-        builder: (ctx, state) {
-          return ListView(
-            //without this it crashes on windows...
-            controller: ScrollController(),
-            children: state.map(
-              loading: (_) => [const Center(child: CircularProgressIndicator())],
-              initial: (state) => [
-                ThemeSettingsCard(appThemeType: state.appTheme),
-                AccentColorSettingsCard(accentColorType: state.accentColor),
-                LanguageSettingsCard(language: state.appLanguage),
-                if (state.isUserLoggedIn)
-                  SyncSettingsCard(
-                    syncIntervalType: state.syncInterval,
-                    showNotificationAfterFullSync: state.showNotificationAfterFullSync,
+        builder:
+            (ctx, state) => ListView(
+              //without this it crashes on windows...
+              controller: ScrollController(),
+              children: switch (state) {
+                SettingsStateLoadingState() => [const Center(child: CircularProgressIndicator())],
+                SettingsStateInitialState() => [
+                  ThemeSettingsCard(appThemeType: state.appTheme),
+                  AccentColorSettingsCard(accentColorType: state.accentColor),
+                  LanguageSettingsCard(language: state.appLanguage),
+                  if (state.isUserLoggedIn)
+                    SyncSettingsCard(
+                      syncIntervalType: state.syncInterval,
+                      showNotificationAfterFullSync: state.showNotificationAfterFullSync,
+                    ),
+                  OtherSettingsCard(
+                    currencySymbolType: state.currencySymbol,
+                    currencyToTheRight: state.currencyToTheRight,
+                    askForPassword: state.askForPassword,
+                    canUseFingerPrint: state.canUseFingerPrint,
+                    askForFingerPrint: state.askForFingerPrint,
+                    showNotificationForRecurringTrans: state.showNotificationForRecurringTrans,
                   ),
-                OtherSettingsCard(
-                  currencySymbolType: state.currencySymbol,
-                  currencyToTheRight: state.currencyToTheRight,
-                  askForPassword: state.askForPassword,
-                  canUseFingerPrint: state.canUseFingerPrint,
-                  askForFingerPrint: state.askForFingerPrint,
-                  showNotificationForRecurringTrans: state.showNotificationForRecurringTrans,
-                ),
-                AboutSettingsCard(appVersion: state.appVersion),
-              ],
+                  AboutSettingsCard(appVersion: state.appVersion),
+                ],
+              },
             ),
-          );
-        },
       ),
     );
   }

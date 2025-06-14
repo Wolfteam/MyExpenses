@@ -1,16 +1,12 @@
 part of 'user_accounts_bloc.dart';
 
 @freezed
-class UserAccountsEvent with _$UserAccountsEvent {
-  const factory UserAccountsEvent.init() = _Init;
+sealed class UserAccountsEvent with _$UserAccountsEvent {
+  const factory UserAccountsEvent.init() = UserAccountsEventInit;
 
-  const factory UserAccountsEvent.deleteAccount({
-    required int id,
-  }) = _DeleteAccount;
+  const factory UserAccountsEvent.deleteAccount({required int id}) = UserAccountsEventDeleteAccount;
 
-  const factory UserAccountsEvent.changeActiveAccount({
-    required int newActiveUserId,
-  }) = _ChangeActiveAccount;
+  const factory UserAccountsEvent.changeActiveAccount({required int newActiveUserId}) = UserAccountsEventChangeActiveAccount;
 
-  const factory UserAccountsEvent.signIn() = _SignIn;
+  const factory UserAccountsEvent.signIn() = UserAccountsEventSignIn;
 }

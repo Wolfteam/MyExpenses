@@ -1,12 +1,10 @@
 part of 'drawer_bloc.dart';
 
 @freezed
-class DrawerEvent with _$DrawerEvent {
-  const factory DrawerEvent.init() = _Init;
+sealed class DrawerEvent with _$DrawerEvent {
+  const factory DrawerEvent.init() = DrawerEventInit;
 
-  const factory DrawerEvent.selectedItemChanged({
-    required AppDrawerItemType selectedPage,
-  }) = _SelectedItemChanged;
+  const factory DrawerEvent.selectedItemChanged({required AppDrawerItemType selectedPage}) = DrawerEventSelectedItemChanged;
 
-  const factory DrawerEvent.signOut() = _SignOut;
+  const factory DrawerEvent.signOut() = DrawerEventSignOut;
 }

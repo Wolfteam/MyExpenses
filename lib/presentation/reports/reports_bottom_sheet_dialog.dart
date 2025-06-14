@@ -33,91 +33,81 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     final i18n = S.of(context);
     return BlocConsumer<ReportsBloc, ReportState>(
-      listener: (ctx, state) async {
-        state.map(
-          initial: (state) async {
+      listener: (ctx, state) {
+        switch (state) {
+          case ReportStateInitialState():
             if (state.errorOccurred) {
               ToastUtils.showErrorToast(ctx, i18n.unknownErrorOcurred);
             }
-          },
-          generated: (state) {
+          case ReportStateGeneratedState():
             Navigator.pop(context);
-          },
-        );
+        }
       },
-      builder: (ctx, state) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: state.map(
-          initial: (state) {
-            if (state.generatingReport) {
-              return const [
-                SizedBox(
-                  height: 300,
-                  child: Center(
-                    child: CircularProgressIndicator(),
+      builder:
+          (ctx, state) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: switch (state) {
+              final ReportStateInitialState state when state.generatingReport => [
+                const SizedBox(height: 300, child: Center(child: CircularProgressIndicator())),
+              ],
+              ReportStateInitialState() => [
+                ModalSheetSeparator(),
+                ModalSheetTitle(title: i18n.exportFrom),
+                Text('${i18n.startDate}:'),
+                TextButton(
+                  onPressed: () => _showDatePicker(context, state.from, true),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(utils.DateUtils.formatDateWithoutLocale(state.from, utils.DateUtils.monthDayAndYearFormat)),
                   ),
                 ),
-              ];
-            }
-            final fromDateString = utils.DateUtils.formatDateWithoutLocale(state.from, utils.DateUtils.monthDayAndYearFormat);
-            final toDateString = utils.DateUtils.formatDateWithoutLocale(state.to, utils.DateUtils.monthDayAndYearFormat);
-
-            return [
-              ModalSheetSeparator(),
-              ModalSheetTitle(title: i18n.exportFrom),
-              Text('${i18n.startDate}:'),
-              TextButton(
-                onPressed: () => _showDatePicker(context, state.from, true),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(fromDateString),
-                ),
-              ),
-              Text('${i18n.endDate}:'),
-              TextButton(
-                onPressed: () => _showDatePicker(context, state.to, false),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(toDateString),
-                ),
-              ),
-              Text(i18n.reportFormat),
-              Padding(
-                padding: const EdgeInsets.only(left: 16, right: 16),
-                child: DropdownButton<ReportFileType>(
-                  isExpanded: true,
-                  hint: Text(i18n.selectFormat),
-                  underline: Container(height: 0, color: Colors.transparent),
-                  value: state.selectedFileType,
-                  items: ReportFileType.values.map((item) => DropdownMenuItem<ReportFileType>(value: item, child: Text(i18n.getReportFileTypeName(item)))).toList(),
-                  onChanged: (newValue) => _reportFileTypeChanged(context, newValue!),
-                ),
-              ),
-              OverflowBar(
-                alignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text(i18n.cancel),
+                Text('${i18n.endDate}:'),
+                TextButton(
+                  onPressed: () => _showDatePicker(context, state.to, false),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(utils.DateUtils.formatDateWithoutLocale(state.to, utils.DateUtils.monthDayAndYearFormat)),
                   ),
-                  FilledButton(
-                    onPressed: () => _generateReport(context),
-                    child: Text(i18n.generate),
+                ),
+                Text(i18n.reportFormat),
+                Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16),
+                  child: DropdownButton<ReportFileType>(
+                    isExpanded: true,
+                    hint: Text(i18n.selectFormat),
+                    underline: Container(height: 0, color: Colors.transparent),
+                    value: state.selectedFileType,
+                    items:
+                        ReportFileType.values
+                            .map(
+                              (item) =>
+                                  DropdownMenuItem<ReportFileType>(value: item, child: Text(i18n.getReportFileTypeName(item))),
+                            )
+                            .toList(),
+                    onChanged: (newValue) => _reportFileTypeChanged(context, newValue!),
                   ),
-                ],
-              ),
-            ];
-          },
-          generated: (_) => [],
-        ),
-      ),
+                ),
+                OverflowBar(
+                  alignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(i18n.cancel),
+                    ),
+                    FilledButton(onPressed: () => _generateReport(context), child: Text(i18n.generate)),
+                  ],
+                ),
+              ],
+              ReportStateGeneratedState() => [],
+            },
+          ),
     );
   }
 
-  Future _showDatePicker(BuildContext context, DateTime initialDate, bool isFromDate) async {
+  Future<void> _showDatePicker(BuildContext context, DateTime initialDate, bool isFromDate) async {
     final now = DateTime.now();
     await showDatePicker(
       context: context,
@@ -137,7 +127,8 @@ class _Body extends StatelessWidget {
     });
   }
 
-  void _reportFileTypeChanged(BuildContext context, ReportFileType newValue) => context.read<ReportsBloc>().add(ReportsEvent.fileTypeChanged(selectedFileType: newValue));
+  void _reportFileTypeChanged(BuildContext context, ReportFileType newValue) =>
+      context.read<ReportsBloc>().add(ReportsEvent.fileTypeChanged(selectedFileType: newValue));
 
   void _generateReport(BuildContext context) {
     final translations = S.of(context).getReportTranslations();

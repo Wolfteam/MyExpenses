@@ -42,54 +42,54 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
     this._deviceInfoService,
     this._usersDao,
     this._currencyBloc,
-  ) : super(_initialState);
+  ) : super(_initialState) {
+    on<ReportsEventResetReportSheet>((event, emit) {
+      emit(_initialState);
+    });
 
-  _InitialState get currentState => state as _InitialState;
-
-  @override
-  Stream<ReportState> mapEventToState(ReportsEvent event) async* {
-    try {
-      final s = await event.map(
-        resetReportSheet: (_) async => _initialState,
-        fromDateChanged: (e) async {
-          var from = e.selectedDate;
-          final to = currentState.to;
-          if (from.isAfter(to)) {
-            from = to.add(const Duration(days: -1));
-          }
-
-          return currentState.copyWith(from: from, to: to);
-        },
-        toDateChanged: (e) async {
-          var from = currentState.from;
-          if (e.selectedDate.isBefore(from)) {
-            from = e.selectedDate.add(const Duration(days: -1));
-          }
-          return currentState.copyWith(from: from, to: e.selectedDate);
-        },
-        fileTypeChanged: (e) async => currentState.copyWith(selectedFileType: e.selectedFileType),
-        generateReport: (e) async => _buildReport(e.translations),
-      );
-
-      if (event is _GenerateReport) {
-        yield currentState.copyWith(generatingReport: true);
+    on<ReportsEventFromDateChanged>((event, emit) {
+      var from = event.selectedDate;
+      final to = currentState.to;
+      if (from.isAfter(to)) {
+        from = to.add(const Duration(days: -1));
       }
 
-      yield s;
-    } catch (e, s) {
-      _logger.error(runtimeType, 'Unknown error occurred', e, s);
-      yield currentState.copyWith(errorOccurred: true, generatingReport: false);
-      yield currentState.copyWith(errorOccurred: false, generatingReport: false);
-    }
+      final s = currentState.copyWith(from: from, to: to);
+      emit(s);
+    });
+
+    on<ReportsEventToDateChanged>((event, emit) {
+      var from = currentState.from;
+      if (event.selectedDate.isBefore(from)) {
+        from = event.selectedDate.add(const Duration(days: -1));
+      }
+      final s = currentState.copyWith(from: from, to: event.selectedDate);
+      emit(s);
+    });
+
+    on<ReportsEventFileTypeChanged>((event, emit) {
+      final s = currentState.copyWith(selectedFileType: event.selectedFileType);
+      emit(s);
+    });
+
+    on<ReportsEventGenerateReport>((event, emit) async {
+      try {
+        emit(currentState.copyWith(generatingReport: true));
+        final s = await _buildReport(event.translations);
+        emit(s);
+      } catch (e, s) {
+        _logger.error(runtimeType, 'Unknown error occurred', e, s);
+        emit(currentState.copyWith(errorOccurred: true, generatingReport: false));
+        emit(currentState.copyWith(errorOccurred: false, generatingReport: false));
+      }
+    });
   }
+
+  ReportStateInitialState get currentState => state as ReportStateInitialState;
 
   Future<ReportState> _buildReport(ReportTranslations translations) async {
     final currentUser = await _usersDao.getActiveUser();
-    final transactions = await _transactionsDao.getAllTransactions(
-      currentUser?.id,
-      currentState.from,
-      currentState.to,
-    );
+    final transactions = await _transactionsDao.getAllTransactions(currentUser?.id, currentState.from, currentState.to);
     transactions.sort((t1, t2) => t1.transactionDate.compareTo(t2.transactionDate));
 
     String path;
@@ -105,7 +105,14 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
 
   Future<String> _buildCsvReport(List<TransactionItem> transactions, ReportTranslations translations) async {
     final csvData = [
-      <String>[translations.id, translations.description, translations.amount, translations.date, translations.category, translations.type],
+      <String>[
+        translations.id,
+        translations.description,
+        translations.amount,
+        translations.date,
+        translations.category,
+        translations.type,
+      ],
       ...transactions.map(
         (t) => [
           t.id,

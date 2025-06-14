@@ -1,8 +1,8 @@
 part of 'category_form_bloc.dart';
 
 @freezed
-class CategoryState with _$CategoryState {
-  const factory CategoryState.loading() = _LoadingState;
+sealed class CategoryState with _$CategoryState {
+  const factory CategoryState.loading() = CategoryStateLoadingState;
 
   const factory CategoryState.loaded({
     required int id,
@@ -20,5 +20,5 @@ class CategoryState with _$CategoryState {
     @Default(false) bool categoryCantBeDeleted,
     @Default(false) bool saved,
     @Default(false) bool deleted,
-  }) = _LoadedState;
+  }) = CategoryStateLoadedState;
 }

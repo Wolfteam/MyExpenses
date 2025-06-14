@@ -5,13 +5,13 @@ part 'category_item.freezed.dart';
 part 'category_item.g.dart';
 
 @freezed
-class CategoryItem with _$CategoryItem {
+sealed class CategoryItem with _$CategoryItem {
   const factory CategoryItem({
     required int id,
     required bool isAnIncome,
     required String name,
-    @JsonKey(ignore: true) IconData? icon,
-    @JsonKey(ignore: true) Color? iconColor,
+    @JsonKey(includeToJson: false, includeFromJson: false) IconData? icon,
+    @JsonKey(includeToJson: false, includeFromJson: false) Color? iconColor,
     @Default(false) bool isSelected,
   }) = _CategoryItem;
 

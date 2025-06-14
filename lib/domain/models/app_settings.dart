@@ -5,7 +5,7 @@ part 'app_settings.freezed.dart';
 part 'app_settings.g.dart';
 
 @freezed
-class AppSettings with _$AppSettings {
+sealed class AppSettings with _$AppSettings {
   const factory AppSettings({
     required AppThemeType appTheme,
     required bool useDarkAmoled,

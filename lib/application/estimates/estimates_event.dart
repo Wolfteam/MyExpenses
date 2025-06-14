@@ -1,16 +1,15 @@
 part of 'estimates_bloc.dart';
 
 @freezed
-class EstimatesEvent with _$EstimatesEvent {
-  const EstimatesEvent._();
+sealed class EstimatesEvent with _$EstimatesEvent {
+  const factory EstimatesEvent.load() = EstimatesEventEstimatesLoadEvent;
 
-  factory EstimatesEvent.load() = _EstimatesLoadEvent;
+  const factory EstimatesEvent.transactionTypeChanged({required int newValue}) =
+      EstimatesEventEstimatesTransactionTypeChangedEvent;
 
-  factory EstimatesEvent.transactionTypeChanged({required int newValue}) = _EstimatesTransactionTypeChangedEvent;
+  const factory EstimatesEvent.fromDateChanged({required DateTime newDate}) = EstimatesEventEstimatesFromDateChangedEvent;
 
-  factory EstimatesEvent.fromDateChanged({required DateTime newDate}) = _EstimatesFromDateChangedEvent;
+  const factory EstimatesEvent.untilDateChanged({required DateTime newDate}) = EstimatesEventEstimatesUntilDateChangedEvent;
 
-  factory EstimatesEvent.untilDateChanged({required DateTime newDate}) = _EstimatesUntilDateChangedEvent;
-
-  factory EstimatesEvent.calculate() = _EstimatesCalculateEvent;
+  const factory EstimatesEvent.calculate() = EstimatesEventEstimatesCalculateEvent;
 }

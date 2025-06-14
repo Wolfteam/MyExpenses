@@ -4,7 +4,7 @@ import 'package:my_expenses/domain/models/transactions/transaction_item.dart';
 part 'transaction_card_items.freezed.dart';
 
 @freezed
-class TransactionCardItems with _$TransactionCardItems {
+sealed class TransactionCardItems with _$TransactionCardItems {
   const factory TransactionCardItems({
     required String groupedBy,
     required double income,

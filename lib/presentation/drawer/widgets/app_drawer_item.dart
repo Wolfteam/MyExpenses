@@ -12,11 +12,7 @@ class AppDrawerItem extends StatelessWidget {
   final AppDrawerItemType type;
   final bool isSelected;
 
-  const AppDrawerItem({
-    super.key,
-    required this.type,
-    required this.isSelected,
-  });
+  const AppDrawerItem({super.key, required this.type, required this.isSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -47,25 +43,15 @@ class AppDrawerItem extends StatelessWidget {
       case AppDrawerItemType.search:
         icon = const Icon(Icons.search);
         text = i18n.search;
-      default:
-        throw Exception('Invalid drawer item type = $type');
     }
 
     if (!isSelected) {
-      return ListTile(
-        title: Text(text),
-        leading: icon,
-        onTap: () => _onSelectedItem(context),
-      );
+      return ListTile(title: Text(text), leading: icon, onTap: () => _onSelectedItem(context));
     }
 
     return Ink(
-      color: theme.colorScheme.secondary.withOpacity(0.35),
-      child: ListTile(
-        title: Text(text),
-        leading: icon,
-        onTap: () => _onSelectedItem(context),
-      ),
+      color: theme.colorScheme.secondary.withValues(alpha: 0.35),
+      child: ListTile(title: Text(text), leading: icon, onTap: () => _onSelectedItem(context)),
     );
   }
 
@@ -112,12 +98,13 @@ class AppDrawerItem extends StatelessWidget {
     Navigator.pop(context);
     showDialog(
       context: context,
-      builder: (ctx) => ConfirmDialog(
-        title: i18n.logout,
-        content: i18n.confirmSignOut,
-        okText: i18n.yes,
-        onOk: () => ctx.read<DrawerBloc>().add(const DrawerEvent.signOut()),
-      ),
+      builder:
+          (ctx) => ConfirmDialog(
+            title: i18n.logout,
+            content: i18n.confirmSignOut,
+            okText: i18n.yes,
+            onOk: () => ctx.read<DrawerBloc>().add(const DrawerEvent.signOut()),
+          ),
     );
   }
 }

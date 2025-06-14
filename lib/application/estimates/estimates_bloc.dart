@@ -20,43 +20,47 @@ class EstimatesBloc extends Bloc<EstimatesEvent, EstimatesState> {
   final UsersDao _usersDao;
   final TransactionsDao _transactionsDao;
 
-  EstimatesBloc(this._logger, this._settings, this._usersDao, this._transactionsDao) : super(EstimatesState.loading());
-
-  _EstimatesInitialState get currentState => state as _EstimatesInitialState;
-
-  @override
-  Stream<EstimatesState> mapEventToState(EstimatesEvent event) async* {
-    final s = event.map(
-      load: (_) async => _calculateAmounts(
+  EstimatesBloc(this._logger, this._settings, this._usersDao, this._transactionsDao) : super(const EstimatesState.loading()) {
+    on<EstimatesEventEstimatesLoadEvent>((event, emit) async {
+      final s = await _calculateAmounts(
         0,
         DateUtils.getFirstDayDateOfTheMonth(DateTime.now()),
         DateUtils.getLastDayDateOfTheMonth(DateTime.now()),
-      ),
-      transactionTypeChanged: (e) async => currentState.copyWith.call(selectedTransactionType: e.newValue),
-      fromDateChanged: (e) async {
-        final from = e.newDate;
-        var until = currentState.untilDate;
-        if (from.isAfter(until)) {
-          until = from;
-        }
-        return _datesChanged(from, until);
-      },
-      untilDateChanged: (e) async {
-        var from = currentState.fromDate;
-        if (e.newDate.isBefore(from)) {
-          from = e.newDate.add(const Duration(days: -1));
-        }
-        return _datesChanged(from, e.newDate);
-      },
-      calculate: (e) => _calculateAmounts(
-        currentState.selectedTransactionType,
-        currentState.fromDate,
-        currentState.untilDate,
-      ),
-    );
+      );
+      emit(s);
+    });
 
-    yield await s;
+    on<EstimatesEventEstimatesTransactionTypeChangedEvent>((event, emit) {
+      final s = currentState.copyWith.call(selectedTransactionType: event.newValue);
+      emit(s);
+    });
+
+    on<EstimatesEventEstimatesFromDateChangedEvent>((event, emit) {
+      final from = event.newDate;
+      var until = currentState.untilDate;
+      if (from.isAfter(until)) {
+        until = from;
+      }
+      final s = _datesChanged(from, until);
+      emit(s);
+    });
+
+    on<EstimatesEventEstimatesUntilDateChangedEvent>((event, emit) {
+      var from = currentState.fromDate;
+      if (event.newDate.isBefore(from)) {
+        from = event.newDate.add(const Duration(days: -1));
+      }
+      final s = _datesChanged(from, event.newDate);
+      emit(s);
+    });
+
+    on<EstimatesEventEstimatesCalculateEvent>((event, emit) async {
+      final s = await _calculateAmounts(currentState.selectedTransactionType, currentState.fromDate, currentState.untilDate);
+      emit(s);
+    });
   }
+
+  EstimatesStateEstimatesInitialState get currentState => state as EstimatesStateEstimatesInitialState;
 
   Future<EstimatesState> _calculateAmounts(int transactionType, DateTime from, DateTime until) async {
     final lang = _settings.getCurrentLanguageModel();

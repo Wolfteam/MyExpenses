@@ -10,9 +10,7 @@ import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/domain/services/services.dart';
 
 part 'app_bloc.freezed.dart';
-
 part 'app_event.dart';
-
 part 'app_state.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
@@ -39,35 +37,46 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     this._usersDao,
   ) : super(const AppState.loading()) {
     _listenBgPort();
-  }
 
-  @override
-  Stream<AppState> mapEventToState(AppEvent event) async* {
-    final s = await event.map(
-      init: (e) async => _init(e.translations),
-      themeChanged: (e) async {
-        _logger.info(runtimeType, 'App theme changed, the selected theme is: ${e.theme}');
-        return _loadThemeData(e.theme, _settingsService.accentColor, _settingsService.language);
-      },
-      accentColorChanged: (e) async {
-        _logger.info(runtimeType, 'App accent color changed, the selected color is: ${e.accentColor}');
-        return _loadThemeData(_settingsService.appTheme, e.accentColor, _settingsService.language);
-      },
-      bgTaskIsRunning: (e) async => _loadThemeData(
+    on<AppEventInit>((event, emit) async {
+      final s = await _init(event.translations);
+      emit(s);
+    });
+
+    on<AppEventThemeChanged>((event, emit) {
+      _logger.info(runtimeType, 'App theme changed, the selected theme is: ${event.theme}');
+      final s = _loadThemeData(event.theme, _settingsService.accentColor, _settingsService.language);
+      emit(s);
+    });
+
+    on<AppEventAccentColorChanged>((event, emit) {
+      _logger.info(runtimeType, 'App accent color changed, the selected color is: ${event.accentColor}');
+      final s = _loadThemeData(_settingsService.appTheme, event.accentColor, _settingsService.language);
+      emit(s);
+    });
+
+    on<AppEventBgTaskIsRunning>((event, emit) {
+      final s = _loadThemeData(
         _settingsService.appTheme,
         _settingsService.accentColor,
         _settingsService.language,
-        bgTaskIsRunning: e.isRunning,
-      ),
-      languageChanged: (e) async => _loadThemeData(_settingsService.appTheme, _settingsService.accentColor, e.newValue),
-      registerRecurringBackgroundTask: (e) async {
-        await _registerRecurringBackgroundTask(e.translations);
-        return state;
-      },
-      restart: (_) async => const AppState.loading(),
-    );
+        bgTaskIsRunning: event.isRunning,
+      );
+      emit(s);
+    });
 
-    yield s;
+    on<AppEventLanguageChanged>((event, emit) {
+      final s = _loadThemeData(_settingsService.appTheme, _settingsService.accentColor, event.newValue);
+      emit(s);
+    });
+
+    on<AppEventRegisterRecurringBackgroundTask>((event, emit) async {
+      await _registerRecurringBackgroundTask(event.translations);
+    });
+
+    on<AppEventRestart>((event, emit) {
+      emit(const AppState.loading());
+    });
   }
 
   @override
@@ -117,7 +126,12 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
     await Future.delayed(const Duration(milliseconds: 500));
 
-    return _loadThemeData(_settingsService.appTheme, _settingsService.accentColor, _settingsService.language, forceSignOut: forceSignOut);
+    return _loadThemeData(
+      _settingsService.appTheme,
+      _settingsService.accentColor,
+      _settingsService.language,
+      forceSignOut: forceSignOut,
+    );
   }
 
   AppState _loadThemeData(

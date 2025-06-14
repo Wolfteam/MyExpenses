@@ -35,8 +35,8 @@ class _BodyState extends State<_Body> {
   Widget build(BuildContext context) {
     return BlocListener<SplashScreenBloc, SplashScreenState>(
       listener: (ctx, state) async {
-        await state.map(
-          initial: (state) async {
+        switch (state) {
+          case SplashScreenStateInitialState():
             final translations = S.of(ctx).getBackgroundTranslations();
             if (state.askForFingerPrint) {
               await _authenticateViaFingerPrint(translations);
@@ -45,8 +45,7 @@ class _BodyState extends State<_Body> {
             } else {
               ctx.read<AppBloc>().add(AppEvent.init(bgTaskIsRunning: false, translations: translations));
             }
-          },
-        );
+        }
       },
       child: ColoredBox(
         color: Colors.orange,
@@ -54,14 +53,7 @@ class _BodyState extends State<_Body> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Container(
-                margin: const EdgeInsets.all(10),
-                child: Image.asset(
-                  CustomAssets.appIcon,
-                  width: 250,
-                  height: 250,
-                ),
-              ),
+              Container(margin: const EdgeInsets.all(10), child: Image.asset(CustomAssets.appIcon, width: 250, height: 250)),
               const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
             ],
           ),
