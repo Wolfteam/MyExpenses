@@ -1,17 +1,24 @@
 include: package:lint/analysis_options.yaml
 
+formatter:
+  page_width: 130
+  trailing_commas: preserve
+
 linter:
   rules:
     prefer_single_quotes: true
     avoid_classes_with_only_static_members: false
     depend_on_referenced_packages: false
+    avoid_positional_boolean_parameters: false
 
 analyzer:
   exclude: 
     - '**/*.freezed.dart'
     - '**/*.g.dart'
     - lib/**/*.*.dart
-    - lib/generated/*
+    - lib/generated/*.dart
+    - lib/generated/**/*.dart
     - '**/custom_icons.dart'
   errors:
     missing_return: error
+    invalid_annotation_target: ignore
