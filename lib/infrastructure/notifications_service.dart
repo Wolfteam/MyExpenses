@@ -154,7 +154,6 @@ class NotificationServiceImpl implements NotificationService {
       body,
       scheduledDate,
       specifics,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       payload: payload,
     );
