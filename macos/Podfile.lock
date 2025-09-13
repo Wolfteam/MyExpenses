@@ -44,7 +44,7 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - rate_my_app (2.3.0):
+  - rate_my_app (2.3.2):
     - Flutter
     - FlutterMacOS
   - shared_preferences_foundation (0.0.1):
@@ -136,7 +136,7 @@ SPEC CHECKSUMS:
   flutter_local_notifications: 4bf37a31afde695b56091b4ae3e4d9c7a7e6cda0
   flutter_secure_storage_macos: 7f45e30f838cf2659862a4e4e3ee1c347c2b3b54
   flutter_timezone: d59eea86178cbd7943cd2431cc2eaa9850f935d8
-  FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
+  FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
   google_sign_in_ios: 19297361f2c51d7d8ac0201b866ef1fa5d1f94a8
   GoogleSignIn: d4281ab6cf21542b1cfaff85c191f230b399d2db
   GTMAppAuth: f69bd07d68cd3b766125f7e072c45d7340dea0de
@@ -144,12 +144,12 @@ SPEC CHECKSUMS:
   local_auth_darwin: 553ce4f9b16d3fdfeafce9cf042e7c9f77c1c391
   package_info_plus: f0052d280d17aa382b932f399edf32507174e870
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
-  rate_my_app: 567848e885b804d65eb9443f96e9fc2c30a06abb
+  rate_my_app: cbb89973f870601f80f7bad63aba107260cabc5b
   shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
   sqlite3: 7559e33dae4c78538df563795af3a86fc887ee71
   sqlite3_flutter_libs: 7997a56aa96fdba2546e237664deb07f600768ac
   url_launcher_macos: 0fba8ddabfc33ce0a9afe7c5fef5aab3d8d2d673
 
-PODFILE CHECKSUM: 9ebaf0ce3d369aaa26a9ea0e159195ed94724cf3
+PODFILE CHECKSUM: 54d867c82ac51cbd61b565781b9fada492027009
 
 COCOAPODS: 1.16.2
