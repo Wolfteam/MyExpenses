@@ -79,24 +79,27 @@ class _SearchAmountFilterBottomSheetDialogState extends State<SearchAmountFilter
                       ],
                     ),
                     if (!_amountController.text.isNullEmptyOrWhitespace)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children:
-                            ComparerType.values
-                                .map(
-                                  (e) => ListTile(
-                                    contentPadding: EdgeInsets.zero,
-                                    dense: true,
-                                    title: Text(i18n.getComparerTypeName(e)),
-                                    leading: Radio<ComparerType>(
-                                      value: e,
-                                      groupValue: state.tempComparerType,
-                                      activeColor: theme.colorScheme.secondary,
-                                      onChanged: (v) => _comparerChanged(v!),
+                      RadioGroup<ComparerType>(
+                        groupValue: state.tempComparerType,
+                        onChanged: (v) => _comparerChanged(v!),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children:
+                              ComparerType.values
+                                  .map(
+                                    (e) => ListTile(
+                                      contentPadding: EdgeInsets.zero,
+                                      dense: true,
+                                      horizontalTitleGap: 0,
+                                      title: Text(i18n.getComparerTypeName(e)),
+                                      leading: Radio<ComparerType>(
+                                        value: e,
+                                        activeColor: theme.colorScheme.secondary,
+                                      ),
                                     ),
-                                  ),
-                                )
-                                .toList(),
+                                  )
+                                  .toList(),
+                        ),
                       ),
                     OverflowBar(
                       alignment: MainAxisAlignment.end,

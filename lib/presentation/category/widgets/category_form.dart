@@ -51,24 +51,30 @@ class CategoryForm extends StatelessWidget {
                 _NameInput(name: name),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Radio<TransactionType>(
-                  value: TransactionType.incomes,
-                  activeColor: theme.colorScheme.secondary,
-                  groupValue: type,
-                  onChanged: id > 0 ? null : (v) => _typeChanged(v!, context),
-                ),
-                Text(i18n.income),
-                Radio<TransactionType>(
-                  value: TransactionType.expenses,
-                  activeColor: theme.colorScheme.secondary,
-                  groupValue: type,
-                  onChanged: id > 0 ? null : (v) => _typeChanged(v!, context),
-                ),
-                Text(i18n.expense),
-              ],
+            RadioGroup<TransactionType>(
+              groupValue: type,
+              onChanged: (v) {
+                if (id > 0 || v == null) {
+                  return;
+                }
+
+                _typeChanged(v, context);
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Radio<TransactionType>(
+                    value: TransactionType.incomes,
+                    activeColor: theme.colorScheme.secondary,
+                  ),
+                  Text(i18n.income),
+                  Radio<TransactionType>(
+                    value: TransactionType.expenses,
+                    activeColor: theme.colorScheme.secondary,
+                  ),
+                  Text(i18n.expense),
+                ],
+              ),
             ),
             // ListTile(
             //   contentPadding: const EdgeInsets.only(left: 10),
