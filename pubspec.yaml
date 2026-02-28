@@ -49,7 +49,7 @@ dependencies:
   json_annotation: ^4.9.0
   local_auth: ^2.3.0
   logger: ^2.5.0
-  month_picker_dialog: ^6.2.3
+  month_picker_dialog: ^6.7.2
   open_filex: ^4.7.0
   package_info_plus: ^8.3.0
   path: ^1.9.1
