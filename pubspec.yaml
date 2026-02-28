@@ -27,7 +27,7 @@ dependencies:
   drift: ^2.26.1
   drift_flutter: ^0.2.4
   enum_to_string: ^2.2.1
-  extension_google_sign_in_as_googleapis_auth: ^2.0.13
+  extension_google_sign_in_as_googleapis_auth: ^3.0.0
   fl_chart: ^1.0.0
   flutter:
     sdk: flutter
@@ -42,7 +42,7 @@ dependencies:
   font_awesome_flutter: ^10.8.0
   freezed_annotation: ^3.0.0
   get_it: ^8.0.3
-  google_sign_in: ^6.3.0
+  google_sign_in: ^7.2.0
   googleapis: ^14.0.0
   image_picker: ^1.1.2
   internet_connection_checker_plus: ^2.7.2
