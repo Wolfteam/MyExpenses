@@ -25,7 +25,7 @@ dependencies:
   darq: ^2.0.0
   device_info_plus: ^11.4.0
   drift: ^2.26.1
-  drift_flutter: ^0.2.4
+  drift_flutter: ^0.2.8
   enum_to_string: ^2.2.1
   extension_google_sign_in_as_googleapis_auth: ^2.0.13
   fl_chart: ^1.0.0
