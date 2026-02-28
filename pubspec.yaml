@@ -44,7 +44,7 @@ dependencies:
   get_it: ^8.0.3
   google_sign_in: ^6.3.0
   googleapis: ^14.0.0
-  image_picker: ^1.1.2
+  image_picker: ^1.2.1
   internet_connection_checker_plus: ^2.7.2
   json_annotation: ^4.9.0
   local_auth: ^2.3.0
