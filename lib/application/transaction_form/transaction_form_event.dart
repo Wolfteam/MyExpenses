@@ -25,6 +25,9 @@ sealed class TransactionFormEvent with _$TransactionFormEvent {
   const factory TransactionFormEvent.imageChanged({required String path, required bool imageExists}) =
       TransactionFormEventImageChanged;
 
+  const factory TransactionFormEvent.paymentMethodChanged({required int? paymentMethodId}) =
+      TransactionFormEventPaymentMethodChanged;
+
   const factory TransactionFormEvent.isRunningChanged({required bool isRunning}) = TransactionFormEventIsRunningChanged;
 
   const factory TransactionFormEvent.deleteTransaction({required bool keepChildren}) = TransactionFormEventDeleteTransaction;

@@ -21,6 +21,7 @@ sealed class SearchState with _$SearchState {
     required ComparerType comparerType,
     required ComparerType tempComparerType,
     CategoryItem? category,
+    int? paymentMethodId,
     TransactionType? transactionType,
     required TransactionFilterType transactionFilterType,
     required SortDirectionType sortDirectionType,

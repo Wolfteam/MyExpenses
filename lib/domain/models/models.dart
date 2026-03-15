@@ -12,3 +12,4 @@ export 'transactions/transaction_item.dart';
 export 'transactions/transactions_summary_per_day.dart';
 export 'transactions/transactions_summary_per_month.dart';
 export 'users/user_item.dart';
+export 'payment_methods/payment_method_item.dart';

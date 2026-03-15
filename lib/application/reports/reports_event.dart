@@ -11,4 +11,8 @@ sealed class ReportsEvent with _$ReportsEvent {
   const factory ReportsEvent.fileTypeChanged({required ReportFileType selectedFileType}) = ReportsEventFileTypeChanged;
 
   const factory ReportsEvent.generateReport({required ReportTranslations translations}) = ReportsEventGenerateReport;
+
+  const factory ReportsEvent.paymentMethodChanged({int? selectedPaymentMethodId}) = ReportsEventPaymentMethodChanged;
+
+  const factory ReportsEvent.groupByPaymentMethodChanged({required bool value}) = ReportsEventGroupByPaymentMethodChanged;
 }

@@ -21,6 +21,7 @@ sealed class TransactionItem with _$TransactionItem {
     String? imagePath,
     required CategoryItem category,
     String? longDescription,
+    int? paymentMethodId,
   }) = _TransactionItem;
 
   const TransactionItem._();

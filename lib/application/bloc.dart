@@ -7,6 +7,8 @@ export 'drawer/drawer_bloc.dart';
 export 'estimates/estimates_bloc.dart';
 export 'main_tab/main_tab_bloc.dart';
 export 'password_dialog/password_dialog_bloc.dart';
+export 'payment_method_picker/payment_method_picker_bloc.dart';
+export 'payment_methods/payment_methods_bloc.dart';
 export 'reports/reports_bloc.dart';
 export 'search/search_bloc.dart';
 export 'settings/settings_bloc.dart';

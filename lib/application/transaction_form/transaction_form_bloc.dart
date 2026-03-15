@@ -118,6 +118,11 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
       emit(s);
     });
 
+    on<TransactionFormEventPaymentMethodChanged>((event, emit) {
+      final s = currentState.copyWith(paymentMethodId: event.paymentMethodId);
+      emit(s);
+    });
+
     on<TransactionFormEventIsRunningChanged>(
       (event, emit) => _onSaveOrDelete(emit, () async {
         final s = await _isRunningChanged(event.isRunning);
@@ -181,6 +186,7 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
           repetitionCycle: RepetitionCycleType.none,
           category: category,
           isCategoryValid: false,
+          paymentMethodId: null,
           language: language,
           languageModel: _settingsService.getCurrentLanguageModel(),
           isLongDescriptionDirty: false,
@@ -239,6 +245,7 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
       isRecurringTransactionRunning: transaction.nextRecurringDate != null,
       nextRecurringDate: transaction.nextRecurringDate,
       longDescription: transaction.longDescription,
+      paymentMethodId: transaction.paymentMethodId,
     );
   }
 
@@ -358,12 +365,11 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
     final tomorrow = now.add(const Duration(days: 1));
     final inFifteenDate = DateUtils.getNextBiweeklyDate(now);
 
-    final firstDate =
-        cycle == RepetitionCycleType.none
-            ? DateTime(now.year - 1)
-            : cycle == RepetitionCycleType.biweekly
-            ? inFifteenDate
-            : tomorrow;
+    final firstDate = cycle == RepetitionCycleType.none
+        ? DateTime(now.year - 1)
+        : cycle == RepetitionCycleType.biweekly
+        ? inFifteenDate
+        : tomorrow;
 
     final tentativeDate = DateTime(firstDate.year, firstDate.month, firstDate.day);
     if (transactionDate.isBefore(tentativeDate)) return transactionDate;
@@ -375,12 +381,11 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
     final tomorrow = now.add(const Duration(days: 1));
     final inFifteenDate = DateUtils.getNextBiweeklyDate(now);
 
-    final transactionDate =
-        cycle == RepetitionCycleType.none
-            ? now
-            : cycle == RepetitionCycleType.biweekly
-            ? inFifteenDate
-            : tomorrow;
+    final transactionDate = cycle == RepetitionCycleType.none
+        ? now
+        : cycle == RepetitionCycleType.biweekly
+        ? inFifteenDate
+        : tomorrow;
 
     return transactionDate;
   }
@@ -389,8 +394,8 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
     final amountToSave = currentState.amount.abs();
     final nextRecurringDate =
         currentState.repetitionCycle == RepetitionCycleType.none || !currentState.isRecurringTransactionRunning
-            ? null
-            : currentState.transactionDate;
+        ? null
+        : currentState.transactionDate;
     final isParentTransaction = nextRecurringDate != null;
 
     return TransactionItem(
@@ -405,6 +410,7 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
       nextRecurringDate: nextRecurringDate,
       imagePath: imgFilename,
       longDescription: currentState.longDescription,
+      paymentMethodId: currentState.paymentMethodId,
     );
   }
 }
