@@ -16,6 +16,10 @@ sealed class Transaction with _$Transaction {
     DateTime? nextRecurringDate,
     String? imagePath,
     required String categoryCreatedHash,
+    // Optional link to payment method by createdHash (nullable means Unknown)
+    String? paymentMethodCreatedHash,
+    // Optional convenience name for older readers
+    String? paymentMethodName,
     required DateTime createdAt,
     required String createdBy,
     required String createdHash,
