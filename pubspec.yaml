@@ -39,7 +39,7 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   flutter_timezone: ^5.0.1
   fluttertoast: ^8.2.12
-  font_awesome_flutter: ^10.12.0
+  font_awesome_flutter: ^11.0.0
   freezed_annotation: ^3.1.0
   get_it: ^9.2.0
   google_sign_in: ^6.3.0
