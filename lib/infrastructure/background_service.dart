@@ -114,9 +114,9 @@ class BackgroundServiceImpl implements BackgroundService {
       _recurringTransId,
       _recurringTransName,
       frequency: duration,
-      existingWorkPolicy: ExistingWorkPolicy.replace,
+      existingWorkPolicy: ExistingPeriodicWorkPolicy.replace,
       constraints: Constraints(
-        networkType: NetworkType.not_required,
+        networkType: NetworkType.notRequired,
         requiresBatteryNotLow: true,
         requiresDeviceIdle: false,
       ),
@@ -132,7 +132,7 @@ class BackgroundServiceImpl implements BackgroundService {
         _recurringTransName,
         existingWorkPolicy: ExistingWorkPolicy.replace,
         constraints: Constraints(
-          networkType: NetworkType.not_required,
+          networkType: NetworkType.notRequired,
           requiresBatteryNotLow: true,
           requiresDeviceIdle: false,
         ),

@@ -493,7 +493,7 @@ class _RecurringSwitch extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           SwitchListTile(
-            activeColor: theme.colorScheme.secondary,
+            activeThumbColor: theme.colorScheme.secondary,
             value: isRecurringTransactionRunning,
             title: Text(isRecurringTransactionRunning ? i18n.running : i18n.stopped),
             secondary: Icon(isRecurringTransactionRunning ? Icons.play_arrow : Icons.stop, size: 30),
