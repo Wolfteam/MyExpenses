@@ -29,21 +29,19 @@ class AddEditTransactionPage extends StatefulWidget {
 
   static MaterialPageRoute addRoute(BuildContext context) {
     return MaterialPageRoute(
-      builder:
-          (ctx) => BlocProvider<TransactionFormBloc>(
-            create: (ctx) => Injection.transactionFormBloc..add(const TransactionFormEvent.add()),
-            child: const AddEditTransactionPage(),
-          ),
+      builder: (ctx) => BlocProvider<TransactionFormBloc>(
+        create: (ctx) => Injection.transactionFormBloc..add(const TransactionFormEvent.add()),
+        child: const AddEditTransactionPage(),
+      ),
     );
   }
 
   static MaterialPageRoute editRoute(TransactionItem transaction, BuildContext context) {
     return MaterialPageRoute(
-      builder:
-          (ctx) => BlocProvider<TransactionFormBloc>(
-            create: (ctx) => Injection.transactionFormBloc..add(TransactionFormEvent.edit(id: transaction.id)),
-            child: AddEditTransactionPage(item: transaction),
-          ),
+      builder: (ctx) => BlocProvider<TransactionFormBloc>(
+        create: (ctx) => Injection.transactionFormBloc..add(TransactionFormEvent.edit(id: transaction.id)),
+        child: AddEditTransactionPage(item: transaction),
+      ),
     );
   }
 
@@ -105,10 +103,9 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               BlocUtils.raiseCommonBlocEvents(context, reloadTransactions: true);
             }
           case TransactionFormStateTransactionChanged():
-            final msg =
-                state.wasUpdated || state.wasCreated
-                    ? i18n.transactionsWasSuccessfullySaved
-                    : i18n.transactionsWasSuccessfullyDeleted;
+            final msg = state.wasUpdated || state.wasCreated
+                ? i18n.transactionsWasSuccessfullySaved
+                : i18n.transactionsWasSuccessfullyDeleted;
             ToastUtils.showSucceedToast(ctx, msg);
             BlocUtils.raiseCommonBlocEvents(context, reloadTransactions: true);
             Navigator.of(ctx).pop();
@@ -182,6 +179,8 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                             isLongDescriptionValid: state.isLongDescriptionValid,
                             onSubmit: () => _fieldFocusChange(context, _longDescriptionFocus, _repetitionsFocus),
                           ),
+                          const SizedBox(height: 10),
+                          _PaymentMethodSelector(paymentMethodId: state.paymentMethodId, isChildTransaction: isChildTransaction),
                           FormDateButton(
                             isChildTransaction: isChildTransaction,
                             repetitionCycle: state.repetitionCycle,
@@ -313,6 +312,122 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   }
 }
 
+class _PaymentMethodSelector extends StatelessWidget {
+  final int? paymentMethodId;
+  final bool isChildTransaction;
+
+  const _PaymentMethodSelector({required this.paymentMethodId, required this.isChildTransaction});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => Injection.paymentMethodPickerBloc..add(PaymentMethodPickerEvent.load(initialSelectedId: paymentMethodId)),
+      child: Builder(
+        builder: (context) {
+          return BlocBuilder<PaymentMethodPickerBloc, PaymentMethodPickerState>(
+            builder: (context, pickerState) {
+              final i18n = S.of(context);
+              final selectedName = () {
+                if (paymentMethodId == null) return i18n.paymentMethodUnknownNone;
+                final items = pickerState.maybeWhen(
+                  loaded: (items, _, __) => items,
+                  orElse: () => const <PaymentMethodItem>[],
+                );
+                final m = items
+                    .where((e) => e.id == paymentMethodId)
+                    .cast<PaymentMethodItem?>()
+                    .firstWhere(
+                      (e) => e != null,
+                      orElse: () => null,
+                    );
+                return m?.name ?? i18n.paymentMethodUnknownNone;
+              }();
+
+              return ListTile(
+                contentPadding: EdgeInsets.zero,
+                enabled: !isChildTransaction,
+                leading: const Icon(Icons.account_balance_wallet_outlined),
+                title: Text(i18n.paymentMethodFieldTitle),
+                subtitle: Text(selectedName),
+                onTap: isChildTransaction
+                    ? null
+                    : () async {
+                        await showModalBottomSheet(
+                          context: context,
+                          builder: (_) => _PaymentMethodPickerSheet(initialId: paymentMethodId),
+                        );
+                      },
+                trailing: paymentMethodId != null && !isChildTransaction
+                    ? IconButton(
+                        tooltip: i18n.clear,
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          context.read<TransactionFormBloc>().add(
+                            const TransactionFormEvent.paymentMethodChanged(paymentMethodId: null),
+                          );
+                        },
+                      )
+                    : null,
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _PaymentMethodPickerSheet extends StatelessWidget {
+  final int? initialId;
+  const _PaymentMethodPickerSheet({this.initialId});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: BlocProvider.value(
+        value: Injection.paymentMethodPickerBloc..add(PaymentMethodPickerEvent.load(initialSelectedId: initialId)),
+        child: BlocBuilder<PaymentMethodPickerBloc, PaymentMethodPickerState>(
+          builder: (context, state) {
+            final i18n = S.of(context);
+            final items = state.maybeWhen(
+              loaded: (items, _, __) => items,
+              orElse: () => const <PaymentMethodItem>[],
+            );
+            return ListView(
+              shrinkWrap: true,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.not_interested),
+                  title: Text(i18n.paymentMethodUnknownNone),
+                  selected: initialId == null,
+                  onTap: () {
+                    context.read<TransactionFormBloc>().add(
+                      const TransactionFormEvent.paymentMethodChanged(paymentMethodId: null),
+                    );
+                    Navigator.of(context).pop();
+                  },
+                ),
+                const Divider(height: 1),
+                for (final m in items)
+                  ListTile(
+                    leading: const Icon(Icons.credit_card),
+                    title: Text(m.name),
+                    subtitle: Text(i18n.translatePaymentMethodType(m.type)),
+                    selected: initialId == m.id,
+                    onTap: () {
+                      context.read<TransactionFormBloc>().add(TransactionFormEvent.paymentMethodChanged(paymentMethodId: m.id));
+                      Navigator.of(context).pop();
+                    },
+                  ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
 typedef OnCategoryChanged = void Function(CategoryItem);
 
 class AddEditTransactionHeader extends StatelessWidget {
@@ -346,19 +461,17 @@ class AddEditTransactionHeader extends StatelessWidget {
     const cornerRadius = Radius.circular(20);
     final theme = Theme.of(context);
     final i18n = S.of(context);
-    final dateString =
-        isParentTransaction && nextRecurringDate != null && isRecurringTransactionRunning
-            ? i18n.nextDateOn(utils.DateUtils.formatDateWithoutLocale(nextRecurringDate, utils.DateUtils.monthDayAndYearFormat))
-            : '${i18n.date}: $transactionDateString';
+    final dateString = isParentTransaction && nextRecurringDate != null && isRecurringTransactionRunning
+        ? i18n.nextDateOn(utils.DateUtils.formatDateWithoutLocale(nextRecurringDate, utils.DateUtils.monthDayAndYearFormat))
+        : '${i18n.date}: $transactionDateString';
 
     final formattedAmount = context.watch<CurrencyBloc>().format(amount);
     final repetitionCycleType = i18n.translateRepetitionCycleType(repetitionCycle);
-    final Color? transactionColor =
-        category.id <= 0
-            ? null
-            : category.isAnIncome
-            ? Colors.green
-            : Colors.red;
+    final Color? transactionColor = category.id <= 0
+        ? null
+        : category.isAnIncome
+        ? Colors.green
+        : Colors.red;
 
     return SizedBox(
       height: 260.0,

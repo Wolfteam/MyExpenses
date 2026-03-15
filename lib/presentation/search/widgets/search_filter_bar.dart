@@ -4,9 +4,11 @@ import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/generated/l10n.dart';
+import 'package:my_expenses/injection.dart';
 import 'package:my_expenses/presentation/categories/categories_page.dart';
 import 'package:my_expenses/presentation/search/widgets/search_amount_filter_bottom_sheet_dialog.dart';
 import 'package:my_expenses/presentation/search/widgets/search_date_filter_bottom_sheet_dialog.dart';
+import 'package:my_expenses/presentation/shared/extensions/i18n_extensions.dart';
 import 'package:my_expenses/presentation/shared/sort_direction_popupmenu_filter.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
 import 'package:my_expenses/presentation/shared/transaction_popupmenu_filter.dart';
@@ -51,6 +53,12 @@ class SearchFilterBar extends StatelessWidget {
           icon: const Icon(Icons.category),
           onPressed: () => _showCategoriesPage(category, context),
           tooltip: i18n.category,
+          splashRadius: Styles.iconButtonSplashRadius,
+        ),
+        IconButton(
+          icon: const Icon(Icons.account_balance_wallet_outlined),
+          onPressed: () => _showPaymentMethodPicker(context),
+          tooltip: i18n.paymentMethodFieldTitle,
           splashRadius: Styles.iconButtonSplashRadius,
         ),
         TransactionPopupMenuFilter(
@@ -134,5 +142,66 @@ class SearchFilterBar extends StatelessWidget {
   void _sortDirectionChanged(SortDirectionType newValue, BuildContext context) {
     _removeSearchFocus(context);
     context.read<SearchBloc>().add(SearchEvent.sortDirectionChanged(newValue: newValue));
+  }
+
+  void _showPaymentMethodPicker(BuildContext context) {
+    _removeSearchFocus(context);
+    final bloc = Injection.paymentMethodPickerBloc;
+    final initialId = context.read<SearchBloc>().currentState.paymentMethodId;
+
+    showModalBottomSheet(
+      shape: Styles.modalBottomSheetShape,
+      context: context,
+      builder: (ctx) => BlocProvider.value(
+        value: bloc..add(PaymentMethodPickerEvent.load(initialSelectedId: initialId == 0 ? null : initialId)),
+        child: SafeArea(
+          child: BlocBuilder<PaymentMethodPickerBloc, PaymentMethodPickerState>(
+            builder: (context, state) {
+              final i18n = S.of(context);
+              final items = state.maybeWhen(
+                loaded: (items, _, __) => items,
+                orElse: () => const <PaymentMethodItem>[],
+              );
+              return ListView(
+                shrinkWrap: true,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.all_inclusive),
+                    title: Text(i18n.all),
+                    selected: initialId == null,
+                    onTap: () {
+                      context.read<SearchBloc>().add(const SearchEvent.paymentMethodChanged(newValue: null));
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.not_interested),
+                    title: Text(i18n.paymentMethodUnknownNone),
+                    selected: initialId == 0,
+                    onTap: () {
+                      context.read<SearchBloc>().add(const SearchEvent.paymentMethodChanged(newValue: 0));
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  const Divider(height: 1),
+                  for (final m in items)
+                    ListTile(
+                      leading: const Icon(Icons.credit_card),
+                      title: Text(m.name),
+                      subtitle: Text(i18n.translatePaymentMethodType(m.type)),
+                      selected: initialId == m.id,
+                      onTap: () {
+                        context.read<SearchBloc>().add(SearchEvent.paymentMethodChanged(newValue: m.id));
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
   }
 }
