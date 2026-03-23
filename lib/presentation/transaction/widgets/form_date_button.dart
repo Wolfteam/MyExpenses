@@ -39,27 +39,24 @@ class _FormDateButtonState extends State<FormDateButton> {
   Widget build(BuildContext context) {
     final i18n = S.of(context);
     final theme = Theme.of(context);
-    final textColor = theme.brightness == Brightness.dark ? Colors.white : Colors.black;
+    final showError = !widget.isChildTransaction &&
+        !widget.isTransactionDateValid &&
+        widget.repetitionCycle != RepetitionCycleType.none;
+
     return Column(
-      children: <Widget>[
-        Row(
-          children: <Widget>[
-            const Icon(Icons.calendar_today, size: 30),
-            Expanded(
-              child: TextButton(
-                style: ButtonStyle(foregroundColor: WidgetStateProperty.all<Color>(textColor)),
-                onPressed: !widget.isChildTransaction ? () => _transactionDateClicked(context) : null,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(widget.transactionDateString),
-                ),
-              ),
-            ),
-          ],
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ListTile(
+          contentPadding: EdgeInsets.zero,
+          enabled: !widget.isChildTransaction,
+          leading: const Icon(Icons.calendar_today),
+          title: Text(i18n.date),
+          subtitle: Text(widget.transactionDateString),
+          onTap: widget.isChildTransaction ? null : () => _transactionDateClicked(context),
         ),
-        if (!widget.isChildTransaction && !widget.isTransactionDateValid && widget.repetitionCycle != RepetitionCycleType.none)
+        if (showError)
           Padding(
-            padding: const EdgeInsets.only(left: 8, right: 8),
+            padding: const EdgeInsets.only(left: 8, right: 8, bottom: 4),
             child: Text(
               i18n.recurringDateMustStartFromTomorrow,
               textAlign: TextAlign.center,

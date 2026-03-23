@@ -13,6 +13,7 @@ import 'package:my_expenses/injection.dart';
 import 'package:my_expenses/presentation/categories/categories_page.dart';
 import 'package:my_expenses/presentation/shared/extensions/i18n_extensions.dart';
 import 'package:my_expenses/presentation/shared/input_suffix_icon.dart';
+import 'package:my_expenses/presentation/shared/payment_method_picker_sheet.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
 import 'package:my_expenses/presentation/shared/utils/bloc_utils.dart';
 import 'package:my_expenses/presentation/shared/utils/toast_utils.dart';
@@ -21,6 +22,13 @@ import 'package:my_expenses/presentation/transaction/widgets/form_date_button.da
 import 'package:my_expenses/presentation/transaction/widgets/form_image_preview.dart';
 import 'package:my_expenses/presentation/transaction/widgets/form_repetition_cycle_dropdown.dart';
 import 'package:provider/provider.dart';
+
+part 'widgets/_amount_input.dart';
+part 'widgets/_description_input.dart';
+part 'widgets/_long_description_input.dart';
+part 'widgets/_recurring_switch.dart';
+part 'widgets/_payment_method_selector.dart';
+part 'widgets/_add_edit_transaction_header.dart';
 
 class AddEditTransactionPage extends StatefulWidget {
   final TransactionItem? item;
@@ -138,7 +146,9 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                       if (_descriptionController.text.isNullEmptyOrWhitespace) {
                         _descriptionController.text = selectedCat.name;
                       }
-                      context.read<TransactionFormBloc>().add(TransactionFormEvent.categoryWasUpdated(category: selectedCat));
+                      context.read<TransactionFormBloc>().add(
+                        TransactionFormEvent.categoryWasUpdated(category: selectedCat),
+                      );
                     },
                   ),
                   if (isChildTransaction)
@@ -180,7 +190,10 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                             onSubmit: () => _fieldFocusChange(context, _longDescriptionFocus, _repetitionsFocus),
                           ),
                           const SizedBox(height: 10),
-                          _PaymentMethodSelector(paymentMethodId: state.paymentMethodId, isChildTransaction: isChildTransaction),
+                          _PaymentMethodSelector(
+                            paymentMethodId: state.paymentMethodId,
+                            isChildTransaction: isChildTransaction,
+                          ),
                           FormDateButton(
                             isChildTransaction: isChildTransaction,
                             repetitionCycle: state.repetitionCycle,
@@ -276,7 +289,9 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
       return;
     }
     _currentDescription = _descriptionController.text;
-    context.read<TransactionFormBloc>().add(TransactionFormEvent.descriptionChanged(description: _descriptionController.text));
+    context.read<TransactionFormBloc>().add(
+      TransactionFormEvent.descriptionChanged(description: _descriptionController.text),
+    );
   }
 
   void _longDescriptionChanged() {
@@ -309,475 +324,5 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         ToastUtils.showWarningToast(context, i18n.acceptPermissionsToUseThisFeature);
       }
     }
-  }
-}
-
-class _PaymentMethodSelector extends StatelessWidget {
-  final int? paymentMethodId;
-  final bool isChildTransaction;
-
-  const _PaymentMethodSelector({required this.paymentMethodId, required this.isChildTransaction});
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => Injection.paymentMethodPickerBloc..add(PaymentMethodPickerEvent.load(initialSelectedId: paymentMethodId)),
-      child: Builder(
-        builder: (context) {
-          return BlocBuilder<PaymentMethodPickerBloc, PaymentMethodPickerState>(
-            builder: (context, pickerState) {
-              final i18n = S.of(context);
-              final selectedName = () {
-                if (paymentMethodId == null) return i18n.paymentMethodUnknownNone;
-                final items = switch (pickerState) {
-                  final PaymentMethodPickerStateLoadedState s => s.items,
-                  _ => const <PaymentMethodItem>[],
-                };
-                final m = items
-                    .where((e) => e.id == paymentMethodId)
-                    .cast<PaymentMethodItem?>()
-                    .firstWhere(
-                      (e) => e != null,
-                      orElse: () => null,
-                    );
-                return m?.name ?? i18n.paymentMethodUnknownNone;
-              }();
-
-              return ListTile(
-                contentPadding: EdgeInsets.zero,
-                enabled: !isChildTransaction,
-                leading: const Icon(Icons.account_balance_wallet_outlined),
-                title: Text(i18n.paymentMethodFieldTitle),
-                subtitle: Text(selectedName),
-                onTap: isChildTransaction
-                    ? null
-                    : () async {
-                        final transactionFormBloc = context.read<TransactionFormBloc>();
-                        await showModalBottomSheet(
-                          context: context,
-                          builder: (_) => BlocProvider.value(
-                            value: transactionFormBloc,
-                            child: _PaymentMethodPickerSheet(initialId: paymentMethodId),
-                          ),
-                        );
-                      },
-                trailing: paymentMethodId != null && !isChildTransaction
-                    ? IconButton(
-                        tooltip: i18n.clear,
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          context.read<TransactionFormBloc>().add(
-                            const TransactionFormEvent.paymentMethodChanged(paymentMethodId: null),
-                          );
-                        },
-                      )
-                    : null,
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _PaymentMethodPickerSheet extends StatelessWidget {
-  final int? initialId;
-  const _PaymentMethodPickerSheet({this.initialId});
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: BlocProvider.value(
-        value: Injection.paymentMethodPickerBloc..add(PaymentMethodPickerEvent.load(initialSelectedId: initialId)),
-        child: BlocBuilder<PaymentMethodPickerBloc, PaymentMethodPickerState>(
-          builder: (context, state) {
-            final i18n = S.of(context);
-            final items = switch (state) {
-              final PaymentMethodPickerStateLoadedState s => s.items,
-              _ => const <PaymentMethodItem>[],
-            };
-            return ListView(
-              shrinkWrap: true,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.not_interested),
-                  title: Text(i18n.paymentMethodUnknownNone),
-                  selected: initialId == null,
-                  onTap: () {
-                    context.read<TransactionFormBloc>().add(
-                      const TransactionFormEvent.paymentMethodChanged(paymentMethodId: null),
-                    );
-                    Navigator.of(context).pop();
-                  },
-                ),
-                const Divider(height: 1),
-                for (final m in items)
-                  ListTile(
-                    leading: const Icon(Icons.credit_card),
-                    title: Text(m.name),
-                    subtitle: Text(i18n.translatePaymentMethodType(m.type)),
-                    selected: initialId == m.id,
-                    onTap: () {
-                      context.read<TransactionFormBloc>().add(TransactionFormEvent.paymentMethodChanged(paymentMethodId: m.id));
-                      Navigator.of(context).pop();
-                    },
-                  ),
-              ],
-            );
-          },
-        ),
-      ),
-    );
-  }
-}
-
-typedef OnCategoryChanged = void Function(CategoryItem);
-
-class AddEditTransactionHeader extends StatelessWidget {
-  final bool isParentTransaction;
-  final DateTime? nextRecurringDate;
-  final bool isRecurringTransactionRunning;
-  final String transactionDateString;
-  final double amount;
-  final RepetitionCycleType repetitionCycle;
-  final String description;
-  final bool isChildTransaction;
-  final CategoryItem category;
-  final OnCategoryChanged onCategoryChanged;
-
-  const AddEditTransactionHeader({
-    super.key,
-    required this.isParentTransaction,
-    this.nextRecurringDate,
-    required this.isRecurringTransactionRunning,
-    required this.transactionDateString,
-    required this.amount,
-    required this.repetitionCycle,
-    required this.description,
-    required this.isChildTransaction,
-    required this.category,
-    required this.onCategoryChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    const cornerRadius = Radius.circular(20);
-    final theme = Theme.of(context);
-    final i18n = S.of(context);
-    final dateString = isParentTransaction && nextRecurringDate != null && isRecurringTransactionRunning
-        ? i18n.nextDateOn(utils.DateUtils.formatDateWithoutLocale(nextRecurringDate, utils.DateUtils.monthDayAndYearFormat))
-        : '${i18n.date}: $transactionDateString';
-
-    final formattedAmount = context.watch<CurrencyBloc>().format(amount);
-    final repetitionCycleType = i18n.translateRepetitionCycleType(repetitionCycle);
-    final Color? transactionColor = category.id <= 0
-        ? null
-        : category.isAnIncome
-        ? Colors.green
-        : Colors.red;
-
-    return SizedBox(
-      height: 260.0,
-      child: Stack(
-        children: <Widget>[
-          Container(height: 150, color: theme.colorScheme.primary),
-          Container(
-            padding: const EdgeInsets.only(top: 60.0, left: 10.0, right: 10.0, bottom: 10.0),
-            child: Material(
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                  bottomLeft: cornerRadius,
-                  bottomRight: cornerRadius,
-                  topLeft: cornerRadius,
-                  topRight: cornerRadius,
-                ),
-              ),
-              elevation: 5.0,
-              child: Container(
-                margin: Styles.edgeInsetHorizontal16,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    const SizedBox(height: 40.0),
-                    Text(description, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.headlineMedium),
-                    Text(dateString, overflow: TextOverflow.ellipsis, style: theme.textTheme.titleSmall),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: <Widget>[
-                        Expanded(
-                          child: ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            title: Tooltip(
-                              message: formattedAmount,
-                              child: Text(
-                                formattedAmount,
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.titleLarge!.copyWith(color: transactionColor),
-                              ),
-                            ),
-                            subtitle: Text(
-                              i18n.amount.toUpperCase(),
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.bodySmall,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            title: Tooltip(
-                              message: repetitionCycleType,
-                              child: Text(
-                                repetitionCycleType,
-                                textAlign: TextAlign.center,
-                                overflow: TextOverflow.ellipsis,
-                                style: theme.textTheme.titleLarge,
-                              ),
-                            ),
-                            subtitle: Text(
-                              i18n.repetitions.toUpperCase(),
-                              textAlign: TextAlign.center,
-                              overflow: TextOverflow.ellipsis,
-                              style: theme.textTheme.bodySmall,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.only(top: 15),
-            alignment: Alignment.topCenter,
-            child: Material(
-              elevation: 10,
-              color: theme.cardColor.withValues(alpha: 0.8),
-              type: MaterialType.circle,
-              child: IconButton(
-                iconSize: 80,
-                icon: FaIcon(category.icon),
-                color: category.iconColor,
-                onPressed: !isChildTransaction ? () => _changeCategory(context) : null,
-                disabledColor: category.iconColor,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _changeCategory(BuildContext context) async {
-    final selectedCatProvider = Provider.of<CurrentSelectedCategory>(context, listen: false);
-
-    if (category.id > 0) {
-      selectedCatProvider.currentSelectedItem = category;
-    }
-
-    final route = MaterialPageRoute<CategoryItem>(
-      builder: (ctx) => CategoriesPage(isInSelectionMode: true, selectedCategory: category),
-    );
-    final selectedCat = await Navigator.of(context).push(route);
-
-    selectedCatProvider.currentSelectedItem = null;
-
-    if (selectedCat != null) {
-      onCategoryChanged(selectedCat);
-    }
-  }
-}
-
-class _RecurringSwitch extends StatelessWidget {
-  final bool isRecurringTransactionRunning;
-
-  const _RecurringSwitch({required this.isRecurringTransactionRunning});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final i18n = S.of(context);
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          SwitchListTile(
-            activeThumbColor: theme.colorScheme.secondary,
-            value: isRecurringTransactionRunning,
-            title: Text(isRecurringTransactionRunning ? i18n.running : i18n.stopped),
-            secondary: Icon(isRecurringTransactionRunning ? Icons.play_arrow : Icons.stop, size: 30),
-            subtitle: Text(
-              isRecurringTransactionRunning ? i18n.recurringTransactionIsNowRunning : i18n.recurringTransactionIsNowStopped,
-            ),
-            onChanged: (newValue) => _isRunningChanged(newValue, context),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _isRunningChanged(bool newValue, BuildContext context) =>
-      context.read<TransactionFormBloc>().add(TransactionFormEvent.isRunningChanged(isRunning: newValue));
-}
-
-typedef OnInputSubmit = void Function();
-
-class _AmountInput extends StatelessWidget {
-  final TextEditingController amountController;
-  final FocusNode amountFocus;
-  final bool isChildTransaction;
-  final bool isAmountValid;
-  final bool isAmountDirty;
-  final OnInputSubmit onSubmit;
-
-  const _AmountInput({
-    required this.amountController,
-    required this.amountFocus,
-    required this.isChildTransaction,
-    required this.isAmountValid,
-    required this.isAmountDirty,
-    required this.onSubmit,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final i18n = S.of(context);
-
-    return Row(
-      children: <Widget>[
-        Container(margin: const EdgeInsets.only(right: 10), child: const Icon(Icons.attach_money, size: 30)),
-        Expanded(
-          child: TextFormField(
-            enabled: !isChildTransaction,
-            controller: amountController,
-            minLines: 1,
-            maxLength: TransactionFormBloc.maxAmountLength,
-            maxLengthEnforcement: MaxLengthEnforcement.enforced,
-            focusNode: amountFocus,
-            textInputAction: TextInputAction.next,
-            keyboardType: const TextInputType.numberWithOptions(signed: true, decimal: true),
-            decoration: InputDecoration(
-              suffixIcon: InputSuffixIcon(controller: amountController, focusNode: amountFocus),
-              alignLabelWithHint: true,
-              hintText: '0\$',
-              labelText: i18n.amount,
-            ),
-            autovalidateMode: isAmountDirty ? AutovalidateMode.always : null,
-            onFieldSubmitted: (_) => onSubmit(),
-            validator: (_) => isAmountValid ? null : i18n.invalidAmount,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _DescriptionInput extends StatelessWidget {
-  final TextEditingController descriptionController;
-  final FocusNode descriptionFocus;
-  final bool isChildTransaction;
-  final bool isDescriptionDirty;
-  final bool isDescriptionValid;
-  final OnInputSubmit onSubmit;
-
-  const _DescriptionInput({
-    required this.descriptionController,
-    required this.descriptionFocus,
-    required this.isChildTransaction,
-    required this.isDescriptionDirty,
-    required this.isDescriptionValid,
-    required this.onSubmit,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final i18n = S.of(context);
-
-    return Row(
-      children: <Widget>[
-        Container(margin: const EdgeInsets.only(right: 10), child: const Icon(Icons.note, size: 30)),
-        Expanded(
-          child: TextFormField(
-            enabled: !isChildTransaction,
-            controller: descriptionController,
-            keyboardType: TextInputType.text,
-            minLines: 1,
-            maxLength: TransactionFormBloc.maxDescriptionLength,
-            maxLengthEnforcement: MaxLengthEnforcement.enforced,
-            focusNode: descriptionFocus,
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              suffixIcon: InputSuffixIcon(controller: descriptionController, focusNode: descriptionFocus),
-              alignLabelWithHint: true,
-              labelText: i18n.description,
-              hintText: i18n.descriptionOfThisTransaction,
-            ),
-            autovalidateMode: isDescriptionDirty ? AutovalidateMode.always : null,
-            onFieldSubmitted: (_) => onSubmit(),
-            validator: (_) => isDescriptionValid ? null : i18n.invalidDescription,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _LongDescriptionInput extends StatelessWidget {
-  final TextEditingController longDescriptionController;
-  final FocusNode longDescriptionFocus;
-  final bool isChildTransaction;
-  final bool isLongDescriptionDirty;
-  final bool isLongDescriptionValid;
-  final OnInputSubmit onSubmit;
-
-  const _LongDescriptionInput({
-    required this.longDescriptionController,
-    required this.longDescriptionFocus,
-    required this.isChildTransaction,
-    required this.isLongDescriptionDirty,
-    required this.isLongDescriptionValid,
-    required this.onSubmit,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final i18n = S.of(context);
-
-    return Row(
-      children: <Widget>[
-        Container(margin: const EdgeInsets.only(right: 10), child: const Icon(Icons.note, size: 30)),
-        Expanded(
-          child: TextFormField(
-            enabled: !isChildTransaction,
-            controller: longDescriptionController,
-            keyboardType: TextInputType.text,
-            maxLines: 5,
-            minLines: 1,
-            maxLength: TransactionFormBloc.maxLongDescriptionLength,
-            maxLengthEnforcement: MaxLengthEnforcement.enforced,
-            focusNode: longDescriptionFocus,
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              suffixIcon: InputSuffixIcon(controller: longDescriptionController, focusNode: longDescriptionFocus),
-              alignLabelWithHint: true,
-              labelText: i18n.longDescription,
-              hintText: i18n.descriptionOfThisTransaction,
-              hintMaxLines: 1,
-            ),
-            autovalidateMode: isLongDescriptionDirty ? AutovalidateMode.always : null,
-            onFieldSubmitted: (_) => onSubmit(),
-            validator: (_) => isLongDescriptionValid ? null : i18n.invalidDescription,
-          ),
-        ),
-      ],
-    );
   }
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:my_expenses/application/payment_methods/payment_methods_bloc.dart';
-import 'package:my_expenses/domain/enums/enums.dart';
+import 'package:my_expenses/application/bloc.dart';
+import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/injection.dart';
 
@@ -13,97 +13,115 @@ class CreditCardCyclesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final i18n = S.of(context);
     return BlocProvider(
-      create: (_) => Injection.paymentMethodsBloc..add(const PaymentMethodsEvent.load()),
+      create: (_) => Injection.creditCardCyclesBloc..add(const CreditCardCyclesEvent.load()),
       child: Scaffold(
         appBar: AppBar(title: Text(i18n.creditCardCycles)),
-        body: BlocBuilder<PaymentMethodsBloc, PaymentMethodsState>(
+        body: BlocBuilder<CreditCardCyclesBloc, CreditCardCyclesState>(
           builder: (context, state) {
-            switch (state) {
-              case final PaymentMethodsStateLoadedState s:
-                final cards = s.items.where((e) => e.type == PaymentMethodType.creditCard && !e.isArchived).toList()
-                  ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
-
-                if (cards.isEmpty) {
-                  return Center(child: Text(i18n.noPaymentMethodsYet));
-                }
-
-                return ListView.separated(
-                  itemCount: cards.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1),
-                  itemBuilder: (context, index) {
-                    final m = cards[index];
-                    final today = DateTime.now();
-                    final cycle = _computeCurrentCycle(today, m.statementCloseDay);
-                    final nextDue = _computeDueForClose(cycle.nextClose, m.paymentDueDay);
-                    final df = DateFormat.yMMMd();
-
-                    return ListTile(
-                      leading: Icon(m.icon, color: m.iconColor),
-                      title: Text(m.name),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (m.statementCloseDay != null || m.paymentDueDay != null)
-                            Text(
-                              '${i18n.statementCloseDay}: ${m.statementCloseDay ?? i18n.na}  •  ${i18n.paymentDueDay}: ${m.paymentDueDay ?? i18n.na}',
-                            ),
-                          const SizedBox(height: 4),
-                          Text('${i18n.currentCycle}: ${df.format(cycle.start)} — ${df.format(cycle.nextClose)}'),
-                          if (nextDue != null) Text(i18n.nextDueOn(df.format(nextDue))),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              default:
-                return const Center(child: CircularProgressIndicator());
-            }
+            return switch (state) {
+              CreditCardCyclesStateLoading() => const Center(child: CircularProgressIndicator()),
+              final CreditCardCyclesStateLoaded s when s.items.isEmpty =>
+                Center(child: Text(i18n.noPaymentMethodsYet)),
+              final CreditCardCyclesStateLoaded s => ListView.builder(
+                  padding: const EdgeInsets.all(12),
+                  itemCount: s.items.length,
+                  itemBuilder: (context, index) => _CycleCard(item: s.items[index]),
+                ),
+            };
           },
         ),
       ),
     );
   }
+}
 
-  ({DateTime start, DateTime lastClose, DateTime nextClose}) _computeCurrentCycle(DateTime today, int? closeDay) {
-    final cd = (closeDay == null || closeDay < 1 || closeDay > 31) ? 31 : closeDay;
-    final monthDays = _daysInMonth(today.year, today.month);
-    final effectiveCloseDay = cd > monthDays ? monthDays : cd;
-    final tentativeClose = DateTime(today.year, today.month, effectiveCloseDay);
+class _CycleCard extends StatelessWidget {
+  final CreditCardCycleItem item;
+  const _CycleCard({required this.item});
 
-    DateTime lastClose;
-    if (_isSameOrBefore(tentativeClose, today)) {
-      lastClose = tentativeClose;
-    } else {
-      // previous month close
-      final prev = _addMonths(DateTime(today.year, today.month, 1), -1);
-      final dpm = _daysInMonth(prev.year, prev.month);
-      final prevClose = DateTime(prev.year, prev.month, cd > dpm ? dpm : cd);
-      lastClose = prevClose;
+  @override
+  Widget build(BuildContext context) {
+    final i18n = S.of(context);
+    final theme = Theme.of(context);
+    final df = DateFormat.yMMMd();
+    final m = item.paymentMethod;
+    final today = DateTime.now();
+
+    Color chipColor = Colors.green;
+    if (item.nextDueDate != null) {
+      final days = item.nextDueDate!
+          .difference(DateTime(today.year, today.month, today.day))
+          .inDays;
+      if (days < 0) {
+        chipColor = Colors.red;
+      } else if (days <= 7) {
+        chipColor = Colors.amber;
+      }
     }
 
-    final nextMonth = _addMonths(DateTime(lastClose.year, lastClose.month, 1), 1);
-    final dnm = _daysInMonth(nextMonth.year, nextMonth.month);
-    final nextClose = DateTime(nextMonth.year, nextMonth.month, cd > dnm ? dnm : cd);
-    final start = lastClose.add(const Duration(days: 1));
-    return (start: start, lastClose: lastClose, nextClose: nextClose);
-  }
-
-  DateTime? _computeDueForClose(DateTime closeDate, int? dueDay) {
-    if (dueDay == null || dueDay < 1 || dueDay > 31) return null;
-    // Due day is in the month AFTER the close date's month
-    final dueMonth = _addMonths(DateTime(closeDate.year, closeDate.month, 1), 1);
-    final dim = _daysInMonth(dueMonth.year, dueMonth.month);
-    final day = dueDay > dim ? dim : dueDay;
-    return DateTime(dueMonth.year, dueMonth.month, day);
-  }
-
-  int _daysInMonth(int year, int month) => DateTime(year, month + 1, 0).day;
-
-  DateTime _addMonths(DateTime date, int months) => DateTime(date.year, date.month + months, date.day);
-
-  bool _isSameOrBefore(DateTime a, DateTime b) {
-    final aa = DateTime(a.year, a.month, a.day);
-    final bb = DateTime(b.year, b.month, b.day);
-    return aa.isAtSameMomentAs(bb) || aa.isBefore(bb);
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(m.icon, color: m.iconColor),
+                const SizedBox(width: 8),
+                Text(m.name, style: theme.textTheme.titleMedium),
+              ],
+            ),
+            const Divider(height: 20),
+            Text(i18n.currentCycle, style: theme.textTheme.labelMedium),
+            const SizedBox(height: 4),
+            Text(
+              '${df.format(item.cycleStart)} — ${df.format(item.cycleNextClose)}',
+              style: theme.textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(i18n.statementCloseDay, style: theme.textTheme.labelSmall),
+                      const SizedBox(height: 2),
+                      Text(
+                        m.statementCloseDay != null ? '${m.statementCloseDay}' : i18n.na,
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(i18n.paymentDueDay, style: theme.textTheme.labelSmall),
+                      const SizedBox(height: 2),
+                      Text(
+                        m.paymentDueDay != null ? '${m.paymentDueDay}' : i18n.na,
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            if (item.nextDueDate != null) ...[
+              const SizedBox(height: 12),
+              Chip(
+                avatar: Icon(Icons.calendar_today, size: 16, color: chipColor),
+                label: Text(i18n.nextDueOn(df.format(item.nextDueDate!))),
+                side: BorderSide(color: chipColor),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 }

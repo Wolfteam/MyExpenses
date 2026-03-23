@@ -16,6 +16,13 @@ import 'package:my_expenses/infrastructure/infrastructure.dart';
 final GetIt getIt = GetIt.instance;
 
 class Injection {
+  static CreditCardCyclesBloc get creditCardCyclesBloc {
+    final logger = getIt<LoggingService>();
+    final paymentMethodsDao = getIt<PaymentMethodsDao>();
+    final usersDao = getIt<UsersDao>();
+    return CreditCardCyclesBloc(logger, paymentMethodsDao, usersDao);
+  }
+
   static SplashScreenBloc get splashScreenBloc {
     final settingsService = getIt<SettingsService>();
     return SplashScreenBloc(settingsService);
@@ -112,6 +119,8 @@ class Injection {
     final usersDao = getIt<UsersDao>();
     return PaymentMethodsBloc(logger, paymentMethodsDao, usersDao);
   }
+
+  static PaymentMethodFormBloc get paymentMethodFormBloc => PaymentMethodFormBloc();
 
   static PaymentMethodPickerBloc get paymentMethodPickerBloc {
     final logger = getIt<LoggingService>();
