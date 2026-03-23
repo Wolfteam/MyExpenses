@@ -82,8 +82,11 @@ flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/images/cost.png"
-  image_path_ios: "assets/images/cost_ios.png"
+  image_path_ios: "assets/images/ios.png"
   remove_alpha_ios: true
+  macos:
+    generate: true
+    image_path: "assets/images/macos.png"
 
 flutter:
   uses-material-design: true
