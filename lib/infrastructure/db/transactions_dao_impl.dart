@@ -58,9 +58,11 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
 
     // Optional payment method filter
     if (paymentMethodId != null) {
-      joined.where(transactions.paymentMethodId.equals(paymentMethodId));
-    } else {
-      joined.where(transactions.paymentMethodId.isNull());
+      if (paymentMethodId == 0) {
+        joined.where(transactions.paymentMethodId.isNull());
+      } else {
+        joined.where(transactions.paymentMethodId.equals(paymentMethodId));
+      }
     }
 
     final results = await joined.get();
