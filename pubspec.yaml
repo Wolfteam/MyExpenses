@@ -24,7 +24,7 @@ dependencies:
   csv: ^6.0.0
   darq: ^2.1.0
   device_info_plus: ^12.3.0
-  drift: ^2.30.0
+  drift: ^2.31.0
   drift_flutter: ^0.2.8
   enum_to_string: ^2.2.1
   extension_google_sign_in_as_googleapis_auth: ^2.0.13
