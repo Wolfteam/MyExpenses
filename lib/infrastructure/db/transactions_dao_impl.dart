@@ -37,14 +37,17 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
 
   @override
   Future<List<TransactionItem>> getAllTransactions(int? userId, DateTime from, DateTime to, {int? paymentMethodId}) async {
-    final joined = (select(transactions)
-          ..where(
-            (t) =>
-                t.localStatus.equals(LocalStatusType.deleted.index).not() &
-                t.transactionDate.isBetweenValues(from, to) &
-                t.isParentTransaction.not(),
-          ))
-        .join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))]);
+    final joined =
+        (select(transactions)..where(
+              (t) =>
+                  t.localStatus.equals(LocalStatusType.deleted.index).not() &
+                  t.transactionDate.isBetweenValues(from, to) &
+                  t.isParentTransaction.not(),
+            ))
+            .join([
+              innerJoin(categories, categories.id.equalsExp(transactions.categoryId)),
+              leftOuterJoin(paymentMethods, paymentMethods.id.equalsExp(transactions.paymentMethodId)),
+            ]);
 
     // User filter
     if (userId == null) {
@@ -55,11 +58,9 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
 
     // Optional payment method filter
     if (paymentMethodId != null) {
-      if (paymentMethodId == 0) {
-        joined.where(transactions.paymentMethodId.isNull());
-      } else {
-        joined.where(transactions.paymentMethodId.equals(paymentMethodId));
-      }
+      joined.where(transactions.paymentMethodId.equals(paymentMethodId));
+    } else {
+      joined.where(transactions.paymentMethodId.isNull());
     }
 
     final results = await joined.get();
@@ -151,6 +152,12 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
       savedTransaction = (await query.get()).first;
     }
 
+    String? pmName;
+    if (savedTransaction.paymentMethodId != null) {
+      final pm = await (select(paymentMethods)..where((p) => p.id.equals(savedTransaction.paymentMethodId!))).getSingleOrNull();
+      pmName = pm?.name;
+    }
+
     return TransactionItem(
       amount: savedTransaction.amount,
       category: transaction.category,
@@ -164,6 +171,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
       parentTransactionId: savedTransaction.parentTransactionId,
       longDescription: savedTransaction.longDescription,
       paymentMethodId: savedTransaction.paymentMethodId,
+      paymentMethodName: pmName,
     );
   }
 
@@ -194,7 +202,10 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
                   t.repetitionCycle.equals(RepetitionCycleType.none.index).not() &
                   t.isParentTransaction,
             ))
-            .join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))]);
+            .join([
+              innerJoin(categories, categories.id.equalsExp(transactions.categoryId)),
+              leftOuterJoin(paymentMethods, paymentMethods.id.equalsExp(transactions.paymentMethodId)),
+            ]);
 
     var results = <TypedResult>[];
     if (userId == null) {
@@ -217,7 +228,10 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
                   t.nextRecurringDate.isSmallerOrEqualValue(until) &
                   t.isParentTransaction,
             ))
-            .join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))]);
+            .join([
+              innerJoin(categories, categories.id.equalsExp(transactions.categoryId)),
+              leftOuterJoin(paymentMethods, paymentMethods.id.equalsExp(transactions.paymentMethodId)),
+            ]);
 
     var results = <TypedResult>[];
     if (userId == null) {
@@ -239,7 +253,10 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
                   t.parentTransactionId.equals(parentId) &
                   t.transactionDate.isBetweenValues(from, to),
             ))
-            .join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))])
+            .join([
+              innerJoin(categories, categories.id.equalsExp(transactions.categoryId)),
+              leftOuterJoin(paymentMethods, paymentMethods.id.equalsExp(transactions.paymentMethodId)),
+            ])
             .get();
 
     return results.map(_mapToTransactionItem).toList();
@@ -278,7 +295,10 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
               (t) =>
                   t.parentTransactionId.isNotNull() & t.parentTransactionId.equals(parent.id) & t.transactionDate.isIn(periods),
             ))
-            .join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))])
+            .join([
+              innerJoin(categories, categories.id.equalsExp(transactions.categoryId)),
+              leftOuterJoin(paymentMethods, paymentMethods.id.equalsExp(transactions.paymentMethodId)),
+            ])
             .get();
 
     return results.map(_mapToTransactionItem).toList();
@@ -290,7 +310,10 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
         (select(transactions)..where(
               (t) => t.id.equals(id),
             ))
-            .join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))])
+            .join([
+              innerJoin(categories, categories.id.equalsExp(transactions.categoryId)),
+              leftOuterJoin(paymentMethods, paymentMethods.id.equalsExp(transactions.paymentMethodId)),
+            ])
             .map(_mapToTransactionItem);
 
     return query.getSingle();
@@ -602,7 +625,10 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
         (select(transactions)..where(
               (t) => t.localStatus.equals(LocalStatusType.deleted.index).not() & t.isParentTransaction.not(),
             ))
-            .join([innerJoin(categories, categories.id.equalsExp(transactions.categoryId))]);
+            .join([
+              innerJoin(categories, categories.id.equalsExp(transactions.categoryId)),
+              leftOuterJoin(paymentMethods, paymentMethods.id.equalsExp(transactions.paymentMethodId)),
+            ]);
     if (userId == null) {
       query = query..where(categories.userId.isNull());
     } else {
@@ -741,6 +767,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
   TransactionItem _mapToTransactionItem(TypedResult row) {
     final cat = row.readTable(categories);
     final trans = row.readTable(transactions);
+    final pm = row.readTableOrNull(paymentMethods);
     return TransactionItem(
       id: trans.id,
       amount: trans.amount,
@@ -761,6 +788,7 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
       ),
       longDescription: trans.longDescription,
       paymentMethodId: trans.paymentMethodId,
+      paymentMethodName: pm?.name,
     );
   }
 

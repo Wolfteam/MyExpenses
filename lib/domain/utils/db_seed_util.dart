@@ -5,7 +5,7 @@ import 'package:my_expenses/domain/models/entities/converters/db_converters.dart
 import 'package:my_expenses/infrastructure/db/database.dart';
 import 'package:my_expenses/presentation/shared/utils/category_utils.dart';
 
-const createdBy = 'ebastidas';
+const String createdBy = 'system';
 
 //TODO: MOVE THIS OUT OF HERE ?
 
