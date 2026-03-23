@@ -38,7 +38,7 @@ class CreditCardCyclesPage extends StatelessWidget {
                     final df = DateFormat.yMMMd();
 
                     return ListTile(
-                      leading: const Icon(Icons.credit_card),
+                      leading: Icon(m.icon, color: m.iconColor),
                       title: Text(m.name),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

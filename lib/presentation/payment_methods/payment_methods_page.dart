@@ -267,7 +267,7 @@ class _CreateOrEditDialogState extends State<_CreateOrEditDialog> {
       ),
       actions: [
         TextButton(onPressed: () => Navigator.pop(context), child: Text(i18n.cancel)),
-        ElevatedButton(
+        FilledButton(
           onPressed: () {
             final name = nameCtrl.text.trim();
             if (name.isEmpty) {

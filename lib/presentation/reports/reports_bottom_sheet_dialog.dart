@@ -85,8 +85,7 @@ class _Body extends StatelessWidget {
                 onChanged: (newValue) => _reportFileTypeChanged(context, newValue!),
               ),
             ),
-            const SizedBox(height: 12),
-            ModalSheetTitle(title: i18n.paymentMethods),
+            Text(i18n.paymentMethods),
             Padding(
               padding: const EdgeInsets.only(left: 16, right: 16),
               child: BlocProvider<PaymentMethodPickerBloc>(
@@ -121,13 +120,13 @@ class _Body extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 8),
             SwitchListTile(
               value: state.groupByPaymentMethod,
               onChanged: (v) => context.read<ReportsBloc>().add(ReportsEvent.groupByPaymentMethodChanged(value: v)),
               title: Text(i18n.groupByPaymentMethod),
-              contentPadding: const EdgeInsets.only(left: 8, right: 8),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8),
             ),
+            const SizedBox(height: 8),
             OverflowBar(
               alignment: MainAxisAlignment.end,
               children: <Widget>[
