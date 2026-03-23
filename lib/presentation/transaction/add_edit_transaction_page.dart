@@ -329,10 +329,10 @@ class _PaymentMethodSelector extends StatelessWidget {
               final i18n = S.of(context);
               final selectedName = () {
                 if (paymentMethodId == null) return i18n.paymentMethodUnknownNone;
-                final items = pickerState.maybeWhen(
-                  loaded: (items, _, __) => items,
-                  orElse: () => const <PaymentMethodItem>[],
-                );
+                final items = switch (pickerState) {
+                  final PaymentMethodPickerStateLoadedState s => s.items,
+                  _ => const <PaymentMethodItem>[],
+                };
                 final m = items
                     .where((e) => e.id == paymentMethodId)
                     .cast<PaymentMethodItem?>()
@@ -352,9 +352,13 @@ class _PaymentMethodSelector extends StatelessWidget {
                 onTap: isChildTransaction
                     ? null
                     : () async {
+                        final transactionFormBloc = context.read<TransactionFormBloc>();
                         await showModalBottomSheet(
                           context: context,
-                          builder: (_) => _PaymentMethodPickerSheet(initialId: paymentMethodId),
+                          builder: (_) => BlocProvider.value(
+                            value: transactionFormBloc,
+                            child: _PaymentMethodPickerSheet(initialId: paymentMethodId),
+                          ),
                         );
                       },
                 trailing: paymentMethodId != null && !isChildTransaction
@@ -389,10 +393,10 @@ class _PaymentMethodPickerSheet extends StatelessWidget {
         child: BlocBuilder<PaymentMethodPickerBloc, PaymentMethodPickerState>(
           builder: (context, state) {
             final i18n = S.of(context);
-            final items = state.maybeWhen(
-              loaded: (items, _, __) => items,
-              orElse: () => const <PaymentMethodItem>[],
-            );
+            final items = switch (state) {
+              final PaymentMethodPickerStateLoadedState s => s.items,
+              _ => const <PaymentMethodItem>[],
+            };
             return ListView(
               shrinkWrap: true,
               children: [

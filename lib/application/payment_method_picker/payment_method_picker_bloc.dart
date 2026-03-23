@@ -19,12 +19,18 @@ class PaymentMethodPickerBloc extends Bloc<PaymentMethodPickerEvent, PaymentMeth
   PaymentMethodPickerBloc(this._logger, this._dao, this._usersDao) : super(const PaymentMethodPickerState.loading()) {
     on<PaymentMethodPickerEventLoad>(_onLoad);
     on<PaymentMethodPickerEventSelect>((event, emit) {
-      final items = state.maybeWhen(loaded: (items, _, __) => items, orElse: () => const <PaymentMethodItem>[]);
-      emit(PaymentMethodPickerState.loaded(items: items, selectedId: event.id, errorOccurred: false));
+      final items = switch (state) {
+        final PaymentMethodPickerStateLoadedState s => s.items,
+        _ => const <PaymentMethodItem>[],
+      };
+      emit(PaymentMethodPickerState.loaded(items: items, selectedId: event.id));
     });
     on<PaymentMethodPickerEventClear>((event, emit) {
-      final items = state.maybeWhen(loaded: (items, _, __) => items, orElse: () => const <PaymentMethodItem>[]);
-      emit(PaymentMethodPickerState.loaded(items: items, selectedId: null, errorOccurred: false));
+      final items = switch (state) {
+        final PaymentMethodPickerStateLoadedState s => s.items,
+        _ => const <PaymentMethodItem>[],
+      };
+      emit(PaymentMethodPickerState.loaded(items: items));
     });
   }
 
@@ -32,16 +38,12 @@ class PaymentMethodPickerBloc extends Bloc<PaymentMethodPickerEvent, PaymentMeth
     emit(const PaymentMethodPickerState.loading());
     try {
       final user = await _usersDao.getActiveUser();
-      if (user == null) {
-        emit(const PaymentMethodPickerState.loaded(items: [], selectedId: null));
-        return;
-      }
-      final items = await _dao.getAll(user.id, includeArchived: false);
+      final items = await _dao.getAll(user?.id);
       emit(PaymentMethodPickerState.loaded(items: items, selectedId: event.initialSelectedId));
     } catch (e, s) {
       _logger.error(runtimeType, 'Load failed', e, s);
-      emit(const PaymentMethodPickerState.loaded(items: [], selectedId: null, errorOccurred: true));
-      emit(const PaymentMethodPickerState.loaded(items: [], selectedId: null, errorOccurred: false));
+      emit(const PaymentMethodPickerState.loaded(items: [], errorOccurred: true));
+      emit(const PaymentMethodPickerState.loaded(items: []));
     }
   }
 }

@@ -21,7 +21,7 @@ class PaymentMethodsPage extends StatelessWidget {
 }
 
 class _Page extends StatelessWidget {
-  const _Page({super.key});
+  const _Page();
 
   @override
   Widget build(BuildContext context) {
@@ -105,14 +105,8 @@ class _List extends StatelessWidget {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: active.length,
-                        onReorder: (oldIndex, newIndex) {
-                          final ids = List<int>.from(active.map((e) => e.id));
-                          if (newIndex > oldIndex) newIndex -= 1;
-                          final moved = ids.removeAt(oldIndex);
-                          ids.insert(newIndex, moved);
-                          context.read<PaymentMethodsBloc>().add(PaymentMethodsEvent.reorder(orderedIds: ids));
-                        },
-                        itemBuilder: (context, index) => _ListItem(item: active[index]),
+                        onReorder: (oldIndex, newIndex) => _onReorder(oldIndex, newIndex, active, context),
+                        itemBuilder: (context, index) => _ListItem(key: ValueKey(active[index].id), item: active[index]),
                       ),
                     if (archived.isNotEmpty)
                       Padding(
@@ -124,18 +118,23 @@ class _List extends StatelessWidget {
                 )
               : ReorderableListView.builder(
                   itemCount: active.length,
-                  onReorder: (oldIndex, newIndex) {
-                    final ids = List<int>.from(active.map((e) => e.id));
-                    if (newIndex > oldIndex) newIndex -= 1;
-                    final moved = ids.removeAt(oldIndex);
-                    ids.insert(newIndex, moved);
-                    context.read<PaymentMethodsBloc>().add(PaymentMethodsEvent.reorder(orderedIds: ids));
-                  },
-                  itemBuilder: (context, index) => _ListItem(item: active[index]),
+                  onReorder: (oldIndex, newIndex) => _onReorder(oldIndex, newIndex, active, context),
+                  itemBuilder: (context, index) => _ListItem(key: ValueKey(active[index].id), item: active[index]),
                 ),
         ),
       ],
     );
+  }
+
+  void _onReorder(int oldIndex, int newIndex, List<PaymentMethodItem> active, BuildContext context) {
+    int nIndex = newIndex;
+    final ids = List<int>.from(active.map((e) => e.id));
+    if (nIndex > oldIndex) {
+      nIndex -= 1;
+    }
+    final moved = ids.removeAt(oldIndex);
+    ids.insert(nIndex, moved);
+    context.read<PaymentMethodsBloc>().add(PaymentMethodsEvent.reorder(orderedIds: ids));
   }
 }
 
@@ -143,28 +142,31 @@ class _ListItem extends StatelessWidget {
   final PaymentMethodItem item;
   final bool draggable;
 
-  const _ListItem({required this.item, this.draggable = true});
+  const _ListItem({super.key, required this.item, this.draggable = true});
 
   @override
   Widget build(BuildContext context) {
     final i18n = S.of(context);
     return ListTile(
-      key: ValueKey(item.id),
-      leading: draggable ? const Icon(Icons.drag_handle) : const Icon(Icons.credit_card),
+      leading: Icon(item.icon, color: item.iconColor),
       title: Text(item.name),
       subtitle: Text(i18n.translatePaymentMethodType(item.type)),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () => _showCreateOrEditDialog(context, existing: item),
-          ),
-          Switch(
-            value: item.isArchived,
-            onChanged: (v) => context.read<PaymentMethodsBloc>().add(PaymentMethodsEvent.archive(id: item.id, isArchived: v)),
-          ),
-        ],
+      trailing: Container(
+        margin: const EdgeInsets.only(right: 10),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () => _showCreateOrEditDialog(context, existing: item),
+            ),
+            Switch(
+              value: item.isArchived,
+              onChanged: (v) => context.read<PaymentMethodsBloc>().add(PaymentMethodsEvent.archive(id: item.id, isArchived: v)),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -191,22 +193,33 @@ class _CreateOrEditDialog extends StatefulWidget {
 
 class _CreateOrEditDialogState extends State<_CreateOrEditDialog> {
   PaymentMethodType selectedType = PaymentMethodType.cash;
+  late final TextEditingController nameCtrl;
+  late final TextEditingController statementCtrl;
+  late final TextEditingController dueCtrl;
+  late final TextEditingController limitCtrl;
 
   @override
   void initState() {
-    if (widget.existing != null) {
-      selectedType = widget.existing!.type;
-    }
     super.initState();
+    selectedType = widget.existing?.type ?? PaymentMethodType.cash;
+    nameCtrl = TextEditingController(text: widget.existing?.name ?? '');
+    statementCtrl = TextEditingController(text: widget.existing?.statementCloseDay?.toString() ?? '');
+    dueCtrl = TextEditingController(text: widget.existing?.paymentDueDay?.toString() ?? '');
+    limitCtrl = TextEditingController(text: widget.existing?.creditLimitMinor?.toString() ?? '');
+  }
+
+  @override
+  void dispose() {
+    nameCtrl.dispose();
+    statementCtrl.dispose();
+    dueCtrl.dispose();
+    limitCtrl.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final i18n = S.of(context);
-    final nameCtrl = TextEditingController(text: widget.existing?.name ?? '');
-    final statementCtrl = TextEditingController(text: widget.existing?.statementCloseDay?.toString() ?? '');
-    final dueCtrl = TextEditingController(text: widget.existing?.paymentDueDay?.toString() ?? '');
-    final limitCtrl = TextEditingController(text: widget.existing?.creditLimitMinor?.toString() ?? '');
 
     return AlertDialog(
       title: Text(widget.existing == null ? i18n.newPaymentMethod : i18n.editPaymentMethod),
@@ -263,13 +276,13 @@ class _CreateOrEditDialogState extends State<_CreateOrEditDialog> {
             }
 
             // Duplicate check against current list
-            final exists = context.read<PaymentMethodsBloc>().state.maybeWhen(
-              loaded: (items, _, __) => items.any(
+            final exists = switch (context.read<PaymentMethodsBloc>().state) {
+              final PaymentMethodsStateLoadedState s => s.items.any(
                 (e) =>
                     e.name.toLowerCase() == name.toLowerCase() && (widget.existing == null ? true : e.id != widget.existing!.id),
               ),
-              orElse: () => false,
-            );
+              _ => false,
+            };
             if (exists) {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(i18n.nameAlreadyExists)));
               return;
@@ -278,7 +291,7 @@ class _CreateOrEditDialogState extends State<_CreateOrEditDialog> {
             int? statementDay;
             int? dueDay;
             int? creditLimit;
-            if (selectedType == 'credit_card') {
+            if (selectedType == PaymentMethodType.creditCard) {
               statementDay = int.tryParse(statementCtrl.text);
               dueDay = int.tryParse(dueCtrl.text);
               creditLimit = int.tryParse(limitCtrl.text);

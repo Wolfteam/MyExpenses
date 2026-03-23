@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:my_expenses/application/payment_methods/payment_methods_bloc.dart';
+import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/injection.dart';
 
@@ -17,9 +18,9 @@ class CreditCardCyclesPage extends StatelessWidget {
         appBar: AppBar(title: Text(i18n.creditCardCycles)),
         body: BlocBuilder<PaymentMethodsBloc, PaymentMethodsState>(
           builder: (context, state) {
-            return state.maybeWhen(
-              loaded: (items, includeArchived, errorOccurred) {
-                final cards = items.where((e) => e.type == 'credit_card' && !e.isArchived).toList()
+            switch (state) {
+              case final PaymentMethodsStateLoadedState s:
+                final cards = s.items.where((e) => e.type == PaymentMethodType.creditCard && !e.isArchived).toList()
                   ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
 
                 if (cards.isEmpty) {
@@ -54,9 +55,9 @@ class CreditCardCyclesPage extends StatelessWidget {
                     );
                   },
                 );
-              },
-              orElse: () => const Center(child: CircularProgressIndicator()),
-            );
+              default:
+                return const Center(child: CircularProgressIndicator());
+            }
           },
         ),
       ),

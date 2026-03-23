@@ -158,10 +158,10 @@ class SearchFilterBar extends StatelessWidget {
           child: BlocBuilder<PaymentMethodPickerBloc, PaymentMethodPickerState>(
             builder: (context, state) {
               final i18n = S.of(context);
-              final items = state.maybeWhen(
-                loaded: (items, _, __) => items,
-                orElse: () => const <PaymentMethodItem>[],
-              );
+              final items = switch (state) {
+                final PaymentMethodPickerStateLoadedState s => s.items,
+                _ => const <PaymentMethodItem>[],
+              };
               return ListView(
                 shrinkWrap: true,
                 children: [

@@ -37,10 +37,6 @@ class PaymentMethodsBloc extends Bloc<PaymentMethodsEvent, PaymentMethodsState> 
           final PaymentMethodsStateLoadedState loaded => loaded.includeArchived,
         };
 
-    if (userId == null) {
-      emit(PaymentMethodsState.loaded(items: const [], includeArchived: include));
-      return;
-    }
     final items = await _dao.getAll(userId, includeArchived: include);
     emit(PaymentMethodsState.loaded(items: items, includeArchived: include));
   }
@@ -62,23 +58,31 @@ class PaymentMethodsBloc extends Bloc<PaymentMethodsEvent, PaymentMethodsState> 
   ) async {
     try {
       final userId = await _getActiveUserId();
-      if (userId == null) return;
       await _dao.save(userId, event.method);
       await _refresh(emit);
     } catch (e, s) {
       _logger.error(runtimeType, 'Save failed', e, s);
       // pulse error flag
-      final include = state.maybeWhen(loaded: (_, inc, __) => inc, orElse: () => false);
+      final include = switch (state) {
+        final PaymentMethodsStateLoadedState s => s.includeArchived,
+        _ => false,
+      };
       emit(
         PaymentMethodsState.loaded(
-          items: state.maybeWhen(loaded: (it, _, __) => it, orElse: () => const []),
+          items: switch (state) {
+            final PaymentMethodsStateLoadedState s => s.items,
+            _ => const [],
+          },
           includeArchived: include,
           errorOccurred: true,
         ),
       );
       emit(
         PaymentMethodsState.loaded(
-          items: state.maybeWhen(loaded: (it, _, _) => it, orElse: () => const []),
+          items: switch (state) {
+            final PaymentMethodsStateLoadedState s => s.items,
+            _ => const [],
+          },
           includeArchived: include,
         ),
       );
@@ -91,17 +95,26 @@ class PaymentMethodsBloc extends Bloc<PaymentMethodsEvent, PaymentMethodsState> 
       await _refresh(emit);
     } catch (e, s) {
       _logger.error(runtimeType, 'Archive failed', e, s);
-      final include = state.maybeWhen(loaded: (_, inc, __) => inc, orElse: () => false);
+      final include = switch (state) {
+        final PaymentMethodsStateLoadedState s => s.includeArchived,
+        _ => false,
+      };
       emit(
         PaymentMethodsState.loaded(
-          items: state.maybeWhen(loaded: (it, _, __) => it, orElse: () => const []),
+          items: switch (state) {
+            final PaymentMethodsStateLoadedState s => s.items,
+            _ => const [],
+          },
           includeArchived: include,
           errorOccurred: true,
         ),
       );
       emit(
         PaymentMethodsState.loaded(
-          items: state.maybeWhen(loaded: (it, _, __) => it, orElse: () => const []),
+          items: switch (state) {
+            final PaymentMethodsStateLoadedState s => s.items,
+            _ => const [],
+          },
           includeArchived: include,
         ),
       );
@@ -111,22 +124,30 @@ class PaymentMethodsBloc extends Bloc<PaymentMethodsEvent, PaymentMethodsState> 
   Future<void> _onReorder(PaymentMethodsEventReorder event, Emitter<PaymentMethodsState> emit) async {
     try {
       final userId = await _getActiveUserId();
-      if (userId == null) return;
       await _dao.updateSortOrders(userId, event.orderedIds);
       await _refresh(emit);
     } catch (e, s) {
       _logger.error(runtimeType, 'Reorder failed', e, s);
-      final include = state.maybeWhen(loaded: (_, inc, __) => inc, orElse: () => false);
+      final include = switch (state) {
+        final PaymentMethodsStateLoadedState s => s.includeArchived,
+        _ => false,
+      };
       emit(
         PaymentMethodsState.loaded(
-          items: state.maybeWhen(loaded: (it, _, __) => it, orElse: () => const []),
+          items: switch (state) {
+            final PaymentMethodsStateLoadedState s => s.items,
+            _ => const [],
+          },
           includeArchived: include,
           errorOccurred: true,
         ),
       );
       emit(
         PaymentMethodsState.loaded(
-          items: state.maybeWhen(loaded: (it, _, __) => it, orElse: () => const []),
+          items: switch (state) {
+            final PaymentMethodsStateLoadedState s => s.items,
+            _ => const [],
+          },
           includeArchived: include,
         ),
       );

@@ -94,33 +94,30 @@ class _Body extends StatelessWidget {
                     Injection.paymentMethodPickerBloc
                       ..add(PaymentMethodPickerEvent.load(initialSelectedId: state.selectedPaymentMethodId)),
                 child: BlocBuilder<PaymentMethodPickerBloc, PaymentMethodPickerState>(
-                  builder: (ctx, pmState) => pmState.maybeWhen(
-                    loaded: (items, selectedId, __) {
-                      final currentSelection = state.selectedPaymentMethodId;
-                      return DropdownButton<int?>(
-                        isExpanded: true,
-                        hint: Text(i18n.paymentMethods),
-                        underline: Container(height: 0, color: Colors.transparent),
-                        value: currentSelection,
-                        items:
-                            <DropdownMenuItem<int?>>[
-                              DropdownMenuItem<int?>(value: null, child: Text(i18n.all)),
-                              DropdownMenuItem<int?>(value: 0, child: Text(i18n.paymentMethodUnknownNone)),
-                            ] +
-                            items
-                                .map(
-                                  (m) => DropdownMenuItem<int?>(
-                                    value: m.id,
-                                    child: Text(m.name),
-                                  ),
-                                )
-                                .toList(),
-                        onChanged: (newValue) =>
-                            context.read<ReportsBloc>().add(ReportsEvent.paymentMethodChanged(selectedPaymentMethodId: newValue)),
-                      );
-                    },
-                    orElse: () => const SizedBox(height: 48, child: Center(child: CircularProgressIndicator())),
-                  ),
+                  builder: (ctx, pmState) => switch (pmState) {
+                    final PaymentMethodPickerStateLoadedState s => DropdownButton<int?>(
+                      isExpanded: true,
+                      hint: Text(i18n.paymentMethods),
+                      underline: Container(height: 0, color: Colors.transparent),
+                      value: state.selectedPaymentMethodId,
+                      items:
+                          <DropdownMenuItem<int?>>[
+                            DropdownMenuItem<int?>(child: Text(i18n.all)),
+                            DropdownMenuItem<int?>(value: 0, child: Text(i18n.paymentMethodUnknownNone)),
+                          ] +
+                          s.items
+                              .map(
+                                (m) => DropdownMenuItem<int?>(
+                                  value: m.id,
+                                  child: Text(m.name),
+                                ),
+                              )
+                              .toList(),
+                      onChanged: (newValue) =>
+                          context.read<ReportsBloc>().add(ReportsEvent.paymentMethodChanged(selectedPaymentMethodId: newValue)),
+                    ),
+                    _ => const SizedBox(height: 48, child: Center(child: CircularProgressIndicator())),
+                  },
                 ),
               ),
             ),
