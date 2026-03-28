@@ -23,7 +23,7 @@ abstract class CategoriesDao {
 
   Future<void> deleteAll(int? userId);
 
-  Future<List<drive.Category>> getAllCategoriesToSync(int userId);
+  Future<List<drive.Category>> getAllCategoriesToSync(int? userId);
 
   Future<void> syncDownDelete(int userId, List<drive.Category> existingCats);
 
