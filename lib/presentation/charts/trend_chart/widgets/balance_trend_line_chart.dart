@@ -47,12 +47,23 @@ class BalanceTrendLineChart extends StatelessWidget {
               },
             ),
           ),
-          leftTitles: const AxisTitles(
+          leftTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              reservedSize: 40,
+              reservedSize: 48,
               maxIncluded: false,
               minIncluded: false,
+              getTitlesWidget: (value, meta) {
+                return SideTitleWidget(
+                  meta: meta,
+                  child: Text(
+                    meta.formattedValue,
+                    style: theme.textTheme.labelSmall,
+                    softWrap: false,
+                    overflow: TextOverflow.visible,
+                  ),
+                );
+              },
             ),
           ),
         ),

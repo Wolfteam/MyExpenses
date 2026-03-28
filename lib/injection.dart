@@ -167,6 +167,14 @@ class Injection {
     return CategoryChartBloc(logger, transactionsDao, usersDao);
   }
 
+  static PaymentMethodChartBloc get paymentMethodChartBloc {
+    final logger = getIt<LoggingService>();
+    final transactionsDao = getIt<TransactionsDao>();
+    final usersDao = getIt<UsersDao>();
+    final paymentMethodsDao = getIt<PaymentMethodsDao>();
+    return PaymentMethodChartBloc(logger, transactionsDao, usersDao, paymentMethodsDao);
+  }
+
   static IncomeExpenseChartBloc get incomeExpenseChartBloc {
     final logger = getIt<LoggingService>();
     final transactionsDao = getIt<TransactionsDao>();
@@ -179,6 +187,15 @@ class Injection {
     final transactionsDao = getIt<TransactionsDao>();
     final usersDao = getIt<UsersDao>();
     return TrendChartBloc(logger, transactionsDao, usersDao);
+  }
+
+  static DataTransferBloc get dataTransferBloc {
+    final logger = getIt<LoggingService>();
+    final transactionsDao = getIt<TransactionsDao>();
+    final categoriesDao = getIt<CategoriesDao>();
+    final paymentMethodsDao = getIt<PaymentMethodsDao>();
+    final usersDao = getIt<UsersDao>();
+    return DataTransferBloc(logger, transactionsDao, categoriesDao, paymentMethodsDao, usersDao);
   }
 
   static Future<void> init() async {

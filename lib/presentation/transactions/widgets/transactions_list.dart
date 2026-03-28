@@ -35,6 +35,8 @@ class _TransactionsListState extends State<TransactionsList> {
                     ? state.recurringTransactions
                     : state.groupingType == TransactionFilterType.category
                     ? state.groupedTransactionsByCategory
+                    : state.groupingType == TransactionFilterType.paymentMethod
+                    ? state.groupedTransactionsByPaymentMethod
                     : state.transactions;
             return SliverPadding(
               padding: Styles.edgeInsetVertical10,
@@ -59,9 +61,10 @@ class _TransactionsListState extends State<TransactionsList> {
                   }
 
                   final TransactionCardItems group = transactions[index - 1];
-                  return state.groupingType != TransactionFilterType.category
-                      ? TransactionsCardContainer(model: group)
-                      : CategoryGroupedTransactionsCardContainer(group: group);
+                  return (state.groupingType == TransactionFilterType.category ||
+                          state.groupingType == TransactionFilterType.paymentMethod)
+                      ? CategoryGroupedTransactionsCardContainer(group: group)
+                      : TransactionsCardContainer(model: group);
                 }, childCount: transactions.length + 1),
               ),
             );

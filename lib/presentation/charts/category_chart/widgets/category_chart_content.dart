@@ -24,15 +24,18 @@ class CategoryChartContent extends StatelessWidget {
                 sectionsSpace: 2,
                 centerSpaceRadius: 40,
                 sections: categories.map((item) {
+                  final showLabel = item.percentage >= 5.0;
+                  final luminance = item.color.computeLuminance();
+                  final textColor = luminance > 0.4 ? Colors.black : Colors.white;
                   return PieChartSectionData(
                     color: item.color,
                     value: item.total,
-                    title: '${item.percentage.toStringAsFixed(1)}%',
+                    title: showLabel ? '${item.percentage.toStringAsFixed(1)}%' : '',
                     radius: 80,
-                    titleStyle: const TextStyle(
+                    titleStyle: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: textColor,
                     ),
                   );
                 }).toList(),

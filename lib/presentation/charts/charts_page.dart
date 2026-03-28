@@ -5,11 +5,13 @@ import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/injection.dart';
 import 'package:my_expenses/presentation/charts/category_chart/category_chart_page.dart';
 import 'package:my_expenses/presentation/charts/income_expense_chart/income_expense_chart_page.dart';
+import 'package:my_expenses/presentation/charts/payment_method_chart/payment_method_chart_page.dart';
 import 'package:my_expenses/presentation/charts/trend_chart/trend_chart_page.dart';
 import 'package:my_expenses/presentation/charts/widgets/chart_card.dart';
 import 'package:my_expenses/presentation/charts/widgets/charts_period_filter.dart';
 import 'package:my_expenses/presentation/charts/widgets/charts_summary_cards.dart';
 import 'package:my_expenses/presentation/charts/widgets/income_expense_mini_preview.dart';
+import 'package:my_expenses/presentation/charts/widgets/payment_method_mini_preview.dart';
 import 'package:my_expenses/presentation/charts/widgets/top_categories_mini_preview.dart';
 import 'package:my_expenses/presentation/charts/widgets/trend_mini_preview.dart';
 import 'package:my_expenses/presentation/shared/loading.dart';
@@ -85,13 +87,28 @@ class _ChartsContent extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        ChartCard(
-          title: i18n.topCategories,
-          icon: Icons.format_list_numbered,
-          preview: const TopCategoriesMiniPreview(),
-          onTap: () => _pushDetail(context, const CategoryChartPage()),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: ChartCard(
+                title: i18n.topCategories,
+                icon: Icons.format_list_numbered,
+                preview: const TopCategoriesMiniPreview(),
+                onTap: () => _pushDetail(context, const CategoryChartPage()),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ChartCard(
+                title: i18n.topPaymentMethods,
+                icon: Icons.credit_card,
+                preview: const PaymentMethodMiniPreview(),
+                onTap: () => _pushDetail(context, const PaymentMethodChartPage()),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 8),
       ],
     );
   }

@@ -109,6 +109,8 @@ extension I18nExtensions on S {
         return date;
       case TransactionFilterType.category:
         return category;
+      case TransactionFilterType.paymentMethod:
+        return paymentMethodFieldTitle;
     }
   }
 

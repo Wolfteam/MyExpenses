@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/generated/l10n.dart';
-import 'package:my_expenses/presentation/charts/widgets/legend_dot.dart';
 import 'package:my_expenses/presentation/charts/trend_chart/widgets/balance_trend_line_chart.dart';
 import 'package:my_expenses/presentation/charts/trend_chart/widgets/monthly_breakdown_bar_chart.dart';
+import 'package:my_expenses/presentation/charts/widgets/legend_dot.dart';
 import 'package:my_expenses/presentation/shared/mixins/transaction_mixin.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
 

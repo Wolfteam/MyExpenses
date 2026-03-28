@@ -44,8 +44,23 @@ class MonthlyBreakdownBarChart extends StatelessWidget with TransactionMixin {
         titlesData: FlTitlesData(
           rightTitles: const AxisTitles(),
           topTitles: const AxisTitles(),
-          leftTitles: const AxisTitles(
-            sideTitles: SideTitles(showTitles: true, reservedSize: 40),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 48,
+              getTitlesWidget: (value, meta) {
+                if (value == meta.max) return const SizedBox.shrink();
+                return SideTitleWidget(
+                  meta: meta,
+                  child: Text(
+                    meta.formattedValue,
+                    style: theme.textTheme.labelSmall,
+                    softWrap: false,
+                    overflow: TextOverflow.visible,
+                  ),
+                );
+              },
+            ),
           ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
