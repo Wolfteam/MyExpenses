@@ -75,7 +75,7 @@ dev_dependencies:
     sdk: flutter
   freezed: ^3.2.3
   intl_utils: ^2.8.13
-  json_serializable: ^6.9.5
+  json_serializable: ^6.13.1
   lint: ^2.8.0
 
 flutter_launcher_icons:
