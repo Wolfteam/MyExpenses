@@ -13,22 +13,19 @@ import 'package:my_expenses/presentation/shared/utils/enum_utils.dart';
 
 class SyncSettingsCard extends StatelessWidget {
   final SyncIntervalType syncIntervalType;
-  final bool showNotificationAfterFullSync;
 
   const SyncSettingsCard({
     super.key,
     required this.syncIntervalType,
-    required this.showNotificationAfterFullSync,
   });
 
   @override
   Widget build(BuildContext context) {
     final i18n = S.of(context);
-
     return SettingsCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
+        children: [
           SettingsCardTitleText(text: i18n.sync, icon: const Icon(Icons.sync)),
           SettingsCardSubtitleText(text: i18n.chooseSyncInterval),
           Padding(
@@ -36,14 +33,12 @@ class SyncSettingsCard extends StatelessWidget {
             child: CommonDropdownButton<SyncIntervalType>(
               hint: i18n.selectSyncInterval,
               currentValue: syncIntervalType,
-              values: EnumUtils.getTranslatedAndSortedEnum(SyncIntervalType.values, (v, _) => i18n.translateSyncIntervalType(v)),
+              values: EnumUtils.getTranslatedAndSortedEnum(
+                SyncIntervalType.values,
+                (v, _) => i18n.translateSyncIntervalType(v),
+              ),
               onChanged: (v, _) => _syncIntervalChanged(v, context),
             ),
-          ),
-          SwitchListTile(
-            value: showNotificationAfterFullSync,
-            title: Text(i18n.showNotificationAfterFullSync),
-            onChanged: (v) => _showNotificationAfterFullSyncChanged(v, context),
           ),
           TextButton.icon(
             icon: const Icon(Icons.sync),
@@ -57,14 +52,18 @@ class SyncSettingsCard extends StatelessWidget {
 
   void _syncIntervalChanged(SyncIntervalType newValue, BuildContext context) {
     final s = S.of(context);
-    context.read<SettingsBloc>().add(SettingsEvent.syncIntervalChanged(selectedSyncInterval: newValue, translations: s.getBackgroundTranslations()));
+    context.read<SettingsBloc>().add(
+      SettingsEvent.syncIntervalChanged(
+        selectedSyncInterval: newValue,
+        translations: s.getBackgroundTranslations(),
+      ),
+    );
   }
-
-  void _showNotificationAfterFullSyncChanged(bool newValue, BuildContext context) =>
-      context.read<SettingsBloc>().add(SettingsEvent.showNotificationAfterFullSyncChanged(show: newValue));
 
   void _triggerSyncTask(BuildContext context) {
     final s = S.of(context);
-    context.read<SettingsBloc>().add(SettingsEvent.triggerSyncTask(translations: s.getBackgroundTranslations()));
+    context.read<SettingsBloc>().add(
+      SettingsEvent.triggerSyncTask(translations: s.getBackgroundTranslations()),
+    );
   }
 }
