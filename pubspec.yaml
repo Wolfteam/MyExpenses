@@ -46,7 +46,7 @@ dependencies:
   googleapis: ^14.0.0
   image_picker: ^1.2.1
   internet_connection_checker_plus: ^2.9.1+1
-  json_annotation: ^4.9.0
+  json_annotation: ^4.11.0
   local_auth: ^2.3.0
   logger: ^2.7.0
   month_picker_dialog: ^6.7.0
