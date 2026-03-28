@@ -1,5 +1,9 @@
 export 'app/app_bloc.dart';
 export 'categories_list/categories_list_bloc.dart';
+export 'charts/charts_bloc.dart';
+export 'charts/category_chart/category_chart_bloc.dart';
+export 'charts/income_expense_chart/income_expense_chart_bloc.dart';
+export 'charts/trend_chart/trend_chart_bloc.dart';
 export 'category_form/category_form_bloc.dart';
 export 'category_icon/category_icon_bloc.dart';
 export 'credit_card_cycles/credit_card_cycles_bloc.dart';

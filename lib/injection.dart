@@ -153,6 +153,34 @@ class Injection {
     return TransactionsBloc(logger, transactionsDao, usersDao, settingsService);
   }
 
+  static ChartsBloc get chartsBloc {
+    final logger = getIt<LoggingService>();
+    final transactionsDao = getIt<TransactionsDao>();
+    final usersDao = getIt<UsersDao>();
+    return ChartsBloc(logger, transactionsDao, usersDao);
+  }
+
+  static CategoryChartBloc get categoryChartBloc {
+    final logger = getIt<LoggingService>();
+    final transactionsDao = getIt<TransactionsDao>();
+    final usersDao = getIt<UsersDao>();
+    return CategoryChartBloc(logger, transactionsDao, usersDao);
+  }
+
+  static IncomeExpenseChartBloc get incomeExpenseChartBloc {
+    final logger = getIt<LoggingService>();
+    final transactionsDao = getIt<TransactionsDao>();
+    final usersDao = getIt<UsersDao>();
+    return IncomeExpenseChartBloc(logger, transactionsDao, usersDao);
+  }
+
+  static TrendChartBloc get trendChartBloc {
+    final logger = getIt<LoggingService>();
+    final transactionsDao = getIt<TransactionsDao>();
+    final usersDao = getIt<UsersDao>();
+    return TrendChartBloc(logger, transactionsDao, usersDao);
+  }
+
   static Future<void> init() async {
     if (!getIt.isRegistered<NetworkService>()) {
       getIt.registerSingleton<NetworkService>(NetworkServiceImpl());

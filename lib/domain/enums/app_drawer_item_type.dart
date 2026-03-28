@@ -6,4 +6,5 @@ enum AppDrawerItemType {
   logout,
   estimates,
   search,
+  charts,
 }

@@ -4,6 +4,7 @@ export 'app_language_type.dart';
 export 'app_notification_type.dart';
 export 'app_theme_type.dart';
 export 'category_icon_type.dart';
+export 'chart_period_type.dart';
 export 'comparer_type.dart';
 export 'currency_symbol_type.dart';
 export 'local_status_type.dart';
