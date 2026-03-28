@@ -28,14 +28,9 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
     this._googleService,
     this._settingsService,
     this._pathService,
-  ) : super(const DrawerState.loaded(selectedPage: AppDrawerItemType.transactions)) {
+  ) : super(const DrawerState.loaded()) {
     on<DrawerEventInit>((event, emit) async {
       final s = await _initialize();
-      emit(s);
-    });
-
-    on<DrawerEventSelectedItemChanged>((event, emit) {
-      final s = state.copyWith(selectedPage: event.selectedPage, userSignedOut: false);
       emit(s);
     });
 
@@ -70,6 +65,6 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
     }
 
     _logger.info(runtimeType, '_signOut: User was signed out');
-    return DrawerState.loaded(selectedPage: AppDrawerItemType.transactions, isUserSignedIn: !signedOut, userSignedOut: signedOut);
+    return DrawerState.loaded(isUserSignedIn: !signedOut, userSignedOut: signedOut);
   }
 }

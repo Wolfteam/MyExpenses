@@ -8,6 +8,7 @@ import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/extensions/iterable_extensions.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/generated/l10n.dart';
+import 'package:my_expenses/presentation/charts/charts_page.dart';
 import 'package:my_expenses/presentation/shared/mixins/transaction_mixin.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
 
@@ -61,7 +62,14 @@ class _Header extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(i18n.activity, style: theme.textTheme.titleLarge),
+          TextButton.icon(
+            onPressed: () => Navigator.of(context).push(ChartsPage.route()),
+            style: TextButton.styleFrom(
+              foregroundColor: theme.colorScheme.onSurface,
+            ),
+            icon: const Icon(Icons.insert_chart),
+            label: Text(i18n.activity, style: theme.textTheme.titleLarge),
+          ),
           ToggleButtons(
             onPressed: (index) {
               final dateRangeType = TransactionActivityDateRangeType.values[index];

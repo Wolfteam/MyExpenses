@@ -3,16 +3,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/generated/l10n.dart';
+import 'package:my_expenses/presentation/estimates/estimate_bottom_sheet_dialog.dart';
+import 'package:my_expenses/presentation/reports/reports_bottom_sheet_dialog.dart';
 import 'package:my_expenses/presentation/shared/loading.dart';
 import 'package:my_expenses/presentation/shared/mixins/transaction_mixin.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
 import 'package:my_expenses/presentation/shared/utils/i18n_utils.dart';
+
+enum _SummaryAction { reports, estimates }
 
 class TransactionSummaryPerMonth extends StatelessWidget with TransactionMixin {
   const TransactionSummaryPerMonth();
 
   @override
   Widget build(BuildContext context) {
+    final i18n = S.of(context);
     return BlocBuilder<TransactionsSummaryPerMonthBloc, TransactionsSummaryPerMonthState>(
       builder:
           (context, state) => switch (state) {
@@ -23,10 +28,33 @@ class TransactionSummaryPerMonth extends StatelessWidget with TransactionMixin {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text(state.month, style: Theme.of(context).textTheme.titleLarge),
-                    IconButton(
-                      icon: const Icon(Icons.calendar_month),
-                      onPressed: () => _changeCurrentDate(context, state.currentDate, currentLocale(state.language)),
+                    Flexible(
+                      child: TextButton.icon(
+                        onPressed: () => _changeCurrentDate(context, state.currentDate, currentLocale(state.language)),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Theme.of(context).colorScheme.onSurface,
+                        ),
+                        icon: const Icon(Icons.calendar_month),
+                        label: Text(
+                          state.month,
+                          style: Theme.of(context).textTheme.titleLarge,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        TextButton.icon(
+                          onPressed: () => _onActionSelected(context, _SummaryAction.reports),
+                          icon: const Icon(Icons.insert_drive_file),
+                          label: Text(i18n.reports),
+                        ),
+                        TextButton.icon(
+                          onPressed: () => _onActionSelected(context, _SummaryAction.estimates),
+                          icon: const Icon(Icons.attach_money),
+                          label: Text(i18n.estimates),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -48,6 +76,25 @@ class TransactionSummaryPerMonth extends StatelessWidget with TransactionMixin {
             ),
           },
     );
+  }
+
+  void _onActionSelected(BuildContext context, _SummaryAction action) {
+    switch (action) {
+      case _SummaryAction.reports:
+        showModalBottomSheet(
+          shape: Styles.modalBottomSheetShape,
+          isScrollControlled: true,
+          context: context,
+          builder: (ctx) => ReportsBottomSheetDialog(),
+        );
+      case _SummaryAction.estimates:
+        showModalBottomSheet(
+          shape: Styles.modalBottomSheetShape,
+          isScrollControlled: true,
+          context: context,
+          builder: (ctx) => EstimateBottomSheetDialog(),
+        );
+    }
   }
 
   Future<void> _changeCurrentDate(BuildContext context, DateTime currentDate, Locale locale) async {

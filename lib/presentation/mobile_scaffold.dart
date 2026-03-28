@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_expenses/application/bloc.dart';
-import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/categories/categories_page.dart';
-import 'package:my_expenses/presentation/drawer/app_drawer.dart';
 import 'package:my_expenses/presentation/search/search_page.dart';
 import 'package:my_expenses/presentation/settings/settings_page.dart';
 import 'package:my_expenses/presentation/shared/utils/bloc_utils.dart';
@@ -38,7 +36,6 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
   Widget build(BuildContext context) {
     final i18n = S.of(context);
     return Scaffold(
-      drawer: AppDrawer(),
       body: SafeArea(
         child: TabBarView(
           controller: widget.tabController,
@@ -58,9 +55,13 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
         tooltip: i18n.addTransaction,
         child: const Icon(Icons.add),
       ),
-      bottomNavigationBar: BlocConsumer<DrawerBloc, DrawerState>(
-        listener: (ctx, state) => _onDrawerStateChanged(state),
-        builder: (ctx, state) => BottomNavigationBar(
+      bottomNavigationBar: BlocListener<DrawerBloc, DrawerState>(
+        listener: (ctx, state) {
+          if (state.userSignedOut) {
+            BlocUtils.raiseAllCommonBlocEvents(context);
+          }
+        },
+        child: BottomNavigationBar(
           showUnselectedLabels: true,
           landscapeLayout: BottomNavigationBarLandscapeLayout.linear,
           type: BottomNavigationBarType.fixed,
@@ -93,57 +94,14 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
     );
   }
 
-  int _getSelectedIndex(AppDrawerItemType item) {
-    int index;
-    switch (item) {
-      case AppDrawerItemType.transactions:
-        index = 0;
-      case AppDrawerItemType.categories:
-        index = 1;
-      case AppDrawerItemType.search:
-        index = 2;
-      case AppDrawerItemType.settings:
-        index = 3;
-      default:
-        throw Exception('The selected drawer item = $item is not valid in the bottom nav bar items');
-    }
-
-    return index;
-  }
-
-  void _onDrawerStateChanged(DrawerState state) {
-    if (state.userSignedOut) {
-      BlocUtils.raiseAllCommonBlocEvents(context);
-    }
-
-    _onPageSelected(state.selectedPage);
-  }
-
-  void _onPageSelected(AppDrawerItemType page) {
-    final index = _getSelectedIndex(page);
-    widget.tabController.animateTo(index);
-    _changeCurrentTab(index);
-  }
-
   void _changeCurrentTab(int index) {
-    final item = _getSelectedDrawerItem(index);
     if (widget.tabController.index == index && _index == index) {
       return;
     }
     widget.tabController.index = index;
-    context.read<DrawerBloc>().add(DrawerEvent.selectedItemChanged(selectedPage: item));
     setState(() {
       _index = index;
     });
-  }
-
-  AppDrawerItemType _getSelectedDrawerItem(int index) {
-    if (index == 0) return AppDrawerItemType.transactions;
-    if (index == 1) return AppDrawerItemType.categories;
-    if (index == 2) return AppDrawerItemType.search;
-    if (index == 3) return AppDrawerItemType.settings;
-
-    throw Exception('The provided index = $index is not valid in the bottom nav bar items');
   }
 
   Future<void> _gotoAddTransactionPage(BuildContext context) async {

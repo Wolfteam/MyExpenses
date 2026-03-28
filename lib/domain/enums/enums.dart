@@ -1,5 +1,4 @@
 export 'app_accent_color_type.dart';
-export 'app_drawer_item_type.dart';
 export 'app_language_type.dart';
 export 'app_notification_type.dart';
 export 'app_theme_type.dart';

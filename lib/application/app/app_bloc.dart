@@ -157,9 +157,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     _portSubscription = _backgroundService.port.listen((data) {
       final isRunning = data[0] as bool;
       add(AppEvent.bgTaskIsRunning(isRunning: isRunning));
-      if (!isRunning) {
-        _drawerBloc.add(const DrawerEvent.selectedItemChanged(selectedPage: AppDrawerItemType.transactions));
-      }
     });
   }
 
