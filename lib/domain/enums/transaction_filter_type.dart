@@ -3,4 +3,5 @@ enum TransactionFilterType {
   amount,
   date,
   category,
+  paymentMethod,
 }

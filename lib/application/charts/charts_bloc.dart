@@ -74,6 +74,7 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
 
     final topCategories = _buildTopCategories(transactions);
     final monthlyPoints = _buildMonthlyPoints(transactions);
+    final topPaymentMethods = _buildPaymentMethods(transactions);
 
     return ChartsState.loaded(
       loaded: true,
@@ -85,6 +86,7 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
       balance: balance,
       topCategories: topCategories,
       monthlyPoints: monthlyPoints,
+      topPaymentMethods: topPaymentMethods,
     );
   }
 
@@ -133,6 +135,28 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
             isAnIncome: isAnIncome,
           );
         })
+        .toList();
+  }
+
+  List<PaymentMethodChartItem> _buildPaymentMethods(List<TransactionItem> transactions) {
+    final expenseTransactions = transactions.where((t) => !t.category.isAnIncome).toList();
+    final grouped = <String, double>{};
+
+    for (final t in expenseTransactions) {
+      final key = t.paymentMethodName ?? '';
+      grouped[key] = TransactionUtils.roundDouble((grouped[key] ?? 0) + t.amount.abs());
+    }
+
+    final total = grouped.values.fold(0.0, (a, b) => a + b);
+    if (total == 0) return [];
+
+    return grouped.entries
+        .sortedByCompare((e) => e.value, (a, b) => b.compareTo(a))
+        .map((e) => PaymentMethodChartItem(
+              methodName: e.key,
+              total: e.value,
+              percentage: TransactionUtils.roundDouble((e.value / total) * 100),
+            ))
         .toList();
   }
 

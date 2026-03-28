@@ -12,5 +12,6 @@ sealed class TransactionsState with _$TransactionsState {
     required List<TransactionCardItems> transactions,
     required List<TransactionCardItems> recurringTransactions,
     required List<TransactionCardItems> groupedTransactionsByCategory,
+    required List<TransactionCardItems> groupedTransactionsByPaymentMethod,
   }) = TransactionsStateLoadedState;
 }

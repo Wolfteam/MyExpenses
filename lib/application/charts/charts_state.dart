@@ -12,5 +12,6 @@ sealed class ChartsState with _$ChartsState {
     required double balance,
     required List<CategoryChartItem> topCategories,
     required List<TransactionActivityPerDate> monthlyPoints,
+    @Default([]) List<PaymentMethodChartItem> topPaymentMethods,
   }) = ChartsStateLoaded;
 }

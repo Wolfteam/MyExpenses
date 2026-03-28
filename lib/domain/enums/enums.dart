@@ -7,6 +7,7 @@ export 'category_icon_type.dart';
 export 'chart_period_type.dart';
 export 'comparer_type.dart';
 export 'currency_symbol_type.dart';
+export 'data_transfer_operation.dart';
 export 'local_status_type.dart';
 export 'notification_type.dart';
 export 'payment_method_type.dart';

@@ -5,6 +5,7 @@ export 'categories/category_icon.dart';
 export 'categories/category_item.dart';
 export 'categories/current_selected_category.dart';
 export 'charts/category_chart_item.dart';
+export 'charts/payment_method_chart_item.dart';
 export 'language_model.dart';
 export 'payment_methods/credit_card_cycle_item.dart';
 export 'payment_methods/payment_method_item.dart';
