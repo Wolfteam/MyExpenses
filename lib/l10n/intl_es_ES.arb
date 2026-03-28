@@ -280,5 +280,6 @@
   "clearConfirmTitle": "Borrar todos los datos",
   "clearConfirmMessage": "Esto eliminará permanentemente todas tus transacciones, categorías y métodos de pago. Esta acción no se puede deshacer.",
   "invalidImportFile": "Formato de archivo inválido",
-  "invalidImportFileMissingFields": "El archivo no tiene los campos requeridos: {fields}"
+  "invalidImportFileMissingFields": "El archivo no tiene los campos requeridos: {fields}",
+  "moreOptions": "Más opciones"
 }

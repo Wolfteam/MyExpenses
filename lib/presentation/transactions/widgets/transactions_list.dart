@@ -4,12 +4,16 @@ import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/generated/l10n.dart';
+import 'package:my_expenses/presentation/estimates/estimate_bottom_sheet_dialog.dart';
+import 'package:my_expenses/presentation/reports/reports_bottom_sheet_dialog.dart';
 import 'package:my_expenses/presentation/shared/nothing_found.dart';
 import 'package:my_expenses/presentation/shared/sliver_loading.dart';
 import 'package:my_expenses/presentation/shared/sort_direction_popupmenu_filter.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
 import 'package:my_expenses/presentation/shared/transaction_popupmenu_filter.dart';
 import 'package:my_expenses/presentation/transactions/widgets/transactions_card_container.dart';
+
+enum _SummaryAction { reports, estimates }
 
 class TransactionsList extends StatefulWidget {
   const TransactionsList();
@@ -113,7 +117,49 @@ class _Switch extends StatelessWidget {
             onSelected:
                 (newValue) => context.read<TransactionsBloc>().add(TransactionsEvent.sortDirectionTypeChanged(type: newValue)),
           ),
+        if (!showRecurringTransactions)
+          ClipRRect(
+            borderRadius: Styles.popupMenuButtonRadius,
+            child: Material(
+              color: Colors.transparent,
+              child: PopupMenuButton<_SummaryAction>(
+                padding: EdgeInsets.zero,
+                icon: const Icon(Icons.more_vert),
+                onSelected: (action) => _onActionSelected(context, action),
+                tooltip: i18n.moreOptions,
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: _SummaryAction.reports,
+                    child: Row(children: [const Icon(Icons.insert_drive_file), const SizedBox(width: 8), Text(i18n.reports)]),
+                  ),
+                  PopupMenuItem(
+                    value: _SummaryAction.estimates,
+                    child: Row(children: [const Icon(Icons.attach_money), const SizedBox(width: 8), Text(i18n.estimates)]),
+                  ),
+                ],
+              ),
+            ),
+          ),
       ],
     );
+  }
+
+  void _onActionSelected(BuildContext context, _SummaryAction action) {
+    switch (action) {
+      case _SummaryAction.reports:
+        showModalBottomSheet(
+          shape: Styles.modalBottomSheetShape,
+          isScrollControlled: true,
+          context: context,
+          builder: (_) => ReportsBottomSheetDialog(),
+        );
+      case _SummaryAction.estimates:
+        showModalBottomSheet(
+          shape: Styles.modalBottomSheetShape,
+          isScrollControlled: true,
+          context: context,
+          builder: (_) => EstimateBottomSheetDialog(),
+        );
+    }
   }
 }
