@@ -67,6 +67,7 @@ class CategoryUtils {
   static const giftcard = 'GitfCard';
   static const creditcard = 'CreditCard';
   static const mastercard = 'Mastercard';
+  static const visa = 'Visa';
   static const stipe = 'Stipe';
   static const discover = 'Discover';
   static const amex = 'Amex';
@@ -453,6 +454,11 @@ class CategoryUtils {
     CategoryIcon(
       icon: Icon(CustomIcons.cc_mastercard),
       name: mastercard,
+      type: CategoryIconType.income,
+    ),
+    CategoryIcon(
+      icon: Icon(CustomIcons.cc_visa),
+      name: visa,
       type: CategoryIconType.income,
     ),
     CategoryIcon(
