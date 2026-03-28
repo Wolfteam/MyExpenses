@@ -23,6 +23,7 @@ class AppDrawer extends StatelessWidget {
             AppDrawerItem(type: AppDrawerItemType.reports, isSelected: state.selectedPage == AppDrawerItemType.reports),
             AppDrawerItem(type: AppDrawerItemType.categories, isSelected: state.selectedPage == AppDrawerItemType.categories),
             AppDrawerItem(type: AppDrawerItemType.estimates, isSelected: state.selectedPage == AppDrawerItemType.estimates),
+            AppDrawerItem(type: AppDrawerItemType.charts, isSelected: state.selectedPage == AppDrawerItemType.charts),
             AppDrawerItem(type: AppDrawerItemType.search, isSelected: state.selectedPage == AppDrawerItemType.search),
             const Divider(),
             AppDrawerItem(type: AppDrawerItemType.settings, isSelected: state.selectedPage == AppDrawerItemType.settings),

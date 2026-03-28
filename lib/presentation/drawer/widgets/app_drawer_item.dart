@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/generated/l10n.dart';
+import 'package:my_expenses/presentation/charts/charts_page.dart';
 import 'package:my_expenses/presentation/estimates/estimate_bottom_sheet_dialog.dart';
 import 'package:my_expenses/presentation/reports/reports_bottom_sheet_dialog.dart';
 import 'package:my_expenses/presentation/shared/dialogs/confirm_dialog.dart';
@@ -43,6 +44,9 @@ class AppDrawerItem extends StatelessWidget {
       case AppDrawerItemType.search:
         icon = const Icon(Icons.search);
         text = i18n.search;
+      case AppDrawerItemType.charts:
+        icon = const Icon(Icons.insert_chart);
+        text = i18n.charts;
     }
 
     if (!isSelected) {
@@ -66,6 +70,11 @@ class AppDrawerItem extends StatelessWidget {
     }
     if (type == AppDrawerItemType.logout) {
       _showSignOutDialog(context);
+      return;
+    }
+    if (type == AppDrawerItemType.charts) {
+      Navigator.pop(context);
+      Navigator.of(context).push(ChartsPage.route());
       return;
     }
     context.read<DrawerBloc>().add(DrawerEvent.selectedItemChanged(selectedPage: type));

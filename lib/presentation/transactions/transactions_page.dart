@@ -33,22 +33,25 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
 
     return Stack(
       children: [
-        Padding(
-          padding: Styles.edgeInsetAll16,
-          child:
-              MediaQuery.of(context).orientation == Orientation.portrait
-                  ? CustomScrollView(
-                    controller: _scrollController,
-                    slivers: [_buildHomeWelcome(), _buildTransSummaryPerMonth(), _buildHomeActivity(), _buildTransactions()],
-                  )
-                  : Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Expanded(flex: 55, child: CustomScrollView(slivers: [_buildHomeWelcome(), _buildTransSummaryPerMonth(), _buildHomeActivity()])),
-                      Expanded(flex: 45, child: CustomScrollView(controller: _scrollController, slivers: [_buildTransactions()])),
-                    ],
-                  ),
-        ),
+        if (MediaQuery.of(context).orientation == Orientation.portrait)
+          CustomScrollView(
+            controller: _scrollController,
+            slivers: [_buildHomeWelcome(), _buildTransSummaryPerMonth(), _buildHomeActivity(), _buildTransactions()],
+          )
+        else
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(
+                flex: 55,
+                child: CustomScrollView(slivers: [_buildHomeWelcome(), _buildTransSummaryPerMonth(), _buildHomeActivity()]),
+              ),
+              Expanded(
+                flex: 45,
+                child: CustomScrollView(controller: _scrollController, slivers: [_buildTransactions()]),
+              ),
+            ],
+          ),
         Align(
           alignment: Alignment.bottomRight,
           child: Padding(
@@ -57,7 +60,11 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
               opacity: _hideFabAnimController,
               child: ScaleTransition(
                 scale: _hideFabAnimController,
-                child: FloatingActionButton(mini: true, onPressed: () => _scrollController.goToTheTop(), child: const Icon(Icons.arrow_upward)),
+                child: FloatingActionButton(
+                  mini: true,
+                  onPressed: () => _scrollController.goToTheTop(),
+                  child: const Icon(Icons.arrow_upward),
+                ),
               ),
             ),
           ),
@@ -74,18 +81,30 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
   }
 
   Widget _buildHomeWelcome() {
-    return const SliverToBoxAdapter(child: HomeWelcome());
+    return const SliverPadding(
+      padding: Styles.edgeInsetAll16,
+      sliver: SliverToBoxAdapter(child: HomeWelcome()),
+    );
   }
 
   Widget _buildTransSummaryPerMonth() {
-    return const SliverToBoxAdapter(child: TransactionSummaryPerMonth());
+    return const SliverPadding(
+      padding: Styles.edgeInsetAll16,
+      sliver: SliverToBoxAdapter(child: TransactionSummaryPerMonth()),
+    );
   }
 
   Widget _buildTransactions() {
-    return const TransactionsList();
+    return const SliverPadding(
+      padding: Styles.edgeInsetAll16,
+      sliver: TransactionsList(),
+    );
   }
 
   Widget _buildHomeActivity() {
-    return const SliverToBoxAdapter(child: TransactionsActivityChart());
+    return const SliverPadding(
+      padding: Styles.edgeInsetAll16,
+      sliver: SliverToBoxAdapter(child: TransactionsActivityChart()),
+    );
   }
 }

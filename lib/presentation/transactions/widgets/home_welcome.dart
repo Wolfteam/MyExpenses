@@ -32,7 +32,12 @@ class HomeWelcome extends StatelessWidget {
                   ),
                 ),
                 if (state.isUserSignedIn)
-                  LoggedUserImage(image: state.img, isUserSignedIn: state.isUserSignedIn, radius: 20, popContext: false)
+                  LoggedUserImage(
+                    image: state.img,
+                    isUserSignedIn: state.isUserSignedIn,
+                    radius: 20,
+                    popContext: false,
+                  )
                 else
                   const SizedBox.square(dimension: 40),
               ],

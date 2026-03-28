@@ -10,9 +10,9 @@ import 'package:my_expenses/presentation/payment_methods/credit_card_cycles_page
 import 'package:my_expenses/presentation/shared/custom_icons.dart';
 import 'package:my_expenses/presentation/shared/extensions/i18n_extensions.dart';
 
-part 'widgets/_payment_method_list.dart';
-part 'widgets/_payment_method_list_item.dart';
-part 'widgets/_payment_method_form_dialog.dart';
+part 'widgets/payment_method_list.dart';
+part 'widgets/payment_method_list_item.dart';
+part 'widgets/payment_method_form_dialog.dart';
 
 class PaymentMethodsPage extends StatelessWidget {
   const PaymentMethodsPage({super.key});
