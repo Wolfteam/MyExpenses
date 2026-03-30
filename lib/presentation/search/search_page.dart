@@ -93,84 +93,80 @@ class _BodyState extends State<_Body> {
 
   @override
   Widget build(BuildContext context) {
-    final double statusBarHeight = MediaQuery.of(context).padding.top;
     final i18n = S.of(context);
     return BlocBuilder<SearchBloc, SearchState>(
-      builder:
-          (ctx, state) => CustomScrollView(
-            controller: widget.scrollController,
-            slivers: switch (state) {
-              SearchStateLoadingState() => [
-                const SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [CircularProgressIndicator()]),
-                ),
-              ],
-              SearchStateInitialState() => [
-                SliverAppBar(
-                  title: Text(i18n.search),
-                  floating: true,
-                  backgroundColor: Colors.transparent,
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: Container(
-                      padding: EdgeInsets.only(top: statusBarHeight, bottom: 10),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          SearchBoxCard(
-                            controller: _searchBoxTextController,
-                            focusNode: _searchFocusNode,
-                            showCleanButton: !state.description.isNullEmptyOrWhitespace,
-                          ),
-                          SearchFilterBar(
-                            currentAmountFilter: state.amount,
-                            category: state.category,
-                            transactionFilterType: state.transactionFilterType,
-                            sortDirectionType: state.sortDirectionType,
-                            transactionType: state.transactionType,
-                          ),
-                        ],
+      builder: (ctx, state) => CustomScrollView(
+        controller: widget.scrollController,
+        slivers: switch (state) {
+          SearchStateLoadingState() => [
+            const SliverFillRemaining(
+              hasScrollBody: false,
+              child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [CircularProgressIndicator()]),
+            ),
+          ],
+          SearchStateInitialState() => [
+            SliverAppBar(
+              floating: true,
+              pinned: true,
+              snap: true,
+              automaticallyImplyLeading: false,
+              toolbarHeight: 0,
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(120),
+                child: ColoredBox(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  child: Column(
+                    children: [
+                      SearchBoxCard(
+                        controller: _searchBoxTextController,
+                        focusNode: _searchFocusNode,
+                        showCleanButton: !state.description.isNullEmptyOrWhitespace,
                       ),
-                    ),
+                      SearchFilterBar(
+                        currentAmountFilter: state.amount,
+                        category: state.category,
+                        transactionFilterType: state.transactionFilterType,
+                        sortDirectionType: state.sortDirectionType,
+                        transactionType: state.transactionType,
+                      ),
+                    ],
                   ),
-                  expandedHeight: 170,
-                  pinned: true,
-                  snap: true,
                 ),
-                if (state.transactions.isNotEmpty)
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: Styles.edgeInsetAll10,
-                      child: Text(i18n.transactions, textAlign: TextAlign.start, style: Theme.of(context).textTheme.titleLarge),
-                    ),
-                  ),
-                if (state.transactions.isNotEmpty)
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) =>
-                          index >= state.transactions.length
-                              ? const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 10),
-                                child: Center(child: CircularProgressIndicator(strokeWidth: 1.5)),
-                              )
-                              : TransactionItemCardContainer(
-                                key: Key('transaction_item_${state.transactions[index].id}'),
-                                item: state.transactions[index],
-                              ),
-                      childCount: state.hasReachedMax ? state.transactions.length : state.transactions.length + 1,
-                    ),
-                  ),
-                if (state.transactions.isEmpty)
-                  SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [NothingFound(msg: i18n.noTransactionsForThisPeriod)],
-                    ),
-                  ),
-              ],
-            },
-          ),
+              ),
+            ),
+            if (state.transactions.isNotEmpty)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: Styles.edgeInsetAll10,
+                  child: Text(i18n.transactions, textAlign: TextAlign.start, style: Theme.of(context).textTheme.titleLarge),
+                ),
+              ),
+            if (state.transactions.isNotEmpty)
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) => index >= state.transactions.length
+                      ? const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Center(child: CircularProgressIndicator(strokeWidth: 1.5)),
+                        )
+                      : TransactionItemCardContainer(
+                          key: Key('transaction_item_${state.transactions[index].id}'),
+                          item: state.transactions[index],
+                        ),
+                  childCount: state.hasReachedMax ? state.transactions.length : state.transactions.length + 1,
+                ),
+              ),
+            if (state.transactions.isEmpty)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [NothingFound(msg: i18n.noTransactionsForThisPeriod)],
+                ),
+              ),
+          ],
+        },
+      ),
     );
   }
 

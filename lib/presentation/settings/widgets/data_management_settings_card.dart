@@ -94,7 +94,6 @@ class _DataManagementCardContent extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const Divider(height: 24),
                   Container(
                     decoration: BoxDecoration(
                       border: Border.all(color: Theme.of(context).colorScheme.error),
