@@ -17,5 +17,15 @@ sealed class Category with _$Category {
     String? updatedBy,
   }) = _Category;
 
+  static const requiredJsonFields = [
+    'name',
+    'isAnIncome',
+    'icon',
+    'iconColor',
+    'createdAt',
+    'createdBy',
+    'createdHash',
+  ];
+
   factory Category.fromJson(Map<String, dynamic> json) => _$CategoryFromJson(json);
 }

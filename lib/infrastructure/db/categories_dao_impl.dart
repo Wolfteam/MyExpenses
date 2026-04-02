@@ -219,8 +219,14 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
   }
 
   @override
-  Future<void> syncDownCreate(int userId, List<drive.Category> existingCats) async {
-    final catsInDb = await (select(categories)..where((c) => c.userId.equals(userId))).get();
+  Future<void> syncDownCreate(int? userId, List<drive.Category> existingCats) async {
+    var query = select(categories);
+    if (userId == null) {
+      query = query..where((c) => c.userId.isNull());
+    } else {
+      query = query..where((c) => c.userId.equals(userId));
+    }
+    final catsInDb = await query.get();
     final localCatsHash = catsInDb.map((c) => c.createdHash).toList();
     final catsToBeCreated = existingCats
         .where((c) => !localCatsHash.contains(c.createdHash))

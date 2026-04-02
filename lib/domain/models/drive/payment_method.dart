@@ -26,5 +26,13 @@ sealed class PaymentMethod with _$PaymentMethod {
     String? updatedBy,
   }) = _PaymentMethod;
 
+  static const requiredJsonFields = [
+    'name',
+    'type',
+    'createdAt',
+    'createdBy',
+    'createdHash',
+  ];
+
   factory PaymentMethod.fromJson(Map<String, dynamic> json) => _$PaymentMethodFromJson(json);
 }

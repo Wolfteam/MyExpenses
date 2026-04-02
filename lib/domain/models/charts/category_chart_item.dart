@@ -11,5 +11,6 @@ sealed class CategoryChartItem with _$CategoryChartItem {
     required double percentage,
     required Color color,
     required bool isAnIncome,
+    IconData? icon,
   }) = _CategoryChartItem;
 }
