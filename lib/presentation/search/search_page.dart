@@ -111,6 +111,8 @@ class _BodyState extends State<_Body> {
               snap: true,
               automaticallyImplyLeading: false,
               toolbarHeight: 0,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              surfaceTintColor: Theme.of(context).scaffoldBackgroundColor,
               bottom: PreferredSize(
                 preferredSize: const Size.fromHeight(120),
                 child: ColoredBox(
