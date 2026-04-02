@@ -165,7 +165,9 @@ class _CreateOrEditDialogState extends State<_CreateOrEditDialog> {
                         children: [
                           for (final color in _presetColors) ...[
                             GestureDetector(
-                              onTap: () => bloc.add(PaymentMethodFormEvent.iconColorChanged(iconColor: color)),
+                              onTap: () => bloc.add(
+                                PaymentMethodFormEvent.iconColorChanged(iconColor: color),
+                              ),
                               child: Container(
                                 width: 30,
                                 height: 30,
@@ -184,8 +186,42 @@ class _CreateOrEditDialogState extends State<_CreateOrEditDialog> {
                                     : null,
                               ),
                             ),
-                            if (color != _presetColors.last) const SizedBox(width: 6),
+                            const SizedBox(width: 6),
                           ],
+                          // Custom color picker button
+                          GestureDetector(
+                            onTap: () async {
+                              final result = await showDialog<Color>(
+                                context: context,
+                                builder: (_) => ColorPickerDialog(
+                                  iconColor: s.iconColor ?? _defaultColor,
+                                ),
+                              );
+                              if (result != null && context.mounted) {
+                                bloc.add(
+                                  PaymentMethodFormEvent.iconColorChanged(
+                                    iconColor: result,
+                                  ),
+                                );
+                              }
+                            },
+                            child: Container(
+                              width: 30,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Theme.of(context).colorScheme.outline,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.palette,
+                                size: 16,
+                                color: Theme.of(context).colorScheme.outline,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
