@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:intl/intl.dart';
 import 'package:my_expenses/domain/models/entities/daos/transactions_dao.dart';
 import 'package:my_expenses/domain/models/entities/daos/users_dao.dart';
 import 'package:my_expenses/domain/models/models.dart';
@@ -45,6 +46,7 @@ class IncomeExpenseChartBloc extends Bloc<IncomeExpenseChartEvent, IncomeExpense
         income: inc,
         expense: exp,
         balance: TransactionUtils.roundDouble(inc + exp),
+        dateRangeString: DateFormat.MMM().format(e.key),
       );
     }).toList();
   }

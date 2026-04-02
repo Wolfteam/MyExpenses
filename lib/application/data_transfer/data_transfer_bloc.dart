@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
+import 'package:csv/csv.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:intl/intl.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
@@ -62,8 +63,51 @@ class DataTransferBloc extends Bloc<DataTransferEvent, DataTransferState> {
       await exportsDir.create(recursive: true);
 
       final timestamp = DateFormat('yyyy-MM-dd_HH-mm-ss').format(DateTime.now());
-      final filePath = p.join(exportsDir.path, 'my_expenses_export_$timestamp.json');
-      await File(filePath).writeAsString(jsonEncode(appFile.toJson()));
+
+      if (event.isCsv) {
+        // Build a category lookup by createdHash
+        final categoryLookup = {
+          for (final c in appFile.categories) c.createdHash: c,
+        };
+        // Build a payment method lookup by createdHash
+        final pmLookup = {
+          for (final pm in appFile.paymentMethods) pm.createdHash: pm,
+        };
+
+        final labels = event.csvLabels!;
+        final rows = <List<dynamic>>[
+          [
+            labels.date,
+            labels.description,
+            labels.amount,
+            labels.category,
+            labels.type,
+            labels.paymentMethod,
+          ],
+          for (final t in appFile.transactions)
+            [
+              DateFormat('yyyy-MM-dd').format(t.transactionDate),
+              t.description,
+              t.amount,
+              categoryLookup[t.categoryCreatedHash]?.name ?? '',
+              if (categoryLookup[t.categoryCreatedHash]?.isAnIncome ?? false) labels.income else labels.expense,
+              t.paymentMethodName ?? pmLookup[t.paymentMethodCreatedHash]?.name ?? '',
+            ],
+        ];
+
+        final csvString = const ListToCsvConverter().convert(rows);
+        final filePath = p.join(
+          exportsDir.path,
+          'my_expenses_export_$timestamp.csv',
+        );
+        await File(filePath).writeAsString(csvString);
+      } else {
+        final filePath = p.join(
+          exportsDir.path,
+          'my_expenses_export_$timestamp.json',
+        );
+        await File(filePath).writeAsString(jsonEncode(appFile.toJson()));
+      }
 
       await OpenFilex.open(exportsDir.path);
       emit(const DataTransferState.success(operation: DataTransferOperation.export));
@@ -98,9 +142,7 @@ class DataTransferBloc extends Bloc<DataTransferEvent, DataTransferState> {
       await _paymentMethodsDao.deleteAll(userId);
 
       // Insert order: categories → payment methods → transactions
-      if (userId != null) {
-        await _categoriesDao.syncDownCreate(userId, appFile.categories);
-      }
+      await _categoriesDao.syncDownCreate(userId, appFile.categories);
       await _paymentMethodsDao.syncDownCreate(userId, appFile.paymentMethods);
       await _transactionsDao.syncDownCreate(userId, appFile.transactions);
 
@@ -123,7 +165,6 @@ class DataTransferBloc extends Bloc<DataTransferEvent, DataTransferState> {
       await _transactionsDao.deleteAll(userId);
       await _categoriesDao.deleteAll(userId);
       await _paymentMethodsDao.deleteAll(userId);
-      //TODO: DELETES SHOULD NOT CARE ABOUT THE CURRENT USER
       emit(const DataTransferState.success(operation: DataTransferOperation.clearAll));
     } catch (e, s) {
       _logger.error(runtimeType, '_onClearAll: error', e, s);
@@ -141,19 +182,28 @@ class DataTransferBloc extends Bloc<DataTransferEvent, DataTransferState> {
     final transactions = json['transactions'] as List;
     for (final t in transactions) {
       if (t is! Map<String, dynamic>) return const ImportValidationError.invalidFormat();
-      for (final field in ['amount', 'transactionDate', 'description', 'category']) {
+      for (final field in Transaction.requiredJsonFields) {
         if (!t.containsKey(field)) return ImportValidationError.missingField(field: field);
       }
     }
     final categories = json['categories'] as List;
     for (final c in categories) {
       if (c is! Map<String, dynamic>) return const ImportValidationError.invalidFormat();
-      for (final field in ['name', 'icon']) {
+      for (final field in Category.requiredJsonFields) {
         if (!c.containsKey(field)) return ImportValidationError.missingField(field: field);
       }
     }
-    if (json.containsKey('paymentMethods') && json['paymentMethods'] is! List) {
-      return const ImportValidationError.invalidFormat();
+    if (json.containsKey('paymentMethods')) {
+      if (json['paymentMethods'] is! List) {
+        return const ImportValidationError.invalidFormat();
+      }
+      final paymentMethods = json['paymentMethods'] as List;
+      for (final p in paymentMethods) {
+        if (p is! Map<String, dynamic>) return const ImportValidationError.invalidFormat();
+        for (final field in PaymentMethod.requiredJsonFields) {
+          if (!p.containsKey(field)) return ImportValidationError.missingField(field: field);
+        }
+      }
     }
     return null;
   }
