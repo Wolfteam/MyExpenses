@@ -47,17 +47,24 @@ class IncomeExpenseContent extends StatelessWidget with TransactionMixin {
             child: BarChart(
               BarChartData(
                 maxY: maxY * 1.1,
+                alignment: BarChartAlignment.spaceEvenly,
                 barGroups: barGroups,
                 gridData: FlGridData(
                   drawVerticalLine: false,
-                  getDrawingHorizontalLine: (_) => FlLine(color: theme.dividerColor, strokeWidth: 0.3),
+                  getDrawingHorizontalLine: (_) => FlLine(
+                    color: theme.dividerColor,
+                    strokeWidth: 0.3,
+                  ),
                 ),
                 borderData: FlBorderData(show: false),
                 titlesData: FlTitlesData(
                   rightTitles: const AxisTitles(),
                   topTitles: const AxisTitles(),
                   leftTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: true, reservedSize: 40),
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      reservedSize: 50,
+                    ),
                   ),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
@@ -71,12 +78,18 @@ class IncomeExpenseContent extends StatelessWidget with TransactionMixin {
                         final label = points[idx].dateRangeString ?? '';
                         return SideTitleWidget(
                           meta: meta,
-                          child: Text(label, style: theme.textTheme.labelSmall),
+                          child: Text(
+                            label,
+                            style: theme.textTheme.labelSmall,
+                          ),
                         );
                       },
                     ),
                   ),
                 ),
+              ),
+              transformationConfig: const FlTransformationConfig(
+                scaleAxis: FlScaleAxis.horizontal,
               ),
             ),
           ),

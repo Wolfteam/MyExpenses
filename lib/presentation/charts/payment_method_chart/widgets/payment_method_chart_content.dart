@@ -69,18 +69,20 @@ class _PaymentMethodRow extends StatelessWidget {
       child: Row(
         children: [
           if (item.icon != null)
-            Icon(item.icon, size: 14, color: color)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: Icon(item.icon, size: 18, color: color),
+            )
           else
             Container(
-              width: 14,
-              height: 14,
+              width: 18,
+              height: 18,
               margin: const EdgeInsets.only(right: 8),
               decoration: BoxDecoration(
                 color: color,
                 borderRadius: BorderRadius.circular(3),
               ),
             ),
-          if (item.icon != null) const SizedBox(width: 8),
           Expanded(
             child: Text(displayName, style: theme.textTheme.bodyMedium),
           ),

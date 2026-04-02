@@ -63,15 +63,21 @@ class _CategoryRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Container(
-            width: 14,
-            height: 14,
-            margin: const EdgeInsets.only(right: 8),
-            decoration: BoxDecoration(
-              color: item.color,
-              borderRadius: BorderRadius.circular(3),
+          if (item.icon != null)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: Icon(item.icon, size: 18, color: item.color),
+            )
+          else
+            Container(
+              width: 18,
+              height: 18,
+              margin: const EdgeInsets.only(right: 8),
+              decoration: BoxDecoration(
+                color: item.color,
+                borderRadius: BorderRadius.circular(3),
+              ),
             ),
-          ),
           Expanded(
             child: Text(item.categoryName, style: theme.textTheme.bodyMedium),
           ),
