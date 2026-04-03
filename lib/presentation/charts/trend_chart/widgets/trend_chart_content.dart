@@ -4,6 +4,7 @@ import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/charts/trend_chart/widgets/balance_trend_line_chart.dart';
 import 'package:my_expenses/presentation/charts/trend_chart/widgets/monthly_breakdown_bar_chart.dart';
 import 'package:my_expenses/presentation/charts/widgets/legend_dot.dart';
+import 'package:my_expenses/presentation/charts/widgets/scrollable_chart.dart';
 import 'package:my_expenses/presentation/shared/mixins/transaction_mixin.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
 
@@ -28,18 +29,23 @@ class TrendChartContent extends StatelessWidget with TransactionMixin {
           if (trendPoints.isNotEmpty) ...[
             Text(i18n.balanceTrend, style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
-            SizedBox(
+            ScrollableChart(
+              pointCount: trendPoints.length,
               height: 200,
-              child: BalanceTrendLineChart(points: trendPoints),
+              builder: (width) =>
+                  BalanceTrendLineChart(points: trendPoints),
             ),
             const SizedBox(height: 24),
           ],
           if (monthlyPoints.isNotEmpty) ...[
             Text(i18n.monthlyBreakdown, style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
-            SizedBox(
+            ScrollableChart(
+              pointCount: monthlyPoints.length,
               height: 240,
-              child: MonthlyBreakdownBarChart(points: monthlyPoints),
+              builder: (width) => MonthlyBreakdownBarChart(
+                points: monthlyPoints,
+              ),
             ),
             const SizedBox(height: 16),
             Row(

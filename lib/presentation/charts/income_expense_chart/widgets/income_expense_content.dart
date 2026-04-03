@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/charts/widgets/legend_dot.dart';
+import 'package:my_expenses/presentation/charts/widgets/scrollable_chart.dart';
 import 'package:my_expenses/presentation/shared/mixins/transaction_mixin.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
 
@@ -42,9 +43,10 @@ class IncomeExpenseContent extends StatelessWidget with TransactionMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SizedBox(
+          ScrollableChart(
+            pointCount: points.length,
             height: 240,
-            child: BarChart(
+            builder: (width) => BarChart(
               BarChartData(
                 maxY: maxY * 1.1,
                 alignment: BarChartAlignment.spaceEvenly,
@@ -75,7 +77,8 @@ class IncomeExpenseContent extends StatelessWidget with TransactionMixin {
                         if (idx < 0 || idx >= points.length) {
                           return const SizedBox.shrink();
                         }
-                        final label = points[idx].dateRangeString ?? '';
+                        final label =
+                            points[idx].dateRangeString ?? '';
                         return SideTitleWidget(
                           meta: meta,
                           child: Text(
@@ -87,9 +90,6 @@ class IncomeExpenseContent extends StatelessWidget with TransactionMixin {
                     ),
                   ),
                 ),
-              ),
-              transformationConfig: const FlTransformationConfig(
-                scaleAxis: FlScaleAxis.horizontal,
               ),
             ),
           ),
