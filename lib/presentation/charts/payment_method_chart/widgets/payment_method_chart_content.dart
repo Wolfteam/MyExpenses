@@ -59,7 +59,6 @@ class _PaymentMethodRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final i18n = S.of(context);
     final icon = item.icon ?? ChartColors.defaultPaymentMethodIcon(item.type);
     final color = item.iconColor ?? ChartColors.defaultColor;
