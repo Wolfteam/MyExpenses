@@ -83,6 +83,9 @@ class DataTransferBloc extends Bloc<DataTransferEvent, DataTransferState> {
             labels.category,
             labels.type,
             labels.paymentMethod,
+            labels.longDescription,
+            labels.repetitionCycle,
+            labels.isRecurring,
           ],
           for (final t in appFile.transactions)
             [
@@ -92,6 +95,9 @@ class DataTransferBloc extends Bloc<DataTransferEvent, DataTransferState> {
               categoryLookup[t.categoryCreatedHash]?.name ?? '',
               if (categoryLookup[t.categoryCreatedHash]?.isAnIncome ?? false) labels.income else labels.expense,
               t.paymentMethodName ?? pmLookup[t.paymentMethodCreatedHash]?.name ?? '',
+              t.longDescription ?? '',
+              t.repetitionCycle.name,
+              if (t.isParentTransaction) labels.yes else labels.no,
             ],
         ];
 

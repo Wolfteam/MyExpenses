@@ -9,6 +9,11 @@ typedef CsvLabels = ({
   String paymentMethod,
   String income,
   String expense,
+  String longDescription,
+  String repetitionCycle,
+  String isRecurring,
+  String yes,
+  String no,
 });
 
 @freezed

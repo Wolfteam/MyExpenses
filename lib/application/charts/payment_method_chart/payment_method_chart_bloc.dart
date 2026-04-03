@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:my_expenses/domain/models/entities/daos/payment_methods_dao.dart';
 import 'package:my_expenses/domain/models/entities/daos/transactions_dao.dart';
@@ -8,6 +7,7 @@ import 'package:my_expenses/domain/models/entities/daos/users_dao.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/domain/services/services.dart';
 import 'package:my_expenses/domain/utils/transaction_utils.dart';
+import 'package:my_expenses/presentation/charts/widgets/chart_colors.dart';
 
 part 'payment_method_chart_bloc.freezed.dart';
 part 'payment_method_chart_event.dart';
@@ -25,7 +25,10 @@ class PaymentMethodChartBloc extends Bloc<PaymentMethodChartEvent, PaymentMethod
       final user = await _usersDao.getActiveUser();
       _logger.info(runtimeType, 'load: from=${event.from} to=${event.to}');
       final transactions = await _transactionsDao.getAllTransactions(user?.id, event.from, event.to);
-      final paymentMethods = await _paymentMethodsDao.getAll(user?.id);
+      final paymentMethods = await _paymentMethodsDao.getAll(
+        user?.id,
+        includeArchived: true,
+      );
       emit(PaymentMethodChartState.loaded(
         loaded: true,
         methods: _buildMethods(transactions, paymentMethods),
@@ -50,14 +53,23 @@ class PaymentMethodChartBloc extends Bloc<PaymentMethodChartEvent, PaymentMethod
       return [];
     }
 
-    return grouped.entries.sortedByCompare((e) => e.value, (a, b) => b.compareTo(a)).map((e) {
-      final method = paymentMethods.firstWhereOrNull((m) => m.name == e.key);
+    return grouped.entries
+        .sortedByCompare((e) => e.value, (a, b) => b.compareTo(a))
+        .mapIndexed((index, e) {
+      final method = paymentMethods.firstWhereOrNull(
+        (m) => m.name == e.key,
+      );
       return PaymentMethodChartItem(
         methodName: e.key,
-        icon: method?.icon,
-        iconColor: method?.iconColor ?? Colors.grey,
+        icon: method?.icon ??
+            ChartColors.defaultPaymentMethodIcon(method?.type),
+        iconColor: method?.iconColor ??
+            ChartColors.fromIndex(index),
         total: e.value,
-        percentage: TransactionUtils.roundDouble((e.value / total) * 100),
+        percentage: TransactionUtils.roundDouble(
+          (e.value / total) * 100,
+        ),
+        type: method?.type,
       );
     }).toList();
   }
