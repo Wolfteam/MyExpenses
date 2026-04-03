@@ -55,6 +55,41 @@ class PaymentMethodsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Payment
   }
 
   @override
+  Future<List<PaymentMethodItem>> getAllByIds(int? userId, List<int> ids) async {
+    final q = select(paymentMethods)
+      ..where((t) => t.localStatus.equals(LocalStatusType.deleted.index).not() & t.id.isIn(ids))
+      ..orderBy([
+        (t) => OrderingTerm(expression: t.sortOrder),
+        (t) => OrderingTerm(expression: t.name),
+      ]);
+
+    if (userId == null) {
+      q.where((t) => t.userId.isNull());
+    } else {
+      q.where((t) => t.userId.equals(userId));
+    }
+
+    final rows = await q.get();
+    return rows
+        .map(
+          (r) => PaymentMethodItem(
+            id: r.id,
+            userId: r.userId,
+            name: r.name,
+            type: r.type,
+            icon: r.icon,
+            iconColor: r.iconColor,
+            statementCloseDay: r.statementCloseDay,
+            paymentDueDay: r.paymentDueDay,
+            creditLimitMinor: r.creditLimitMinor,
+            isArchived: r.isArchived,
+            sortOrder: r.sortOrder,
+          ),
+        )
+        .toList();
+  }
+
+  @override
   Future<PaymentMethodItem> save(int? userId, PaymentMethodItem method) async {
     final now = DateTime.now();
     int id = method.id;

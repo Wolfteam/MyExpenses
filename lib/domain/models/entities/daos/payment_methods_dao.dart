@@ -5,6 +5,8 @@ import 'package:my_expenses/domain/models/models.dart';
 abstract class PaymentMethodsDao {
   Future<List<PaymentMethodItem>> getAll(int? userId, {bool includeArchived = false});
 
+  Future<List<PaymentMethodItem>> getAllByIds(int? userId, List<int> ids);
+
   Future<PaymentMethodItem> save(int? userId, PaymentMethodItem method);
 
   Future<void> archive(int id, {required bool isArchived});
