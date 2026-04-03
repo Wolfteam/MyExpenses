@@ -33,9 +33,14 @@ class Styles {
     final theme = Theme.of(context);
     final darkTheme = theme.brightness == Brightness.dark;
     return MonthPickerDialogSettings(
-      headerSettings: PickerHeaderSettings(headerBackgroundColor: darkTheme ? theme.colorScheme.primaryContainer : theme.colorScheme.primary),
+      headerSettings: PickerHeaderSettings(
+        headerBackgroundColor: darkTheme ? theme.colorScheme.primaryContainer : theme.colorScheme.primary,
+      ),
       dialogSettings: PickerDialogSettings(locale: locale),
       dateButtonsSettings: PickerDateButtonsSettings(unselectedMonthsTextColor: darkTheme ? Colors.white : Colors.black),
+      actionBarSettings: const PickerActionBarSettings(
+        actionBarPadding: Styles.edgeInsetAll5,
+      ),
     );
   }
 
@@ -48,8 +53,12 @@ class Styles {
     }
 
     final EdgeInsets padding = switch (Theme.of(context).platform) {
-      TargetPlatform.macOS || TargetPlatform.linux || TargetPlatform.windows => const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-      TargetPlatform.android || TargetPlatform.fuchsia || TargetPlatform.iOS => const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+      TargetPlatform.macOS ||
+      TargetPlatform.linux ||
+      TargetPlatform.windows => const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      TargetPlatform.android ||
+      TargetPlatform.fuchsia ||
+      TargetPlatform.iOS => const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
     };
 
     final (TextStyle defaultTextStyle, BoxDecoration defaultDecoration) = switch (Theme.of(context)) {

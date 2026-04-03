@@ -14,39 +14,50 @@ class TransactionSummaryPerMonth extends StatelessWidget with TransactionMixin {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TransactionsSummaryPerMonthBloc, TransactionsSummaryPerMonthState>(
-      builder:
-          (context, state) => switch (state) {
-            TransactionsSummaryPerMonthStateLoadingState() => const Loading(useScaffold: false),
-            TransactionsSummaryPerMonthStateLoadedState() => Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+      builder: (context, state) => switch (state) {
+        TransactionsSummaryPerMonthStateLoadingState() => const Loading(useScaffold: false),
+        TransactionsSummaryPerMonthStateLoadedState() => Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(state.month, style: Theme.of(context).textTheme.titleLarge),
-                    IconButton(
-                      icon: const Icon(Icons.calendar_month),
-                      onPressed: () => _changeCurrentDate(context, state.currentDate, currentLocale(state.language)),
+                Flexible(
+                  child: TextButton.icon(
+                    onPressed: () => _changeCurrentDate(context, state.currentDate, currentLocale(state.language)),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Theme.of(context).colorScheme.onSurface,
                     ),
-                  ],
-                ),
-                Padding(
-                  padding: Styles.edgeInsetHorizontal10,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Expanded(flex: 45, child: _SummaryCard.incomes(amount: state.income, percentage: state.incomePercentage)),
-                      const Spacer(flex: 10),
-                      Expanded(
-                        flex: 45,
-                        child: _SummaryCard.expenses(amount: state.expense, percentage: state.expensePercentage),
-                      ),
-                    ],
+                    icon: const Icon(Icons.calendar_month),
+                    label: Text(
+                      state.month,
+                      style: Theme.of(context).textTheme.titleLarge,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
               ],
             ),
-          },
+            Padding(
+              padding: Styles.edgeInsetHorizontal10,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    flex: 45,
+                    child: _SummaryCard.incomes(amount: state.income, percentage: state.incomePercentage),
+                  ),
+                  const Spacer(flex: 10),
+                  Expanded(
+                    flex: 45,
+                    child: _SummaryCard.expenses(amount: state.expense, percentage: state.expensePercentage),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      },
     );
   }
 

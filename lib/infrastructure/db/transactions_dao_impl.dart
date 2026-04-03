@@ -696,6 +696,10 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
         orderingTerm = sortDirectionType == SortDirectionType.asc
             ? OrderingTerm.asc(categories.name)
             : OrderingTerm.desc(categories.name);
+      case TransactionFilterType.paymentMethod:
+        orderingTerm = sortDirectionType == SortDirectionType.asc
+            ? OrderingTerm.asc(transactions.transactionDate)
+            : OrderingTerm.desc(transactions.transactionDate);
     }
     query = query..orderBy([orderingTerm]);
 

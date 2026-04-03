@@ -74,6 +74,10 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
             groupingType == TransactionFilterType.category
                 ? _groupByCategory([...transactions], sortDirectionType)
                 : <TransactionCardItems>[],
+        groupedTransactionsByPaymentMethod:
+            groupingType == TransactionFilterType.paymentMethod
+                ? _groupByPaymentMethod([...transactions], sortDirectionType)
+                : <TransactionCardItems>[],
       );
     } catch (e, s) {
       _logger.error(runtimeType, '_handle: An unknown error occurred', e, s);
@@ -85,6 +89,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         transactions: [],
         recurringTransactions: [],
         groupedTransactionsByCategory: [],
+        groupedTransactionsByPaymentMethod: [],
       );
     }
   }
@@ -115,6 +120,8 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
         }
       case TransactionFilterType.category:
         break;
+      case TransactionFilterType.paymentMethod:
+        break;
     }
   }
 
@@ -141,6 +148,36 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
       grouped.sort((t1, t2) => t1.balance.abs().compareTo(t2.balance.abs()));
     } else {
       grouped.sort((t1, t2) => t2.balance.abs().compareTo(t1.balance.abs()));
+    }
+
+    return grouped;
+  }
+
+  List<TransactionCardItems> _groupByPaymentMethod(
+    List<TransactionItem> transactions,
+    SortDirectionType sortDirectionType,
+  ) {
+    const noMethod = '';
+    final methodNames = transactions.map((t) => t.paymentMethodName ?? noMethod).toSet().toList();
+    final grouped = <TransactionCardItems>[];
+
+    for (final methodName in methodNames) {
+      final trans = transactions.where((t) => (t.paymentMethodName ?? noMethod) == methodName).toList();
+      _sortTransactions(trans, TransactionFilterType.amount, sortDirectionType);
+
+      grouped.add(TransactionCardItems(
+        groupedBy: methodName,
+        transactions: trans,
+        income: TransactionUtils.getTotalTransactionAmounts(trans, onlyIncomes: true),
+        expense: TransactionUtils.getTotalTransactionAmounts(trans),
+        balance: TransactionUtils.getTotalTransactionAmount(trans),
+      ));
+    }
+
+    if (sortDirectionType == SortDirectionType.asc) {
+      grouped.sort((a, b) => a.balance.abs().compareTo(b.balance.abs()));
+    } else {
+      grouped.sort((a, b) => b.balance.abs().compareTo(a.balance.abs()));
     }
 
     return grouped;

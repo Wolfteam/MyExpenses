@@ -11,7 +11,7 @@ class SettingsCardSubtitleText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 5),
-      child: Text(text, style: const TextStyle(color: Colors.grey)),
+      child: Text(text, style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
     );
   }
 }

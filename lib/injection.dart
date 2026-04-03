@@ -153,6 +153,52 @@ class Injection {
     return TransactionsBloc(logger, transactionsDao, usersDao, settingsService);
   }
 
+  static ChartsBloc get chartsBloc {
+    final logger = getIt<LoggingService>();
+    final transactionsDao = getIt<TransactionsDao>();
+    final usersDao = getIt<UsersDao>();
+    final paymentMethodsDao = getIt<PaymentMethodsDao>();
+    return ChartsBloc(logger, transactionsDao, usersDao, paymentMethodsDao);
+  }
+
+  static CategoryChartBloc get categoryChartBloc {
+    final logger = getIt<LoggingService>();
+    final transactionsDao = getIt<TransactionsDao>();
+    final usersDao = getIt<UsersDao>();
+    return CategoryChartBloc(logger, transactionsDao, usersDao);
+  }
+
+  static PaymentMethodChartBloc get paymentMethodChartBloc {
+    final logger = getIt<LoggingService>();
+    final transactionsDao = getIt<TransactionsDao>();
+    final usersDao = getIt<UsersDao>();
+    final paymentMethodsDao = getIt<PaymentMethodsDao>();
+    return PaymentMethodChartBloc(logger, transactionsDao, usersDao, paymentMethodsDao);
+  }
+
+  static IncomeExpenseChartBloc get incomeExpenseChartBloc {
+    final logger = getIt<LoggingService>();
+    final transactionsDao = getIt<TransactionsDao>();
+    final usersDao = getIt<UsersDao>();
+    return IncomeExpenseChartBloc(logger, transactionsDao, usersDao);
+  }
+
+  static TrendChartBloc get trendChartBloc {
+    final logger = getIt<LoggingService>();
+    final transactionsDao = getIt<TransactionsDao>();
+    final usersDao = getIt<UsersDao>();
+    return TrendChartBloc(logger, transactionsDao, usersDao);
+  }
+
+  static DataTransferBloc get dataTransferBloc {
+    final logger = getIt<LoggingService>();
+    final transactionsDao = getIt<TransactionsDao>();
+    final categoriesDao = getIt<CategoriesDao>();
+    final paymentMethodsDao = getIt<PaymentMethodsDao>();
+    final usersDao = getIt<UsersDao>();
+    return DataTransferBloc(logger, transactionsDao, categoriesDao, paymentMethodsDao, usersDao);
+  }
+
   static Future<void> init() async {
     if (!getIt.isRegistered<NetworkService>()) {
       getIt.registerSingleton<NetworkService>(NetworkServiceImpl());

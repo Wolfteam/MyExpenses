@@ -28,5 +28,17 @@ sealed class Transaction with _$Transaction {
     String? longDescription,
   }) = _Transaction;
 
+  static const requiredJsonFields = [
+    'amount',
+    'description',
+    'transactionDate',
+    'repetitionCycle',
+    'isParentTransaction',
+    'categoryCreatedHash',
+    'createdAt',
+    'createdBy',
+    'createdHash',
+  ];
+
   factory Transaction.fromJson(Map<String, dynamic> json) => _$TransactionFromJson(json);
 }

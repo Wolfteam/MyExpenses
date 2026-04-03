@@ -19,7 +19,7 @@ class HomeWelcome extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(onPressed: () => Scaffold.of(context).openDrawer(), icon: const Icon(Icons.menu)),
+                const SizedBox.square(dimension: 40),
                 Expanded(
                   child: Center(
                     child: Column(
@@ -31,10 +31,12 @@ class HomeWelcome extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (state.isUserSignedIn)
-                  LoggedUserImage(image: state.img, isUserSignedIn: state.isUserSignedIn, radius: 20, popContext: false)
-                else
-                  const SizedBox.square(dimension: 40),
+                LoggedUserImage(
+                  image: state.img,
+                  isUserSignedIn: state.isUserSignedIn,
+                  radius: 20,
+                  popContext: false,
+                ),
               ],
             ),
           ),

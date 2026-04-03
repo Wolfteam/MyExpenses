@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_expenses/application/bloc.dart';
-import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/extensions/string_extensions.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/shared/modal_sheet_separator.dart';
 import 'package:my_expenses/presentation/shared/modal_sheet_title.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
-import 'package:my_expenses/presentation/shared/utils/i18n_utils.dart';
 
 class SearchDateFilterBottomSheetDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final i18n = S.of(context);
-    final now = DateTime.now();
     return SingleChildScrollView(
       padding: MediaQuery.of(context).viewInsets,
       child: Container(
@@ -29,30 +26,34 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
                   SearchStateInitialState() => [
                     ModalSheetSeparator(),
                     ModalSheetTitle(title: i18n.filterByX(i18n.date.toLowerCase())),
-                    Text('${i18n.startDate}:'),
-                    TextButton(
-                      style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                      onPressed: () => _changeDate(context, state.tempFrom ?? now, state.currentLanguage, true),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text((state.fromString.isNullEmptyOrWhitespace ? i18n.na : state.fromString)!),
+                    TextButton.icon(
+                      icon: const Icon(Icons.date_range),
+                      style: TextButton.styleFrom(
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
-                    ),
-                    Text('${i18n.untilDate}:'),
-                    TextButton(
-                      style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                      onPressed: () => _changeDate(context, state.tempUntil ?? now, state.currentLanguage, false),
-                      child: Align(
+                      onPressed: () => _pickDateRange(context, state),
+                      label: Align(
                         alignment: Alignment.centerLeft,
-                        child: Text((state.untilString.isNullEmptyOrWhitespace ? i18n.na : state.untilString)!),
+                        child: Text(
+                          _formatDateRange(i18n, state),
+                        ),
                       ),
                     ),
                     OverflowBar(
                       alignment: MainAxisAlignment.end,
                       children: <Widget>[
-                        TextButton(onPressed: () => _closeModal(context), child: Text(i18n.close)),
-                        TextButton(onPressed: () => _clearFilters(context), child: Text(i18n.clear)),
-                        FilledButton(onPressed: () => _applyDates(context), child: Text(i18n.apply)),
+                        TextButton(
+                          onPressed: () => _closeModal(context),
+                          child: Text(i18n.close),
+                        ),
+                        TextButton(
+                          onPressed: () => _clearFilters(context),
+                          child: Text(i18n.clear),
+                        ),
+                        FilledButton(
+                          onPressed: () => _applyDates(context),
+                          child: Text(i18n.apply),
+                        ),
                       ],
                     ),
                   ],
@@ -63,24 +64,40 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
     );
   }
 
-  Future<void> _changeDate(BuildContext context, DateTime initialDate, AppLanguageType language, bool isFromDate) async {
+  String _formatDateRange(S i18n, SearchStateInitialState state) {
+    final from = state.fromString;
+    final until = state.untilString;
+    if (from.isNullEmptyOrWhitespace && until.isNullEmptyOrWhitespace) {
+      return i18n.selectDateRange;
+    }
+    return '${from.isNullEmptyOrWhitespace ? i18n.na : from!}'
+        ' - '
+        '${until.isNullEmptyOrWhitespace ? i18n.na : until!}';
+  }
+
+  Future<void> _pickDateRange(
+    BuildContext context,
+    SearchStateInitialState state,
+  ) async {
     final now = DateTime.now();
-    await showDatePicker(
+    final result = await showDateRangePicker(
       context: context,
-      locale: currentLocale(language),
       firstDate: DateTime(now.year - 1),
-      initialDate: initialDate,
       lastDate: DateTime(now.year + 1),
-    ).then((selectedDate) {
-      if (selectedDate == null || !context.mounted) {
-        return;
-      }
-      if (isFromDate) {
-        context.read<SearchBloc>().add(SearchEvent.tempFromDateChanged(newValue: selectedDate));
-      } else {
-        context.read<SearchBloc>().add(SearchEvent.tempToDateChanged(newValue: selectedDate));
-      }
-    });
+      initialDateRange: state.tempFrom != null && state.tempUntil != null
+          ? DateTimeRange(start: state.tempFrom!, end: state.tempUntil!)
+          : DateTimeRange(
+              start: now.subtract(const Duration(days: 30)),
+              end: now,
+            ),
+    );
+    if (result == null || !context.mounted) return;
+    context.read<SearchBloc>().add(
+      SearchEvent.tempFromDateChanged(newValue: result.start),
+    );
+    context.read<SearchBloc>().add(
+      SearchEvent.tempToDateChanged(newValue: result.end),
+    );
   }
 
   void _closeModal(BuildContext context) {

@@ -78,10 +78,13 @@ class TransactionItem extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-          Text(
-            currencyBloc.format(item.amount),
-            style: TextStyle(
-              color: item.category.isAnIncome ? Colors.green : Colors.red,
+          Flexible(
+            child: Text(
+              currencyBloc.format(item.amount),
+              style: TextStyle(
+                color: item.category.isAnIncome ? Colors.green : Colors.red,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           if (item.isChildTransaction)

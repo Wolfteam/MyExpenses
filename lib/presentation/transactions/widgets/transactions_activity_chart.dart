@@ -8,6 +8,7 @@ import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/extensions/iterable_extensions.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/generated/l10n.dart';
+import 'package:my_expenses/presentation/charts/charts_page.dart';
 import 'package:my_expenses/presentation/shared/mixins/transaction_mixin.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
 
@@ -23,26 +24,24 @@ class TransactionsActivityChart extends StatelessWidget with TransactionMixin {
     final expenseTextStyle = textStyle.copyWith(color: getTransactionColor());
     final incomeTextStyle = textStyle.copyWith(color: getTransactionColor(isAnIncome: true));
     return BlocBuilder<TransactionsActivityBloc, TransactionsActivityState>(
-      builder:
-          (context, state) => Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _Header(selected: state.type),
-              Text(i18n.balance, style: theme.textTheme.bodySmall, textAlign: TextAlign.center),
-              Text(
-                bloc.format(state.balance),
-                style:
-                    state.balance == 0
-                        ? textStyle
-                        : state.balance > 0
-                        ? incomeTextStyle
-                        : expenseTextStyle,
-                textAlign: TextAlign.center,
-              ),
-              _Chart(dateRangeType: state.type, selectedActivityTypes: state.selectedActivityTypes, transactions: state.transactions),
-              _ChartLegend(selectedActivityTypes: state.selectedActivityTypes),
-            ],
+      builder: (context, state) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _Header(selected: state.type),
+          Text(i18n.balance, style: theme.textTheme.bodySmall, textAlign: TextAlign.center),
+          Text(
+            bloc.format(state.balance),
+            style: state.balance == 0
+                ? textStyle
+                : state.balance > 0
+                ? incomeTextStyle
+                : expenseTextStyle,
+            textAlign: TextAlign.center,
           ),
+          _Chart(dateRangeType: state.type, selectedActivityTypes: state.selectedActivityTypes, transactions: state.transactions),
+          _ChartLegend(selectedActivityTypes: state.selectedActivityTypes),
+        ],
+      ),
     );
   }
 }
@@ -61,7 +60,14 @@ class _Header extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(i18n.activity, style: theme.textTheme.titleLarge),
+          TextButton.icon(
+            onPressed: () => Navigator.of(context).push(ChartsPage.route()),
+            style: TextButton.styleFrom(
+              foregroundColor: theme.colorScheme.onSurface,
+            ),
+            icon: const Icon(Icons.insert_chart),
+            label: Text(i18n.activity, style: theme.textTheme.titleLarge),
+          ),
           ToggleButtons(
             onPressed: (index) {
               final dateRangeType = TransactionActivityDateRangeType.values[index];
@@ -95,7 +101,9 @@ class _Chart extends StatelessWidget with TransactionMixin {
   Widget build(BuildContext context) {
     final bloc = context.read<CurrencyBloc>();
     final theme = Theme.of(context);
-    final (TextStyle tooltipTextStyle, BoxDecoration tooltipBoxDecoration, EdgeInsets tooltipPadding) = Styles.getTooltipStyling(context);
+    final (TextStyle tooltipTextStyle, BoxDecoration tooltipBoxDecoration, EdgeInsets tooltipPadding) = Styles.getTooltipStyling(
+      context,
+    );
     final Color accentColor = Theme.of(context).colorScheme.secondary;
     final List<Color> balanceColors = [accentColor.withValues(alpha: 0.5), accentColor];
     final Color incomeColor = getTransactionColor(isAnIncome: true);
@@ -146,7 +154,8 @@ class _Chart extends StatelessWidget with TransactionMixin {
     }
 
     final dotData = FlDotData(
-      getDotPainter: (x, y, z, w) => FlDotCirclePainter(color: Colors.white, strokeColor: Colors.black, strokeWidth: 2, radius: 5),
+      getDotPainter: (x, y, z, w) =>
+          FlDotCirclePainter(color: Colors.white, strokeColor: Colors.black, strokeWidth: 2, radius: 5),
       checkToShowDot: (spot, barData) => barData.color != Colors.transparent,
       show: hasData,
     );
@@ -171,12 +180,14 @@ class _Chart extends StatelessWidget with TransactionMixin {
                 reservedSize: 40,
                 maxIncluded: false,
                 minIncluded: false,
-                getTitlesWidget:
-                    (value, meta) => SideTitleWidget(
-                      meta: meta,
-                      fitInside: SideTitleFitInsideData.fromTitleMeta(meta),
-                      child: Tooltip(message: bloc.format(value), child: Text(meta.formattedValue, style: theme.textTheme.labelSmall)),
-                    ),
+                getTitlesWidget: (value, meta) => SideTitleWidget(
+                  meta: meta,
+                  fitInside: SideTitleFitInsideData.fromTitleMeta(meta),
+                  child: Tooltip(
+                    message: bloc.format(value),
+                    child: Text(meta.formattedValue, style: theme.textTheme.labelSmall),
+                  ),
+                ),
               ),
             ),
           ),
@@ -192,24 +203,24 @@ class _Chart extends StatelessWidget with TransactionMixin {
               tooltipMargin: 0,
               fitInsideHorizontally: true,
               fitInsideVertically: true,
-              getTooltipItems: (values) => _getToolTipItems(bloc, tooltipTextStyle, values, incomeColors, expenseColors, balanceColors),
+              getTooltipItems: (values) =>
+                  _getToolTipItems(bloc, tooltipTextStyle, values, incomeColors, expenseColors, balanceColors),
             ),
           ),
-          lineBarsData:
-              colorSpotMap.entries
-                  .map(
-                    (kvp) => LineChartBarData(
-                      spots: kvp.value,
-                      shadow: kvp.key.isEmpty ? const Shadow(color: Colors.transparent) : Shadow(color: kvp.key.first),
-                      dotData: dotData,
-                      isCurved: true,
-                      preventCurveOverShooting: true,
-                      color: kvp.key.isEmpty ? Colors.transparent : null,
-                      gradient: kvp.key.isEmpty ? null : LinearGradient(colors: kvp.key),
-                      barWidth: 3.5,
-                    ),
-                  )
-                  .toList(),
+          lineBarsData: colorSpotMap.entries
+              .map(
+                (kvp) => LineChartBarData(
+                  spots: kvp.value,
+                  shadow: kvp.key.isEmpty ? const Shadow(color: Colors.transparent) : Shadow(color: kvp.key.first),
+                  dotData: dotData,
+                  isCurved: true,
+                  preventCurveOverShooting: true,
+                  color: kvp.key.isEmpty ? Colors.transparent : null,
+                  gradient: kvp.key.isEmpty ? null : LinearGradient(colors: kvp.key),
+                  barWidth: 3.5,
+                ),
+              )
+              .toList(),
         ),
       ),
     );
@@ -233,19 +244,20 @@ class _Chart extends StatelessWidget with TransactionMixin {
         final String? header = switch (dateRangeType) {
           TransactionActivityDateRangeType.last7days => transactions[i].dateRangeString,
           TransactionActivityDateRangeType.monthly => transactions[i].dateRangeString,
-          TransactionActivityDateRangeType.yearly => toBeginningOfSentenceCase(DateFormat('MMMM').format(DateTime(2024, spot.spotIndex + 1))),
+          TransactionActivityDateRangeType.yearly => toBeginningOfSentenceCase(
+            DateFormat('MMMM').format(DateTime(2024, spot.spotIndex + 1)),
+          ),
         };
 
         toolTipItem = LineTooltipItem(header!, tooltipTextStyle.copyWith(fontWeight: FontWeight.bold));
       }
-      final int index =
-          incomeColors.contains(color)
-              ? 1
-              : expenseColors.contains(color)
-              ? 2
-              : totalColors.contains(color)
-              ? 3
-              : 0;
+      final int index = incomeColors.contains(color)
+          ? 1
+          : expenseColors.contains(color)
+          ? 2
+          : totalColors.contains(color)
+          ? 3
+          : 0;
       tooltipItems.putIfAbsent(index, () => toolTipItem);
     }
 
@@ -265,22 +277,20 @@ class _ChartLegend extends StatelessWidget with TransactionMixin {
 
     return OverflowBar(
       alignment: MainAxisAlignment.center,
-      children:
-          TransactionActivityType.values
-              .mapIndex(
-                (type, i) => _ChartLegendIndicator(
-                  selected: selectedActivityTypes.contains(type),
-                  text:
-                      i == 0
-                          ? i18n.balance
-                          : i == 1
-                          ? i18n.incomes
-                          : i18n.expenses,
-                  color: i == 0 ? theme.colorScheme.primaryContainer : getTransactionColor(isAnIncome: i == 1),
-                  onTap: () => context.read<TransactionsActivityBloc>().add(TransactionsActivityEvent.activitySelected(type: type)),
-                ),
-              )
-              .toList(),
+      children: TransactionActivityType.values
+          .mapIndex(
+            (type, i) => _ChartLegendIndicator(
+              selected: selectedActivityTypes.contains(type),
+              text: i == 0
+                  ? i18n.balance
+                  : i == 1
+                  ? i18n.incomes
+                  : i18n.expenses,
+              color: i == 0 ? theme.colorScheme.primaryContainer : getTransactionColor(isAnIncome: i == 1),
+              onTap: () => context.read<TransactionsActivityBloc>().add(TransactionsActivityEvent.activitySelected(type: type)),
+            ),
+          )
+          .toList(),
     );
   }
 }

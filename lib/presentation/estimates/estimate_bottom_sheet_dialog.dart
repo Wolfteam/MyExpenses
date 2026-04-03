@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_expenses/application/bloc.dart';
-import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/injection.dart';
 import 'package:my_expenses/presentation/estimates/widgets/estimates_summary.dart';
 import 'package:my_expenses/presentation/estimates/widgets/estimates_toggle_buttons.dart';
 import 'package:my_expenses/presentation/shared/modal_sheet_separator.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
-import 'package:my_expenses/presentation/shared/utils/i18n_utils.dart';
 
 class EstimateBottomSheetDialog extends StatelessWidget {
   @override
@@ -47,17 +45,17 @@ class _Body extends StatelessWidget {
                   style: theme.textTheme.titleLarge,
                 ),
                 EstimatesToggleButtons(selectedButtons: _getSelectedButtons(state.selectedTransactionType)),
-                Text('${i18n.startDate}:'),
-                TextButton(
-                  style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                  onPressed: () => _changeDate(context, state.fromDate, state.currentLanguage, true),
-                  child: Align(alignment: Alignment.centerLeft, child: Text(state.fromDateString)),
-                ),
-                Text('${i18n.untilDate}:'),
-                TextButton(
-                  style: TextButton.styleFrom(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                  onPressed: () => _changeDate(context, state.untilDate, state.currentLanguage, false),
-                  child: Align(alignment: Alignment.centerLeft, child: Text(state.untilDateString)),
+                Text('${i18n.startDate} - ${i18n.untilDate}:'),
+                TextButton.icon(
+                  icon: const Icon(Icons.date_range),
+                  style: TextButton.styleFrom(
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  onPressed: () => _pickDateRange(context, state),
+                  label: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('${state.fromDateString} - ${state.untilDateString}'),
+                  ),
                 ),
                 Divider(color: theme.colorScheme.secondary),
                 Text('${i18n.period}: ${state.fromDateString} - ${state.untilDateString}'),
@@ -77,25 +75,28 @@ class _Body extends StatelessWidget {
     );
   }
 
-  Future<void> _changeDate(BuildContext context, DateTime initialDate, AppLanguageType language, bool isFromDate) async {
+  Future<void> _pickDateRange(
+    BuildContext context,
+    EstimatesStateEstimatesInitialState state,
+  ) async {
     final now = DateTime.now();
-    await showDatePicker(
+    final result = await showDateRangePicker(
       context: context,
-      locale: currentLocale(language),
       firstDate: DateTime(now.year - 1),
-      initialDate: initialDate,
       lastDate: DateTime(now.year + 1),
-    ).then((selectedDate) {
-      if (selectedDate == null || !context.mounted) {
-        return;
-      }
-      if (isFromDate) {
-        context.read<EstimatesBloc>().add(EstimatesEvent.fromDateChanged(newDate: selectedDate));
-      } else {
-        context.read<EstimatesBloc>().add(EstimatesEvent.untilDateChanged(newDate: selectedDate));
-      }
-      context.read<EstimatesBloc>().add(const EstimatesEvent.calculate());
-    });
+      initialDateRange: DateTimeRange(
+        start: state.fromDate,
+        end: state.untilDate,
+      ),
+    );
+    if (result == null || !context.mounted) return;
+    context.read<EstimatesBloc>().add(
+      EstimatesEvent.fromDateChanged(newDate: result.start),
+    );
+    context.read<EstimatesBloc>().add(
+      EstimatesEvent.untilDateChanged(newDate: result.end),
+    );
+    context.read<EstimatesBloc>().add(const EstimatesEvent.calculate());
   }
 
   List<bool> _getSelectedButtons(int selectedTransactionType) {
