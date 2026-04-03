@@ -1,9 +1,9 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/models/charts/payment_method_chart_item.dart';
 import 'package:my_expenses/generated/l10n.dart';
+import 'package:my_expenses/presentation/charts/widgets/chart_colors.dart';
+import 'package:my_expenses/presentation/charts/widgets/spending_item_row.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
 
 class PaymentMethodChartContent extends StatelessWidget {
@@ -61,46 +61,15 @@ class _PaymentMethodRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final i18n = S.of(context);
-    final currencyBloc = context.read<CurrencyBloc>();
-    final color = item.iconColor ?? Colors.grey;
+    final icon = item.icon ?? ChartColors.defaultPaymentMethodIcon(item.type);
+    final color = item.iconColor ?? ChartColors.defaultColor;
     final displayName = item.methodName.isEmpty ? i18n.noPaymentMethod : item.methodName;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        children: [
-          if (item.icon != null)
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: Icon(item.icon, size: 18, color: color),
-            )
-          else
-            Container(
-              width: 18,
-              height: 18,
-              margin: const EdgeInsets.only(right: 8),
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(3),
-              ),
-            ),
-          Expanded(
-            child: Text(displayName, style: theme.textTheme.bodyMedium),
-          ),
-          Text(
-            currencyBloc.format(item.total),
-            style: theme.textTheme.bodyMedium,
-          ),
-          const SizedBox(width: 8),
-          SizedBox(
-            width: 48,
-            child: Text(
-              '${item.percentage.toStringAsFixed(1)}%',
-              style: theme.textTheme.bodySmall,
-              textAlign: TextAlign.end,
-            ),
-          ),
-        ],
-      ),
+    return SpendingItemRow(
+      displayName: displayName,
+      icon: icon,
+      iconColor: color,
+      total: item.total,
+      percentage: item.percentage,
     );
   }
 }

@@ -168,6 +168,13 @@ class _DataManagementCardContent extends StatelessWidget {
                 isRecurring: i18n.isRecurring,
                 yes: i18n.yes,
                 no: i18n.no,
+                auto: i18n.auto,
+                repetitionCycleNone: i18n.none,
+                repetitionCycleEachDay: i18n.eachDay,
+                repetitionCycleEachWeek: i18n.eachWeek,
+                repetitionCycleEachMonth: i18n.eachMonth,
+                repetitionCycleBiweekly: i18n.biweekly,
+                repetitionCycleEachYear: i18n.eachYear,
               )
             : null,
       ),

@@ -1,8 +1,8 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/models/charts/category_chart_item.dart';
+import 'package:my_expenses/presentation/charts/widgets/chart_colors.dart';
+import 'package:my_expenses/presentation/charts/widgets/spending_item_row.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
 
 class CategoryChartContent extends StatelessWidget {
@@ -25,7 +25,8 @@ class CategoryChartContent extends StatelessWidget {
                 centerSpaceRadius: 40,
                 sections: categories.map((item) {
                   final showLabel = item.percentage >= 5.0;
-                  final luminance = item.color.computeLuminance();
+                  final color = item.color ?? ChartColors.defaultColor;
+                  final luminance = color.computeLuminance();
                   final textColor = luminance > 0.4 ? Colors.black : Colors.white;
                   return PieChartSectionData(
                     color: item.color,
@@ -43,55 +44,13 @@ class CategoryChartContent extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          ...categories.map((item) => _CategoryRow(item: item)),
-        ],
-      ),
-    );
-  }
-}
-
-class _CategoryRow extends StatelessWidget {
-  final CategoryChartItem item;
-
-  const _CategoryRow({required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final currencyBloc = context.read<CurrencyBloc>();
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        children: [
-          if (item.icon != null)
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: Icon(item.icon, size: 18, color: item.color),
-            )
-          else
-            Container(
-              width: 18,
-              height: 18,
-              margin: const EdgeInsets.only(right: 8),
-              decoration: BoxDecoration(
-                color: item.color,
-                borderRadius: BorderRadius.circular(3),
-              ),
-            ),
-          Expanded(
-            child: Text(item.categoryName, style: theme.textTheme.bodyMedium),
-          ),
-          Text(
-            currencyBloc.format(item.total),
-            style: theme.textTheme.bodyMedium,
-          ),
-          const SizedBox(width: 8),
-          SizedBox(
-            width: 48,
-            child: Text(
-              '${item.percentage.toStringAsFixed(1)}%',
-              style: theme.textTheme.bodySmall,
-              textAlign: TextAlign.end,
+          ...categories.map(
+            (item) => SpendingItemRow(
+              displayName: item.categoryName,
+              icon: item.icon ?? ChartColors.defaultCategoryIcon,
+              iconColor: item.color ?? ChartColors.defaultColor,
+              total: item.total,
+              percentage: item.percentage,
             ),
           ),
         ],

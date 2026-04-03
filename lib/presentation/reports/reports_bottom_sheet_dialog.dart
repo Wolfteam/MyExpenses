@@ -83,7 +83,7 @@ class _Body extends StatelessWidget {
               hint: i18n.selectFormat,
               currentValue: state.selectedFileType,
               values: ReportFileType.values.map((el) => TranslatedEnum(el, i18n.getReportFileTypeName(el))).toList(),
-              onChanged: (newValue, _) => _reportFileTypeChanged(context, newValue!),
+              onChanged: (newValue, _) => _reportFileTypeChanged(context, newValue),
             ),
             Text(i18n.paymentMethods),
             BlocProvider<PaymentMethodPickerBloc>(
@@ -92,28 +92,31 @@ class _Body extends StatelessWidget {
                     ..add(PaymentMethodPickerEvent.load(initialSelectedId: state.selectedPaymentMethodId)),
               child: BlocBuilder<PaymentMethodPickerBloc, PaymentMethodPickerState>(
                 builder: (ctx, pmState) => switch (pmState) {
-                  final PaymentMethodPickerStateLoadedState s => DropdownButton<int?>(
-                    isExpanded: true,
-                    hint: Text(i18n.paymentMethods),
-                    underline: Container(height: 0, color: Colors.transparent),
-                    value: state.selectedPaymentMethodId,
-                    items:
-                        <DropdownMenuItem<int?>>[
-                          DropdownMenuItem<int?>(child: Text(i18n.all)),
-                          DropdownMenuItem<int?>(value: 0, child: Text(i18n.paymentMethodUnknownNone)),
-                        ] +
-                        s.items
-                            .map(
-                              (m) => DropdownMenuItem<int?>(
-                                value: m.id,
-                                child: Text(m.name),
-                              ),
-                            )
-                            .toList(),
-                    onChanged: (newValue) =>
-                        context.read<ReportsBloc>().add(ReportsEvent.paymentMethodChanged(selectedPaymentMethodId: newValue)),
+                  final PaymentMethodPickerStateLoadedState s => CommonDropdownButton<int?>(
+                    hint: i18n.paymentMethods,
+                    currentValue: state.selectedPaymentMethodId,
+                    values: [
+                      TranslatedEnum(null, i18n.all),
+                      TranslatedEnum(
+                        0,
+                        i18n.paymentMethodUnknownNone,
+                      ),
+                      ...s.items.map(
+                        (m) => TranslatedEnum(m.id, m.name),
+                      ),
+                    ],
+                    onChanged: (newValue, _) => context.read<ReportsBloc>().add(
+                      ReportsEvent.paymentMethodChanged(
+                        selectedPaymentMethodId: newValue,
+                      ),
+                    ),
                   ),
-                  _ => const SizedBox(height: 48, child: Center(child: CircularProgressIndicator())),
+                  _ => const SizedBox(
+                    height: 48,
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
                 },
               ),
             ),

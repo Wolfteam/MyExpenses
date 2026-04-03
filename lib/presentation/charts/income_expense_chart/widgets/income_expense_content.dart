@@ -62,10 +62,23 @@ class IncomeExpenseContent extends StatelessWidget with TransactionMixin {
                 titlesData: FlTitlesData(
                   rightTitles: const AxisTitles(),
                   topTitles: const AxisTitles(),
-                  leftTitles: const AxisTitles(
+                  leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
                       reservedSize: 50,
+                      maxIncluded: false,
+                      minIncluded: false,
+                      getTitlesWidget: (value, meta) {
+                        return SideTitleWidget(
+                          meta: meta,
+                          child: Text(
+                            meta.formattedValue,
+                            style: theme.textTheme.labelSmall,
+                            softWrap: false,
+                            overflow: TextOverflow.visible,
+                          ),
+                        );
+                      },
                     ),
                   ),
                   bottomTitles: AxisTitles(
