@@ -1,12 +1,14 @@
 import 'package:get_it/get_it.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/models/entities/daos/categories_dao.dart';
+import 'package:my_expenses/domain/models/entities/daos/payment_methods_dao.dart';
 import 'package:my_expenses/domain/models/entities/daos/transactions_dao.dart';
 import 'package:my_expenses/domain/models/entities/daos/users_dao.dart';
 import 'package:my_expenses/domain/services/services.dart';
 import 'package:my_expenses/infrastructure/background_service.dart';
 import 'package:my_expenses/infrastructure/db/categories_dao_impl.dart';
 import 'package:my_expenses/infrastructure/db/database.dart';
+import 'package:my_expenses/infrastructure/db/payment_methods_dao_impl.dart';
 import 'package:my_expenses/infrastructure/db/transactions_dao_impl.dart';
 import 'package:my_expenses/infrastructure/db/users_dao_impl.dart';
 import 'package:my_expenses/infrastructure/infrastructure.dart';
@@ -14,6 +16,13 @@ import 'package:my_expenses/infrastructure/infrastructure.dart';
 final GetIt getIt = GetIt.instance;
 
 class Injection {
+  static CreditCardCyclesBloc get creditCardCyclesBloc {
+    final logger = getIt<LoggingService>();
+    final paymentMethodsDao = getIt<PaymentMethodsDao>();
+    final usersDao = getIt<UsersDao>();
+    return CreditCardCyclesBloc(logger, paymentMethodsDao, usersDao);
+  }
+
   static SplashScreenBloc get splashScreenBloc {
     final settingsService = getIt<SettingsService>();
     return SplashScreenBloc(settingsService);
@@ -77,11 +86,21 @@ class Injection {
   static ReportsBloc getReportsBloc(CurrencyBloc currencyBloc) {
     final logger = getIt<LoggingService>();
     final transactionsDao = getIt<TransactionsDao>();
+    final paymentMethodsDao = getIt<PaymentMethodsDao>();
     final usersDao = getIt<UsersDao>();
     final pathService = getIt<PathService>();
     final notificationService = getIt<NotificationService>();
     final deviceInfoService = getIt<DeviceInfoService>();
-    return ReportsBloc(logger, transactionsDao, pathService, notificationService, deviceInfoService, usersDao, currencyBloc);
+    return ReportsBloc(
+      logger,
+      transactionsDao,
+      pathService,
+      notificationService,
+      deviceInfoService,
+      usersDao,
+      currencyBloc,
+      paymentMethodsDao,
+    );
   }
 
   static TransactionFormBloc get transactionFormBloc {
@@ -92,6 +111,22 @@ class Injection {
     final pathService = getIt<PathService>();
     final syncService = getIt<SyncService>();
     return TransactionFormBloc(logger, transactionsDao, usersDao, settingsService, pathService, syncService);
+  }
+
+  static PaymentMethodsBloc get paymentMethodsBloc {
+    final logger = getIt<LoggingService>();
+    final paymentMethodsDao = getIt<PaymentMethodsDao>();
+    final usersDao = getIt<UsersDao>();
+    return PaymentMethodsBloc(logger, paymentMethodsDao, usersDao);
+  }
+
+  static PaymentMethodFormBloc get paymentMethodFormBloc => PaymentMethodFormBloc();
+
+  static PaymentMethodPickerBloc get paymentMethodPickerBloc {
+    final logger = getIt<LoggingService>();
+    final paymentMethodsDao = getIt<PaymentMethodsDao>();
+    final usersDao = getIt<UsersDao>();
+    return PaymentMethodPickerBloc(logger, paymentMethodsDao, usersDao);
   }
 
   static TransactionsSummaryPerMonthBloc get transactionsSummaryPerMonthBloc {
@@ -167,6 +202,10 @@ class Injection {
       getIt.registerSingleton<TransactionsDao>(TransactionsDaoImpl(getIt<AppDatabase>()));
     }
 
+    if (!getIt.isRegistered<PaymentMethodsDao>()) {
+      getIt.registerSingleton<PaymentMethodsDao>(PaymentMethodsDaoImpl(getIt<AppDatabase>()));
+    }
+
     if (!getIt.isRegistered<UsersDao>()) {
       getIt.registerSingleton<UsersDao>(UsersDaoImpl(getIt<AppDatabase>()));
     }
@@ -189,6 +228,7 @@ class Injection {
           getIt<LoggingService>(),
           getIt<TransactionsDao>(),
           getIt<CategoriesDao>(),
+          getIt<PaymentMethodsDao>(),
           getIt<UsersDao>(),
           getIt<GoogleService>(),
           getIt<SecureStorageService>(),
@@ -233,10 +273,20 @@ class Injection {
     final db = getIsolateDatabase();
     final transactionsDao = TransactionsDaoImpl(db);
     final categoriesDao = CategoriesDaoImpl(db);
+    final paymentMethodsDao = PaymentMethodsDaoImpl(db);
     final usersDao = UsersDaoImpl(db);
     final secureStorage = SecureStorageServiceImpl();
     final googleService = GoogleServiceImpl(loggingService, secureStorage);
-    final syncService = SyncServiceImpl(loggingService, transactionsDao, categoriesDao, usersDao, googleService, secureStorage, pathService);
+    final syncService = SyncServiceImpl(
+      loggingService,
+      transactionsDao,
+      categoriesDao,
+      paymentMethodsDao,
+      usersDao,
+      googleService,
+      secureStorage,
+      pathService,
+    );
     final networkService = NetworkServiceImpl();
     return BackgroundServiceImpl(
       networkService,

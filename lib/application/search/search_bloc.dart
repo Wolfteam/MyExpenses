@@ -95,6 +95,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       final s = await _transactionTypeChanged(event.newValue);
       emit(s);
     });
+
+    on<SearchEventPaymentMethodChanged>((event, emit) async {
+      final s = await _paymentMethodChanged(event.newValue);
+      emit(s);
+    });
   }
 
   Future<SearchState> _init() {
@@ -117,6 +122,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       amount: s.amount,
       comparerType: s.comparerType,
       category: s.category,
+      paymentMethodId: s.paymentMethodId,
       transactionType: s.transactionType,
       transactionFilterType: s.transactionFilterType,
       sortDirectionType: s.sortDirectionType,
@@ -134,6 +140,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       amount: s.amount,
       comparerType: s.comparerType,
       category: s.category,
+      paymentMethodId: s.paymentMethodId,
       transactionType: s.transactionType,
       transactionFilterType: s.transactionFilterType,
       sortDirectionType: s.sortDirectionType,
@@ -150,6 +157,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       amount: s.amount,
       comparerType: s.comparerType,
       category: s.category,
+      paymentMethodId: s.paymentMethodId,
       transactionType: s.transactionType,
       transactionFilterType: s.transactionFilterType,
       sortDirectionType: s.sortDirectionType,
@@ -178,6 +186,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       amount: s.tempAmount,
       comparerType: s.tempComparerType,
       category: s.category,
+      paymentMethodId: s.paymentMethodId,
       transactionType: s.transactionType,
       transactionFilterType: s.transactionFilterType,
       sortDirectionType: s.sortDirectionType,
@@ -198,6 +207,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       amount: s.amount,
       comparerType: newValue,
       category: s.category,
+      paymentMethodId: s.paymentMethodId,
       transactionType: s.transactionType,
       transactionFilterType: s.transactionFilterType,
       sortDirectionType: s.sortDirectionType,
@@ -214,6 +224,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       amount: s.amount,
       comparerType: s.comparerType,
       category: newValue,
+      paymentMethodId: s.paymentMethodId,
       transactionType: s.transactionType,
       transactionFilterType: s.transactionFilterType,
       sortDirectionType: s.sortDirectionType,
@@ -230,6 +241,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       amount: s.amount,
       comparerType: s.comparerType,
       category: s.category,
+      paymentMethodId: s.paymentMethodId,
       transactionType: s.transactionType,
       transactionFilterType: newValue,
       sortDirectionType: s.sortDirectionType,
@@ -246,6 +258,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       amount: s.amount,
       comparerType: s.comparerType,
       category: s.category,
+      paymentMethodId: s.paymentMethodId,
       transactionType: s.transactionType,
       transactionFilterType: s.transactionFilterType,
       sortDirectionType: newValue,
@@ -262,7 +275,25 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       amount: s.amount,
       comparerType: s.comparerType,
       category: s.category,
+      paymentMethodId: s.paymentMethodId,
       transactionType: newValue,
+      transactionFilterType: s.transactionFilterType,
+      sortDirectionType: s.sortDirectionType,
+    );
+  }
+
+  Future<SearchState> _paymentMethodChanged(int? newValue) {
+    final s = currentState;
+    return _buildInitialState(
+      s.currentLanguage,
+      from: s.from,
+      to: s.tempUntil,
+      description: s.description,
+      amount: s.amount,
+      comparerType: s.comparerType,
+      category: s.category,
+      paymentMethodId: newValue,
+      transactionType: s.transactionType,
       transactionFilterType: s.transactionFilterType,
       sortDirectionType: s.sortDirectionType,
     );
@@ -278,6 +309,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     double? amount,
     ComparerType comparerType = ComparerType.equal,
     CategoryItem? category,
+    int? paymentMethodId,
     TransactionType? transactionType,
     TransactionFilterType transactionFilterType = TransactionFilterType.date,
     SortDirectionType sortDirectionType = SortDirectionType.desc,
@@ -293,6 +325,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         amount,
         comparerType,
         category?.id,
+        paymentMethodId,
         transactionType,
         transactionFilterType,
         sortDirectionType,
@@ -314,6 +347,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
           comparerType: comparerType,
           tempComparerType: comparerType,
           category: category,
+          paymentMethodId: paymentMethodId,
           transactionType: transactionType,
           transactionFilterType: transactionFilterType,
           sortDirectionType: sortDirectionType,
@@ -341,6 +375,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         comparerType: comparerType,
         tempComparerType: comparerType,
         category: category,
+        paymentMethodId: paymentMethodId,
         transactionType: transactionType,
         transactionFilterType: transactionFilterType,
         sortDirectionType: sortDirectionType,

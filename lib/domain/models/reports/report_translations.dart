@@ -37,5 +37,8 @@ sealed class ReportTranslations with _$ReportTranslations {
     required GeneratedOn generatedOn,
     required AppVersion appVersion,
     required ReportWasSuccessfullyGenerated reportWasSuccessfullyGenerated,
+    // New labels
+    required String paymentMethod,
+    required String unknown,
   }) = _ReportTranslations;
 }

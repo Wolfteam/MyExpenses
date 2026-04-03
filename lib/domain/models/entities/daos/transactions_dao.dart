@@ -5,7 +5,7 @@ import 'package:my_expenses/domain/models/transactions/transaction_item.dart';
 abstract class TransactionsDao {
   Future<double> getAmount(int? userId, DateTime from, DateTime to, bool calculateIncome);
 
-  Future<List<TransactionItem>> getAllTransactions(int? userId, DateTime from, DateTime to);
+  Future<List<TransactionItem>> getAllTransactions(int? userId, DateTime from, DateTime to, {int? paymentMethodId});
 
   Future<TransactionItem> saveTransaction(TransactionItem transaction);
 
@@ -55,6 +55,7 @@ abstract class TransactionsDao {
     double? amount,
     ComparerType comparerType,
     int? categoryId,
+    int? paymentMethodId,
     TransactionType? transactionType,
     TransactionFilterType transactionFilterType,
     SortDirectionType sortDirectionType,

@@ -32,4 +32,6 @@ sealed class SearchEvent with _$SearchEvent {
   const factory SearchEvent.sortDirectionChanged({required SortDirectionType newValue}) = SearchEventSortDirectionChanged;
 
   const factory SearchEvent.transactionTypeChanged({required TransactionType? newValue}) = SearchEventTransactionTypeChanged;
+
+  const factory SearchEvent.paymentMethodChanged({int? newValue}) = SearchEventPaymentMethodChanged;
 }

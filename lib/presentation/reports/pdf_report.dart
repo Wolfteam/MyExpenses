@@ -18,8 +18,11 @@ Future<Document> buildPdf(
   DateTime from,
   DateTime to,
   String appName,
-  String version,
-) async {
+  String version, {
+  bool groupByPaymentMethod = false,
+  Map<int, String>? paymentMethodNames,
+  String? unknownPaymentMethodLabel,
+}) async {
   final pdf = Document(
     pageMode: PdfPageMode.outlines,
     author: appName,
@@ -74,7 +77,7 @@ Future<Document> buildPdf(
   // );
 
   // transactions.addAll([...transactions]);
-//TODO: FIX THIS SHIT
+  //TODO: FIX THIS SHIT
   final page = MultiPage(
     margin: const EdgeInsets.only(
       left: 0.8 * PdfPageFormat.cm,
@@ -86,7 +89,20 @@ Future<Document> buildPdf(
     maxPages: 100,
     header: (ctx) => PdfHeader(translations),
     footer: (ctx) => PdfFooter(translations),
-    build: (ctx) => _buildPdfBody(ctx, pdf, version, image, transactions, translations, from, to, formatter),
+    build: (ctx) => _buildPdfBody(
+      ctx,
+      pdf,
+      version,
+      image,
+      transactions,
+      translations,
+      from,
+      to,
+      formatter,
+      groupByPaymentMethod: groupByPaymentMethod,
+      paymentMethodNames: paymentMethodNames,
+      unknownPaymentMethodLabel: unknownPaymentMethodLabel,
+    ),
   );
 
   pdf.addPage(page);
@@ -103,37 +119,94 @@ List<Widget> _buildPdfBody(
   ReportTranslations translations,
   DateTime from,
   DateTime to,
-  String Function(double) formatter,
-) {
+  String Function(double) formatter, {
+  bool groupByPaymentMethod = false,
+  Map<int, String>? paymentMethodNames,
+  String? unknownPaymentMethodLabel,
+}) {
   final summary = PdfSummary(version, img, transactions, translations, from, to, formatter);
 
-  final transactionsMap = _buildTransactionsPerMonth(transactions);
-  if (transactionsMap.isEmpty) {
+  if (transactions.isEmpty) {
+    return _noTransactions(translations, summary);
+  }
+
+  if (!groupByPaymentMethod) {
+    final transactionsMap = _buildTransactionsPerMonth(transactions);
+    if (transactionsMap.isEmpty) {
+      return _noTransactions(translations, summary);
+    }
+    final tables = transactionsMap.entries.map((kvp) => PdfTransactionTable(kvp.value, translations, formatter)).toList();
     return [
       summary,
-      Padding(
-        padding: const EdgeInsets.only(top: 30, right: 20, left: 20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Text(
-              translations.noTransactionsForThisPeriod,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
+      Partition(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: tables),
       ),
     ];
   }
-  final tables = transactionsMap.entries.map((kvp) => PdfTransactionTable(kvp.value, translations, formatter)).toList();
+
+  // Group by payment method id (null => Unknown)
+  final unknownLabel = unknownPaymentMethodLabel ?? translations.unknown;
+  final names = paymentMethodNames ?? <int, String>{};
+  final pmGroups = <int?, List<TransactionItem>>{};
+  for (final t in transactions) {
+    final key = t.paymentMethodId; // nullable
+    (pmGroups[key] ??= <TransactionItem>[]).add(t);
+  }
+
+  final children = <Widget>[summary];
+  // Sort groups by label
+  final sortedKeys = pmGroups.keys.toList()
+    ..sort((a, b) {
+      final an = a == null ? unknownLabel : (names[a] ?? unknownLabel);
+      final bn = b == null ? unknownLabel : (names[b] ?? unknownLabel);
+      return an.compareTo(bn);
+    });
+
+  for (final key in sortedKeys) {
+    final label = key == null ? unknownLabel : (names[key] ?? unknownLabel);
+    final groupTxs = pmGroups[key]!..sort((x, y) => x.transactionDate.compareTo(y.transactionDate));
+    children.add(
+      Padding(
+        padding: const EdgeInsets.only(top: 16, bottom: 8, left: 8, right: 8),
+        child: Text(
+          '${translations.paymentMethod}: $label',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+
+    final monthly = _buildTransactionsPerMonth(groupTxs);
+    final tables = monthly.entries.map((kvp) => PdfTransactionTable(kvp.value, translations, formatter)).toList();
+    children.add(
+      Partition(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: tables),
+      ),
+    );
+  }
+
+  return children;
+}
+
+List<Widget> _noTransactions(ReportTranslations translations, Widget summary) {
   return [
     summary,
-    Partition(child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: tables)),
+    Padding(
+      padding: const EdgeInsets.only(top: 30, right: 20, left: 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(
+            translations.noTransactionsForThisPeriod,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    ),
   ];
 }
 

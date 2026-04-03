@@ -6,6 +6,8 @@ sealed class ReportState with _$ReportState {
     required ReportFileType selectedFileType,
     required DateTime from,
     required DateTime to,
+    int? selectedPaymentMethodId,
+    @Default(false) bool groupByPaymentMethod,
     @Default(false) bool errorOccurred,
     @Default(false) bool generatingReport,
   }) = ReportStateInitialState;

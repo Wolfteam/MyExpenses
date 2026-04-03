@@ -176,6 +176,20 @@ extension I18nExtensions on S {
       expense: expense,
       income: income,
       tapToOpen: tapToOpen,
+      // For now reuse existing keys: use plural as header, and reuse paymentMethodUnknownNone for unknown label
+      paymentMethod: paymentMethods,
+      unknown: paymentMethodUnknownNone,
     );
+  }
+
+  String translatePaymentMethodType(PaymentMethodType type) {
+    return switch (type) {
+      PaymentMethodType.cash => cash,
+      PaymentMethodType.debitCard => debitCard,
+      PaymentMethodType.creditCard => creditCard,
+      PaymentMethodType.mobileWallet => mobileWallet,
+      PaymentMethodType.bankTransfer => bankTransfer,
+      PaymentMethodType.other => other,
+    };
   }
 }

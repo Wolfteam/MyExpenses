@@ -7,6 +7,7 @@ import 'package:csv/csv.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
+import 'package:my_expenses/domain/models/entities/daos/payment_methods_dao.dart';
 import 'package:my_expenses/domain/models/entities/daos/transactions_dao.dart';
 import 'package:my_expenses/domain/models/entities/daos/users_dao.dart';
 import 'package:my_expenses/domain/models/models.dart';
@@ -23,6 +24,8 @@ final _initialState = ReportState.initial(
   selectedFileType: ReportFileType.pdf,
   from: DateUtils.getFirstDayDateOfTheMonth(DateTime.now()),
   to: DateTime.now(),
+  selectedPaymentMethodId: null,
+  groupByPaymentMethod: false,
 );
 
 class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
@@ -33,6 +36,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
   final DeviceInfoService _deviceInfoService;
   final UsersDao _usersDao;
   final CurrencyBloc _currencyBloc;
+  final PaymentMethodsDao _paymentMethodsDao;
 
   ReportsBloc(
     this._logger,
@@ -42,6 +46,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
     this._deviceInfoService,
     this._usersDao,
     this._currencyBloc,
+    this._paymentMethodsDao,
   ) : super(_initialState) {
     on<ReportsEventResetReportSheet>((event, emit) {
       emit(_initialState);
@@ -72,6 +77,16 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
       emit(s);
     });
 
+    on<ReportsEventPaymentMethodChanged>((event, emit) {
+      final s = currentState.copyWith(selectedPaymentMethodId: event.selectedPaymentMethodId);
+      emit(s);
+    });
+
+    on<ReportsEventGroupByPaymentMethodChanged>((event, emit) {
+      final s = currentState.copyWith(groupByPaymentMethod: event.value);
+      emit(s);
+    });
+
     on<ReportsEventGenerateReport>((event, emit) async {
       try {
         emit(currentState.copyWith(generatingReport: true));
@@ -89,21 +104,41 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
 
   Future<ReportState> _buildReport(ReportTranslations translations) async {
     final currentUser = await _usersDao.getActiveUser();
-    final transactions = await _transactionsDao.getAllTransactions(currentUser?.id, currentState.from, currentState.to);
+    final transactions = await _transactionsDao.getAllTransactions(
+      currentUser?.id,
+      currentState.from,
+      currentState.to,
+      paymentMethodId: currentState.selectedPaymentMethodId,
+    );
     transactions.sort((t1, t2) => t1.transactionDate.compareTo(t2.transactionDate));
 
     String path;
+    // Build payment method id->name map when needed (include archived)
+    final pmList = currentUser != null
+        ? await _paymentMethodsDao.getAll(currentUser.id, includeArchived: true)
+        : <PaymentMethodItem>[];
+    final pmNames = {for (final m in pmList) m.id: m.name};
+
     if (currentState.selectedFileType == ReportFileType.csv) {
-      path = await _buildCsvReport(transactions, translations);
+      path = await _buildCsvReport(transactions, translations, pmNames);
     } else {
-      path = await _buildPdfReport(transactions, translations);
+      path = await _buildPdfReport(
+        transactions,
+        translations,
+        groupByPaymentMethod: currentState.groupByPaymentMethod,
+        paymentMethodNames: pmNames,
+      );
     }
     final filename = basename(path);
     await __showNotification(filename, path, translations);
     return ReportState.generated(fileName: filename, filePath: path, selectedFileType: currentState.selectedFileType);
   }
 
-  Future<String> _buildCsvReport(List<TransactionItem> transactions, ReportTranslations translations) async {
+  Future<String> _buildCsvReport(
+    List<TransactionItem> transactions,
+    ReportTranslations translations,
+    Map<int, String> pmNames,
+  ) async {
     final csvData = [
       <String>[
         translations.id,
@@ -112,6 +147,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
         translations.date,
         translations.category,
         translations.type,
+        translations.paymentMethod,
       ],
       ...transactions.map(
         (t) => [
@@ -121,6 +157,7 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
           DateUtils.formatDateWithoutLocale(t.transactionDate, DateUtils.monthDayAndYearFormat),
           t.category.name,
           if (t.category.isAnIncome) translations.income else translations.expense,
+          t.paymentMethodId != null ? (pmNames[t.paymentMethodId!] ?? translations.unknown) : translations.unknown,
         ],
       ),
     ];
@@ -135,7 +172,12 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
   }
 
   //TODO: REMOVE THE BUILD PDF AND CSV FROM HERE?
-  Future<String> _buildPdfReport(List<TransactionItem> transactions, ReportTranslations translations) async {
+  Future<String> _buildPdfReport(
+    List<TransactionItem> transactions,
+    ReportTranslations translations, {
+    bool groupByPaymentMethod = false,
+    Map<int, String>? paymentMethodNames,
+  }) async {
     final pdf = await buildPdf(
       (amount) => _currencyBloc.format(amount),
       transactions,
@@ -144,6 +186,9 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
       currentState.to,
       _deviceInfoService.appName,
       _deviceInfoService.version,
+      groupByPaymentMethod: groupByPaymentMethod,
+      paymentMethodNames: paymentMethodNames,
+      unknownPaymentMethodLabel: translations.unknown,
     );
 
     final path = await _pathService.generateReportFilePath();

@@ -52,6 +52,7 @@ sealed class TransactionFormState with _$TransactionFormState {
     required RepetitionCycleType repetitionCycle,
     required CategoryItem category,
     required bool isCategoryValid,
+    int? paymentMethodId,
     required AppLanguageType language,
     required LanguageModel languageModel,
     @Default(false) bool errorOccurred,

@@ -8,6 +8,7 @@ export 'comparer_type.dart';
 export 'currency_symbol_type.dart';
 export 'local_status_type.dart';
 export 'notification_type.dart';
+export 'payment_method_type.dart';
 export 'repetition_cycle_type.dart';
 export 'report_file_type.dart';
 export 'secure_resource_type.dart';

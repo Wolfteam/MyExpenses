@@ -7,6 +7,7 @@ import 'package:my_expenses/generated/l10n.dart';
 import 'package:my_expenses/presentation/categories/categories_page.dart';
 import 'package:my_expenses/presentation/search/widgets/search_amount_filter_bottom_sheet_dialog.dart';
 import 'package:my_expenses/presentation/search/widgets/search_date_filter_bottom_sheet_dialog.dart';
+import 'package:my_expenses/presentation/shared/payment_method_picker_sheet.dart';
 import 'package:my_expenses/presentation/shared/sort_direction_popupmenu_filter.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
 import 'package:my_expenses/presentation/shared/transaction_popupmenu_filter.dart';
@@ -53,6 +54,12 @@ class SearchFilterBar extends StatelessWidget {
           tooltip: i18n.category,
           splashRadius: Styles.iconButtonSplashRadius,
         ),
+        IconButton(
+          icon: const Icon(Icons.account_balance_wallet_outlined),
+          onPressed: () => _showPaymentMethodPicker(context),
+          tooltip: i18n.paymentMethodFieldTitle,
+          splashRadius: Styles.iconButtonSplashRadius,
+        ),
         TransactionPopupMenuFilter(
           selectedValue: transactionFilterType,
           onSelected: (v) => _transactionFilterTypeChanged(v, context),
@@ -64,7 +71,10 @@ class SearchFilterBar extends StatelessWidget {
         ),
         TransactionPopupMenuTypeFilter(
           selectedValue: transactionType,
-          onSelectedValue: (v) => _transactionTypeChanged(v == nothingSelected ? null : TransactionType.values[v], context),
+          onSelectedValue: (v) => _transactionTypeChanged(
+            v == nothingSelected ? null : TransactionType.values[v],
+            context,
+          ),
           showNa: true,
         ),
       ],
@@ -134,5 +144,21 @@ class SearchFilterBar extends StatelessWidget {
   void _sortDirectionChanged(SortDirectionType newValue, BuildContext context) {
     _removeSearchFocus(context);
     context.read<SearchBloc>().add(SearchEvent.sortDirectionChanged(newValue: newValue));
+  }
+
+  void _showPaymentMethodPicker(BuildContext context) {
+    _removeSearchFocus(context);
+    final searchBloc = context.read<SearchBloc>();
+    final initialId = searchBloc.currentState.paymentMethodId;
+
+    showModalBottomSheet(
+      shape: Styles.modalBottomSheetShape,
+      context: context,
+      builder: (_) => PaymentMethodPickerSheet(
+        initialSelectedId: initialId,
+        showAllOption: true,
+        onSelected: (id) => searchBloc.add(SearchEvent.paymentMethodChanged(newValue: id)),
+      ),
+    );
   }
 }

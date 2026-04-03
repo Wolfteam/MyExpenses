@@ -5,6 +5,7 @@ import 'package:my_expenses/presentation/settings/widgets/about_settings_card.da
 import 'package:my_expenses/presentation/settings/widgets/accent_color_settings_card.dart';
 import 'package:my_expenses/presentation/settings/widgets/language_settings_card.dart';
 import 'package:my_expenses/presentation/settings/widgets/others_settings_card.dart';
+import 'package:my_expenses/presentation/settings/widgets/payment_methods_settings_card.dart';
 import 'package:my_expenses/presentation/settings/widgets/sync_settings_card.dart';
 import 'package:my_expenses/presentation/settings/widgets/theme_settings_card.dart';
 import 'package:my_expenses/presentation/shared/styles.dart';
@@ -24,33 +25,33 @@ class _SettingsPageState extends State<SettingsPage> with AutomaticKeepAliveClie
     return Padding(
       padding: Styles.edgeInsetAll5,
       child: BlocBuilder<SettingsBloc, SettingsState>(
-        builder:
-            (ctx, state) => ListView(
-              //without this it crashes on windows...
-              controller: ScrollController(),
-              children: switch (state) {
-                SettingsStateLoadingState() => [const Center(child: CircularProgressIndicator())],
-                SettingsStateInitialState() => [
-                  ThemeSettingsCard(appThemeType: state.appTheme),
-                  AccentColorSettingsCard(accentColorType: state.accentColor),
-                  LanguageSettingsCard(language: state.appLanguage),
-                  if (state.isUserLoggedIn)
-                    SyncSettingsCard(
-                      syncIntervalType: state.syncInterval,
-                      showNotificationAfterFullSync: state.showNotificationAfterFullSync,
-                    ),
-                  OtherSettingsCard(
-                    currencySymbolType: state.currencySymbol,
-                    currencyToTheRight: state.currencyToTheRight,
-                    askForPassword: state.askForPassword,
-                    canUseFingerPrint: state.canUseFingerPrint,
-                    askForFingerPrint: state.askForFingerPrint,
-                    showNotificationForRecurringTrans: state.showNotificationForRecurringTrans,
-                  ),
-                  AboutSettingsCard(appVersion: state.appVersion),
-                ],
-              },
-            ),
+        builder: (ctx, state) => ListView(
+          //without this it crashes on windows...
+          controller: ScrollController(),
+          children: switch (state) {
+            SettingsStateLoadingState() => [const Center(child: CircularProgressIndicator())],
+            SettingsStateInitialState() => [
+              ThemeSettingsCard(appThemeType: state.appTheme),
+              AccentColorSettingsCard(accentColorType: state.accentColor),
+              LanguageSettingsCard(language: state.appLanguage),
+              if (state.isUserLoggedIn)
+                SyncSettingsCard(
+                  syncIntervalType: state.syncInterval,
+                  showNotificationAfterFullSync: state.showNotificationAfterFullSync,
+                ),
+              OtherSettingsCard(
+                currencySymbolType: state.currencySymbol,
+                currencyToTheRight: state.currencyToTheRight,
+                askForPassword: state.askForPassword,
+                canUseFingerPrint: state.canUseFingerPrint,
+                askForFingerPrint: state.askForFingerPrint,
+                showNotificationForRecurringTrans: state.showNotificationForRecurringTrans,
+              ),
+              const PaymentMethodsSettingsCard(),
+              AboutSettingsCard(appVersion: state.appVersion),
+            ],
+          },
+        ),
       ),
     );
   }

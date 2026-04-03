@@ -15,6 +15,7 @@ import 'package:my_expenses/domain/models/entities.dart';
 import 'package:my_expenses/domain/models/entities/converters/db_converters.dart';
 import 'package:my_expenses/domain/utils/db_seed_util.dart';
 import 'package:my_expenses/infrastructure/db/categories_dao_impl.dart';
+import 'package:my_expenses/infrastructure/db/payment_methods_dao_impl.dart';
 import 'package:my_expenses/infrastructure/db/transactions_dao_impl.dart';
 import 'package:my_expenses/infrastructure/db/users_dao_impl.dart';
 import 'package:path/path.dart' as p;
@@ -103,11 +104,13 @@ class _IsolateStartRequest {
     Transactions,
     Categories,
     RunningTasks,
+    PaymentMethods,
   ],
   daos: [
     UsersDaoImpl,
     TransactionsDaoImpl,
     CategoriesDaoImpl,
+    PaymentMethodsDaoImpl,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -116,31 +119,39 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forIsolate(super.executor);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (Migrator m) {
-          return m.createAll();
-        },
-        beforeOpen: (details) async {
-          await customStatement('PRAGMA foreign_keys = ON');
+    onCreate: (Migrator m) {
+      return m.createAll();
+    },
+    beforeOpen: (details) async {
+      await customStatement('PRAGMA foreign_keys = ON');
 
-          if (details.wasCreated) {
-            final defaultCats = getDefaultCategories();
-            await batch((b) {
-              b.insertAll(categories, defaultCats);
-            });
-          }
-        },
-        onUpgrade: (Migrator m, int from, int to) async {
-          // disable foreign_keys before migrations
-          await customStatement('PRAGMA foreign_keys = OFF');
+      if (details.wasCreated) {
+        final defaultCats = getDefaultCategories();
+        final defaultPaymentMethods = getDefaultPaymentMethods();
+        await batch((b) {
+          b.insertAll(categories, defaultCats);
+          b.insertAll(paymentMethods, defaultPaymentMethods);
+        });
+      }
+    },
+    onUpgrade: (Migrator m, int from, int to) async {
+      // disable foreign_keys before migrations
+      await customStatement('PRAGMA foreign_keys = OFF');
 
-          if (from == 1) {
-            //long description was added in v2
-            await m.addColumn(transactions, transactions.longDescription);
-          }
-        },
-      );
+      if (from == 1) {
+        //long description was added in v2
+        await m.addColumn(transactions, transactions.longDescription);
+      }
+
+      if (from <= 2) {
+        // v3: Add payment methods table and nullable FK on transactions
+        await m.createTable(paymentMethods);
+        await m.addColumn(transactions, transactions.paymentMethodId);
+      }
+    },
+  );
 }

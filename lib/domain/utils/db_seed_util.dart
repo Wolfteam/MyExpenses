@@ -5,7 +5,7 @@ import 'package:my_expenses/domain/models/entities/converters/db_converters.dart
 import 'package:my_expenses/infrastructure/db/database.dart';
 import 'package:my_expenses/presentation/shared/utils/category_utils.dart';
 
-const createdBy = 'ebastidas';
+const String createdBy = 'system';
 
 //TODO: MOVE THIS OUT OF HERE ?
 
@@ -144,6 +144,48 @@ List<CategoriesCompanion> getDefaultCategories() {
   return categories;
 }
 
+List<PaymentMethodsCompanion> getDefaultPaymentMethods() {
+  final paymentMethods = [
+    _buildPaymentMethod(
+      'Cash',
+      PaymentMethodType.cash,
+      0,
+      CategoryUtils.getByName(CategoryUtils.money2).icon.icon!,
+      Colors.green,
+    ),
+    _buildPaymentMethod(
+      'Debit card',
+      PaymentMethodType.debitCard,
+      1,
+      CategoryUtils.getByName(CategoryUtils.creditcard).icon.icon!,
+      Colors.grey,
+    ),
+    _buildPaymentMethod(
+      'Credit card',
+      PaymentMethodType.creditCard,
+      2,
+      CategoryUtils.getByName(CategoryUtils.creditcard).icon.icon!,
+      Colors.yellow,
+    ),
+    _buildPaymentMethod(
+      'Bank transfer',
+      PaymentMethodType.bankTransfer,
+      4,
+      CategoryUtils.getByName(CategoryUtils.bank).icon.icon!,
+      Colors.black,
+    ),
+    _buildPaymentMethod(
+      'Mobile wallet',
+      PaymentMethodType.mobileWallet,
+      5,
+      CategoryUtils.getByName(CategoryUtils.giftcard).icon.icon!,
+      Colors.orange,
+    ),
+  ];
+
+  return paymentMethods;
+}
+
 //TODO: DELETE THIS ONCE THE APP IS COMPLETED
 List<TransactionsCompanion> getDefaultTransactions() {
   final transactions = [
@@ -250,8 +292,40 @@ CategoriesCompanion _buildCategory(
     createdBy: createdBy,
     createdAt: now,
     createdHash: createdHash(
-      [name, isAnIncome, const IconDataConverter().toSql(icon)!, const ColorConverter().toSql(color), createdBy, now, LocalStatusType.nothing],
+      [
+        name,
+        isAnIncome,
+        const IconDataConverter().toSql(icon)!,
+        const ColorConverter().toSql(color),
+        createdBy,
+        now,
+        LocalStatusType.nothing,
+      ],
     ),
+  );
+}
+
+PaymentMethodsCompanion _buildPaymentMethod(String title, PaymentMethodType type, int sortOrder, IconData icon, Color color) {
+  final now = DateTime.now();
+  return PaymentMethodsCompanion.insert(
+    localStatus: LocalStatusType.nothing,
+    name: title,
+    type: type,
+    sortOrder: Value(sortOrder),
+    icon: Value(icon),
+    iconColor: Value(color),
+    createdAt: now,
+    createdBy: createdBy,
+    createdHash: createdHash([
+      title,
+      const PaymentTypeConverter().toSql(type),
+      sortOrder,
+      const IconDataConverter().toSql(icon)!,
+      const ColorConverter().toSql(color),
+      now,
+      createdBy,
+      LocalStatusType.nothing,
+    ]),
   );
 }
 

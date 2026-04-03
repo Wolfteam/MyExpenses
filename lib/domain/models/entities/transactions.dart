@@ -22,4 +22,8 @@ class Transactions extends BaseEntity {
   TextColumn get imagePath => text().nullable()();
 
   IntColumn get categoryId => integer().references(Categories, #id)();
+
+  IntColumn get paymentMethodId => integer()
+      .nullable()
+      .references(PaymentMethods, #id, onDelete: KeyAction.setNull, onUpdate: KeyAction.cascade)();
 }

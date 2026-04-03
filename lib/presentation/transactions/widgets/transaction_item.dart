@@ -26,13 +26,35 @@ class TransactionItem extends StatelessWidget {
 
     final daysLeft = Text(daysToNextRecurringDate == 0 ? i18n.tomorrow : i18n.executesInXDays('$daysToNextRecurringDate'));
 
-    final subtitle = item.isParentTransaction && item.nextRecurringDate != null
-        ? Text(i18n.nextDateOn(dateString))
-        : item.isParentTransaction
-            ? Text(i18n.stopped)
-            : showDate
-                ? Text(i18n.dateOn(dateString))
-                : null;
+    final pmName = item.paymentMethodName;
+
+    Widget? buildSubtitle() {
+      if (item.isParentTransaction) {
+        final dateText = item.nextRecurringDate != null ? Text(i18n.nextDateOn(dateString)) : Text(i18n.stopped);
+        if (item.nextRecurringDate == null) return dateText;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [dateText, daysLeft],
+        );
+      }
+
+      final dateText = showDate ? Text(i18n.dateOn(dateString)) : null;
+      final pmText = pmName != null
+          ? Text(
+              pmName,
+              style: const TextStyle(fontSize: 11),
+              overflow: TextOverflow.ellipsis,
+            )
+          : null;
+
+      if (dateText != null && pmText != null) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [dateText, pmText],
+        );
+      }
+      return dateText ?? pmText;
+    }
 
     return ListTile(
       dense: true,
@@ -51,15 +73,7 @@ class TransactionItem extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
       ),
-      subtitle: !item.isParentTransaction || item.nextRecurringDate == null
-          ? subtitle
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                if (subtitle != null) subtitle,
-                daysLeft,
-              ],
-            ),
+      subtitle: buildSubtitle(),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.end,

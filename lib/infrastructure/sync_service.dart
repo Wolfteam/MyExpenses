@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:my_expenses/domain/enums/enums.dart';
 import 'package:my_expenses/domain/models/drive.dart';
 import 'package:my_expenses/domain/models/entities/daos/categories_dao.dart';
+import 'package:my_expenses/domain/models/entities/daos/payment_methods_dao.dart';
 import 'package:my_expenses/domain/models/entities/daos/transactions_dao.dart';
 import 'package:my_expenses/domain/models/entities/daos/users_dao.dart';
 import 'package:my_expenses/domain/services/services.dart';
@@ -14,6 +15,7 @@ class SyncServiceImpl implements SyncService {
   final LoggingService _logger;
   final TransactionsDao _transactionsDao;
   final CategoriesDao _categoriesDao;
+  final PaymentMethodsDao _paymentMethodsDao;
   final UsersDao _usersDao;
   final GoogleService _googleService;
   final SecureStorageService _secureStorageService;
@@ -45,6 +47,7 @@ class SyncServiceImpl implements SyncService {
     this._logger,
     this._transactionsDao,
     this._categoriesDao,
+    this._paymentMethodsDao,
     this._usersDao,
     this._googleService,
     this._secureStorageService,
@@ -153,7 +156,10 @@ class SyncServiceImpl implements SyncService {
       _logger.info(runtimeType, 'createAppFile: Getting all categories to save..');
       final categories = await _categoriesDao.getAllCategoriesToSync(currentUser.id);
 
-      final appFile = AppFile(transactions: transactions, categories: categories);
+      _logger.info(runtimeType, 'createAppFile: Getting all payment methods to save..');
+      final paymentMethods = await _paymentMethodsDao.getAllPaymentMethodsToSync(currentUser.id);
+
+      final appFile = AppFile(transactions: transactions, categories: categories, paymentMethods: paymentMethods);
       final encoded = jsonEncode(appFile);
       final path = await appFilePath;
 
@@ -221,6 +227,7 @@ class SyncServiceImpl implements SyncService {
     //The order here matters
     await _transactionsDao.deleteAll(null);
     await _categoriesDao.deleteAll(null);
+    await _paymentMethodsDao.deleteAll(user.id);
 
     await _performSyncDown(user.id, appFile);
   }
@@ -239,29 +246,40 @@ class SyncServiceImpl implements SyncService {
 
   Future<void> _performSyncDown(int userId, AppFile appFile) async {
     //The order is important
-    _logger.info(runtimeType, '_performSyncDown: Creating categories and transactions...');
+    _logger.info(runtimeType, '_performSyncDown: Creating payment methods, categories and transactions...');
+    await _paymentMethodsDao.syncDownCreate(userId, appFile.paymentMethods);
     await _categoriesDao.syncDownCreate(userId, appFile.categories);
     await _transactionsDao.syncDownCreate(userId, appFile.transactions);
 
     _logger.info(runtimeType, '_performSyncDown: Deleting categories and transactions...');
     await _transactionsDao.syncDownDelete(userId, appFile.transactions);
     await _categoriesDao.syncDownDelete(userId, appFile.categories);
+    await _paymentMethodsDao.syncDownDelete(userId, appFile.paymentMethods);
 
-    _logger.info(runtimeType, '_performSyncDown: Updating categories and transactions...');
+    _logger.info(runtimeType, '_performSyncDown: Updating payment methods, categories and transactions...');
+    await _paymentMethodsDao.syncDownUpdate(userId, appFile.paymentMethods);
     await _categoriesDao.syncDownUpdate(userId, appFile.categories);
     await _transactionsDao.syncDownUpdate(userId, appFile.transactions);
   }
 
   Future<void> _performSyncUp(int userId) async {
     //The order is important
-    _logger.info(runtimeType, '_performSyncUp: Deleting categories and transactions...');
+    _logger.info(runtimeType, '_performSyncUp: Deleting categories, payment methods and transactions...');
     await _transactionsDao.syncUpDelete(userId);
     await _categoriesDao.syncUpDelete(userId);
+    await _paymentMethodsDao.syncUpDelete(userId);
   }
 
   Future<void> _updateLocalStatus(LocalStatusType newValue) {
-    _logger.info(runtimeType, '_updateLocalStatus: Updating the local status for all categories and transactions');
-    return Future.wait([_categoriesDao.updateAllLocalStatus(newValue), _transactionsDao.updateAllLocalStatus(newValue)]);
+    _logger.info(
+      runtimeType,
+      '_updateLocalStatus: Updating the local status for all categories, payment methods and transactions',
+    );
+    return Future.wait([
+      _categoriesDao.updateAllLocalStatus(newValue),
+      _transactionsDao.updateAllLocalStatus(newValue),
+      _paymentMethodsDao.updateAllLocalStatus(newValue),
+    ]);
   }
 
   Future<void> _uploadAllLocalImgs(int userId) async {
@@ -269,10 +287,9 @@ class SyncServiceImpl implements SyncService {
 
     try {
       final imgPath = await _pathService.getUserImgPath(userId);
-      final imgs =
-          await Directory(
-            imgPath,
-          ).list().asyncMap((f) => f.path).where((path) => path.startsWith(_pathService.transactionImgPrefix)).toList();
+      final imgs = await Directory(
+        imgPath,
+      ).list().asyncMap((f) => f.path).where((path) => path.startsWith(_pathService.transactionImgPrefix)).toList();
 
       _logger.info(runtimeType, '_uploadAllLocalImgs: ${imgs.length} will be uploaded...');
 
@@ -313,10 +330,9 @@ class SyncServiceImpl implements SyncService {
       _logger.info(runtimeType, '_updateImgFiles: Getting all local imgs...');
       final imgPath = await _pathService.getUserImgPath(userId);
 
-      final imgs =
-          await Directory(
-            imgPath,
-          ).list().asyncMap((f) => basename(f.path)).where((path) => path.contains(_pathService.transactionImgPrefix)).toList();
+      final imgs = await Directory(
+        imgPath,
+      ).list().asyncMap((f) => basename(f.path)).where((path) => path.contains(_pathService.transactionImgPrefix)).toList();
 
       final imgsToUpload = imgs.where((filename) => !currentImgsMap.values.contains(filename)).toList();
       _logger.info(runtimeType, '_updateImgFiles: We will upload ${imgsToUpload.length} imgs...');

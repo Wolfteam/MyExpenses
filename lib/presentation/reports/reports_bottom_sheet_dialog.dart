@@ -43,67 +43,106 @@ class _Body extends StatelessWidget {
             Navigator.pop(context);
         }
       },
-      builder:
-          (ctx, state) => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: switch (state) {
-              final ReportStateInitialState state when state.generatingReport => [
-                const SizedBox(height: 300, child: Center(child: CircularProgressIndicator())),
-              ],
-              ReportStateInitialState() => [
-                ModalSheetSeparator(),
-                ModalSheetTitle(title: i18n.exportFrom),
-                Text('${i18n.startDate}:'),
-                TextButton(
-                  onPressed: () => _showDatePicker(context, state.from, true),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(utils.DateUtils.formatDateWithoutLocale(state.from, utils.DateUtils.monthDayAndYearFormat)),
-                  ),
-                ),
-                Text('${i18n.endDate}:'),
-                TextButton(
-                  onPressed: () => _showDatePicker(context, state.to, false),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(utils.DateUtils.formatDateWithoutLocale(state.to, utils.DateUtils.monthDayAndYearFormat)),
-                  ),
-                ),
-                Text(i18n.reportFormat),
-                Padding(
-                  padding: const EdgeInsets.only(left: 16, right: 16),
-                  child: DropdownButton<ReportFileType>(
-                    isExpanded: true,
-                    hint: Text(i18n.selectFormat),
-                    underline: Container(height: 0, color: Colors.transparent),
-                    value: state.selectedFileType,
-                    items:
-                        ReportFileType.values
-                            .map(
-                              (item) =>
-                                  DropdownMenuItem<ReportFileType>(value: item, child: Text(i18n.getReportFileTypeName(item))),
-                            )
-                            .toList(),
-                    onChanged: (newValue) => _reportFileTypeChanged(context, newValue!),
-                  ),
-                ),
-                OverflowBar(
-                  alignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text(i18n.cancel),
+      builder: (ctx, state) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: switch (state) {
+          final ReportStateInitialState state when state.generatingReport => [
+            const SizedBox(height: 300, child: Center(child: CircularProgressIndicator())),
+          ],
+          ReportStateInitialState() => [
+            ModalSheetSeparator(),
+            ModalSheetTitle(title: i18n.exportFrom),
+            Text('${i18n.startDate}:'),
+            TextButton(
+              onPressed: () => _showDatePicker(context, state.from, true),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(utils.DateUtils.formatDateWithoutLocale(state.from, utils.DateUtils.monthDayAndYearFormat)),
+              ),
+            ),
+            Text('${i18n.endDate}:'),
+            TextButton(
+              onPressed: () => _showDatePicker(context, state.to, false),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(utils.DateUtils.formatDateWithoutLocale(state.to, utils.DateUtils.monthDayAndYearFormat)),
+              ),
+            ),
+            Text(i18n.reportFormat),
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16),
+              child: DropdownButton<ReportFileType>(
+                isExpanded: true,
+                hint: Text(i18n.selectFormat),
+                underline: Container(height: 0, color: Colors.transparent),
+                value: state.selectedFileType,
+                items: ReportFileType.values
+                    .map(
+                      (item) => DropdownMenuItem<ReportFileType>(value: item, child: Text(i18n.getReportFileTypeName(item))),
+                    )
+                    .toList(),
+                onChanged: (newValue) => _reportFileTypeChanged(context, newValue!),
+              ),
+            ),
+            Text(i18n.paymentMethods),
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16),
+              child: BlocProvider<PaymentMethodPickerBloc>(
+                create: (_) =>
+                    Injection.paymentMethodPickerBloc
+                      ..add(PaymentMethodPickerEvent.load(initialSelectedId: state.selectedPaymentMethodId)),
+                child: BlocBuilder<PaymentMethodPickerBloc, PaymentMethodPickerState>(
+                  builder: (ctx, pmState) => switch (pmState) {
+                    final PaymentMethodPickerStateLoadedState s => DropdownButton<int?>(
+                      isExpanded: true,
+                      hint: Text(i18n.paymentMethods),
+                      underline: Container(height: 0, color: Colors.transparent),
+                      value: state.selectedPaymentMethodId,
+                      items:
+                          <DropdownMenuItem<int?>>[
+                            DropdownMenuItem<int?>(child: Text(i18n.all)),
+                            DropdownMenuItem<int?>(value: 0, child: Text(i18n.paymentMethodUnknownNone)),
+                          ] +
+                          s.items
+                              .map(
+                                (m) => DropdownMenuItem<int?>(
+                                  value: m.id,
+                                  child: Text(m.name),
+                                ),
+                              )
+                              .toList(),
+                      onChanged: (newValue) =>
+                          context.read<ReportsBloc>().add(ReportsEvent.paymentMethodChanged(selectedPaymentMethodId: newValue)),
                     ),
-                    FilledButton(onPressed: () => _generateReport(context), child: Text(i18n.generate)),
-                  ],
+                    _ => const SizedBox(height: 48, child: Center(child: CircularProgressIndicator())),
+                  },
                 ),
+              ),
+            ),
+            SwitchListTile(
+              value: state.groupByPaymentMethod,
+              onChanged: (v) => context.read<ReportsBloc>().add(ReportsEvent.groupByPaymentMethodChanged(value: v)),
+              title: Text(i18n.groupByPaymentMethod),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+            ),
+            const SizedBox(height: 8),
+            OverflowBar(
+              alignment: MainAxisAlignment.end,
+              children: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(i18n.cancel),
+                ),
+                FilledButton(onPressed: () => _generateReport(context), child: Text(i18n.generate)),
               ],
-              ReportStateGeneratedState() => [],
-            },
-          ),
+            ),
+          ],
+          ReportStateGeneratedState() => [],
+        },
+      ),
     );
   }
 
