@@ -282,5 +282,8 @@
   "clearConfirmMessage": "This will permanently delete all your transactions, categories, and payment methods. This cannot be undone.",
   "invalidImportFile": "Invalid file format",
   "invalidImportFileMissingFields": "The file is missing required fields: {fields}",
-  "moreOptions": "More options"
+  "moreOptions": "More options",
+  "selectExportFormat": "Select export format",
+  "repetitionCycle": "Repetition cycle",
+  "isRecurring": "Is recurring"
 }

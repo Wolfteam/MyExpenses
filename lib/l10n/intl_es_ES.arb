@@ -281,5 +281,8 @@
   "clearConfirmMessage": "Esto eliminará permanentemente todas tus transacciones, categorías y métodos de pago. Esta acción no se puede deshacer.",
   "invalidImportFile": "Formato de archivo inválido",
   "invalidImportFileMissingFields": "El archivo no tiene los campos requeridos: {fields}",
-  "moreOptions": "Más opciones"
+  "moreOptions": "Más opciones",
+  "selectExportFormat": "Seleccione formato de exportación",
+  "repetitionCycle": "Ciclo de repetición",
+  "isRecurring": "Es recurrente"
 }
