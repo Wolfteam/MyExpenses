@@ -9,7 +9,6 @@ import 'package:my_expenses/presentation/settings/widgets/settings_card.dart';
 import 'package:my_expenses/presentation/settings/widgets/settings_card_title_text.dart';
 import 'package:my_expenses/presentation/shared/common_dropdown_button.dart';
 import 'package:my_expenses/presentation/shared/extensions/i18n_extensions.dart';
-import 'package:my_expenses/presentation/shared/styles.dart';
 import 'package:my_expenses/presentation/shared/utils/enum_utils.dart';
 
 class LanguageSettingsCard extends StatelessWidget {
@@ -26,19 +25,15 @@ class LanguageSettingsCard extends StatelessWidget {
         children: [
           SettingsCardTitleText(text: i18n.language, icon: const Icon(Icons.language)),
           SettingsCardSubtitleText(text: i18n.chooseLanguage),
-          Padding(
-            padding: Styles.edgeInsetHorizontal16,
-            child: CommonDropdownButton<AppLanguageType>(
-              hint: i18n.selectLanguage,
-              currentValue: language,
-              values: EnumUtils.getTranslatedAndSortedEnum(
-                AppLanguageType.values,
-                (v, _) => i18n.translateAppLanguageType(v),
-              ),
-              onChanged: (v, _) => _languageChanged(v, context),
+          CommonDropdownButton<AppLanguageType>(
+            hint: i18n.selectLanguage,
+            currentValue: language,
+            values: EnumUtils.getTranslatedAndSortedEnum(
+              AppLanguageType.values,
+              (v, _) => i18n.translateAppLanguageType(v),
             ),
+            onChanged: (v, _) => _languageChanged(v, context),
           ),
-          const SizedBox(height: 8),
           const RestartWarning(),
         ],
       ),

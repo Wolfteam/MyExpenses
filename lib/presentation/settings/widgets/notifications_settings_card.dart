@@ -30,12 +30,18 @@ class NotificationsSettingsCard extends StatelessWidget {
           SettingsCardSubtitleText(text: i18n.notificationsCardSubTitle),
           SwitchListTile(
             value: showNotificationForRecurringTrans,
-            title: Text(i18n.showNotificationForRecurringTrans),
+            title: Tooltip(
+              message: i18n.showNotificationForRecurringTrans,
+              child: Text(i18n.showNotificationForRecurringTrans, overflow: TextOverflow.ellipsis),
+            ),
             onChanged: (v) => _recurringTransNotificationChanged(v, context),
           ),
           SwitchListTile(
             value: showNotificationAfterFullSync,
-            title: Text(i18n.showNotificationAfterFullSync),
+            title: Tooltip(
+              message: i18n.showNotificationAfterFullSync,
+              child: Text(i18n.showNotificationAfterFullSync, overflow: TextOverflow.ellipsis),
+            ),
             onChanged: (v) => _syncNotificationChanged(v, context),
           ),
         ],
@@ -43,13 +49,11 @@ class NotificationsSettingsCard extends StatelessWidget {
     );
   }
 
-  void _recurringTransNotificationChanged(bool newValue, BuildContext context) =>
-      context.read<SettingsBloc>().add(
-        SettingsEvent.showNotificationForRecurringTransChanged(show: newValue),
-      );
+  void _recurringTransNotificationChanged(bool newValue, BuildContext context) => context.read<SettingsBloc>().add(
+    SettingsEvent.showNotificationForRecurringTransChanged(show: newValue),
+  );
 
-  void _syncNotificationChanged(bool newValue, BuildContext context) =>
-      context.read<SettingsBloc>().add(
-        SettingsEvent.showNotificationAfterFullSyncChanged(show: newValue),
-      );
+  void _syncNotificationChanged(bool newValue, BuildContext context) => context.read<SettingsBloc>().add(
+    SettingsEvent.showNotificationAfterFullSyncChanged(show: newValue),
+  );
 }

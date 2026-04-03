@@ -8,7 +8,6 @@ import 'package:my_expenses/presentation/settings/widgets/setting_card_subtitle_
 import 'package:my_expenses/presentation/settings/widgets/settings_card.dart';
 import 'package:my_expenses/presentation/settings/widgets/settings_card_title_text.dart';
 import 'package:my_expenses/presentation/shared/common_dropdown_button.dart';
-import 'package:my_expenses/presentation/shared/styles.dart';
 import 'package:my_expenses/presentation/shared/utils/bloc_utils.dart';
 import 'package:my_expenses/presentation/shared/utils/enum_utils.dart';
 
@@ -34,22 +33,19 @@ class CurrencySettingsCard extends StatelessWidget {
             icon: const Icon(Icons.attach_money),
           ),
           SettingsCardSubtitleText(text: i18n.currencyCardSubTitle),
-          Container(
-            margin: const EdgeInsets.only(top: 10),
-            padding: Styles.edgeInsetHorizontal16,
-            child: CommonDropdownButton<CurrencySymbolType>(
-              hint: i18n.currencySymbol,
-              currentValue: currencySymbolType,
-              values: CurrencySymbolType.values
-                  .map((e) => TranslatedEnum(e, CurrencyUtils.getCurrencySymbol(e)))
-                  .toList(),
-              selectedItemBuilder: (current) => _CurrencyItem(value: current.enumValue),
-              onChanged: (v, _) => _currencyChanged(v, context),
-            ),
+          CommonDropdownButton<CurrencySymbolType>(
+            hint: i18n.currencySymbol,
+            currentValue: currencySymbolType,
+            values: CurrencySymbolType.values.map((e) => TranslatedEnum(e, CurrencyUtils.getCurrencySymbol(e))).toList(),
+            selectedItemBuilder: (current) => _CurrencyItem(value: current.enumValue),
+            onChanged: (v, _) => _currencyChanged(v, context),
           ),
           SwitchListTile(
             value: currencyToTheRight,
-            title: Text(i18n.currencySymbolToRight),
+            title: Tooltip(
+              message: i18n.currencySymbolToRight,
+              child: Text(i18n.currencySymbolToRight, overflow: TextOverflow.ellipsis),
+            ),
             onChanged: (v) => _currencyPlacementChanged(v, context),
           ),
         ],
@@ -76,21 +72,9 @@ class _CurrencyItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final i18n = S.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(i18n.currencySymbol),
-            Container(
-              margin: const EdgeInsets.only(right: 15),
-              child: Text(CurrencyUtils.getCurrencySymbol(value)),
-            ),
-          ],
-        ),
-      ],
+    return ListTile(
+      title: Text('${i18n.currencySymbol} (${CurrencyUtils.getCurrencySymbol(value)})'),
+      horizontalTitleGap: 0,
     );
   }
 }

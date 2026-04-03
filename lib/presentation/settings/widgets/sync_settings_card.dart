@@ -8,7 +8,6 @@ import 'package:my_expenses/presentation/settings/widgets/settings_card.dart';
 import 'package:my_expenses/presentation/settings/widgets/settings_card_title_text.dart';
 import 'package:my_expenses/presentation/shared/common_dropdown_button.dart';
 import 'package:my_expenses/presentation/shared/extensions/i18n_extensions.dart';
-import 'package:my_expenses/presentation/shared/styles.dart';
 import 'package:my_expenses/presentation/shared/utils/enum_utils.dart';
 
 class SyncSettingsCard extends StatelessWidget {
@@ -28,17 +27,14 @@ class SyncSettingsCard extends StatelessWidget {
         children: [
           SettingsCardTitleText(text: i18n.sync, icon: const Icon(Icons.sync)),
           SettingsCardSubtitleText(text: i18n.chooseSyncInterval),
-          Padding(
-            padding: Styles.edgeInsetHorizontal16,
-            child: CommonDropdownButton<SyncIntervalType>(
-              hint: i18n.selectSyncInterval,
-              currentValue: syncIntervalType,
-              values: EnumUtils.getTranslatedAndSortedEnum(
-                SyncIntervalType.values,
-                (v, _) => i18n.translateSyncIntervalType(v),
-              ),
-              onChanged: (v, _) => _syncIntervalChanged(v, context),
+          CommonDropdownButton<SyncIntervalType>(
+            hint: i18n.selectSyncInterval,
+            currentValue: syncIntervalType,
+            values: EnumUtils.getTranslatedAndSortedEnum(
+              SyncIntervalType.values,
+              (v, _) => i18n.translateSyncIntervalType(v),
             ),
+            onChanged: (v, _) => _syncIntervalChanged(v, context),
           ),
           TextButton.icon(
             icon: const Icon(Icons.sync),

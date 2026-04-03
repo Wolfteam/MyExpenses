@@ -25,7 +25,7 @@ class CommonDropdownButton<T> extends StatelessWidget {
     this.withoutUnderLine = true,
     this.leadingIconBuilder,
     this.selectedItemBuilder,
-    this.padding = EdgeInsets.zero,
+    this.padding = const EdgeInsets.only(right: 24.0),
     this.title,
     this.subTitle,
   });
@@ -46,13 +46,18 @@ class CommonDropdownButton<T> extends StatelessWidget {
           : null,
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       onChanged: onChanged != null ? (v) => onChanged!(v as T, context) : null,
-      selectedItemBuilder: (context) =>
-          values.map((lang) => selectedItemBuilder?.call(lang) ?? _Content(content: lang.translation, title: title, subTitle: subTitle)).toList(),
+      selectedItemBuilder: (context) => values
+          .map((lang) => selectedItemBuilder?.call(lang) ?? _Content(content: lang.translation, title: title, subTitle: subTitle))
+          .toList(),
       items: values
           .map<DropdownMenuItem<T>>(
             (lang) => DropdownMenuItem<T>(
               value: lang.enumValue,
-              child: _MenuItemContent(lang: lang, currentValue: currentValue, leadingIcon: leadingIconBuilder?.call(lang.enumValue)),
+              child: _MenuItemContent(
+                lang: lang,
+                currentValue: currentValue,
+                leadingIcon: leadingIconBuilder?.call(lang.enumValue),
+              ),
             ),
           )
           .toList(),
@@ -73,13 +78,9 @@ class _Content extends StatelessWidget {
     final mainContent = Text(
       content,
       overflow: TextOverflow.ellipsis,
-      textAlign: TextAlign.center,
     );
     if (title.isNullEmptyOrWhitespace && subTitle.isNullEmptyOrWhitespace) {
-      return Align(
-        alignment: Alignment.centerLeft,
-        child: mainContent,
-      );
+      return ListTile(title: mainContent);
     }
 
     return Column(

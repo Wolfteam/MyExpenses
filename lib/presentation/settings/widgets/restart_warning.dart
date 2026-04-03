@@ -10,19 +10,26 @@ class RestartWarning extends StatelessWidget {
     final i18n = S.of(context);
     return Padding(
       padding: Styles.edgeInsetHorizontal16,
-      child: Row(
-      children: [
-        Icon(Icons.info_outline, size: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
-        const SizedBox(width: 6),
-        Expanded(
-          child: Text(
-            i18n.changesApplyOnNextLaunch,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(Icons.info_outline, size: 14, color: Theme.of(context).colorScheme.onSurfaceVariant),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  i18n.changesApplyOnNextLaunch,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ),
-      ],
+        ],
       ),
     );
   }

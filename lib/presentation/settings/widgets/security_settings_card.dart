@@ -34,13 +34,16 @@ class SecuritySettingsCard extends StatelessWidget {
           SettingsCardSubtitleText(text: i18n.securityCardSubTitle),
           SwitchListTile(
             value: askForPassword,
-            title: Text(i18n.askForPassword),
+            title: Tooltip(message: i18n.askForPassword, child: Text(i18n.askForPassword)),
             onChanged: (v) => _askForPasswordChanged(v, context),
           ),
           if (canUseFingerPrint)
             SwitchListTile(
               value: askForFingerPrint,
-              title: Text(i18n.askForFingerPrint),
+              title: Tooltip(
+                message: i18n.askForFingerPrint,
+                child: Text(i18n.askForFingerPrint, overflow: TextOverflow.ellipsis),
+              ),
               onChanged: (v) => _askForFingerPrintChanged(v, context),
             ),
         ],

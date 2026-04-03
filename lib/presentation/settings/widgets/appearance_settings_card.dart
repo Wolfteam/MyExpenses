@@ -11,7 +11,6 @@ import 'package:my_expenses/presentation/settings/widgets/settings_card_title_te
 import 'package:my_expenses/presentation/shared/common_dropdown_button.dart';
 import 'package:my_expenses/presentation/shared/extensions/app_theme_type_extensions.dart';
 import 'package:my_expenses/presentation/shared/extensions/i18n_extensions.dart';
-import 'package:my_expenses/presentation/shared/styles.dart';
 import 'package:my_expenses/presentation/shared/utils/enum_utils.dart';
 
 class AppearanceSettingsCard extends StatelessWidget {
@@ -33,40 +32,33 @@ class AppearanceSettingsCard extends StatelessWidget {
         children: [
           SettingsCardTitleText(text: i18n.appearance, icon: const Icon(Icons.color_lens)),
           SettingsCardSubtitleText(text: i18n.appearanceSubTitle),
-          Padding(
-            padding: Styles.edgeInsetHorizontal16,
-            child: CommonDropdownButton<AppThemeType>(
-              hint: i18n.selectAppTheme,
-              currentValue: appThemeType,
-              values: EnumUtils.getTranslatedAndSortedEnum(
-                AppThemeType.values,
-                (v, _) => i18n.translateAppThemeType(v),
+          CommonDropdownButton<AppThemeType>(
+            hint: i18n.selectAppTheme,
+            currentValue: appThemeType,
+            values: EnumUtils.getTranslatedAndSortedEnum(
+              AppThemeType.values,
+              (v, _) => i18n.translateAppThemeType(v),
+            ),
+            onChanged: (v, _) => _appThemeChanged(v, context),
+          ),
+          CommonDropdownButton<AppAccentColorType>(
+            hint: i18n.chooseAccentColor,
+            currentValue: accentColorType,
+            values: EnumUtils.getTranslatedAndSortedEnum<AppAccentColorType>(
+              AppAccentColorType.values,
+              (val, _) => _getAccentColorName(val),
+            ),
+            onChanged: _accentColorChanged,
+            leadingIconBuilder: (val) => Container(
+              margin: const EdgeInsets.only(right: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: val.getAccentColor(),
               ),
-              onChanged: (v, _) => _appThemeChanged(v, context),
+              width: 20,
+              height: 20,
             ),
           ),
-          Padding(
-            padding: Styles.edgeInsetHorizontal16,
-            child: CommonDropdownButton<AppAccentColorType>(
-              hint: i18n.chooseAccentColor,
-              currentValue: accentColorType,
-              values: EnumUtils.getTranslatedAndSortedEnum<AppAccentColorType>(
-                AppAccentColorType.values,
-                (val, _) => _getAccentColorName(val),
-              ),
-              onChanged: _accentColorChanged,
-              leadingIconBuilder: (val) => Container(
-                margin: const EdgeInsets.only(right: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: val.getAccentColor(),
-                ),
-                width: 20,
-                height: 20,
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
           const RestartWarning(),
         ],
       ),
