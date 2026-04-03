@@ -157,7 +157,8 @@ class Injection {
     final logger = getIt<LoggingService>();
     final transactionsDao = getIt<TransactionsDao>();
     final usersDao = getIt<UsersDao>();
-    return ChartsBloc(logger, transactionsDao, usersDao);
+    final paymentMethodsDao = getIt<PaymentMethodsDao>();
+    return ChartsBloc(logger, transactionsDao, usersDao, paymentMethodsDao);
   }
 
   static CategoryChartBloc get categoryChartBloc {

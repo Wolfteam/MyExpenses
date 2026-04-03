@@ -30,12 +30,12 @@ class CategoryChartBloc extends Bloc<CategoryChartEvent, CategoryChartState> {
   List<CategoryChartItem> _buildCategories(List<TransactionItem> transactions) {
     final expenseTransactions = transactions.where((t) => !t.category.isAnIncome).toList();
     final grouped = <String, double>{};
-    final categoryMeta = <String, (Color, IconData?, bool)>{};
+    final categoryMeta = <String, (Color?, IconData?, bool)>{};
 
     for (final t in expenseTransactions) {
       final key = t.category.name;
       grouped[key] = TransactionUtils.roundDouble((grouped[key] ?? 0) + t.amount.abs());
-      categoryMeta.putIfAbsent(key, () => (t.category.iconColor ?? Colors.grey, t.category.icon, t.category.isAnIncome));
+      categoryMeta.putIfAbsent(key, () => (t.category.iconColor, t.category.icon, t.category.isAnIncome));
     }
 
     final total = grouped.values.fold(0.0, (a, b) => a + b);

@@ -96,8 +96,15 @@ class DataTransferBloc extends Bloc<DataTransferEvent, DataTransferState> {
               if (categoryLookup[t.categoryCreatedHash]?.isAnIncome ?? false) labels.income else labels.expense,
               t.paymentMethodName ?? pmLookup[t.paymentMethodCreatedHash]?.name ?? '',
               t.longDescription ?? '',
-              t.repetitionCycle.name,
-              if (t.isParentTransaction) labels.yes else labels.no,
+              switch (t.repetitionCycle) {
+                RepetitionCycleType.none => labels.repetitionCycleNone,
+                RepetitionCycleType.eachDay => labels.repetitionCycleEachDay,
+                RepetitionCycleType.eachWeek => labels.repetitionCycleEachWeek,
+                RepetitionCycleType.eachMonth => labels.repetitionCycleEachMonth,
+                RepetitionCycleType.biweekly => labels.repetitionCycleBiweekly,
+                RepetitionCycleType.eachYear => labels.repetitionCycleEachYear,
+              },
+              if (t.isParentTransaction) labels.yes else t.parentTransactionCreatedHash != null ? labels.auto : labels.no,
             ],
         ];
 

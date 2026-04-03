@@ -72,9 +72,14 @@ class TrendChartBloc extends Bloc<TrendChartEvent, TrendChartState> {
       }
     }
 
-    return months.entries.sortedBy((e) => e.key).map((e) {
+    final sorted = months.entries.sortedBy((e) => e.key);
+    final spansMultipleYears = sorted.length > 1 &&
+        sorted.first.key.year != sorted.last.key.year;
+    final format = spansMultipleYears ? 'MMM yy' : 'MMM';
+
+    return sorted.map((e) {
       final (inc, exp) = e.value;
-      final label = DateUtils.formatDateWithoutLocale(e.key, 'MMM yy');
+      final label = DateUtils.formatDateWithoutLocale(e.key, format);
       return TransactionActivityPerDate(
         income: inc,
         expense: exp,

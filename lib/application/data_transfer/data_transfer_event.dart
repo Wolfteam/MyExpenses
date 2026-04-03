@@ -14,6 +14,13 @@ typedef CsvLabels = ({
   String isRecurring,
   String yes,
   String no,
+  String auto,
+  String repetitionCycleNone,
+  String repetitionCycleEachDay,
+  String repetitionCycleEachWeek,
+  String repetitionCycleEachMonth,
+  String repetitionCycleBiweekly,
+  String repetitionCycleEachYear,
 });
 
 @freezed

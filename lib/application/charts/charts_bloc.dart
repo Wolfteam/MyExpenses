@@ -3,6 +3,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:my_expenses/domain/enums/enums.dart';
+import 'package:my_expenses/domain/models/entities/daos/payment_methods_dao.dart';
 import 'package:my_expenses/domain/models/entities/daos/transactions_dao.dart';
 import 'package:my_expenses/domain/models/entities/daos/users_dao.dart';
 import 'package:my_expenses/domain/models/models.dart';
@@ -13,7 +14,7 @@ part 'charts_bloc.freezed.dart';
 part 'charts_event.dart';
 part 'charts_state.dart';
 
-final _initialState = ChartsState.loaded(
+const _initialState = ChartsState.loaded(
   loaded: false,
   selectedPeriod: ChartPeriodType.last30days,
   totalIncome: 0,
@@ -27,10 +28,11 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
   final LoggingService _logger;
   final TransactionsDao _transactionsDao;
   final UsersDao _usersDao;
+  final PaymentMethodsDao _paymentMethodsDao;
 
   ChartsStateLoaded get currentState => state as ChartsStateLoaded;
 
-  ChartsBloc(this._logger, this._transactionsDao, this._usersDao) : super(_initialState) {
+  ChartsBloc(this._logger, this._transactionsDao, this._usersDao, this._paymentMethodsDao) : super(_initialState) {
     on<ChartsEventInit>((event, emit) async {
       final s = await _load(ChartPeriodType.last30days);
       emit(s);
@@ -74,7 +76,7 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
 
     final topCategories = _buildTopCategories(transactions);
     final monthlyPoints = _buildMonthlyPoints(transactions);
-    final topPaymentMethods = _buildPaymentMethods(transactions);
+    final topPaymentMethods = await _buildPaymentMethods(user?.id, transactions);
 
     return ChartsState.loaded(
       loaded: true,
@@ -102,62 +104,74 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
       ChartPeriodType.last3months => (now.subtract(const Duration(days: 90)), today),
       ChartPeriodType.last12months => (now.subtract(const Duration(days: 365)), today),
       ChartPeriodType.allTime => (DateTime(2000), today),
-      ChartPeriodType.custom => customStart != null && customEnd != null
-          ? (customStart, customEnd)
-          : (now.subtract(const Duration(days: 30)), today),
+      ChartPeriodType.custom =>
+        customStart != null && customEnd != null ? (customStart, customEnd) : (now.subtract(const Duration(days: 30)), today),
     };
   }
 
   List<CategoryChartItem> _buildTopCategories(List<TransactionItem> transactions) {
     final expenseTransactions = transactions.where((t) => !t.category.isAnIncome).toList();
     final grouped = <String, double>{};
-    final categoryMeta = <String, (Color, bool)>{};
+    final categoryMeta = <String, (Color, IconData?, bool)>{};
 
     for (final t in expenseTransactions) {
       final key = t.category.name;
       grouped[key] = TransactionUtils.roundDouble((grouped[key] ?? 0) + t.amount.abs());
-      categoryMeta.putIfAbsent(key, () => (t.category.iconColor ?? Colors.grey, t.category.isAnIncome));
+      categoryMeta.putIfAbsent(
+        key,
+        () => (t.category.iconColor ?? Colors.grey, t.category.icon, t.category.isAnIncome),
+      );
     }
 
     final total = grouped.values.fold(0.0, (a, b) => a + b);
     if (total == 0) return [];
 
-    return grouped.entries
-        .sortedByCompare((e) => e.value, (a, b) => b.compareTo(a))
-        .take(5)
-        .map((e) {
-          final (color, isAnIncome) = categoryMeta[e.key]!;
-          return CategoryChartItem(
-            categoryName: e.key,
-            total: e.value,
-            percentage: TransactionUtils.roundDouble((e.value / total) * 100),
-            color: color,
-            isAnIncome: isAnIncome,
-          );
-        })
-        .toList();
+    return grouped.entries.sortedByCompare((e) => e.value, (a, b) => b.compareTo(a)).take(5).map((e) {
+      final (color, icon, isAnIncome) = categoryMeta[e.key]!;
+      return CategoryChartItem(
+        categoryName: e.key,
+        total: e.value,
+        percentage: TransactionUtils.roundDouble((e.value / total) * 100),
+        color: color,
+        isAnIncome: isAnIncome,
+        icon: icon ?? Icons.label,
+      );
+    }).toList();
   }
 
-  List<PaymentMethodChartItem> _buildPaymentMethods(List<TransactionItem> transactions) {
+  Future<List<PaymentMethodChartItem>> _buildPaymentMethods(int? userId, List<TransactionItem> transactions) async {
     final expenseTransactions = transactions.where((t) => !t.category.isAnIncome).toList();
-    final grouped = <String, double>{};
+    final grouped = <int, double>{};
 
     for (final t in expenseTransactions) {
-      final key = t.paymentMethodName ?? '';
+      final key = t.paymentMethodId ?? -1;
       grouped[key] = TransactionUtils.roundDouble((grouped[key] ?? 0) + t.amount.abs());
     }
 
     final total = grouped.values.fold(0.0, (a, b) => a + b);
-    if (total == 0) return [];
+    if (total == 0) {
+      return [];
+    }
 
-    return grouped.entries
-        .sortedByCompare((e) => e.value, (a, b) => b.compareTo(a))
-        .map((e) => PaymentMethodChartItem(
-              methodName: e.key,
-              total: e.value,
-              percentage: TransactionUtils.roundDouble((e.value / total) * 100),
-            ))
-        .toList();
+    final paymentMethods = await _paymentMethodsDao.getAllByIds(userId, grouped.keys.toList());
+
+    return grouped.entries.sortedByCompare((e) => e.value, (a, b) => b.compareTo(a)).mapIndexed(
+      (index, e) {
+        final percentage = TransactionUtils.roundDouble((e.value / total) * 100);
+        final paymentMethod = paymentMethods.firstWhereOrNull((p) => p.id == e.key);
+        if (paymentMethod == null) {
+          return PaymentMethodChartItem(methodName: '', total: e.value, percentage: percentage);
+        }
+
+        return PaymentMethodChartItem(
+          methodName: paymentMethod.name,
+          icon: paymentMethod.icon,
+          iconColor: paymentMethod.iconColor,
+          total: e.value,
+          percentage: percentage,
+        );
+      },
+    ).toList();
   }
 
   List<TransactionActivityPerDate> _buildMonthlyPoints(List<TransactionItem> transactions) {

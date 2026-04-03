@@ -9,7 +9,7 @@ sealed class CategoryChartItem with _$CategoryChartItem {
     required String categoryName,
     required double total,
     required double percentage,
-    required Color color,
+    Color? color,
     required bool isAnIncome,
     IconData? icon,
   }) = _CategoryChartItem;

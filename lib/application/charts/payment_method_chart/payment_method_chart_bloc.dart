@@ -7,7 +7,6 @@ import 'package:my_expenses/domain/models/entities/daos/users_dao.dart';
 import 'package:my_expenses/domain/models/models.dart';
 import 'package:my_expenses/domain/services/services.dart';
 import 'package:my_expenses/domain/utils/transaction_utils.dart';
-import 'package:my_expenses/presentation/charts/widgets/chart_colors.dart';
 
 part 'payment_method_chart_bloc.freezed.dart';
 part 'payment_method_chart_event.dart';
@@ -29,22 +28,21 @@ class PaymentMethodChartBloc extends Bloc<PaymentMethodChartEvent, PaymentMethod
         user?.id,
         includeArchived: true,
       );
-      emit(PaymentMethodChartState.loaded(
-        loaded: true,
-        methods: _buildMethods(transactions, paymentMethods),
-      ));
+      emit(
+        PaymentMethodChartState.loaded(
+          loaded: true,
+          methods: _buildMethods(transactions, paymentMethods),
+        ),
+      );
     });
   }
 
-  List<PaymentMethodChartItem> _buildMethods(
-    List<TransactionItem> transactions,
-    List<PaymentMethodItem> paymentMethods,
-  ) {
+  List<PaymentMethodChartItem> _buildMethods(List<TransactionItem> transactions, List<PaymentMethodItem> paymentMethods) {
     final expenseTransactions = transactions.where((t) => !t.category.isAnIncome).toList();
-    final grouped = <String, double>{};
+    final grouped = <int, double>{};
 
     for (final t in expenseTransactions) {
-      final key = t.paymentMethodName ?? '';
+      final key = t.paymentMethodId ?? -1;
       grouped[key] = TransactionUtils.roundDouble((grouped[key] ?? 0) + t.amount.abs());
     }
 
@@ -53,22 +51,14 @@ class PaymentMethodChartBloc extends Bloc<PaymentMethodChartEvent, PaymentMethod
       return [];
     }
 
-    return grouped.entries
-        .sortedByCompare((e) => e.value, (a, b) => b.compareTo(a))
-        .mapIndexed((index, e) {
-      final method = paymentMethods.firstWhereOrNull(
-        (m) => m.name == e.key,
-      );
+    return grouped.entries.sortedByCompare((e) => e.value, (a, b) => b.compareTo(a)).mapIndexed((index, e) {
+      final method = paymentMethods.firstWhereOrNull((m) => m.id == e.key);
       return PaymentMethodChartItem(
-        methodName: e.key,
-        icon: method?.icon ??
-            ChartColors.defaultPaymentMethodIcon(method?.type),
-        iconColor: method?.iconColor ??
-            ChartColors.fromIndex(index),
+        methodName: method?.name ?? '',
+        icon: method?.icon,
+        iconColor: method?.iconColor,
         total: e.value,
-        percentage: TransactionUtils.roundDouble(
-          (e.value / total) * 100,
-        ),
+        percentage: TransactionUtils.roundDouble((e.value / total) * 100),
         type: method?.type,
       );
     }).toList();

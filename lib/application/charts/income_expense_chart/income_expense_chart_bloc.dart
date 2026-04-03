@@ -40,13 +40,20 @@ class IncomeExpenseChartBloc extends Bloc<IncomeExpenseChartEvent, IncomeExpense
       }
     }
 
-    return months.entries.sortedBy((e) => e.key).map((e) {
+    final sorted = months.entries.sortedBy((e) => e.key);
+    final spansMultipleYears = sorted.length > 1 &&
+        sorted.first.key.year != sorted.last.key.year;
+    final dateFormat = spansMultipleYears
+        ? DateFormat('MMM yy')
+        : DateFormat.MMM();
+
+    return sorted.map((e) {
       final (inc, exp) = e.value;
       return TransactionActivityPerDate(
         income: inc,
         expense: exp,
         balance: TransactionUtils.roundDouble(inc + exp),
-        dateRangeString: DateFormat.MMM().format(e.key),
+        dateRangeString: dateFormat.format(e.key),
       );
     }).toList();
   }
