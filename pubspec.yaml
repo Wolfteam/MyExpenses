@@ -21,7 +21,7 @@ environment:
   sdk: ">=3.8.0 <4.0.0"
 
 dependencies:
-  csv: ^6.0.0
+  csv: ^8.0.0
   darq: ^2.1.0
   device_info_plus: ^12.3.0
   drift: ^2.32.1
