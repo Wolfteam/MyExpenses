@@ -52,7 +52,7 @@ dependencies:
   logger: ^2.7.0
   month_picker_dialog: ^6.7.2
   open_filex: ^4.7.0
-  package_info_plus: ^9.0.0
+  package_info_plus: ^9.0.1
   path: ^1.9.1
   path_provider: ^2.1.5
   pdf: ^3.12.0
