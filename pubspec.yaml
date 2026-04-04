@@ -28,7 +28,7 @@ dependencies:
   drift_flutter: ^0.3.0
   enum_to_string: ^2.2.1
   extension_google_sign_in_as_googleapis_auth: ^2.0.13
-  file_picker: ^10.3.10
+  file_picker: ^11.0.0
   fl_chart: ^1.2.0
   flutter:
     sdk: flutter
