@@ -166,7 +166,7 @@ class BackgroundServiceImpl implements BackgroundService {
 
   @override
   Future<void> handleBackgroundTask(String task, BackgroundTranslations translations, {bool calledFromBg = false}) async {
-    if (!_isPlatformSupported) {
+    if (!_isPlatformSupported && calledFromBg) {
       return Future.value();
     }
 
@@ -188,15 +188,13 @@ class BackgroundServiceImpl implements BackgroundService {
       }
     } catch (e, s) {
       _logger.error(runtimeType, 'bgSync: Unknown error occurred', e, s);
-      if (_settingsService.showNotifAfterFullSync) {
-        await _notificationService.showNotification(
-          _syncNotificationId,
-          AppNotificationType.sync,
-          translations.automaticSync,
-          translations.unknownErrorOccurred,
-          payload: jsonEncode(AppNotification.nothing()),
-        );
-      }
+      await _notificationService.showNotification(
+        _syncNotificationId,
+        AppNotificationType.sync,
+        translations.automaticSync,
+        translations.unknownErrorOccurred,
+        payload: jsonEncode(AppNotification.nothing()),
+      );
     } finally {
       sendPort?.send([false]);
       if (calledFromBg) {

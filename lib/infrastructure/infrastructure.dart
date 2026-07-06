@@ -1,5 +1,7 @@
+export 'cloud_storage_service_resolver.dart';
 export 'device_info_service.dart';
 export 'google_service.dart';
+export 'icloud_storage_service.dart';
 export 'image_service.dart';
 export 'logging_service.dart';
 export 'network_service.dart';

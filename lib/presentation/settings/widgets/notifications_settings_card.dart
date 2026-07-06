@@ -32,7 +32,7 @@ class NotificationsSettingsCard extends StatelessWidget {
             value: showNotificationForRecurringTrans,
             title: Tooltip(
               message: i18n.showNotificationForRecurringTrans,
-              child: Text(i18n.showNotificationForRecurringTrans, overflow: TextOverflow.ellipsis),
+              child: Text(i18n.showNotificationForRecurringTrans),
             ),
             onChanged: (v) => _recurringTransNotificationChanged(v, context),
           ),
@@ -40,7 +40,7 @@ class NotificationsSettingsCard extends StatelessWidget {
             value: showNotificationAfterFullSync,
             title: Tooltip(
               message: i18n.showNotificationAfterFullSync,
-              child: Text(i18n.showNotificationAfterFullSync, overflow: TextOverflow.ellipsis),
+              child: Text(i18n.showNotificationAfterFullSync),
             ),
             onChanged: (v) => _syncNotificationChanged(v, context),
           ),

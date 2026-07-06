@@ -16,6 +16,9 @@ abstract class SettingsService {
   SyncIntervalType get syncInterval;
   set syncInterval(SyncIntervalType interval);
 
+  SyncProviderType get syncProvider;
+  set syncProvider(SyncProviderType provider);
+
   bool get showNotifAfterFullSync;
   set showNotifAfterFullSync(bool show);
 

@@ -1,10 +1,10 @@
-part of 'user_accounts_bloc.dart';
+part of 'auth_bloc.dart';
 
 @freezed
-sealed class UserAccountsState with _$UserAccountsState {
-  const factory UserAccountsState.loading() = UserAccountsEventLoadingState;
+sealed class AuthState with _$AuthState {
+  const factory AuthState.loading() = AuthStateLoading;
 
-  const factory UserAccountsState.initial({
+  const factory AuthState.initial({
     required List<UserItem> users,
     required bool isNetworkAvailable,
     @Default(false) bool userWasDeleted,
@@ -12,5 +12,5 @@ sealed class UserAccountsState with _$UserAccountsState {
     @Default(false) bool accountWasAdded,
     @Default(false) bool signInInProcess,
     @Default(null) bool? signInResult,
-  }) = UserAccountsEventInitialState;
+  }) = AuthStateInitial;
 }

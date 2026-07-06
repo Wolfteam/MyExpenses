@@ -6,7 +6,7 @@ part 'user_item.freezed.dart';
 sealed class UserItem with _$UserItem {
   const factory UserItem({
     required int id,
-    required String googleUserId,
+    String? googleUserId,
     required String name,
     required String email,
     String? pictureUrl,

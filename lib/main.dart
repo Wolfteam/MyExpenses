@@ -66,7 +66,15 @@ class MyApp extends StatelessWidget {
               final googleService = getIt<GoogleService>();
               final settingsService = getIt<SettingsService>();
               final pathService = getIt<PathService>();
-              return DrawerBloc(logger, usersDao, categoriesDao, bgService, googleService, settingsService, pathService)..add(const DrawerEvent.init());
+              return UserSessionBloc(
+                logger,
+                usersDao,
+                categoriesDao,
+                bgService,
+                googleService,
+                settingsService,
+                pathService,
+              )..add(const UserSessionEvent.init());
             },
           ),
           BlocProvider(
@@ -78,13 +86,22 @@ class MyApp extends StatelessWidget {
             create: (ctx) {
               final logger = getIt<LoggingService>();
               final settingsService = getIt<SettingsService>();
-              final drawerBloc = ctx.read<DrawerBloc>();
+              final userSessionBloc = ctx.read<UserSessionBloc>();
               final bgService = getIt<BackgroundService>();
               final deviceInfoService = getIt<DeviceInfoService>();
               final googleService = getIt<GoogleService>();
               final transactionsDao = getIt<TransactionsDao>();
               final usersDao = getIt<UsersDao>();
-              return AppBloc(logger, settingsService, drawerBloc, bgService, deviceInfoService, googleService, transactionsDao, usersDao);
+              return AppBloc(
+                logger,
+                settingsService,
+                userSessionBloc,
+                bgService,
+                deviceInfoService,
+                googleService,
+                transactionsDao,
+                usersDao,
+              );
             },
           ),
           BlocProvider(
@@ -93,8 +110,20 @@ class MyApp extends StatelessWidget {
               final secureStorage = getIt<SecureStorageService>();
               final bgService = getIt<BackgroundService>();
               final deviceInfoService = getIt<DeviceInfoService>();
-              return SettingsBloc(settingsService, secureStorage, bgService, deviceInfoService, getIt<UsersDao>(), ctx.read<AppBloc>())..add(const SettingsEvent.load());
+              return SettingsBloc(
+                settingsService,
+                secureStorage,
+                bgService,
+                deviceInfoService,
+                getIt<UsersDao>(),
+                ctx.read<AppBloc>(),
+              )..add(const SettingsEvent.load());
             },
+          ),
+          BlocProvider(
+            create: (ctx) => Injection.getAuthBloc(
+              ctx.read<AppBloc>(),
+            )..add(const AuthEvent.init()),
           ),
           BlocProvider(create: (ctx) => CategoryIconBloc()),
           BlocProvider(

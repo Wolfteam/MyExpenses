@@ -14,7 +14,7 @@ class BlocUtils {
     bool reloadDrawer = false,
     bool reloadSettings = false,
   }) {
-    debugPrint('Raising corresponding events for transactions, charts, incomes, expenses and drawer bloc');
+    debugPrint('Raising corresponding events for transactions, charts, incomes, expenses and user session bloc');
 
     final now = DateTime.now();
     if (reloadTransactions) {
@@ -29,7 +29,7 @@ class BlocUtils {
     }
 
     if (reloadDrawer) {
-      ctx.read<DrawerBloc>().add(const DrawerEvent.init());
+      ctx.read<UserSessionBloc>().add(const UserSessionEvent.init());
     }
 
     if (reloadSettings) {
