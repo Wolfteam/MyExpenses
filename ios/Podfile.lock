@@ -10,9 +10,6 @@ PODS:
     - Flutter
   - permission_handler_apple (9.3.0):
     - Flutter
-  - rate_my_app (2.3.2):
-    - Flutter
-    - FlutterMacOS
   - workmanager_apple (0.0.1):
     - Flutter
 
@@ -23,7 +20,6 @@ DEPENDENCIES:
   - icloud_storage (from `.symlinks/plugins/icloud_storage/ios`)
   - open_filex (from `.symlinks/plugins/open_filex/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
-  - rate_my_app (from `.symlinks/plugins/rate_my_app/darwin`)
   - workmanager_apple (from `.symlinks/plugins/workmanager_apple/ios`)
 
 EXTERNAL SOURCES:
@@ -39,8 +35,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/open_filex/ios"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
-  rate_my_app:
-    :path: ".symlinks/plugins/rate_my_app/darwin"
   workmanager_apple:
     :path: ".symlinks/plugins/workmanager_apple/ios"
 
@@ -51,9 +45,8 @@ SPEC CHECKSUMS:
   icloud_storage: e55639f0c0d7cb2b0ba9c0b3d5968ccca9cd9aa2
   open_filex: 432f3cd11432da3e39f47fcc0df2b1603854eff1
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
-  rate_my_app: cbb89973f870601f80f7bad63aba107260cabc5b
   workmanager_apple: 904529ae31e97fc5be632cf628507652294a0778
 
-PODFILE CHECKSUM: 53a6aebc29ccee84c41f92f409fc20cd4ca011f1
+PODFILE CHECKSUM: 4b015915ec662986b54bf30ab778da63f7dda016
 
 COCOAPODS: 1.16.2

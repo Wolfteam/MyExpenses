@@ -44,7 +44,7 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
             TransactionsPage(),
             const CategoriesPage(),
             SearchPage(),
-            SettingsPage(),
+            const SettingsPage(),
           ],
         ),
       ),

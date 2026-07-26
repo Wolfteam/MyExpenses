@@ -4,15 +4,11 @@ PODS:
   - FlutterMacOS (1.0.0)
   - icloud_storage (0.0.1):
     - FlutterMacOS
-  - rate_my_app (2.3.2):
-    - Flutter
-    - FlutterMacOS
 
 DEPENDENCIES:
   - flutter_secure_storage_macos (from `Flutter/ephemeral/.symlinks/plugins/flutter_secure_storage_macos/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
   - icloud_storage (from `Flutter/ephemeral/.symlinks/plugins/icloud_storage/macos`)
-  - rate_my_app (from `Flutter/ephemeral/.symlinks/plugins/rate_my_app/darwin`)
 
 EXTERNAL SOURCES:
   flutter_secure_storage_macos:
@@ -21,14 +17,11 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral
   icloud_storage:
     :path: Flutter/ephemeral/.symlinks/plugins/icloud_storage/macos
-  rate_my_app:
-    :path: Flutter/ephemeral/.symlinks/plugins/rate_my_app/darwin
 
 SPEC CHECKSUMS:
   flutter_secure_storage_macos: 7f45e30f838cf2659862a4e4e3ee1c347c2b3b54
   FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
   icloud_storage: eb5b0f20687cf5a4fabc0b541f3b079cd6df7dcb
-  rate_my_app: cbb89973f870601f80f7bad63aba107260cabc5b
 
 PODFILE CHECKSUM: 54d867c82ac51cbd61b565781b9fada492027009
 

@@ -136,7 +136,7 @@ class AddEditTransactionHeader extends StatelessWidget {
               type: MaterialType.circle,
               child: IconButton(
                 iconSize: 80,
-                icon: FaIcon(category.icon),
+                icon: FaIcon(FaIconData(category.icon!)),
                 color: category.iconColor,
                 onPressed: !isChildTransaction ? () => _changeCategory(context) : null,
                 disabledColor: category.iconColor,
