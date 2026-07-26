@@ -96,7 +96,12 @@ class CategoryHeader extends StatelessWidget {
               elevation: 10,
               color: theme.cardColor.withValues(alpha: 0.8),
               type: MaterialType.circle,
-              child: IconButton(iconSize: 80, icon: FaIcon(iconData), color: iconColor, onPressed: () => _gotoIconsPage(context)),
+              child: IconButton(
+                iconSize: 80,
+                icon: FaIcon(FaIconData(iconData)),
+                color: iconColor,
+                onPressed: () => _gotoIconsPage(context),
+              ),
             ),
           ),
         ],

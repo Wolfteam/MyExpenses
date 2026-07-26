@@ -12,6 +12,7 @@ sealed class AppSettings with _$AppSettings {
     required AppAccentColorType accentColor,
     required AppLanguageType appLanguage,
     required SyncIntervalType syncInterval,
+    required SyncProviderType syncProvider,
     required bool showNotifAfterFullSync,
     required bool askForPassword,
     required bool askForFingerPrint,

@@ -1,6 +1,7 @@
 import 'package:my_expenses/domain/models/models.dart';
+import 'package:my_expenses/domain/services/cloud_storage_service.dart';
 
-abstract class GoogleService {
+abstract class GoogleService implements CloudStorageService {
   Future<bool> signIn();
 
   Future<bool?> signInSilently();
@@ -8,14 +9,4 @@ abstract class GoogleService {
   Future<bool> signOut();
 
   Future<UserItem> getUserInfo();
-
-  Future<bool> appFolderExist();
-
-  Future<String> uploadFile(String filePath);
-
-  Future<String> downloadFile(String fileName, String filePath);
-
-  Future<String> updateFile(String fileId, String filePath);
-
-  Future<Map<String, String>> getAllImages(String imgPrefix);
 }

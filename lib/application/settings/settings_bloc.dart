@@ -59,6 +59,15 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       emit(s);
     });
 
+    on<SettingsEventSyncProviderChanged>((event, emit) async {
+      _settingsService.syncProvider = event.selectedSyncProvider;
+      await _backgroundService.cancelSyncTask();
+      final s = currentState.copyWith(
+        syncProvider: event.selectedSyncProvider,
+      );
+      emit(s);
+    });
+
     on<SettingsEventAskForPasswordChanged>((event, emit) async {
       _settingsService.askForPassword = event.ask;
       SettingsState s;
@@ -108,10 +117,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       final s = currentState.copyWith(showNotificationForRecurringTrans: event.show);
       emit(s);
     });
-
-    on<SettingsEventTriggerSyncTask>((event, emit) async {
-      await _backgroundService.runSyncTask(event.translations);
-    });
   }
 
   SettingsStateInitialState get currentState => state as SettingsStateInitialState;
@@ -127,6 +132,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       appLanguage: appSettings.appLanguage,
       isUserLoggedIn: currentUser != null,
       syncInterval: appSettings.syncInterval,
+      syncProvider: appSettings.syncProvider,
       showNotificationAfterFullSync: appSettings.showNotifAfterFullSync,
       askForPassword: appSettings.askForPassword,
       canUseFingerPrint: _deviceInfoService.canUseFingerPrint,

@@ -44,7 +44,7 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
             TransactionsPage(),
             const CategoriesPage(),
             SearchPage(),
-            SettingsPage(),
+            const SettingsPage(),
           ],
         ),
       ),
@@ -55,7 +55,7 @@ class _MobileScaffoldState extends State<MobileScaffold> with SingleTickerProvid
         tooltip: i18n.addTransaction,
         child: const Icon(Icons.add),
       ),
-      bottomNavigationBar: BlocListener<DrawerBloc, DrawerState>(
+      bottomNavigationBar: BlocListener<UserSessionBloc, UserSessionState>(
         listener: (ctx, state) {
           if (state.userSignedOut) {
             BlocUtils.raiseAllCommonBlocEvents(context);

@@ -1,4 +1,5 @@
 export 'background_service.dart';
+export 'cloud_storage_service.dart';
 export 'device_info_service.dart';
 export 'google_service.dart';
 export 'image_service.dart';

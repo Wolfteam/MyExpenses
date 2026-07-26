@@ -184,6 +184,17 @@ extension I18nExtensions on S {
     );
   }
 
+  String translateSyncProviderType(SyncProviderType provider) {
+    switch (provider) {
+      case SyncProviderType.none:
+        return syncProviderNone;
+      case SyncProviderType.googleDrive:
+        return googleDrive;
+      case SyncProviderType.iCloud:
+        return iCloudAccount;
+    }
+  }
+
   String translatePaymentMethodType(PaymentMethodType type) {
     return switch (type) {
       PaymentMethodType.cash => cash,

@@ -14,9 +14,12 @@ GoogleService-Info.plist
 *.swp
 .DS_Store
 .atom/
+.build/
 .buildlog/
 .history
 .svn/
+.swiftpm/
+migrate_working_dir/
 
 # IntelliJ related
 *.iml
@@ -38,6 +41,14 @@ GoogleService-Info.plist
 .pub-cache/
 .pub/
 /build/
+/coverage/
+**/ios/Flutter/.last_build_id
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
 
 # Android related
 **/android/**/gradle-wrapper.jar

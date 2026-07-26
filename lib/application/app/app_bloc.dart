@@ -16,7 +16,7 @@ part 'app_state.dart';
 class AppBloc extends Bloc<AppEvent, AppState> {
   final LoggingService _logger;
   final SettingsService _settingsService;
-  final DrawerBloc _drawerBloc;
+  final UserSessionBloc _drawerBloc;
   final BackgroundService _backgroundService;
   final DeviceInfoService _deviceInfoService;
   final GoogleService _googleService;
@@ -93,7 +93,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
     final forceSignOut = _deviceInfoService.versionChanged && _deviceInfoService.previousBuildVersion < 46;
     if (forceSignOut) {
       await _registerRecurringBackgroundTask(translations);
-      _drawerBloc.add(const DrawerEvent.signOut());
+      _drawerBloc.add(const UserSessionEvent.signOut());
     } else {
       await _googleService.signInSilently();
     }

@@ -17,7 +17,7 @@ class SyncServiceImpl implements SyncService {
   final CategoriesDao _categoriesDao;
   final PaymentMethodsDao _paymentMethodsDao;
   final UsersDao _usersDao;
-  final GoogleService _googleService;
+  final CloudStorageService _cloudStorageService;
   final SecureStorageService _secureStorageService;
   final PathService _pathService;
 
@@ -25,7 +25,7 @@ class SyncServiceImpl implements SyncService {
   static const _readmeFile = 'README.md';
 
   Future<Directory?> get _appDir {
-    if (Platform.isIOS) {
+    if (Platform.isIOS | Platform.isMacOS) {
       return getApplicationDocumentsDirectory();
     }
     return getExternalStorageDirectory();
@@ -49,7 +49,7 @@ class SyncServiceImpl implements SyncService {
     this._categoriesDao,
     this._paymentMethodsDao,
     this._usersDao,
-    this._googleService,
+    this._cloudStorageService,
     this._secureStorageService,
     this._pathService,
   );
@@ -59,7 +59,7 @@ class SyncServiceImpl implements SyncService {
     try {
       _logger.info(runtimeType, 'createAppFolderAndFiles: Checking if drive folder exists...');
       final currentUser = await _secureStorageService.get(SecureResourceType.currentUser, _secureStorageService.defaultUsername);
-      final folderExists = await _googleService.appFolderExist();
+      final folderExists = await _cloudStorageService.appFolderExist();
 
       if (!folderExists) {
         await _onFirstInstall();
@@ -77,7 +77,7 @@ class SyncServiceImpl implements SyncService {
     try {
       _logger.info(runtimeType, 'downloadAndUpdateFile: Getting remote app file....');
       final filePath = await appFilePath;
-      final fileId = await _googleService.downloadFile(_appFile, filePath);
+      final fileId = await _cloudStorageService.downloadFile(_appFile, filePath);
       final appFile = await _getLocalAppFile(filePath);
       final user = await _usersDao.getActiveUser();
       if (user == null) {
@@ -94,7 +94,7 @@ class SyncServiceImpl implements SyncService {
 
       _logger.info(runtimeType, 'downloadAndUpdateFile: Updating file...');
       final path = await appFilePath;
-      await _googleService.updateFile(fileId, path);
+      await _cloudStorageService.updateFile(fileId, path);
       _logger.info(runtimeType, 'downloadAndUpdateFile: File was updated');
 
       await _updateLocalStatus(LocalStatusType.nothing);
@@ -112,7 +112,7 @@ class SyncServiceImpl implements SyncService {
       _logger.info(runtimeType, 'downloadRemoteImg: Trying to download imgs = $img...');
       final imgPath = await _pathService.getUserImgPath(userId);
       final filePath = join(imgPath, img);
-      await _googleService.downloadFile(img, filePath);
+      await _cloudStorageService.downloadFile(img, filePath);
       _logger.info(runtimeType, 'downloadRemoteImg: Downloads completed');
       return true;
     } catch (e, s) {
@@ -131,7 +131,7 @@ class SyncServiceImpl implements SyncService {
         return;
       }
 
-      final appFileId = await _googleService.uploadFile(filePath);
+      final appFileId = await _cloudStorageService.uploadFile(filePath);
       _logger.info(runtimeType, '_uploadAppFile: File was successfully uploaded');
       await _updateLocalStatus(LocalStatusType.nothing);
       await _secureStorageService.save(SecureResourceType.currentUserAppFileId, currentUser, appFileId);
@@ -213,7 +213,7 @@ class SyncServiceImpl implements SyncService {
   Future<void> _onExistingInstall(String currentUser) async {
     _logger.info(runtimeType, '_onExistingInstall: Getting appfile...');
     final filePath = await appFilePath;
-    final fileId = await _googleService.downloadFile(_appFile, filePath);
+    final fileId = await _cloudStorageService.downloadFile(_appFile, filePath);
     final user = await _usersDao.getActiveUser();
     if (user == null) {
       _logger.info(runtimeType, '_onExistingInstall: There is no user....');
@@ -234,7 +234,7 @@ class SyncServiceImpl implements SyncService {
 
   Future<void> _uploadReadmeFile(String folderId) async {
     final readmePath = await readmeFilePath;
-    await _googleService.uploadFile(readmePath);
+    await _cloudStorageService.uploadFile(readmePath);
   }
 
   Future<AppFile> _getLocalAppFile(String filePath) async {
@@ -294,7 +294,7 @@ class SyncServiceImpl implements SyncService {
       _logger.info(runtimeType, '_uploadAllLocalImgs: ${imgs.length} will be uploaded...');
 
       for (final path in imgs) {
-        await _googleService.uploadFile(path);
+        await _cloudStorageService.uploadFile(path);
       }
       _logger.info(runtimeType, '_uploadAllLocalImgs: Completed uploading all the imgs');
     } catch (e, s) {
@@ -305,7 +305,7 @@ class SyncServiceImpl implements SyncService {
   Future<void> _downloadAllRemoteImgs(int userId) async {
     try {
       _logger.info(runtimeType, '_downloadAllRemoteImgs: Trying to download all remote imgs...');
-      final currentImgsMap = await _googleService.getAllImages(_pathService.transactionImgPrefix);
+      final currentImgsMap = await _cloudStorageService.getAllImages(_pathService.transactionImgPrefix);
 
       _logger.info(runtimeType, '_downloadAllRemoteImgs: ${currentImgsMap.length} images will be downloaded...');
 
@@ -313,7 +313,7 @@ class SyncServiceImpl implements SyncService {
 
       for (final kvp in currentImgsMap.entries) {
         final filePath = join(imgPath, kvp.value);
-        await _googleService.downloadFile(kvp.value, filePath);
+        await _cloudStorageService.downloadFile(kvp.value, filePath);
       }
 
       _logger.info(runtimeType, '_downloadAllRemoteImgs: Downloads completed');
@@ -325,7 +325,7 @@ class SyncServiceImpl implements SyncService {
   Future<void> _uploadPendingImgs(int userId) async {
     try {
       _logger.info(runtimeType, '_updateImgFiles: Getting all remote imgs...');
-      final currentImgsMap = await _googleService.getAllImages(_pathService.transactionImgPrefix);
+      final currentImgsMap = await _cloudStorageService.getAllImages(_pathService.transactionImgPrefix);
 
       _logger.info(runtimeType, '_updateImgFiles: Getting all local imgs...');
       final imgPath = await _pathService.getUserImgPath(userId);
@@ -338,7 +338,7 @@ class SyncServiceImpl implements SyncService {
       _logger.info(runtimeType, '_updateImgFiles: We will upload ${imgsToUpload.length} imgs...');
       for (final filename in imgsToUpload) {
         final filePath = join(imgPath, filename);
-        await _googleService.uploadFile(filePath);
+        await _cloudStorageService.uploadFile(filePath);
       }
       _logger.info(runtimeType, '_updateImgFiles: Process completed...');
     } catch (e, s) {
