@@ -3,12 +3,7 @@ import Flutter
 import workmanager_apple
 
 @main
-@objc class AppDelegate: FlutterAppDelegate {
-    /// Registers all pubspec-referenced Flutter plugins in the given registry.
-    static func registerPlugins(with registry: FlutterPluginRegistry) {
-        GeneratedPluginRegistrant.register(with: registry)
-    }
-    
+@objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
     override func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -16,11 +11,13 @@ import workmanager_apple
         if #available(iOS 10.0, *) {
             UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate
         }
-        
-        AppDelegate.registerPlugins(with: self) // Register the app's plugins in the context of a normal run
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
-    
+
+    func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
+        GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    }
+
     override func applicationDidEnterBackground(_ application: UIApplication) {
         super.applicationDidEnterBackground(application)
     }

@@ -47,7 +47,6 @@ class TrendMiniPreview extends StatelessWidget {
                 isCurved: true,
                 preventCurveOverShooting: true,
                 color: accentColor,
-                barWidth: 2,
                 belowBarData: BarAreaData(
                   show: true,
                   color: accentColor.withValues(alpha: 0.2),

@@ -119,7 +119,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forIsolate(super.executor);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -151,6 +151,23 @@ class AppDatabase extends _$AppDatabase {
         // v3: Add payment methods table and nullable FK on transactions
         await m.createTable(paymentMethods);
         await m.addColumn(transactions, transactions.paymentMethodId);
+      }
+
+      if (from <= 3) {
+        // v4: Make googleUserId nullable for iCloud users
+        await customStatement(
+          'ALTER TABLE users ADD COLUMN google_user_id_new TEXT',
+        );
+        await customStatement(
+          'UPDATE users SET google_user_id_new = google_user_id',
+        );
+        await customStatement(
+          'ALTER TABLE users DROP COLUMN google_user_id',
+        );
+        await customStatement(
+          'ALTER TABLE users '
+          'RENAME COLUMN google_user_id_new TO google_user_id',
+        );
       }
     },
   );

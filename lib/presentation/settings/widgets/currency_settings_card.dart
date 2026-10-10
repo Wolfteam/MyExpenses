@@ -44,7 +44,7 @@ class CurrencySettingsCard extends StatelessWidget {
             value: currencyToTheRight,
             title: Tooltip(
               message: i18n.currencySymbolToRight,
-              child: Text(i18n.currencySymbolToRight, overflow: TextOverflow.ellipsis),
+              child: Text(i18n.currencySymbolToRight),
             ),
             onChanged: (v) => _currencyPlacementChanged(v, context),
           ),

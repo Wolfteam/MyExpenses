@@ -286,5 +286,17 @@
   "moreOptions": "More options",
   "selectExportFormat": "Select export format",
   "repetitionCycle": "Repetition cycle",
-  "isRecurring": "Is recurring"
+  "isRecurring": "Is recurring",
+  "syncProvider": "Sync Provider",
+  "chooseSyncProvider": "Choose where to sync your data",
+  "googleDrive": "Google Drive",
+  "iCloudAccount": "iCloud Account",
+  "syncProviderNone": "None",
+  "switchSyncProviderTitle": "Switch Sync Provider",
+  "switchSyncProviderMessage": "Switching sync providers won't automatically transfer your data. We recommend exporting your data first, then importing after switching.",
+  "exportFirst": "Export First",
+  "switchAnyway": "Switch Anyway",
+  "storageFull": "Not enough storage in {provider}. Free up space or upgrade your plan to continue syncing.",
+  "signInWithGoogle": "Sign in with Google",
+  "signOut": "Sign Out"
 }

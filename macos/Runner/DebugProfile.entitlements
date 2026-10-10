@@ -15,5 +15,17 @@
 		<string>$(AppIdentifierPrefix)com.miraisoft.myExpenses</string>
 		<string>$(AppIdentifierPrefix)com.google.GIDSignIn</string>
 	</array>
+	<key>com.apple.developer.icloud-container-identifiers</key>
+	<array>
+		<string>iCloud.com.miraisoft.myExpenses</string>
+	</array>
+	<key>com.apple.developer.icloud-services</key>
+	<array>
+		<string>CloudDocuments</string>
+	</array>
+	<key>com.apple.developer.ubiquity-container-identifiers</key>
+	<array>
+		<string>iCloud.com.miraisoft.myExpenses</string>
+	</array>
 </dict>
 </plist>

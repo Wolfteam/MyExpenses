@@ -7,11 +7,11 @@ import 'package:my_expenses/domain/models/entities/daos/categories_dao.dart';
 import 'package:my_expenses/domain/models/entities/daos/users_dao.dart';
 import 'package:my_expenses/domain/services/services.dart';
 
-part 'drawer_bloc.freezed.dart';
-part 'drawer_event.dart';
-part 'drawer_state.dart';
+part 'user_session_bloc.freezed.dart';
+part 'user_session_event.dart';
+part 'user_session_state.dart';
 
-class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
+class UserSessionBloc extends Bloc<UserSessionEvent, UserSessionState> {
   final LoggingService _logger;
   final UsersDao _usersDao;
   final CategoriesDao _categoriesDao;
@@ -20,7 +20,7 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
   final SettingsService _settingsService;
   final PathService _pathService;
 
-  DrawerBloc(
+  UserSessionBloc(
     this._logger,
     this._usersDao,
     this._categoriesDao,
@@ -28,19 +28,19 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
     this._googleService,
     this._settingsService,
     this._pathService,
-  ) : super(const DrawerState.loaded()) {
-    on<DrawerEventInit>((event, emit) async {
+  ) : super(const UserSessionState.loaded()) {
+    on<UserSessionEventInit>((event, emit) async {
       final s = await _initialize();
       emit(s);
     });
 
-    on<DrawerEventSignOut>((event, emit) async {
+    on<UserSessionEventSignOut>((event, emit) async {
       final s = await _signOut();
       emit(s);
     });
   }
 
-  Future<DrawerState> _initialize() async {
+  Future<UserSessionState> _initialize() async {
     _logger.info(runtimeType, '_initialize: Initializing drawer....');
     final user = await _usersDao.getActiveUser();
     if (user == null) {
@@ -50,10 +50,16 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
 
     _logger.info(runtimeType, '_initialize: User is signed in');
     final imgPath = await _pathService.getDynamicUserImg(user.pictureUrl);
-    return state.copyWith(email: user.email, fullName: user.name, img: imgPath, isUserSignedIn: true, userSignedOut: false);
+    return state.copyWith(
+      email: user.email,
+      fullName: user.name,
+      img: imgPath,
+      isUserSignedIn: true,
+      userSignedOut: false,
+    );
   }
 
-  Future<DrawerState> _signOut() async {
+  Future<UserSessionState> _signOut() async {
     _logger.info(runtimeType, '_signOut: Signing out...');
     final signedOut = await _googleService.signOut();
     if (signedOut) {
@@ -65,6 +71,9 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
     }
 
     _logger.info(runtimeType, '_signOut: User was signed out');
-    return DrawerState.loaded(isUserSignedIn: !signedOut, userSignedOut: signedOut);
+    return UserSessionState.loaded(
+      isUserSignedIn: !signedOut,
+      userSignedOut: signedOut,
+    );
   }
 }

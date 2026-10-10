@@ -36,7 +36,7 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
         if (MediaQuery.of(context).orientation == Orientation.portrait)
           CustomScrollView(
             controller: _scrollController,
-            slivers: [_buildHomeWelcome(), _buildTransSummaryPerMonth(), _buildHomeActivity(), _buildTransactions()],
+            slivers: [_buildTransSummaryPerMonth(), _buildHomeActivity(), _buildTransactions()],
           )
         else
           Row(
@@ -44,7 +44,7 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
             children: [
               Expanded(
                 flex: 55,
-                child: CustomScrollView(slivers: [_buildHomeWelcome(), _buildTransSummaryPerMonth(), _buildHomeActivity()]),
+                child: CustomScrollView(slivers: [_buildTransSummaryPerMonth(), _buildHomeActivity()]),
               ),
               Expanded(
                 flex: 45,
@@ -82,28 +82,28 @@ class _TransactionsPageState extends State<TransactionsPage> with SingleTickerPr
 
   Widget _buildHomeWelcome() {
     return const SliverPadding(
-      padding: Styles.edgeInsetAll16,
+      padding: Styles.edgeInsetAll5,
       sliver: SliverToBoxAdapter(child: HomeWelcome()),
     );
   }
 
   Widget _buildTransSummaryPerMonth() {
     return const SliverPadding(
-      padding: Styles.edgeInsetAll16,
+      padding: Styles.edgeInsetAll5,
       sliver: SliverToBoxAdapter(child: TransactionSummaryPerMonth()),
     );
   }
 
   Widget _buildTransactions() {
     return const SliverPadding(
-      padding: Styles.edgeInsetAll16,
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       sliver: TransactionsList(),
     );
   }
 
   Widget _buildHomeActivity() {
     return const SliverPadding(
-      padding: Styles.edgeInsetAll16,
+      padding: Styles.edgeInsetAll5,
       sliver: SliverToBoxAdapter(child: TransactionsActivityChart()),
     );
   }

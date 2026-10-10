@@ -32,9 +32,8 @@ class _List extends StatelessWidget {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: active.length,
-                        onReorder: (oldIndex, newIndex) => _onReorder(oldIndex, newIndex, active, context),
-                        itemBuilder: (context, index) =>
-                            _ListItem(key: ValueKey(active[index].id), item: active[index]),
+                        onReorderItem: (oldIndex, newIndex) => _onReorder(oldIndex, newIndex, active, context),
+                        itemBuilder: (context, index) => _ListItem(key: ValueKey(active[index].id), item: active[index]),
                       ),
                     if (archived.isNotEmpty)
                       Padding(
@@ -46,9 +45,8 @@ class _List extends StatelessWidget {
                 )
               : ReorderableListView.builder(
                   itemCount: active.length,
-                  onReorder: (oldIndex, newIndex) => _onReorder(oldIndex, newIndex, active, context),
-                  itemBuilder: (context, index) =>
-                      _ListItem(key: ValueKey(active[index].id), item: active[index]),
+                  onReorderItem: (oldIndex, newIndex) => _onReorder(oldIndex, newIndex, active, context),
+                  itemBuilder: (context, index) => _ListItem(key: ValueKey(active[index].id), item: active[index]),
                 ),
         ),
       ],

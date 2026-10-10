@@ -34,16 +34,15 @@ class _TransactionsListState extends State<TransactionsList> {
           case TransactionsStateLoadingState():
             return const SliverLoading();
           case TransactionsStateLoadedState():
-            final List<TransactionCardItems> transactions =
-                _showRecurringTransactions
-                    ? state.recurringTransactions
-                    : state.groupingType == TransactionFilterType.category
-                    ? state.groupedTransactionsByCategory
-                    : state.groupingType == TransactionFilterType.paymentMethod
-                    ? state.groupedTransactionsByPaymentMethod
-                    : state.transactions;
+            final List<TransactionCardItems> transactions = _showRecurringTransactions
+                ? state.recurringTransactions
+                : state.groupingType == TransactionFilterType.category
+                ? state.groupedTransactionsByCategory
+                : state.groupingType == TransactionFilterType.paymentMethod
+                ? state.groupedTransactionsByPaymentMethod
+                : state.transactions;
             return SliverPadding(
-              padding: Styles.edgeInsetVertical10,
+              padding: const EdgeInsetsGeometry.only(bottom: 5),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
                   if (index == 0) {
@@ -51,10 +50,9 @@ class _TransactionsListState extends State<TransactionsList> {
                       showRecurringTransactions: _showRecurringTransactions,
                       groupingType: state.groupingType,
                       sortDirectionType: state.sortDirectionType,
-                      onTap:
-                          () => setState(() {
-                            _showRecurringTransactions = !_showRecurringTransactions;
-                          }),
+                      onTap: () => setState(() {
+                        _showRecurringTransactions = !_showRecurringTransactions;
+                      }),
                     );
                   }
 
@@ -114,8 +112,8 @@ class _Switch extends StatelessWidget {
         if (!showRecurringTransactions)
           SortDirectionPopupMenuFilter(
             selectedSortDirection: sortDirectionType,
-            onSelected:
-                (newValue) => context.read<TransactionsBloc>().add(TransactionsEvent.sortDirectionTypeChanged(type: newValue)),
+            onSelected: (newValue) =>
+                context.read<TransactionsBloc>().add(TransactionsEvent.sortDirectionTypeChanged(type: newValue)),
           ),
         if (!showRecurringTransactions)
           ClipRRect(

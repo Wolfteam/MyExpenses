@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_expenses/application/bloc.dart';
 import 'package:my_expenses/generated/l10n.dart';
-import 'package:my_expenses/injection.dart';
 import 'package:my_expenses/presentation/drawer/user_account_item.dart';
 import 'package:my_expenses/presentation/shared/loading.dart';
 import 'package:my_expenses/presentation/shared/modal_sheet_separator.dart';
@@ -18,10 +17,7 @@ class UserAccountsBottomSheetDialog extends StatelessWidget {
       child: Container(
         margin: Styles.modalBottomSheetContainerMargin,
         padding: Styles.modalBottomSheetContainerPadding,
-        child: BlocProvider(
-          create: (ctx) => Injection.getUserAccountsBloc(context.read<AppBloc>())..add(const UserAccountsEvent.init()),
-          child: const _Content(),
-        ),
+        child: const _Content(),
       ),
     );
   }
@@ -33,14 +29,14 @@ class _Content extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final i18n = S.of(context);
-    return BlocConsumer<UserAccountsBloc, UserAccountsState>(
+    return BlocConsumer<AuthBloc, AuthState>(
       listener: (ctx, state) {
         final i18n = S.of(ctx);
         switch (state) {
-          case UserAccountsEventInitialState():
+          case AuthStateInitial():
             if (state.userWasDeleted) {
               ToastUtils.showSucceedToast(ctx, i18n.userWasSuccessfullyDeleted);
-              ctx.read<DrawerBloc>().add(const DrawerEvent.init());
+              ctx.read<UserSessionBloc>().add(const UserSessionEvent.init());
             } else if (state.activeUserChanged || state.accountWasAdded) {
               BlocUtils.raiseAllCommonBlocEvents(ctx);
             } else if (!state.isNetworkAvailable) {
@@ -59,8 +55,8 @@ class _Content extends StatelessWidget {
       },
       builder:
           (ctx, state) => switch (state) {
-            UserAccountsEventLoadingState() => const Loading(useScaffold: false),
-            UserAccountsEventInitialState() =>
+            AuthStateLoading() => const Loading(useScaffold: false),
+            AuthStateInitial() =>
               state.signInInProcess
                   ? const Loading(useScaffold: false)
                   : Column(
@@ -101,7 +97,7 @@ class _Content extends StatelessWidget {
                           ),
                           if (state.users.isEmpty)
                             FilledButton(
-                              onPressed: () => context.read<UserAccountsBloc>().add(const UserAccountsEvent.signIn()),
+                              onPressed: () => context.read<AuthBloc>().add(const AuthEvent.signIn()),
                               child: Text(i18n.add),
                             ),
                         ],

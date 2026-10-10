@@ -9,6 +9,8 @@ abstract class UsersDao {
 
   Future<UserItem> saveUser(String googleUserId, String fullName, String email, String imgUrl);
 
+  Future<UserItem> saveICloudUser();
+
   Future<bool> deleteUser(int id);
 
   Future<void> deleteAll();

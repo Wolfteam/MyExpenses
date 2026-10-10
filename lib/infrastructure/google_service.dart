@@ -29,6 +29,15 @@ class GoogleServiceImpl implements GoogleService {
 
   GoogleServiceImpl(this._logger, this._secureStorageService) : _googleSignIn = GoogleSignIn(scopes: _scopes);
 
+  @override
+  Future<bool> isAvailable() async {
+    try {
+      return await _googleSignIn.isSignedIn();
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<bool> _afterSignIn(GoogleSignInAccount account) async {
     _logger.info(runtimeType, '_afterSignIn: Getting access token and saving it..');
     final accessToken = await _getAccessToken(account);
@@ -63,7 +72,10 @@ class GoogleServiceImpl implements GoogleService {
       _logger.info(runtimeType, 'User is signed in, doing a silent sign in...');
       final account = await _googleSignIn.signInSilently(reAuthenticate: true, suppressErrors: false);
       if (account == null) {
-        _logger.error(runtimeType, 'signInSilently: Was not able to do a sign in silently even when the user was previously signed in');
+        _logger.error(
+          runtimeType,
+          'signInSilently: Was not able to do a sign in silently even when the user was previously signed in',
+        );
         return false;
       }
       await _afterSignIn(account);
@@ -150,10 +162,7 @@ class GoogleServiceImpl implements GoogleService {
 
       final fileId = fileList.files?.first.id;
       _logger.info(runtimeType, 'downloadFile: Trying to download fileId = $fileId');
-      final file = await api.files.get(
-        fileId!,
-        downloadOptions: drive.DownloadOptions.fullMedia,
-      ) as drive.Media;
+      final file = await api.files.get(fileId!, downloadOptions: drive.DownloadOptions.fullMedia) as drive.Media;
 
       _logger.info(runtimeType, 'downloadFile: Saving downloaded file  to disk...');
       await fileToSave.openWrite().addStream(file.stream);
@@ -185,6 +194,13 @@ class GoogleServiceImpl implements GoogleService {
       _logger.info(runtimeType, 'uploadFile: File was successfully uploaded');
 
       return response.id!;
+    } on drive.DetailedApiRequestError catch (e, s) {
+      if (e.status == 403 && e.errors.any((err) => err.reason?.contains('storageQuotaExceeded') ?? false)) {
+        _logger.error(runtimeType, 'uploadFile: Google Drive storage quota exceeded', e, s);
+      } else {
+        _logger.error(runtimeType, 'uploadFile: API error occurred', e, s);
+      }
+      rethrow;
     } catch (e, s) {
       _logger.error(runtimeType, 'uploadFile: Unknown error occurred...', e, s);
       rethrow;
@@ -210,6 +226,13 @@ class GoogleServiceImpl implements GoogleService {
 
       _logger.info(runtimeType, 'uploadFile: File was successfully updated');
       return response.id!;
+    } on drive.DetailedApiRequestError catch (e, s) {
+      if (e.status == 403 && e.errors.any((err) => err.reason?.contains('storageQuotaExceeded') ?? false)) {
+        _logger.error(runtimeType, 'updateFile: Google Drive storage quota exceeded', e, s);
+      } else {
+        _logger.error(runtimeType, 'updateFile: API error occurred', e, s);
+      }
+      rethrow;
     } catch (e, s) {
       _logger.error(runtimeType, 'updateFile: Unknown error occurred...', e, s);
       rethrow;
@@ -266,9 +289,17 @@ class GoogleServiceImpl implements GoogleService {
       final accessToken = credentials.accessToken;
       await Future.wait([
         _secureStorageService.save(SecureResourceType.accessTokenData, _secureStorageService.defaultUsername, accessToken.data),
-        _secureStorageService.save(SecureResourceType.accessTokenExpiricy, _secureStorageService.defaultUsername, accessToken.expiry.toString()),
+        _secureStorageService.save(
+          SecureResourceType.accessTokenExpiricy,
+          _secureStorageService.defaultUsername,
+          accessToken.expiry.toString(),
+        ),
         _secureStorageService.save(SecureResourceType.accessTokenType, _secureStorageService.defaultUsername, accessToken.type),
-        _secureStorageService.save(SecureResourceType.currentUser, _secureStorageService.defaultUsername, _secureStorageService.defaultUsername),
+        _secureStorageService.save(
+          SecureResourceType.currentUser,
+          _secureStorageService.defaultUsername,
+          _secureStorageService.defaultUsername,
+        ),
       ]);
 
       _logger.info(runtimeType, '_saveAccessCredentials: Access credentials were successfully saved');

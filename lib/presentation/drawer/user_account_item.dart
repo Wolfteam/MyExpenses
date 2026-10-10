@@ -60,12 +60,12 @@ class UserAccountItem extends StatelessWidget {
         title: i18n.confirmation,
         content: i18n.deleteX(fullname),
         okText: i18n.yes,
-        onOk: () => context.read<UserAccountsBloc>().add(UserAccountsEvent.deleteAccount(id: id)),
+        onOk: () => context.read<AuthBloc>().add(AuthEvent.deleteAccount(id: id)),
       ),
     );
   }
 
   void _changeActiveAccount(BuildContext context) {
-    context.read<UserAccountsBloc>().add(UserAccountsEvent.changeActiveAccount(newActiveUserId: id));
+    context.read<AuthBloc>().add(AuthEvent.changeActiveAccount(newActiveUserId: id));
   }
 }

@@ -47,7 +47,7 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase> with _$UsersDaoImplMixi
       id = await into(users).insert(
         UsersCompanion.insert(
           localStatus: LocalStatusType.nothing,
-          googleUserId: googleUserId,
+          googleUserId: Value(googleUserId),
           isActive: const Value(false),
           name: fullName,
           email: email,
@@ -69,6 +69,47 @@ class UsersDaoImpl extends DatabaseAccessor<AppDatabase> with _$UsersDaoImplMixi
 
     await changeActiveUser(id);
     return (select(users)..where((u) => u.id.equals(id))).map(_mapToUserItem).getSingle();
+  }
+
+  @override
+  Future<UserItem> saveICloudUser() async {
+    // Check if an iCloud user already exists (one without googleUserId)
+    final existingUser = await (select(users)
+          ..where((u) => u.googleUserId.isNull()))
+        .getSingleOrNull();
+
+    int id;
+    final now = DateTime.now();
+
+    if (existingUser != null) {
+      id = existingUser.id;
+    } else {
+      id = await into(users).insert(
+        UsersCompanion.insert(
+          localStatus: LocalStatusType.nothing,
+          googleUserId: const Value(null),
+          isActive: const Value(false),
+          name: 'iCloud',
+          email: 'icloud',
+          createdBy: createdBy,
+          createdAt: now,
+          createdHash: createdHash([
+            'null',
+            false,
+            'iCloud',
+            '',
+            'null',
+            createdBy,
+            now,
+          ]),
+        ),
+      );
+    }
+
+    await changeActiveUser(id);
+    return (select(users)..where((u) => u.id.equals(id)))
+        .map(_mapToUserItem)
+        .getSingle();
   }
 
   @override

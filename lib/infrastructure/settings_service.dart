@@ -14,6 +14,7 @@ class SettingsServiceImpl implements SettingsService {
   final _accentColorKey = 'AccentColor';
   final _appLanguageKey = 'AppLanguage';
   final _syncIntervalKey = 'SyncInterval';
+  final _syncProviderKey = 'SyncProvider';
   final _showNotifAfterFullSyncKey = 'ShowNotificationAfterFullSync';
   final _askForPasswordKey = 'AskForPassword';
   final _askForFingerPrintKey = 'AskForFingerPrint';
@@ -37,6 +38,7 @@ class SettingsServiceImpl implements SettingsService {
         accentColor: accentColor,
         appLanguage: language,
         syncInterval: syncInterval,
+        syncProvider: syncProvider,
         showNotifAfterFullSync: showNotifAfterFullSync,
         askForPassword: askForPassword,
         askForFingerPrint: askForFingerPrint,
@@ -72,6 +74,14 @@ class SettingsServiceImpl implements SettingsService {
     _prefs.setInt(_syncIntervalKey, interval.index);
     nextSyncDate = getLastSyncDateToUse(interval);
   }
+
+  @override
+  SyncProviderType get syncProvider =>
+      SyncProviderType.values[_prefs.getInt(_syncProviderKey)!];
+
+  @override
+  set syncProvider(SyncProviderType provider) =>
+      _prefs.setInt(_syncProviderKey, provider.index);
 
   @override
   bool get showNotifAfterFullSync => _prefs.getBool(_showNotifAfterFullSyncKey)!;
@@ -176,6 +186,11 @@ class SettingsServiceImpl implements SettingsService {
     if (_prefs.get(_syncIntervalKey) == null) {
       _logger.info(runtimeType, 'Setting sync type to none...');
       _prefs.setInt(_syncIntervalKey, SyncIntervalType.none.index);
+    }
+
+    if (_prefs.get(_syncProviderKey) == null) {
+      _logger.info(runtimeType, 'Setting sync provider to none...');
+      _prefs.setInt(_syncProviderKey, SyncProviderType.none.index);
     }
 
     if (_prefs.get(_showNotifAfterFullSyncKey) == null) {

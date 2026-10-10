@@ -11,6 +11,7 @@ sealed class SettingsState with _$SettingsState {
     required AppLanguageType appLanguage,
     required bool isUserLoggedIn,
     required SyncIntervalType syncInterval,
+    required SyncProviderType syncProvider,
     required bool showNotificationAfterFullSync,
     required bool askForPassword,
     required bool canUseFingerPrint,

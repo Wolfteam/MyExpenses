@@ -34,7 +34,7 @@ class Injection {
     return PasswordDialogBloc(logger, secureStorage);
   }
 
-  static UserAccountsBloc getUserAccountsBloc(AppBloc appBloc) {
+  static AuthBloc getAuthBloc(AppBloc appBloc) {
     final logger = getIt<LoggingService>();
     final categoriesDao = getIt<CategoriesDao>();
     final transactionsDao = getIt<TransactionsDao>();
@@ -45,7 +45,8 @@ class Injection {
     final imageService = getIt<ImageService>();
     final syncService = getIt<SyncService>();
     final networkService = getIt<NetworkService>();
-    return UserAccountsBloc(
+    final settingsService = getIt<SettingsService>();
+    return AuthBloc(
       logger,
       categoriesDao,
       transactionsDao,
@@ -56,6 +57,7 @@ class Injection {
       imageService,
       syncService,
       networkService,
+      settingsService,
       appBloc,
     );
   }
@@ -264,6 +266,16 @@ class Injection {
       getIt.registerSingleton<GoogleService>(GoogleServiceImpl(getIt<LoggingService>(), getIt<SecureStorageService>()));
     }
 
+    if (!getIt.isRegistered<CloudStorageService>()) {
+      getIt.registerSingleton<CloudStorageService>(
+        CloudStorageServiceResolver(
+          getIt<GoogleService>(),
+          ICloudStorageServiceImpl(getIt<LoggingService>()),
+          getIt<SettingsService>(),
+        ),
+      );
+    }
+
     if (!getIt.isRegistered<NetworkService>()) {
       getIt.registerSingleton<NetworkService>(NetworkServiceImpl());
     }
@@ -276,7 +288,7 @@ class Injection {
           getIt<CategoriesDao>(),
           getIt<PaymentMethodsDao>(),
           getIt<UsersDao>(),
-          getIt<GoogleService>(),
+          getIt<CloudStorageService>(),
           getIt<SecureStorageService>(),
           getIt<PathService>(),
         ),
@@ -323,13 +335,19 @@ class Injection {
     final usersDao = UsersDaoImpl(db);
     final secureStorage = SecureStorageServiceImpl();
     final googleService = GoogleServiceImpl(loggingService, secureStorage);
+    final cloudStorageService = CloudStorageServiceResolver(
+      googleService,
+      ICloudStorageServiceImpl(loggingService),
+      settingsService,
+    );
+
     final syncService = SyncServiceImpl(
       loggingService,
       transactionsDao,
       categoriesDao,
       paymentMethodsDao,
       usersDao,
-      googleService,
+      cloudStorageService,
       secureStorage,
       pathService,
     );

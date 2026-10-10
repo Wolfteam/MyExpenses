@@ -16,6 +16,10 @@ sealed class SettingsEvent with _$SettingsEvent {
     required BackgroundTranslations translations,
   }) = SettingsEventSyncIntervalChanged;
 
+  const factory SettingsEvent.syncProviderChanged({
+    required SyncProviderType selectedSyncProvider,
+  }) = SettingsEventSyncProviderChanged;
+
   const factory SettingsEvent.askForPasswordChanged({required bool ask}) = SettingsEventAskForPasswordChanged;
 
   const factory SettingsEvent.askForFingerPrintChanged({required bool ask}) = SettingsEventAskForFingerPrintChanged;
@@ -29,6 +33,4 @@ sealed class SettingsEvent with _$SettingsEvent {
 
   const factory SettingsEvent.showNotificationForRecurringTransChanged({required bool show}) =
       SettingsEventShowNotificationForRecurringTransChanged;
-
-  const factory SettingsEvent.triggerSyncTask({required BackgroundTranslations translations}) = SettingsEventTriggerSyncTask;
 }
