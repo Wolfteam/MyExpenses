@@ -69,7 +69,9 @@ class SecuritySettingsCard extends StatelessWidget {
       isScrollControlled: true,
       builder: (ctx) => const PasswordBottomSheet(),
     ).then((result) {
-      if (result == null || !context.mounted) return;
+      if (result == null || !context.mounted) {
+        return;
+      }
       context.read<SettingsBloc>().add(SettingsEvent.askForPasswordChanged(ask: result));
     });
   }

@@ -27,7 +27,9 @@ class Loading extends StatelessWidget {
         ),
       ],
     );
-    if (!useScaffold) return body;
+    if (!useScaffold) {
+      return body;
+    }
     return Scaffold(body: body);
   }
 }

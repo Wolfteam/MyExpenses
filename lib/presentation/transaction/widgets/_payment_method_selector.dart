@@ -17,7 +17,9 @@ class _PaymentMethodSelector extends StatelessWidget {
             builder: (context, pickerState) {
               final i18n = S.of(context);
               final selectedName = () {
-                if (paymentMethodId == null) return i18n.paymentMethodUnknownNone;
+                if (paymentMethodId == null) {
+                  return i18n.paymentMethodUnknownNone;
+                }
                 final items = switch (pickerState) {
                   final PaymentMethodPickerStateLoadedState s => s.items,
                   _ => const <PaymentMethodItem>[],

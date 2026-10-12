@@ -12,7 +12,9 @@ class ChartsPeriodFilter extends StatelessWidget {
     final i18n = S.of(context);
     return BlocBuilder<ChartsBloc, ChartsState>(
       builder: (context, state) {
-        if (state is! ChartsStateLoaded) return const SizedBox.shrink();
+        if (state is! ChartsStateLoaded) {
+          return const SizedBox.shrink();
+        }
         final selected = state.selectedPeriod;
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,

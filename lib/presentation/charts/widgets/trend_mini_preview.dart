@@ -23,8 +23,12 @@ class TrendMiniPreview extends StatelessWidget {
         for (int i = 0; i < points.length; i++) {
           final balance = points[i].balance;
           spots.add(FlSpot(i.toDouble(), balance));
-          if (balance < yMin) yMin = balance;
-          if (balance > yMax) yMax = balance;
+          if (balance < yMin) {
+            yMin = balance;
+          }
+          if (balance > yMax) {
+            yMax = balance;
+          }
         }
         final accentColor = Theme.of(context).colorScheme.secondary;
         return LineChart(

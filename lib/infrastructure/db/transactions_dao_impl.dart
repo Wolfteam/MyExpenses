@@ -556,7 +556,9 @@ class TransactionsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Transacti
       }
     }
 
-    if (transToUpdate.isEmpty) return;
+    if (transToUpdate.isEmpty) {
+      return;
+    }
 
     final cats = await (select(categories)..where((c) => c.createdHash.isIn(updatedCatsHash))).get();
 

@@ -144,7 +144,9 @@ class _DataManagementCardContent extends StatelessWidget {
         ],
       ),
     );
-    if (isCsv == null || !context.mounted) return;
+    if (isCsv == null || !context.mounted) {
+      return;
+    }
     _onExport(context, isCsv: isCsv);
   }
 
@@ -201,17 +203,24 @@ class _DataManagementCardContent extends StatelessWidget {
       ),
     );
 
-    if (confirmed != true || !context.mounted) return;
+    if (confirmed != true || !context.mounted) {
+      return;
+    }
 
-    final result = await FilePicker.platform.pickFiles(
+    final file = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['json'],
     );
-    if (result == null || result.files.single.path == null) return;
-    if (!context.mounted) return;
+    if (file == null || file.path == null) {
+      return;
+    }
+
+    if (!context.mounted) {
+      return;
+    }
 
     context.read<DataTransferBloc>().add(
-      DataTransferEvent.import(filePath: result.files.single.path!),
+      DataTransferEvent.import(filePath: file.path!),
     );
   }
 
@@ -238,7 +247,9 @@ class _DataManagementCardContent extends StatelessWidget {
       ),
     );
 
-    if (confirmed != true || !context.mounted) return;
+    if (confirmed != true || !context.mounted) {
+      return;
+    }
     context.read<DataTransferBloc>().add(const DataTransferEvent.clearAll());
   }
 }

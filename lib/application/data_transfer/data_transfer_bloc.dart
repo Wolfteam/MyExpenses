@@ -12,7 +12,7 @@ import 'package:my_expenses/domain/models/entities/daos/payment_methods_dao.dart
 import 'package:my_expenses/domain/models/entities/daos/transactions_dao.dart';
 import 'package:my_expenses/domain/models/entities/daos/users_dao.dart';
 import 'package:my_expenses/domain/services/services.dart';
-import 'package:open_filex/open_filex.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -108,7 +108,7 @@ class DataTransferBloc extends Bloc<DataTransferEvent, DataTransferState> {
             ],
         ];
 
-        final csvString = const ListToCsvConverter().convert(rows);
+        final csvString = csv.encode(rows);
         final filePath = p.join(
           exportsDir.path,
           'my_expenses_export_$timestamp.csv',
@@ -122,7 +122,7 @@ class DataTransferBloc extends Bloc<DataTransferEvent, DataTransferState> {
         await File(filePath).writeAsString(jsonEncode(appFile.toJson()));
       }
 
-      await OpenFilex.open(exportsDir.path);
+      await OpenFile.open(exportsDir.path);
       emit(const DataTransferState.success(operation: DataTransferOperation.export));
     } catch (e, s) {
       _logger.error(runtimeType, '_onExport: error', e, s);
@@ -194,16 +194,24 @@ class DataTransferBloc extends Bloc<DataTransferEvent, DataTransferState> {
     }
     final transactions = json['transactions'] as List;
     for (final t in transactions) {
-      if (t is! Map<String, dynamic>) return const ImportValidationError.invalidFormat();
+      if (t is! Map<String, dynamic>) {
+        return const ImportValidationError.invalidFormat();
+      }
       for (final field in Transaction.requiredJsonFields) {
-        if (!t.containsKey(field)) return ImportValidationError.missingField(field: field);
+        if (!t.containsKey(field)) {
+          return ImportValidationError.missingField(field: field);
+        }
       }
     }
     final categories = json['categories'] as List;
     for (final c in categories) {
-      if (c is! Map<String, dynamic>) return const ImportValidationError.invalidFormat();
+      if (c is! Map<String, dynamic>) {
+        return const ImportValidationError.invalidFormat();
+      }
       for (final field in Category.requiredJsonFields) {
-        if (!c.containsKey(field)) return ImportValidationError.missingField(field: field);
+        if (!c.containsKey(field)) {
+          return ImportValidationError.missingField(field: field);
+        }
       }
     }
     if (json.containsKey('paymentMethods')) {
@@ -212,9 +220,13 @@ class DataTransferBloc extends Bloc<DataTransferEvent, DataTransferState> {
       }
       final paymentMethods = json['paymentMethods'] as List;
       for (final p in paymentMethods) {
-        if (p is! Map<String, dynamic>) return const ImportValidationError.invalidFormat();
+        if (p is! Map<String, dynamic>) {
+          return const ImportValidationError.invalidFormat();
+        }
         for (final field in PaymentMethod.requiredJsonFields) {
-          if (!p.containsKey(field)) return ImportValidationError.missingField(field: field);
+          if (!p.containsKey(field)) {
+            return ImportValidationError.missingField(field: field);
+          }
         }
       }
     }

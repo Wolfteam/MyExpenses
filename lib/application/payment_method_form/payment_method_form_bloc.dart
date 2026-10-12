@@ -30,7 +30,9 @@ class PaymentMethodFormBloc extends Bloc<PaymentMethodFormEvent, PaymentMethodFo
     Emitter<PaymentMethodFormState> emit,
   ) {
     final e = event.existing;
-    if (e == null) return;
+    if (e == null) {
+      return;
+    }
     emit(
       PaymentMethodFormState.initial(
         name: e.name,

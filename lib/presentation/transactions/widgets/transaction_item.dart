@@ -31,7 +31,9 @@ class TransactionItem extends StatelessWidget {
     Widget? buildSubtitle() {
       if (item.isParentTransaction) {
         final dateText = item.nextRecurringDate != null ? Text(i18n.nextDateOn(dateString)) : Text(i18n.stopped);
-        if (item.nextRecurringDate == null) return dateText;
+        if (item.nextRecurringDate == null) {
+          return dateText;
+        }
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [dateText, daysLeft],

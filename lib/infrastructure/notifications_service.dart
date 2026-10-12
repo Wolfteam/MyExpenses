@@ -76,7 +76,7 @@ class NotificationServiceImpl implements NotificationService {
         macOS: initializationSettingsMacOS,
       );
       await _flutterLocalNotificationsPlugin.initialize(
-        initializationSettings,
+        settings: initializationSettings,
         onDidReceiveNotificationResponse: (NotificationResponse notificationResponse) {
           if (notificationResponse.payload.isNullEmptyOrWhitespace) {
             return;
@@ -114,7 +114,13 @@ class NotificationServiceImpl implements NotificationService {
     }
     final specifics = _getPlatformChannelSpecifics(type, body);
     final newId = _generateUniqueId(id, type);
-    return _flutterLocalNotificationsPlugin.show(newId, title, body, specifics, payload: payload);
+    return _flutterLocalNotificationsPlugin.show(
+      id: newId,
+      title: title,
+      body: body,
+      notificationDetails: specifics,
+      payload: payload,
+    );
   }
 
   @override
@@ -123,7 +129,7 @@ class NotificationServiceImpl implements NotificationService {
       return Future.value();
     }
     final realId = _generateUniqueId(id, type);
-    return _flutterLocalNotificationsPlugin.cancel(realId, tag: _getTagFromNotificationType(type));
+    return _flutterLocalNotificationsPlugin.cancel(id: realId, tag: _getTagFromNotificationType(type));
   }
 
   @override
@@ -149,11 +155,11 @@ class NotificationServiceImpl implements NotificationService {
     final specifics = _getPlatformChannelSpecifics(type, body);
     final scheduledDate = tz.TZDateTime.from(toBeDeliveredOn, _location);
     return _flutterLocalNotificationsPlugin.zonedSchedule(
-      newId,
-      title,
-      body,
-      scheduledDate,
-      specifics,
+      id: newId,
+      title: title,
+      body: body,
+      scheduledDate: scheduledDate,
+      notificationDetails: specifics,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       payload: payload,
     );

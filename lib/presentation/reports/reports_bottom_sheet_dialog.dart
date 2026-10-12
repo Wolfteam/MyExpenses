@@ -159,7 +159,9 @@ class _Body extends StatelessWidget {
         end: state.to,
       ),
     );
-    if (result == null || !context.mounted) return;
+    if (result == null || !context.mounted) {
+      return;
+    }
     context.read<ReportsBloc>().add(
       ReportsEvent.fromDateChanged(selectedDate: result.start),
     );

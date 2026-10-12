@@ -18,8 +18,12 @@ class BalanceTrendLineChart extends StatelessWidget {
     for (int i = 0; i < points.length; i++) {
       final balance = points[i].balance;
       spots.add(FlSpot(i.toDouble(), balance));
-      if (balance < yMin) yMin = balance;
-      if (balance > yMax) yMax = balance;
+      if (balance < yMin) {
+        yMin = balance;
+      }
+      if (balance > yMax) {
+        yMax = balance;
+      }
     }
 
     return LineChart(
@@ -38,7 +42,9 @@ class BalanceTrendLineChart extends StatelessWidget {
               reservedSize: 28,
               getTitlesWidget: (value, meta) {
                 final idx = value.toInt();
-                if (idx < 0 || idx >= points.length) return const SizedBox.shrink();
+                if (idx < 0 || idx >= points.length) {
+                  return const SizedBox.shrink();
+                }
                 final label = points[idx].dateRangeString ?? '';
                 return SideTitleWidget(
                   meta: meta,

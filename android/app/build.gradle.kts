@@ -17,7 +17,8 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.miraisoft.my_expenses"
-    compileSdk = flutter.compileSdkVersion
+    // permission_handler 13 requires compileSdk 37; flutter.compileSdkVersion is still 36 on Flutter 3.47.7
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     packaging {
