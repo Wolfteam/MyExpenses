@@ -27,7 +27,9 @@ class CurrencyUtils {
     String decimalSeparator = '.',
   }) {
     final baseFormat = _refineSeparator(amount, decimalDigits, thousandSeparator, decimalSeparator);
-    if (!symbolToTheRight) return '$symbol$symbolSeparator$baseFormat';
+    if (!symbolToTheRight) {
+      return '$symbol$symbolSeparator$baseFormat';
+    }
 
     return '$baseFormat$symbolSeparator$symbol';
   }

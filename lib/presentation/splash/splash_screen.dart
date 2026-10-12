@@ -75,22 +75,15 @@ class _BodyState extends State<_Body> {
     try {
       final isAuthenticated = await localAuth.authenticate(
         localizedReason: i18n.fingerprintRequired,
-        options: const AuthenticationOptions(biometricOnly: true),
+        biometricOnly: true,
         authMessages: <AuthMessages>[
           AndroidAuthMessages(
-            biometricHint: i18n.fingerprintHint,
-            biometricNotRecognized: i18n.fingerprintNotRecognized,
-            biometricSuccess: i18n.fingerprintSuccess,
+            signInHint: i18n.fingerprintHint,
             cancelButton: i18n.cancel,
             signInTitle: i18n.signInTitle,
-            biometricRequiredTitle: i18n.fingerprintRequired,
-            goToSettingsButton: i18n.goToSettings,
-            goToSettingsDescription: i18n.goToSettingDescription,
           ),
           IOSAuthMessages(
             cancelButton: i18n.cancel,
-            goToSettingsButton: i18n.goToSettings,
-            goToSettingsDescription: i18n.goToSettingDescription,
           ),
         ],
       );

@@ -16,7 +16,8 @@ import 'package:path/path.dart';
 class GoogleServiceImpl implements GoogleService {
   final LoggingService _logger;
   final SecureStorageService _secureStorageService;
-  final GoogleSignIn _googleSignIn;
+
+  Future<void>? _initialization;
 
   static const _baseGoogleApisUrl = 'https://www.googleapis.com';
   static const _appDataFolder = 'appDataFolder';
@@ -27,12 +28,29 @@ class GoogleServiceImpl implements GoogleService {
     drive.DriveApi.driveAppdataScope,
   ];
 
-  GoogleServiceImpl(this._logger, this._secureStorageService) : _googleSignIn = GoogleSignIn(scopes: _scopes);
+  GoogleServiceImpl(this._logger, this._secureStorageService);
+
+  Future<void> _ensureInitialized() async {
+    //The in-flight future is memoized (instead of a bool) so that two concurrent first callers
+    //end up awaiting the very same initialize() call instead of running it twice
+    final initialization = _initialization ??= GoogleSignIn.instance.initialize();
+    try {
+      await initialization;
+    } catch (_) {
+      //A failed initialization must not be cached forever, otherwise no caller could ever retry
+      if (_initialization == initialization) {
+        _initialization = null;
+      }
+      rethrow;
+    }
+  }
 
   @override
   Future<bool> isAvailable() async {
     try {
-      return await _googleSignIn.isSignedIn();
+      await _ensureInitialized();
+      final account = await GoogleSignIn.instance.attemptLightweightAuthentication();
+      return account != null;
     } catch (e) {
       return false;
     }
@@ -48,13 +66,16 @@ class GoogleServiceImpl implements GoogleService {
   @override
   Future<bool> signIn() async {
     try {
-      final account = await _googleSignIn.signIn();
-      if (account == null) {
-        _logger.error(runtimeType, 'signIn: Could retrieve account details');
+      await _ensureInitialized();
+      if (!GoogleSignIn.instance.supportsAuthenticate()) {
+        _logger.error(runtimeType, 'signIn: Platform does not support authenticate()');
         return false;
       }
+      final account = await GoogleSignIn.instance.authenticate(scopeHint: _scopes);
       _logger.info(runtimeType, 'signIn: Successfully retrieved account details');
-      return _afterSignIn(account);
+      //This is the only user-initiated path, hence the only one allowed to prompt for the scopes
+      await _getAuthorizationInteractively(account);
+      return await _afterSignIn(account);
     } catch (e, s) {
       _logger.error(runtimeType, 'signIn: Unknown error occurred', e, s);
       return false;
@@ -64,19 +85,11 @@ class GoogleServiceImpl implements GoogleService {
   @override
   Future<bool?> signInSilently() async {
     try {
-      final isSignedIn = await _googleSignIn.isSignedIn();
-      if (!isSignedIn) {
+      await _ensureInitialized();
+      final account = await GoogleSignIn.instance.attemptLightweightAuthentication();
+      if (account == null) {
         _logger.info(runtimeType, 'signInSilently: User is not signed in');
         return null;
-      }
-      _logger.info(runtimeType, 'User is signed in, doing a silent sign in...');
-      final account = await _googleSignIn.signInSilently(reAuthenticate: true, suppressErrors: false);
-      if (account == null) {
-        _logger.error(
-          runtimeType,
-          'signInSilently: Was not able to do a sign in silently even when the user was previously signed in',
-        );
-        return false;
       }
       await _afterSignIn(account);
       return true;
@@ -89,10 +102,8 @@ class GoogleServiceImpl implements GoogleService {
   @override
   Future<bool> signOut() async {
     try {
-      if (await _googleSignIn.isSignedIn()) {
-        await _googleSignIn.signOut();
-      }
-
+      await _ensureInitialized();
+      await GoogleSignIn.instance.signOut();
       return true;
     } catch (e, s) {
       _logger.error(runtimeType, 'signOut: Unknown error occurred', e, s);
@@ -312,6 +323,7 @@ class GoogleServiceImpl implements GoogleService {
   }
 
   Future<http.Client> _getAuthClient() async {
+    await _ensureInitialized();
     _logger.info(runtimeType, '_getAuthClient: Getting auth client...');
     var credentials = await _getAccessCredentials();
     if (credentials == null) {
@@ -319,36 +331,63 @@ class GoogleServiceImpl implements GoogleService {
       throw Exception('Credentials does not exist');
     }
 
-    if (credentials.accessToken.hasExpired) {
-      _logger.info(runtimeType, '_getAuthClient: Token expired, updating it...');
-      try {
-        final account = await _googleSignIn.signInSilently(reAuthenticate: true, suppressErrors: false);
-        if (account == null) {
-          _logger.warning(runtimeType, '_getAuthClient: Could not sign in silently');
-          throw Exception('Could not sign in silently');
-        }
-        final accessToken = await _getAccessToken(account);
-        credentials = g_auth.AccessCredentials(accessToken, null, _scopes);
-      } catch (e, s) {
-        _logger.warning(runtimeType, '_getAuthClient: Unknown error while signing in silently', e, s);
-        rethrow;
-      }
-
-      _logger.info(runtimeType, '_getAuthClient: Token was updated, saving it...');
-      await _saveAccessCredentials(credentials);
+    if (!credentials.accessToken.hasExpired) {
+      //The stored token is still valid, so build the client out of it directly, just like the
+      //pre 7.x implementation did, without consulting google_sign_in at all
+      _logger.info(runtimeType, '_getAuthClient: Returning auth client...');
+      return g_auth.authenticatedClient(http.Client(), credentials);
     }
-    final client = await _googleSignIn.authenticatedClient();
+
+    _logger.info(runtimeType, '_getAuthClient: Token expired, updating it...');
+    final account = await GoogleSignIn.instance.attemptLightweightAuthentication();
+    if (account == null) {
+      _logger.warning(runtimeType, '_getAuthClient: Could not sign in silently');
+      throw Exception('Could not sign in silently');
+    }
+
+    final accessToken = await _getAccessToken(account);
+    credentials = g_auth.AccessCredentials(accessToken, null, _scopes);
+    _logger.info(runtimeType, '_getAuthClient: Token was updated, saving it...');
+    await _saveAccessCredentials(credentials);
+
+    final authorization = await _getAuthorizationSilently(account);
+    if (authorization == null) {
+      _logger.warning(runtimeType, '_getAuthClient: Could not sign in silently');
+      throw Exception('Could not sign in silently');
+    }
 
     _logger.info(runtimeType, '_getAuthClient: Returning auth client...');
-    return client!;
+    return authorization.authClient(scopes: _scopes);
   }
 
   Future<g_auth.AccessToken> _getAccessToken(GoogleSignInAccount account) async {
-    final auth = await account.authentication;
+    final authorization = await _getAuthorizationSilently(account);
+    if (authorization == null) {
+      _logger.warning(runtimeType, '_getAccessToken: Could not sign in silently');
+      throw Exception('Could not sign in silently');
+    }
+
     return g_auth.AccessToken(
       'Bearer',
-      auth.accessToken!,
+      authorization.accessToken,
       DateTime.now().toUtc().add(const Duration(seconds: 3600)),
     );
+  }
+
+  //Non-prompting authorization lookup. It never shows any ui, hence it is the only variant that
+  //can be safely used on cold start and from the workmanager background isolate
+  Future<GoogleSignInClientAuthorization?> _getAuthorizationSilently(GoogleSignInAccount account) {
+    return account.authorizationClient.authorizationForScopes(_scopes);
+  }
+
+  //This one may show a google consent sheet, so it must ONLY be called from a user-interaction
+  //path (that is, the user-initiated signIn)
+  Future<GoogleSignInClientAuthorization> _getAuthorizationInteractively(GoogleSignInAccount account) async {
+    final client = account.authorizationClient;
+    final existing = await client.authorizationForScopes(_scopes);
+    if (existing != null) {
+      return existing;
+    }
+    return client.authorizeScopes(_scopes);
   }
 }

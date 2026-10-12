@@ -91,7 +91,9 @@ class SearchDateFilterBottomSheetDialog extends StatelessWidget {
               end: now,
             ),
     );
-    if (result == null || !context.mounted) return;
+    if (result == null || !context.mounted) {
+      return;
+    }
     context.read<SearchBloc>().add(
       SearchEvent.tempFromDateChanged(newValue: result.start),
     );

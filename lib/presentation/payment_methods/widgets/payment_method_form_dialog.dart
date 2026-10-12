@@ -77,7 +77,9 @@ class _CreateOrEditDialogState extends State<_CreateOrEditDialog> {
       child: BlocConsumer<PaymentMethodFormBloc, PaymentMethodFormState>(
         listener: (context, state) {
           final s = state as PaymentMethodFormStateInitial;
-          if (!s.submitted) return;
+          if (!s.submitted) {
+            return;
+          }
           final isCreditCard = s.type == PaymentMethodType.creditCard;
           final method = PaymentMethodItem(
             id: widget.existing?.id ?? 0,
@@ -234,7 +236,9 @@ class _CreateOrEditDialogState extends State<_CreateOrEditDialog> {
                       autovalidateMode: s.isNameDirty ? AutovalidateMode.always : null,
                       onChanged: (v) => bloc.add(PaymentMethodFormEvent.nameChanged(value: v)),
                       validator: (_) {
-                        if (s.isNameValid) return null;
+                        if (s.isNameValid) {
+                          return null;
+                        }
                         return s.isDuplicate ? i18n.nameAlreadyExists : i18n.nameIsRequired;
                       },
                     ),
@@ -251,7 +255,9 @@ class _CreateOrEditDialogState extends State<_CreateOrEditDialog> {
                           )
                           .toList(),
                       onChanged: (v) {
-                        if (v != null) bloc.add(PaymentMethodFormEvent.typeChanged(value: v));
+                        if (v != null) {
+                          bloc.add(PaymentMethodFormEvent.typeChanged(value: v));
+                        }
                       },
                     ),
                     if (s.type == PaymentMethodType.creditCard) ...[

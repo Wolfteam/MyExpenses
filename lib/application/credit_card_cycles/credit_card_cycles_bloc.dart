@@ -79,7 +79,9 @@ class CreditCardCyclesBloc extends Bloc<CreditCardCyclesEvent, CreditCardCyclesS
   }
 
   DateTime? _computeDueForClose(DateTime closeDate, int? dueDay) {
-    if (dueDay == null || dueDay < 1 || dueDay > 31) return null;
+    if (dueDay == null || dueDay < 1 || dueDay > 31) {
+      return null;
+    }
     final dueMonth = _addMonths(DateTime(closeDate.year, closeDate.month), 1);
     final dim = _daysInMonth(dueMonth.year, dueMonth.month);
     return DateTime(dueMonth.year, dueMonth.month, dueDay > dim ? dim : dueDay);

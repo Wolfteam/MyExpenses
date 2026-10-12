@@ -32,7 +32,9 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
 
   @override
   Future<List<CategoryItem>> getAllCategories(bool onlyIncomes, int? userId) {
-    if (onlyIncomes) return getAllIncomes(userId);
+    if (onlyIncomes) {
+      return getAllIncomes(userId);
+    }
     return getAllExpenses(userId);
   }
 
@@ -206,7 +208,9 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
     final downloadedCatsHash = existingCats.map((c) => c.createdHash).toList();
     final catsToDelete = catsInDb.where((c) => !downloadedCatsHash.contains(c.createdHash)).map((t) => t.id).toList();
 
-    if (catsToDelete.isEmpty) return;
+    if (catsToDelete.isEmpty) {
+      return;
+    }
 
     await batch((b) {
       b.deleteWhere<Categories, Category>(categories, (c) => c.id.isIn(catsToDelete));
@@ -247,7 +251,9 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
         )
         .toList();
 
-    if (catsToBeCreated.isEmpty) return;
+    if (catsToBeCreated.isEmpty) {
+      return;
+    }
 
     await batch((b) {
       b.insertAll(categories, catsToBeCreated);
@@ -276,7 +282,9 @@ class CategoriesDaoImpl extends DatabaseAccessor<AppDatabase> with _$CategoriesD
       }
     }
 
-    if (catsToUpdate.isEmpty) return;
+    if (catsToUpdate.isEmpty) {
+      return;
+    }
 
     await batch((b) {
       for (final cat in catsToUpdate) {

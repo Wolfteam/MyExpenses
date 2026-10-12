@@ -312,7 +312,9 @@ class PaymentMethodsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Payment
         )
         .toList();
 
-    if (toCreate.isEmpty) return;
+    if (toCreate.isEmpty) {
+      return;
+    }
     await batch((b) {
       b.insertAll(paymentMethods, toCreate);
     });
@@ -321,7 +323,9 @@ class PaymentMethodsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Payment
   @override
   Future<void> syncDownUpdate(int? userId, List<drive.PaymentMethod> existing) async {
     final existingToUse = existing.where((e) => e.updatedAt != null).toList();
-    if (existingToUse.isEmpty) return;
+    if (existingToUse.isEmpty) {
+      return;
+    }
     final hashes = existingToUse.map((e) => e.createdHash).toList();
     var query = select(paymentMethods)
       ..where((t) => t.createdHash.isIn(hashes) & t.localStatus.equals(LocalStatusType.deleted.index).not());
@@ -339,7 +343,9 @@ class PaymentMethodsDaoImpl extends DatabaseAccessor<AppDatabase> with _$Payment
         toUpdate.add(m);
       }
     }
-    if (toUpdate.isEmpty) return;
+    if (toUpdate.isEmpty) {
+      return;
+    }
     await batch((b) {
       for (final m in toUpdate) {
         final remote = existingToUse.singleWhere((e) => e.createdHash == m.createdHash);

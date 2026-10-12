@@ -6,7 +6,7 @@ sealed class PasswordDialogState with _$PasswordDialogState {
 
   const PasswordDialogState._();
 
-  const factory PasswordDialogState.initial({
+  const factory PasswordDialogState({
     required String password,
     required bool isPasswordValid,
     required bool isPasswordDirty,

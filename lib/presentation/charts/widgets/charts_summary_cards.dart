@@ -12,7 +12,9 @@ class ChartsSummaryCards extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ChartsBloc, ChartsState>(
       builder: (context, state) {
-        if (state is! ChartsStateLoaded) return const SizedBox.shrink();
+        if (state is! ChartsStateLoaded) {
+          return const SizedBox.shrink();
+        }
         return Column(
           children: [
             Row(

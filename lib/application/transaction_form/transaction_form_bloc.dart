@@ -259,7 +259,9 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
       !description.isNullOrEmpty(minLength: minLongDescriptionLength, maxLength: maxLongDescriptionLength);
 
   bool _isTransactionDateValid(DateTime date, RepetitionCycleType cycle) {
-    if (cycle == RepetitionCycleType.none) return true;
+    if (cycle == RepetitionCycleType.none) {
+      return true;
+    }
     final isAfter = date.isAfter(DateTime.now());
     return isAfter;
   }
@@ -372,7 +374,9 @@ class TransactionFormBloc extends Bloc<TransactionFormEvent, TransactionFormStat
         : tomorrow;
 
     final tentativeDate = DateTime(firstDate.year, firstDate.month, firstDate.day);
-    if (transactionDate.isBefore(tentativeDate)) return transactionDate;
+    if (transactionDate.isBefore(tentativeDate)) {
+      return transactionDate;
+    }
     return tentativeDate;
   }
 

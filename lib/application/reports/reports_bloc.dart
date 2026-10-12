@@ -162,11 +162,11 @@ class ReportsBloc extends Bloc<ReportsEvent, ReportState> {
       ),
     ];
 
-    final csv = const ListToCsvConverter().convert(csvData);
+    final csvString = csv.encode(csvData);
 
     final path = await _pathService.generateReportFilePath(isPdf: false);
     final file = File(path);
-    await file.writeAsString(csv);
+    await file.writeAsString(csvString);
 
     return path;
   }

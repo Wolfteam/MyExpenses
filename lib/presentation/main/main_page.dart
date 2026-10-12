@@ -13,7 +13,7 @@ import 'package:my_expenses/presentation/mobile_scaffold.dart';
 import 'package:my_expenses/presentation/shared/utils/i18n_utils.dart';
 import 'package:my_expenses/presentation/shared/utils/toast_utils.dart';
 import 'package:my_expenses/presentation/transaction/add_edit_transaction_page.dart';
-import 'package:open_filex/open_filex.dart';
+import 'package:open_file/open_file.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:rate_my_app/rate_my_app.dart';
 
@@ -129,7 +129,7 @@ class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin
           final file = File(notification.payload!);
           final fileExists = await file.exists();
           if (fileExists) {
-            final openResult = await OpenFilex.open(file.path);
+            final openResult = await OpenFile.open(file.path);
             if (!mounted) {
               return;
             }

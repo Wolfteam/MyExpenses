@@ -19,8 +19,12 @@ class MonthlyBreakdownBarChart extends StatelessWidget with TransactionMixin {
     for (int i = 0; i < points.length; i++) {
       final p = points[i];
       final expAbs = p.expense.abs();
-      if (p.income > maxY) maxY = p.income;
-      if (expAbs > maxY) maxY = expAbs;
+      if (p.income > maxY) {
+        maxY = p.income;
+      }
+      if (expAbs > maxY) {
+        maxY = expAbs;
+      }
       barGroups.add(
         BarChartGroupData(
           x: i,
@@ -49,7 +53,9 @@ class MonthlyBreakdownBarChart extends StatelessWidget with TransactionMixin {
               showTitles: true,
               reservedSize: 48,
               getTitlesWidget: (value, meta) {
-                if (value == meta.max) return const SizedBox.shrink();
+                if (value == meta.max) {
+                  return const SizedBox.shrink();
+                }
                 return SideTitleWidget(
                   meta: meta,
                   child: Text(

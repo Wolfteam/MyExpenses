@@ -9,7 +9,7 @@ part 'password_dialog_bloc.freezed.dart';
 part 'password_dialog_event.dart';
 part 'password_dialog_state.dart';
 
-const _initialState = PasswordDialogState.initial(
+const _initialState = PasswordDialogState(
   password: '',
   isPasswordValid: false,
   isPasswordDirty: false,

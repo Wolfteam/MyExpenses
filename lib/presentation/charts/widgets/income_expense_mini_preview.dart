@@ -25,8 +25,12 @@ class IncomeExpenseMiniPreview extends StatelessWidget with TransactionMixin {
         for (int i = 0; i < points.length; i++) {
           final p = points[i];
           final expAbs = p.expense.abs();
-          if (p.income > maxY) maxY = p.income;
-          if (expAbs > maxY) maxY = expAbs;
+          if (p.income > maxY) {
+            maxY = p.income;
+          }
+          if (expAbs > maxY) {
+            maxY = expAbs;
+          }
           barGroups.add(
             BarChartGroupData(
               x: i,

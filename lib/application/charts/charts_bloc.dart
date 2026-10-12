@@ -124,7 +124,9 @@ class ChartsBloc extends Bloc<ChartsEvent, ChartsState> {
     }
 
     final total = grouped.values.fold(0.0, (a, b) => a + b);
-    if (total == 0) return [];
+    if (total == 0) {
+      return [];
+    }
 
     return grouped.entries.sortedByCompare((e) => e.value, (a, b) => b.compareTo(a)).take(5).map((e) {
       final (color, icon, isAnIncome) = categoryMeta[e.key]!;

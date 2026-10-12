@@ -186,7 +186,9 @@ class TransactionsActivityBloc extends Bloc<TransactionsActivityEvent, Transacti
       date = date.add(daysToAdd);
     } while (date.weekday != DateTime.sunday);
 
-    if (date.month == from.month) return date;
+    if (date.month == from.month) {
+      return date;
+    }
     return DateUtils.getLastDayDateOfTheMonth(from);
   }
 

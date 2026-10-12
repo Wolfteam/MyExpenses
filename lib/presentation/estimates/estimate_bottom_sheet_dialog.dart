@@ -89,7 +89,9 @@ class _Body extends StatelessWidget {
         end: state.untilDate,
       ),
     );
-    if (result == null || !context.mounted) return;
+    if (result == null || !context.mounted) {
+      return;
+    }
     context.read<EstimatesBloc>().add(
       EstimatesEvent.fromDateChanged(newDate: result.start),
     );
@@ -113,8 +115,12 @@ class _Body extends StatelessWidget {
   }
 
   String _getSelectedTransactionText(S i18n, int value) {
-    if (value == 0) return i18n.all;
-    if (value == 1) return i18n.incomes;
+    if (value == 0) {
+      return i18n.all;
+    }
+    if (value == 1) {
+      return i18n.incomes;
+    }
     return i18n.expenses;
   }
 }
