@@ -6,6 +6,8 @@ formatter:
 
 linter:
   rules:
+    always_put_control_body_on_new_line: true
+    curly_braces_in_flow_control_structures: true
     prefer_single_quotes: true
     avoid_classes_with_only_static_members: false
     depend_on_referenced_packages: false
@@ -19,6 +21,11 @@ analyzer:
     - lib/generated/*.dart
     - lib/generated/**/*.dart
     - '**/custom_icons.dart'
+    - build/**
+    - android/**
+    - ios/**
+    - windows/**
+    - macos/**
   errors:
     missing_return: error
     invalid_annotation_target: ignore
